@@ -13,20 +13,20 @@ likelihood:
 params:
   gMpl:
     prior:
-      min: -10
-      max: 10
+      min: -5
+      max: 5
     ref: 0
     proposal: 0
   aplusb:
     prior:
-      min: -10
-      max: 10
+      min: -5
+      max: 5
     ref: 0
     proposal: 0
 sampler:
   mcmc:
     burn_in: 0
-    max_tries: 10000
+    max_tries: 100000
     covmat: null
     covmat_params: null
     proposal_scale: 2.4

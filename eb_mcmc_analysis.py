@@ -8,7 +8,9 @@ import sympy as sp
 import time
 import pickle
 import argparse
-
+import numba as nb
+import emcee
+import corner
 #Assume installed from github using "git clone --recursive https://github.com/cmbant/CAMB.git"
 #This file is then in the docs folders
 camb_path = os.path.realpath(os.path.join(os.getcwd(),'..'))
@@ -158,12 +160,20 @@ def load_data(spectrum_type, datafile=None):
     GLOBAL_VAR['results'] = results
 
     if(datafile is None):
-        powers = results.get_lensed_scalar_cls(CMB_unit='muK')
+        powers = results.get_lensed_scalar_cls(raw_cl=True,CMB_unit='muK')
         if(spectrum_type=='all'):
             GLOBAL_VAR['TT'] = powers[:, 0]
             GLOBAL_VAR['EE'] = powers[:, 1]
             GLOBAL_VAR['BB'] = powers[:, 2]
             GLOBAL_VAR['TE'] = powers[:, 3]
+            ell_min = 51
+            ell_max = 1490
+            delta_ell = 20
+            ell = np.arange(ell_min, ell_max+1, delta_ell)
+            n_bins = len(ell)
+            
+            GLOBAL_VAR['EE_ebinned'] = bin_spectrum(n_bins, delta_ell, ell_min, powers[:, 1])
+            GLOBAL_VAR['BB_ebinned'] = bin_spectrum(n_bins, delta_ell, ell_min, powers[:, 2])
         else:
             GLOBAL_VAR['measured'] = powers[:, spectrum_type]
         GLOBAL_VAR['ls'] = range(len(powers[:, 0]))
@@ -173,18 +183,6 @@ def load_data(spectrum_type, datafile=None):
         GLOBAL_VAR['ls'] = ls
         GLOBAL_VAR['errs'] = errs
 
-def eb_log_likelihood(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_cmb, aplusb, gMpl):
-    """
-    log-likelihood for coupling g, looping over bins b as a check for vectorized version below
-    """
-    total_log_likelihood = 0
-    for b in range(len(C_eb_observed)):
-        v = C_eb_observed[b] - np.cos(4*aplusb)*gMpl*C_eb_ede[b]
-        v -= np.sin(4*aplusb)/2*(C_ee_cmb[b] - C_bb_cmb[b])
-
-        bin_loglike = np.square(v)/C_eb_var[b]
-        total_log_likelihood += bin_loglike
-    return total_log_likelihood
 
 def eb_log_likelihood_vector(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_cmb, aplusb, gMpl):
     """
@@ -222,44 +220,14 @@ def eb_log_likelihood_vector(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_c
     ------
     This function is vectorized to perform all calculations in parallel, providing a more efficient computation compared to looping over each bin individually.
     """
-    cos_term = np.cos(4 * aplusb) * gMpl * C_eb_ede
-    sin_term = np.sin(4 * aplusb) / 2 * (C_ee_cmb - C_bb_cmb) 
+    cos_term = np.cos(4 * np.deg2rad(aplusb)) * gMpl * C_eb_ede
+    sin_term = np.sin(4 * np.deg2rad(aplusb)) / 2 * (C_ee_cmb - C_bb_cmb) 
     v = C_eb_observed - cos_term - sin_term
-    bin_loglike = np.square(v) / C_eb_var
+    bin_loglike = np.square(v) / np.square(C_eb_var)
     total_log_likelihood = np.sum(bin_loglike)
     return total_log_likelihood
 
-def get_priors_and_variables(gMpl_minmax=(-10, 10), aplusb_minmax=(-10, 10)):
-    """
-    Defines and returns the model variables and their corresponding prior ranges.
 
-    Parameters:
-    -----------
-    gMpl_minmax : tuple, optional
-        The minimum and maximum values (min, max) for the 'gMpl' variable. 
-        Defaults to (-10, 10).
-    
-    aplusb_minmax : tuple, optional
-        The minimum and maximum values (min, max) for the 'aplusb' variable.
-        Defaults to (-10, 10).
-
-    Returns:
-    --------
-    variables : list of str
-        A list of variable names used in the model:
-        - 'gMpl': A scaling factor related to the effective gravitational constant.
-        - 'aplusb': The sum of angle parameters `a` and `b` used in the rotation of polarization modes.
-    
-    priors : list of tuple
-        A list of tuples specifying the prior ranges for each corresponding variable:
-        - gMpl_minmax : tuple
-            Prior range for 'gMpl'.
-        - aplusb_minmax : tuple
-            Prior range for 'aplusb'.
-    """
-    variables = ['gMpl', 'aplusb']
-    priors = [gMpl_minmax, aplusb_minmax]
-    return variables, priors
 
 def plot_info(variables=None, info=None, sampler=None, outfile=None, file_root=None):
     """
@@ -313,14 +281,16 @@ def plot_info(variables=None, info=None, sampler=None, outfile=None, file_root=N
 
 def eb_axion_mcmc_runner(aplusb, gMpl):
     # TODO complete this
-    size = 2401
-    C_eb_observed = np.zeros(size)
-    C_eb_var = np.ones(size)
+    
+    C_ee_cmb = GLOBAL_VAR['EE_ebinned']
+    C_bb_cmb = GLOBAL_VAR['BB_ebinned']
+    C_eb_observed = GLOBAL_VAR['EB_observed']
+    C_eb_var = GLOBAL_VAR['EB_var']
+   
+    size = len(C_ee_cmb)
     C_eb_ede = np.zeros(size)
-    C_ee_cmb = GLOBAL_VAR['EE']
-    C_bb_cmb = GLOBAL_VAR['BB']
-    likelihood = eb_log_likelihood_vector(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_cmb, aplusb, gMpl)
-    return likelihood
+    neg_likelihood = eb_log_likelihood_vector(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_cmb, aplusb, gMpl)
+    return -neg_likelihood
 
 def get_eb_axion_infodict(outpath, variables, priors):
     """
@@ -367,7 +337,7 @@ def get_eb_axion_infodict(outpath, variables, priors):
             "ref": 0,
             "proposal": 0
         }
-    info["sampler"] = {"mcmc": {"Rminus1_stop": 0.1, "max_tries": 10000}}
+    info["sampler"] = {"mcmc": {"Rminus1_stop": 0.1, "max_tries": 100000}}
     info["output"] = outpath
     return info
 
@@ -384,9 +354,162 @@ def eb_axion_driver(outpath, variables, priors, datafile=None):
     updated_info, sampler = run(info_dict, resume=True)
     return updated_info, sampler
 
+def get_priors_and_variables(gMpl_minmax=(-5, 5), aplusb_minmax=(-5, 5)):
+    """
+    Defines and returns the model variables and their corresponding prior ranges.
+
+    Parameters:
+    -----------
+    gMpl_minmax : tuple, optional
+        The minimum and maximum values (min, max) for the 'gMpl' variable. 
+        Defaults to (-10, 10).
+    
+    aplusb_minmax : tuple, optional
+        The minimum and maximum values (min, max) for the 'aplusb' variable.
+        Defaults to (-10, 10).
+
+    Returns:
+    --------
+    variables : list of str
+        A list of variable names used in the model:
+        - 'gMpl': A scaling factor related to the effective gravitational constant.
+        - 'aplusb': The sum of angle parameters `a` and `b` used in the rotation of polarization modes.
+    
+    priors : list of tuple
+        A list of tuples specifying the prior ranges for each corresponding variable:
+        - gMpl_minmax : tuple
+            Prior range for 'gMpl'.
+        - aplusb_minmax : tuple
+            Prior range for 'aplusb'.
+    """
+    variables = ['gMpl', 'aplusb']
+    priors = [gMpl_minmax, aplusb_minmax]
+    return variables, priors
+
+def bin_spectrum(n_bins, delta_ell, ell_min, spectrum):
+    """
+    Bins a spectrum into a specified number of bins by averaging values within each bin.
+
+    Parameters:
+    -----------
+    n_bins : int
+        The number of bins into which the spectrum will be divided.
+
+    delta_ell : int
+        The width of each bin, specifying the number of elements in each bin.
+
+    ell_min : int
+        The minimum value of `ell` corresponding to the starting index of the spectrum.
+
+    spectrum : ndarray
+        The input spectrum to be binned, with values indexed by `ell`. The length of `spectrum` should be sufficient to cover all bins.
+
+    Returns:
+    --------
+    binned_spectrum : ndarray
+        An array of length `n_bins` containing the average values of the spectrum within each bin.
+
+    Notes:
+    ------
+    The function assumes that the `spectrum` array is indexed by `ell` values and that the total length of `spectrum` is at least `ell_min + n_bins * delta_ell`.
+    Each bin is computed by summing the values of `spectrum` within the bin range and then dividing by the number of elements (`delta_ell`) in that bin.
+    """
+    
+    binned_spectrum = np.zeros(n_bins)
+    for ell_b in range(n_bins):
+        bin_cur = 0
+        for ell_0 in range(0, delta_ell):
+            ell_cur = ell_min + delta_ell * ell_b + ell_0
+            bin_cur += spectrum[ell_cur]
+
+        binned_spectrum[ell_b] = bin_cur / delta_ell
+    return binned_spectrum
+
+def eskilt_tutorial():
+    # Load the observed EB power spectrum
+    c_l_EB_o_mean_std = np.load('HFI_f_sky_092_EB_o.npy')
+    # c_l_EB_o_mean_std[:, 0] gives the central values for the binned observed stacked EB power spectrum
+    # c_l_EB_o_mean_std[:, 1] gives the corresponding error bars
+
+    # EB is binned starting at ell_min = 51, ell_max = 1490 and delta ell = 20
+    # For more details see the article.
+    ell_min = 51
+    ell_max = 1490
+    delta_ell = 20
+    ell = np.arange(ell_min, ell_max+1, delta_ell)
+    n_bins = len(ell)
+
+    # Plot the observed EB power spectrum
+    plt.figure()
+    plt.errorbar(ell, c_l_EB_o_mean_std[:, 0], yerr=c_l_EB_o_mean_std[:, 1], fmt='.', color='black')
+
+    plt.axhline(0, linestyle='--', color='black', alpha=0.5)
+    plt.xlabel(r'$\ell$')
+    plt.ylabel(r'$C^{EB}_{\ell}$ [$\mu K^2$]')
+    plt.xlim([0, 1500])
+    plt.title('Stacked EB power spectrum')
+    plt.show()
+    # Get the LCDM spectra from CAMB!
+    cp = camb.set_params(tau=0.0544, ns=0.9649, H0=67.36, ombh2=0.02237, omch2=0.12, As=2.1e-09, lmax=ell_max)
+    camb_results = camb.get_results(cp)
+    all_cls_th = camb_results.get_cmb_power_spectra(lmax=ell_max, raw_cl=True, CMB_unit='muK')['total']
+
+    c_l_th_EE_minus_BB = np.zeros((ell_max+1))
+    c_l_th_EE_minus_BB = all_cls_th[:, 1] - all_cls_th[:, 2] # EE minus BB power spectrum
+
+    c_l_th_EE_minus_BB_binned = bin_spectrum(n_bins, delta_ell, ell_min, c_l_th_EE_minus_BB)
+
+
+    # Now we plot the LCDM EE-BB power spectrum rotated by 0.3 deg vs the observed EB power spectrum
+    plt.figure()
+
+    plt.errorbar(ell, c_l_EB_o_mean_std[:, 0], yerr=c_l_EB_o_mean_std[:, 1], fmt='.', color='black', label='Observed EB power spectrum')
+    plt.plot(ell, np.sin(4 * 0.3 * np.pi/180)/2 * c_l_th_EE_minus_BB_binned, label = r'$\alpha+\beta = 0.3^\circ$', color='red')
+
+    plt.axhline(0, linestyle='--', color='black', alpha=0.5)
+    plt.xlabel(r'$\ell$')
+    plt.ylabel(r'$C^{EB}_{\ell}$ [$\mu K^2$]')
+    plt.xlim([0, 1500])
+    plt.title('Stacked EB power spectrum')
+    plt.legend(frameon=False)
+    plt.show()
+    # Use Numba to speed it up! This is the log-likelihood
+    @nb.njit()
+    def log_prob(alpha_p_beta):
+        v_b = c_l_EB_o_mean_std[:, 0] - np.sin(alpha_p_beta * 4 * np.pi/180)/2 * c_l_th_EE_minus_BB_binned
+
+        var_EB = c_l_EB_o_mean_std[:, 1]**2
+        return -0.5 * np.sum(v_b**2 / var_EB)
+
+    # 32 chains
+    nwalkers = 32
+    # 1 parameter (alpha+beta)
+    ndim = 1
+    p0 = np.random.rand(nwalkers, ndim)
+    sampler = emcee.EnsembleSampler(nwalkers, ndim, log_prob)
+
+    # Run for 200 samples as burnin
+    state = sampler.run_mcmc(p0, 200, progress=True)
+    sampler.reset()
+
+    # Sample for real by using last chain as start
+    sampler.run_mcmc(state, 3000, progress=True)
+    samples = sampler.get_chain(flat=True)
+
+    # Plot the posterior distribution
+    corner.corner(samples, labels=[r'$\alpha+\beta$'], show_titles=True, fontsize=12, color='black', title_fmt='.2f')
+    plt.show()
+
+def load_eskilt_data(data_path = 'HFI_f_sky_092_EB_o.npy'):
+    c_l_EB_o_mean_std = np.load(data_path)
+    GLOBAL_VAR['EB_observed'] = c_l_EB_o_mean_std[:, 0]
+    GLOBAL_VAR['EB_var'] = c_l_EB_o_mean_std[:, 1]
+
 def main():
     print('testin123')
     outpath = 'axion_test/'
+    
+    load_eskilt_data(data_path = 'HFI_f_sky_092_EB_o.npy')
     variables, priors = get_priors_and_variables()
     updated_info, sampler = eb_axion_driver(outpath, variables, priors)#, datafile=args.datapath)
     
@@ -395,4 +518,5 @@ def main():
     print(priors)
 
 if __name__ == '__main__':
+    #eskilt_tutorial()
     main()
