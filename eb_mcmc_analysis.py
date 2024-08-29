@@ -8,9 +8,7 @@ import sympy as sp
 import time
 import pickle
 import argparse
-import numba as nb
-import emcee
-import corner
+
 #Assume installed from github using "git clone --recursive https://github.com/cmbant/CAMB.git"
 #This file is then in the docs folders
 camb_path = os.path.realpath(os.path.join(os.getcwd(),'..'))
@@ -26,6 +24,8 @@ from cobaya.yaml import yaml_load
 from getdist.mcsamples import MCSamplesFromCobaya
 from getdist.mcsamples import loadMCSamples
 import getdist.plots as gdplt
+
+import bicep_data_consts
 
 
 GLOBAL_VAR = {}
@@ -166,14 +166,6 @@ def load_data(spectrum_type, datafile=None):
             GLOBAL_VAR['EE'] = powers[:, 1]
             GLOBAL_VAR['BB'] = powers[:, 2]
             GLOBAL_VAR['TE'] = powers[:, 3]
-            ell_min = 51
-            ell_max = 1490
-            delta_ell = 20
-            ell = np.arange(ell_min, ell_max+1, delta_ell)
-            n_bins = len(ell)
-            
-            GLOBAL_VAR['EE_ebinned'] = bin_spectrum(n_bins, delta_ell, ell_min, powers[:, 1])
-            GLOBAL_VAR['BB_ebinned'] = bin_spectrum(n_bins, delta_ell, ell_min, powers[:, 2])
         else:
             GLOBAL_VAR['measured'] = powers[:, spectrum_type]
         GLOBAL_VAR['ls'] = range(len(powers[:, 0]))
@@ -224,7 +216,7 @@ def eb_log_likelihood_vector(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_c
     sin_term = np.sin(4 * np.deg2rad(aplusb)) / 2 * (C_ee_cmb - C_bb_cmb) 
     v = C_eb_observed - cos_term - sin_term
     bin_loglike = np.square(v) / np.square(C_eb_var)
-    total_log_likelihood = np.sum(bin_loglike)
+    total_log_likelihood = -np.sum(bin_loglike)
     return total_log_likelihood
 
 
@@ -289,8 +281,8 @@ def eb_axion_mcmc_runner(aplusb, gMpl):
    
     size = len(C_ee_cmb)
     C_eb_ede = np.zeros(size)
-    neg_likelihood = eb_log_likelihood_vector(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_cmb, aplusb, gMpl)
-    return -neg_likelihood
+    likelihood = eb_log_likelihood_vector(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_cmb, aplusb, gMpl)
+    return likelihood
 
 def get_eb_axion_infodict(outpath, variables, priors):
     """
@@ -341,18 +333,7 @@ def get_eb_axion_infodict(outpath, variables, priors):
     info["output"] = outpath
     return info
 
-def eb_axion_driver(outpath, variables, priors, datafile=None):
-    info_dict = get_eb_axion_infodict(outpath, variables, priors)
-    init_params = info_dict['params']
 
-    load_data('all', datafile)
-
-    # test to make sure the likelihood function works 
-    log_test = eb_axion_mcmc_runner(init_params['aplusb']['ref'], 
-                                    init_params['gMpl']['ref'])
-    print("test value: " + str(log_test))
-    updated_info, sampler = run(info_dict, resume=True)
-    return updated_info, sampler
 
 def get_priors_and_variables(gMpl_minmax=(-5, 5), aplusb_minmax=(-5, 5)):
     """
@@ -425,93 +406,129 @@ def bin_spectrum(n_bins, delta_ell, ell_min, spectrum):
         binned_spectrum[ell_b] = bin_cur / delta_ell
     return binned_spectrum
 
-def eskilt_tutorial():
-    # Load the observed EB power spectrum
-    c_l_EB_o_mean_std = np.load('HFI_f_sky_092_EB_o.npy')
-    # c_l_EB_o_mean_std[:, 0] gives the central values for the binned observed stacked EB power spectrum
-    # c_l_EB_o_mean_std[:, 1] gives the corresponding error bars
+def bin_spectrum_given_centers(bin_centers, spectrum, ell_min=0):
+    '''
+    Bins a spectrum into specified bin centers.
 
-    # EB is binned starting at ell_min = 51, ell_max = 1490 and delta ell = 20
-    # For more details see the article.
+    Assumes the spectrum starts at l=ell_min and calculates the bin edges based on the given bin centers.
+
+    Parameters
+    ----------
+    bin_centers : array_like
+        An array of bin center values. The function calculates bin edges based on these centers.
+        
+    spectrum : array_like
+        An array representing the spectrum values. The length of this array should be at least as long as the maximum bin edge.
+        
+    ell_min : int, optional
+        The minimum ell value (default is 0). The spectrum is assumed to start at this value. This parameter is used to adjust the starting point of the bin edges.
+
+    Returns
+    -------
+    binned_spectrum : ndarray
+        An array of the binned spectrum values, where each value represents the average spectrum value within the corresponding bin.
+
+    Raises
+    ------
+    ValueError
+        If the length of the spectrum is insufficient to cover the maximum bin edge.
+
+    Notes
+    -----
+    The bin edges are computed such that the center of each bin is the midpoint between the start and end of the bin.
+    The function assumes that the spectrum starts at `ell_min` and is defined for consecutive ell values.
+    '''
+    # Calculate bin edges
+    binned_spectrum = np.zeros(len(bin_centers))
+    bin_starts = np.zeros(len(bin_centers) + 1,dtype=int)
+    bin_starts[0] = ell_min
+
+    for i in range(1, len(bin_starts)):
+        bin_starts[i] = (2 * bin_centers[i - 1] - bin_starts[i - 1] + 1)
+
+    # Check if the spectrum is long enough
+    max_bin_edge = bin_starts[-1]
+    if len(spectrum) < max_bin_edge:
+        raise ValueError(f"Spectrum length is insufficient. Required: {max_bin_edge}, Provided: {len(spectrum)}")
+
+    # Bin the spectrum
+    for i in range(len(bin_centers)):
+        bin_cur = 0
+        for j in range(bin_starts[i], bin_starts[i + 1]):
+            bin_cur += spectrum[j]
+        binned_spectrum[i] = bin_cur / (bin_starts[i + 1] - bin_starts[i])
+
+    return binned_spectrum
+
+
+
+def eb_axion_driver(outpath, variables, priors, datafile=None):
+    info_dict = get_eb_axion_infodict(outpath, variables, priors)
+    init_params = info_dict['params']
+
+    
+    load_bicep_data(datafile)
+    #load_eskilt_data()
+    # test to make sure the likelihood function works 
+    log_test = eb_axion_mcmc_runner(init_params['aplusb']['ref'], 
+                                    init_params['gMpl']['ref'])
+    print("test value: " + str(log_test))
+    updated_info, sampler = run(info_dict, resume=True)
+    return updated_info, sampler
+
+
+def load_bicep_data(data_path):
+    load_data('all')
+    dataset_index = 0
+    EB_index = 5
+    scale = 2*np.pi
+    np_mat = np.load(data_path, allow_pickle=True, encoding='latin1')
+    spectra = np_mat[dataset_index][0] 
+    l_bins = bicep_data_consts.L_BIN_CENTERS
+    bin_start = 1
+    bin_end=10
+    GLOBAL_VAR['EE_ebinned'] = bin_spectrum_given_centers(l_bins, GLOBAL_VAR['EE'])[bin_start:bin_end]
+    GLOBAL_VAR['BB_ebinned'] = bin_spectrum_given_centers(l_bins, GLOBAL_VAR['BB'])[bin_start:bin_end]
+    
+    l_bins = l_bins[bin_start:bin_end]
+    GLOBAL_VAR['EB_observed'] = scale*spectra[bin_start:bin_end,EB_index]/l_bins/(l_bins+1)
+    GLOBAL_VAR['EB_var'] = np.ones(len(l_bins))/1e5
+    
+    #print(GLOBAL_VAR['EE_ebinned'])
+    print(GLOBAL_VAR['BB_ebinned'])
+    print(GLOBAL_VAR['EB_observed'])
+    print(GLOBAL_VAR['EB_var'])
+    indices = np.arange(len(GLOBAL_VAR['EE']))
+    #plt.plot(GLOBAL_VAR['EE'], label='CAMB theory')
+    #plt.plot(l_bins, GLOBAL_VAR['EE_ebinned'], label='Binned EE camb')
+    plt.plot(l_bins, GLOBAL_VAR['BB_ebinned'], label='Binned BB camb')
+    plt.plot(l_bins[:], GLOBAL_VAR['EB_observed'], 
+             label='C_EB bicep data ')
+    plt.ylim([-0.00001, 0.00002])
+    plt.legend()
+    plt.show() 
+
+def load_eskilt_data(data_path = 'HFI_f_sky_092_EB_o.npy'):
+    load_data('all')
+    c_l_EB_o_mean_std = np.load(data_path)
+    GLOBAL_VAR['EB_observed'] = c_l_EB_o_mean_std[:, 0]
+    GLOBAL_VAR['EB_var'] = c_l_EB_o_mean_std[:, 1]
     ell_min = 51
     ell_max = 1490
     delta_ell = 20
     ell = np.arange(ell_min, ell_max+1, delta_ell)
     n_bins = len(ell)
-
-    # Plot the observed EB power spectrum
-    plt.figure()
-    plt.errorbar(ell, c_l_EB_o_mean_std[:, 0], yerr=c_l_EB_o_mean_std[:, 1], fmt='.', color='black')
-
-    plt.axhline(0, linestyle='--', color='black', alpha=0.5)
-    plt.xlabel(r'$\ell$')
-    plt.ylabel(r'$C^{EB}_{\ell}$ [$\mu K^2$]')
-    plt.xlim([0, 1500])
-    plt.title('Stacked EB power spectrum')
-    plt.show()
-    # Get the LCDM spectra from CAMB!
-    cp = camb.set_params(tau=0.0544, ns=0.9649, H0=67.36, ombh2=0.02237, omch2=0.12, As=2.1e-09, lmax=ell_max)
-    camb_results = camb.get_results(cp)
-    all_cls_th = camb_results.get_cmb_power_spectra(lmax=ell_max, raw_cl=True, CMB_unit='muK')['total']
-
-    c_l_th_EE_minus_BB = np.zeros((ell_max+1))
-    c_l_th_EE_minus_BB = all_cls_th[:, 1] - all_cls_th[:, 2] # EE minus BB power spectrum
-
-    c_l_th_EE_minus_BB_binned = bin_spectrum(n_bins, delta_ell, ell_min, c_l_th_EE_minus_BB)
-
-
-    # Now we plot the LCDM EE-BB power spectrum rotated by 0.3 deg vs the observed EB power spectrum
-    plt.figure()
-
-    plt.errorbar(ell, c_l_EB_o_mean_std[:, 0], yerr=c_l_EB_o_mean_std[:, 1], fmt='.', color='black', label='Observed EB power spectrum')
-    plt.plot(ell, np.sin(4 * 0.3 * np.pi/180)/2 * c_l_th_EE_minus_BB_binned, label = r'$\alpha+\beta = 0.3^\circ$', color='red')
-
-    plt.axhline(0, linestyle='--', color='black', alpha=0.5)
-    plt.xlabel(r'$\ell$')
-    plt.ylabel(r'$C^{EB}_{\ell}$ [$\mu K^2$]')
-    plt.xlim([0, 1500])
-    plt.title('Stacked EB power spectrum')
-    plt.legend(frameon=False)
-    plt.show()
-    # Use Numba to speed it up! This is the log-likelihood
-    @nb.njit()
-    def log_prob(alpha_p_beta):
-        v_b = c_l_EB_o_mean_std[:, 0] - np.sin(alpha_p_beta * 4 * np.pi/180)/2 * c_l_th_EE_minus_BB_binned
-
-        var_EB = c_l_EB_o_mean_std[:, 1]**2
-        return -0.5 * np.sum(v_b**2 / var_EB)
-
-    # 32 chains
-    nwalkers = 32
-    # 1 parameter (alpha+beta)
-    ndim = 1
-    p0 = np.random.rand(nwalkers, ndim)
-    sampler = emcee.EnsembleSampler(nwalkers, ndim, log_prob)
-
-    # Run for 200 samples as burnin
-    state = sampler.run_mcmc(p0, 200, progress=True)
-    sampler.reset()
-
-    # Sample for real by using last chain as start
-    sampler.run_mcmc(state, 3000, progress=True)
-    samples = sampler.get_chain(flat=True)
-
-    # Plot the posterior distribution
-    corner.corner(samples, labels=[r'$\alpha+\beta$'], show_titles=True, fontsize=12, color='black', title_fmt='.2f')
-    plt.show()
-
-def load_eskilt_data(data_path = 'HFI_f_sky_092_EB_o.npy'):
-    c_l_EB_o_mean_std = np.load(data_path)
-    GLOBAL_VAR['EB_observed'] = c_l_EB_o_mean_std[:, 0]
-    GLOBAL_VAR['EB_var'] = c_l_EB_o_mean_std[:, 1]
+    
+    GLOBAL_VAR['EE_ebinned'] = bin_spectrum(n_bins, delta_ell, ell_min, GLOBAL_VAR['EE'])
+    GLOBAL_VAR['BB_ebinned'] = bin_spectrum(n_bins, delta_ell, ell_min, GLOBAL_VAR['BB'])
+       
 
 def main():
     print('testin123')
     outpath = 'axion_test/'
-    
-    load_eskilt_data(data_path = 'HFI_f_sky_092_EB_o.npy')
-    variables, priors = get_priors_and_variables()
-    updated_info, sampler = eb_axion_driver(outpath, variables, priors)#, datafile=args.datapath)
+    variables, priors = get_priors_and_variables(aplusb_minmax=(-5,5))
+    data_file = 'real_spectra.npy'
+    updated_info, sampler = eb_axion_driver(outpath, variables, priors, datafile=data_file)
     
     plot_info(variables, updated_info, sampler)
     print(variables)
