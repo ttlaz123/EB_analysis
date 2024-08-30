@@ -1,9 +1,9 @@
 print('Importing Packages')
 import sys, platform, os
-import matplotlib
 from matplotlib import pyplot as plt
 import numpy as np
 from scipy import stats 
+import pandas as pd
 import sympy as sp
 import time
 import pickle
@@ -110,7 +110,7 @@ def read_planck(filepath, spectrum_type):
     return ls, dls, errs
 
 
-def load_data(spectrum_type, datafile=None):
+def load_data(spectrum_type, datafile=None, raw_cls=False):
     """
     Loads and sets global variables with the data to be used for fitting the power spectrum.
 
@@ -160,7 +160,7 @@ def load_data(spectrum_type, datafile=None):
     GLOBAL_VAR['results'] = results
 
     if(datafile is None):
-        powers = results.get_lensed_scalar_cls(raw_cl=True,CMB_unit='muK')
+        powers = results.get_lensed_scalar_cls(raw_cl=raw_cls,CMB_unit='muK')
         if(spectrum_type=='all'):
             GLOBAL_VAR['TT'] = powers[:, 0]
             GLOBAL_VAR['EE'] = powers[:, 1]
@@ -279,8 +279,7 @@ def eb_axion_mcmc_runner(aplusb, gMpl):
     C_eb_observed = GLOBAL_VAR['EB_observed']
     C_eb_var = GLOBAL_VAR['EB_var']
    
-    size = len(C_ee_cmb)
-    C_eb_ede = np.zeros(size)
+    C_eb_ede = GLOBAL_VAR['EB_EDE']
     likelihood = eb_log_likelihood_vector(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_cmb, aplusb, gMpl)
     return likelihood
 
@@ -397,14 +396,19 @@ def bin_spectrum(n_bins, delta_ell, ell_min, spectrum):
     """
     
     binned_spectrum = np.zeros(n_bins)
+    bin_starts = np.zeros(n_bins + 1,dtype=int)
+    bin_starts[0]=ell_min
+    for i in range(1, len(bin_starts)):
+        bin_starts[i] = bin_starts[i-1] + delta_ell
     for ell_b in range(n_bins):
         bin_cur = 0
+        
         for ell_0 in range(0, delta_ell):
             ell_cur = ell_min + delta_ell * ell_b + ell_0
             bin_cur += spectrum[ell_cur]
 
         binned_spectrum[ell_b] = bin_cur / delta_ell
-    return binned_spectrum
+    return binned_spectrum, bin_starts
 
 def bin_spectrum_given_centers(bin_centers, spectrum, ell_min=0):
     '''
@@ -458,8 +462,47 @@ def bin_spectrum_given_centers(bin_centers, spectrum, ell_min=0):
             bin_cur += spectrum[j]
         binned_spectrum[i] = bin_cur / (bin_starts[i + 1] - bin_starts[i])
 
-    return binned_spectrum
+    return binned_spectrum, bin_starts
 
+def rebin(cur_bins, cur_data, new_bin_starts, raw_cl=False):
+    x_binned = []
+    y_binned = []
+
+    # scale from D to C if we're using raw Cls
+    if(raw_cl):
+        cur_data *= 2*np.pi/cur_bins/(cur_bins+1)
+    # Rebin the data
+    for i in range(len(new_bin_starts) - 1):
+        # Find the indices of x that fall within the current bin
+        indices = (cur_bins >= new_bin_starts[i]) & (cur_bins < new_bin_starts[i+1])
+        
+        if np.any(indices):
+            x_bin = np.mean(cur_bins[indices])
+            y_bin = np.mean(cur_data[indices])
+                
+        else:
+            x_bin = (new_bin_starts[i] + new_bin_starts[i+1]) / 2
+            y_bin = np.interp(x_bin, cur_bins, cur_data)
+
+        x_binned.append(x_bin)
+        y_binned.append(y_bin)
+
+    # Convert lists to arrays
+    x_binned = np.array(x_binned)
+    y_binned = np.array(y_binned)
+
+    # Optionally plot the rebinned data
+    plt.figure(figsize=(10, 6))
+    plt.plot(cur_bins, cur_data, 'o-', label='Original Data')
+    plt.plot(x_binned, y_binned, 's-', label='Rebinned Data', color='red')
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.title('Rebinned Data (Averaged y, Ignoring Points Outside Bins)')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+    return y_binned
 
 
 def eb_axion_driver(outpath, variables, priors, datafile=None):
@@ -467,8 +510,10 @@ def eb_axion_driver(outpath, variables, priors, datafile=None):
     init_params = info_dict['params']
 
     
-    load_bicep_data(datafile)
-    #load_eskilt_data()
+    #bin_starts, raw_cl = load_bicep_data()
+    
+    bin_starts, raw_cl = load_eskilt_data()
+    load_ede_data(bin_starts, raw_cl=raw_cl)
     # test to make sure the likelihood function works 
     log_test = eb_axion_mcmc_runner(init_params['aplusb']['ref'], 
                                     init_params['gMpl']['ref'])
@@ -477,22 +522,35 @@ def eb_axion_driver(outpath, variables, priors, datafile=None):
     return updated_info, sampler
 
 
-def load_bicep_data(data_path):
-    load_data('all')
+def load_bicep_data():
+    data_path='input_data/real_spectra_bicep.npy'
+    cov_file = 'input_data/bicep_cov.npy'
+    bin_start = 1
+    bin_end=17
+    scale = 100
+    raw_cl = False
+    load_data('all', raw_cls=raw_cl)
     dataset_index = 0
     EB_index = 5
-    scale = 2*np.pi
+    l_bins = bicep_data_consts.L_BIN_CENTERS
+
+    cov_data = np.load(cov_file, allow_pickle=True, encoding='latin1')
+    cov_mat = cov_data[dataset_index][0][0]
+    print(cov_mat.shape)
+    cov = cov_mat[EB_index]
+    vars = np.diag(cov)[bin_start:bin_end]
+    print(cov)
     np_mat = np.load(data_path, allow_pickle=True, encoding='latin1')
     spectra = np_mat[dataset_index][0] 
-    l_bins = bicep_data_consts.L_BIN_CENTERS
-    bin_start = 1
-    bin_end=10
-    GLOBAL_VAR['EE_ebinned'] = bin_spectrum_given_centers(l_bins, GLOBAL_VAR['EE'])[bin_start:bin_end]
-    GLOBAL_VAR['BB_ebinned'] = bin_spectrum_given_centers(l_bins, GLOBAL_VAR['BB'])[bin_start:bin_end]
+    
+    ee_binned, bin_starts = bin_spectrum_given_centers(l_bins, GLOBAL_VAR['EE'])
+    bb_binned, bin_starts = bin_spectrum_given_centers(l_bins, GLOBAL_VAR['BB'])
+    GLOBAL_VAR['EE_ebinned'] = ee_binned[bin_start:bin_end]
+    GLOBAL_VAR['BB_ebinned'] = bb_binned[bin_start:bin_end]
     
     l_bins = l_bins[bin_start:bin_end]
-    GLOBAL_VAR['EB_observed'] = scale*spectra[bin_start:bin_end,EB_index]/l_bins/(l_bins+1)
-    GLOBAL_VAR['EB_var'] = np.ones(len(l_bins))/1e5
+    GLOBAL_VAR['EB_observed'] = spectra[bin_start:bin_end,EB_index]
+    GLOBAL_VAR['EB_var'] = vars
     
     #print(GLOBAL_VAR['EE_ebinned'])
     print(GLOBAL_VAR['BB_ebinned'])
@@ -500,16 +558,27 @@ def load_bicep_data(data_path):
     print(GLOBAL_VAR['EB_var'])
     indices = np.arange(len(GLOBAL_VAR['EE']))
     #plt.plot(GLOBAL_VAR['EE'], label='CAMB theory')
-    #plt.plot(l_bins, GLOBAL_VAR['EE_ebinned'], label='Binned EE camb')
+    plt.plot(l_bins, GLOBAL_VAR['EE_ebinned'], label='Binned EE camb')
     plt.plot(l_bins, GLOBAL_VAR['BB_ebinned'], label='Binned BB camb')
-    plt.plot(l_bins[:], GLOBAL_VAR['EB_observed'], 
-             label='C_EB bicep data ')
-    plt.ylim([-0.00001, 0.00002])
+    plt.errorbar(l_bins[:], GLOBAL_VAR['EB_observed']*scale, yerr=vars*scale,
+             label='C_EB bicep data scaled by ' + str(scale))
+    #plt.ylim([-0.00001, 0.00002])
     plt.legend()
     plt.show() 
+    return bin_starts[bin_start:bin_end+1], raw_cl   
+
+def load_ede_data(bin_starts, data_path = 'input_data/f_07.csv', raw_cl=False):
+    # Read the CSV file
+    df = pd.read_csv(data_path, header=None, names=['ell_bin', 'D_eb'])
+
+    # Extract the data
+    bin_ell = df['ell_bin'].values
+    eb_ede = df['D_eb'].values
+    GLOBAL_VAR['EB_EDE'] = rebin(bin_ell, eb_ede, bin_starts, raw_cl)
 
 def load_eskilt_data(data_path = 'input_data/HFI_f_sky_092_EB_o.npy'):
-    load_data('all')
+    raw_cl = True
+    load_data('all', raw_cls=raw_cl)
     c_l_EB_o_mean_std = np.load(data_path)
     GLOBAL_VAR['EB_observed'] = c_l_EB_o_mean_std[:, 0]
     GLOBAL_VAR['EB_var'] = c_l_EB_o_mean_std[:, 1]
@@ -518,17 +587,18 @@ def load_eskilt_data(data_path = 'input_data/HFI_f_sky_092_EB_o.npy'):
     delta_ell = 20
     ell = np.arange(ell_min, ell_max+1, delta_ell)
     n_bins = len(ell)
-    
-    GLOBAL_VAR['EE_ebinned'] = bin_spectrum(n_bins, delta_ell, ell_min, GLOBAL_VAR['EE'])
-    GLOBAL_VAR['BB_ebinned'] = bin_spectrum(n_bins, delta_ell, ell_min, GLOBAL_VAR['BB'])
-       
+    ee_binned, bin_starts = bin_spectrum(n_bins, delta_ell, ell_min, GLOBAL_VAR['EE'])
+    bb_binned, bin_starts = bin_spectrum(n_bins, delta_ell, ell_min, GLOBAL_VAR['BB'])
+    GLOBAL_VAR['EE_ebinned'] = ee_binned
+    GLOBAL_VAR['BB_ebinned'] = bb_binned
+    return bin_starts, raw_cl   
 
 def main():
     print('testin123')
     outpath = 'axion_test/'
     variables, priors = get_priors_and_variables(aplusb_minmax=(-5,5))
-    data_file = 'input_data/real_spectra_bicep.npy'
-    updated_info, sampler = eb_axion_driver(outpath, variables, priors, datafile=data_file)
+    
+    updated_info, sampler = eb_axion_driver(outpath, variables, priors)
     
     plot_info(variables, updated_info, sampler)
     print(variables)
