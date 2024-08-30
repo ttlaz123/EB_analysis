@@ -508,7 +508,7 @@ def load_bicep_data(data_path):
     plt.legend()
     plt.show() 
 
-def load_eskilt_data(data_path = 'HFI_f_sky_092_EB_o.npy'):
+def load_eskilt_data(data_path = 'input_data/HFI_f_sky_092_EB_o.npy'):
     load_data('all')
     c_l_EB_o_mean_std = np.load(data_path)
     GLOBAL_VAR['EB_observed'] = c_l_EB_o_mean_std[:, 0]
@@ -527,7 +527,7 @@ def main():
     print('testin123')
     outpath = 'axion_test/'
     variables, priors = get_priors_and_variables(aplusb_minmax=(-5,5))
-    data_file = 'real_spectra.npy'
+    data_file = 'input_data/real_spectra_bicep.npy'
     updated_info, sampler = eb_axion_driver(outpath, variables, priors, datafile=data_file)
     
     plot_info(variables, updated_info, sampler)
