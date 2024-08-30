@@ -1,0 +1,7 @@
+*.txt
+*.yaml
+*.checkpoint
+*.covmat
+*.progress
+*.dill_pickle
+*.png
