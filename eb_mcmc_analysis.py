@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 from scipy import stats 
 import pandas as pd
+from scipy.optimize import minimize
 import sympy as sp
 import time
 import pickle
@@ -27,7 +28,6 @@ import getdist.plots as gdplt
 
 import bicep_data_consts
 
-OUTPUT_PLOTS = 'output_plots_zeroede'
 GLOBAL_VAR = {}
 
 def read_planck(filepath, spectrum_type):
@@ -224,8 +224,8 @@ def eb_log_likelihood_vector(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_c
     return total_log_likelihood
 
 
-def plot_best_fit(sampler, bin_edges, mapname=None):
-    bins = (bin_edges[:-1] + bin_edges[1:]) / 2
+def plot_best_fit(sampler, bin_centers, mapname=None, output_plots='output_plots'):
+    bins = bin_centers
 
     gd_sample = sampler.products()["sample"]
     n = len(gd_sample['gMpl'])
@@ -256,10 +256,10 @@ def plot_best_fit(sampler, bin_edges, mapname=None):
                  ' aplusb=' + str(aplusb) + '+-' + str(aplusb_std) + 
                  '\n mapname=' + str(mapname))
     plt.title(title_str)
-    plt.savefig(OUTPUT_PLOTS + '/' + mapname + '_bestfit.png')
+    plt.savefig(output_plots + '/' + mapname + '_bestfit.png')
     return gMpl, aplusb, gMpl_std, aplusb_std
 
-def plot_info(variables=None, info=None, sampler=None, outfile=None, file_root=None, mapname=None):
+def plot_info(variables=None, info=None, sampler=None, outfile=None, file_root=None, mapname=None, output_plots='output_plots'):
     """
     Generates and displays or saves a triangle plot of posterior distributions for specified variables.
 
@@ -310,7 +310,37 @@ def plot_info(variables=None, info=None, sampler=None, outfile=None, file_root=N
         print('showing plot')
         plt.show()
     else:
-        plt.savefig(OUTPUT_PLOTS + '/' + outfile)
+        plt.savefig(output_plots + '/' + outfile)
+
+def objective_function(aplusb, C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_cmb, gMpl):
+    return -eb_log_likelihood_vector(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_cmb, aplusb, gMpl)
+
+
+def polar_rotation_likelihood():
+    C_ee_cmb = GLOBAL_VAR['EE_ebinned']
+    C_bb_cmb = GLOBAL_VAR['BB_ebinned']
+    C_eb_observed = GLOBAL_VAR['EB_observed']
+    C_eb_var = GLOBAL_VAR['EB_var']
+   
+    C_eb_ede = GLOBAL_VAR['EB_EDE']
+    # Initial guess for aplusb
+    initial_aplusb = 0.0
+
+    # Provide a value for gMpl (if it’s fixed or if it needs to be optimized as well, adjust accordingly)
+    gMpl_value = 0
+    
+    result = minimize(objective_function, initial_aplusb, args=(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_cmb, gMpl_value),
+                      method='BFGS')
+    
+    best_fit_aplusb = result.x[0]
+    print(f'~~~~~~~~~~~~~~~~~~~Best-fit aplusb: {best_fit_aplusb}')
+        # Compute the Hessian matrix
+    hessian_inv = result.hess_inv
+
+    # Extract the error bars from the Hessian
+    error_bars = np.sqrt(np.diag(hessian_inv))
+    print(f'Error bars on aplusb: {error_bars[0]}')
+    return best_fit_aplusb, error_bars[0]
 
 def eb_axion_mcmc_runner(aplusb, gMpl):
     # TODO complete this
@@ -322,6 +352,9 @@ def eb_axion_mcmc_runner(aplusb, gMpl):
    
     C_eb_ede = GLOBAL_VAR['EB_EDE']
     likelihood = eb_log_likelihood_vector(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_cmb, aplusb, gMpl)
+    
+    
+    
     return likelihood
 
 def get_eb_axion_infodict(outpath, variables, priors):
@@ -369,7 +402,10 @@ def get_eb_axion_infodict(outpath, variables, priors):
             "ref": 0,
             "proposal": 0
         }
-    info["sampler"] = {"mcmc": {"Rminus1_stop": 0.1, "max_tries": 100000}}
+    info["sampler"] = {"mcmc": {
+                                "burn_in":0.2,
+                                "Rminus1_stop": 0.001,          
+                                "max_tries": 1000000}}
     info["output"] = outpath
     return info
 
@@ -383,11 +419,11 @@ def get_priors_and_variables(gMpl_minmax=(-5, 5), aplusb_minmax=(-5, 5)):
     -----------
     gMpl_minmax : tuple, optional
         The minimum and maximum values (min, max) for the 'gMpl' variable. 
-        Defaults to (-10, 10).
+        Defaults to (-5, 5).
     
     aplusb_minmax : tuple, optional
         The minimum and maximum values (min, max) for the 'aplusb' variable.
-        Defaults to (-10, 10).
+        Defaults to (-5, 5).
 
     Returns:
     --------
@@ -547,15 +583,64 @@ def rebin(cur_bins, cur_data, new_bin_starts, raw_cl=False, plot=False):
     return y_binned
 
 
+def load_dust_lensing_model(bin_start=2, bin_end=10, mapname='BK18_B95', 
+                            dust_path='input_data/model_dust.npy', 
+                            lensing_path='input_data/model_lens.npy', 
+                            bandpowerwindowfunction_path='input_data/bpwf.npy',
+                            plot=False):
+    '''
+    Assumes specific structure for the npy files
+    '''
+    TT = 0; TE = 1; EE = 2;
+    BB = 3; TB = 4; EB = 5;
+    ET = 6; BT = 7; BE = 8;
+    dust_model = np.load(dust_path, allow_pickle=True)
+    lensing_model = np.load(lensing_path, allow_pickle=True)
+    bpwf = np.load(bandpowerwindowfunction_path, allow_pickle=True)
+  
+    dataset_index = bicep_data_consts.SPECTRA_DATASETS.index(mapname)
+
+    # a lot of zero indices due to matlab file conversion
+    bpwf_ls = bpwf[0][dataset_index]['l'][0]
+    dust_cls = dust_model.item()['model_dust'][mapname][0][0]['Cs_l'][0][0][bpwf_ls]
+    lensing_cls = lensing_model.item()['model_lens'][0][0]['Cs_l'][bpwf_ls]
+    bpwf_cls = bpwf[0][dataset_index]['Cs_l']
+    l_bins = bicep_data_consts.L_BIN_CENTERS
+    ee_binned = np.matmul(dust_cls[:,EE] + lensing_cls[:,EE], bpwf_cls[:,:,EE])
+    
+    bb_binned = np.matmul(dust_cls[:,BB] + lensing_cls[:,BB], bpwf_cls[:,:,BB])
+    GLOBAL_VAR['EE_ebinned'] = ee_binned[bin_start:bin_end]
+    GLOBAL_VAR['BB_ebinned'] = bb_binned[bin_start:bin_end]
 
 
-def load_bicep_data(plot=False, mapname=None):
+    if(plot):
+        plt.title('EE Map: ' + str(mapname))
+        plt.plot(l_bins, ee_binned, label='After applying BPWF')
+        plt.plot(bpwf_ls,dust_cls[:,EE] + lensing_cls[:,EE], label='Lensing+Dust model')
+        plt.ylabel(r'$C_{\ell}^{EE}\cdot\ell(\ell+1)/(2\pi)$  [$\mu K^2$]')
+        plt.xlabel(r'$\ell$')
+        plt.legend()
+        plt.show()
+
+        plt.title('BB Map: ' + str(mapname))
+        plt.plot(l_bins, bb_binned, label='After applying BPWF')
+        plt.plot(bpwf_ls,dust_cls[:,BB] + lensing_cls[:,BB], label='Lensing+Dust model')
+        plt.ylabel(r'$C_{\ell}^{BB}\cdot\ell(\ell+1)/(2\pi)$  [$\mu K^2$]')
+        plt.xlabel(r'$\ell$')
+        plt.legend()
+        plt.show()
+
+
+    
+    return bpwf_ls, bpwf_cls[:,:,EE]
+
+def load_bicep_data(plot=False, mapname=None, output_plots='output_plots'):
     #data_path= 'input_data/real_spectra_bicep.npy'
     #cov_file = 'input_data/bicep_cov.npy'
-
+    offdiag = 2
     data_path= 'input_data/bicep_norot_realspectra.npy'
     cov_file = 'input_data/bicep_norot_covar.npy'
-    bin_start = 2
+    bin_start = 1
     bin_end=10
     scale = 100
     raw_cl = False
@@ -571,27 +656,56 @@ def load_bicep_data(plot=False, mapname=None):
     cov_data = np.load(cov_file, allow_pickle=True, encoding='latin1')
     cov_mat = cov_data[dataset_index][0][0]
     cov = cov_mat[EB_index]
+
+    # Create a mask to keep only the diagonal and up to the 2nd off-diagonal terms
+    size = cov.shape[0]
+    mask = np.abs(np.arange(size)[:, None] - np.arange(size)) <= offdiag
+
+    # Apply the mask to the covariance matrix
+    truncated_cov_matrix = cov * mask
+
     vars = np.diag(cov)[bin_start:bin_end]
     np_mat = np.load(data_path, allow_pickle=True, encoding='latin1')
     spectra = np_mat[dataset_index][0] 
     
-    ee_binned, bin_starts = bin_spectrum_given_centers(l_bins, GLOBAL_VAR['EE'])
-    bb_binned, bin_starts = bin_spectrum_given_centers(l_bins, GLOBAL_VAR['BB'])
+    bpwf_ls, ee_bpwf_cls=load_dust_lensing_model(bin_start=bin_start, bin_end=bin_end, mapname=mapname)
+    
+    #ee_binned, bin_starts = bin_spectrum_given_centers(l_bins, GLOBAL_VAR['EE'])
+    #bb_binned, bin_starts = bin_spectrum_given_centers(l_bins, GLOBAL_VAR['BB'])
     
     
-    
+    '''
     GLOBAL_VAR['EE_ebinned'] = spectra[bin_start:bin_end,EE_index]
     GLOBAL_VAR['BB_ebinned'] = spectra[bin_start:bin_end,BB_index]
-    
+    '''
+
     l_bins = l_bins[bin_start:bin_end]
     GLOBAL_VAR['EB_observed'] = spectra[bin_start:bin_end,EB_index]
-    GLOBAL_VAR['EB_var'] = cov[bin_start:bin_end, bin_start: bin_end]
+    GLOBAL_VAR['EB_var'] = truncated_cov_matrix[bin_start:bin_end, bin_start: bin_end]
     
+    
+
+
+    # Read the CSV file
+    data_path = 'input_data/f_07.csv'
+    df = pd.read_csv(data_path, header=None, names=['ell_bin', 'D_eb'])
+
+    # Extract the data
+    bin_ell = df['ell_bin'].values
+    eb_ede = df['D_eb'].values
+    #eb_ede = np.zeros(len(bin_ell))
+    bin_edges = np.append(bpwf_ls, len(bpwf_ls))
+    eb_ede_theory = rebin(bin_ell, eb_ede, bin_edges, raw_cl, plot=False)
+
+    eb_ede_binned = np.matmul(eb_ede_theory,ee_bpwf_cls)
+    GLOBAL_VAR['EB_EDE'] = eb_ede_binned[bin_start:bin_end]
+
     if(plot):
         plt.figure()
         #plt.plot(GLOBAL_VAR['EE'], label='CAMB theory')
         plt.plot(l_bins, GLOBAL_VAR['EE_ebinned'], label='Binned EE camb')
         plt.plot(l_bins, GLOBAL_VAR['BB_ebinned'], label='Binned BB camb')
+        plt.plot(l_bins, GLOBAL_VAR['EB_EDE']*scale, label='Binned EB EDE scaled by ' + str(scale))
         plt.errorbar(l_bins[:], GLOBAL_VAR['EB_observed']*scale, yerr=np.sqrt(vars)*scale,
                 label='C_EB bicep data scaled by ' + str(scale))
         #plt.ylim([-0.00001, 0.00002])
@@ -599,18 +713,8 @@ def load_bicep_data(plot=False, mapname=None):
         plt.xlabel(r'$\ell$')
         plt.legend()
         plt.title('Map: ' + str(mapname))
-        plt.savefig(OUTPUT_PLOTS + '/' + mapname + '_spectra.png') 
-    return bin_starts[bin_start:bin_end+1], raw_cl   
-
-def load_ede_data(bin_starts, data_path = 'input_data/f_07.csv', raw_cl=False, plot=False):
-    # Read the CSV file
-    df = pd.read_csv(data_path, header=None, names=['ell_bin', 'D_eb'])
-
-    # Extract the data
-    bin_ell = df['ell_bin'].values
-    eb_ede = df['D_eb'].values
-    eb_ede = np.zeros(len(bin_ell))
-    GLOBAL_VAR['EB_EDE'] = rebin(bin_ell, eb_ede, bin_starts, raw_cl, plot=plot)
+        plt.savefig(output_plots + '/' + mapname + '_spectra.png') 
+    return l_bins
 
 def load_eskilt_data(data_path = 'input_data/HFI_f_sky_092_EB_o.npy'):
     raw_cl = True
@@ -629,15 +733,13 @@ def load_eskilt_data(data_path = 'input_data/HFI_f_sky_092_EB_o.npy'):
     GLOBAL_VAR['BB_ebinned'] = bb_binned
     return bin_starts, raw_cl   
 
-def eb_axion_driver(outpath, variables, priors, datafile=None, mapname=None):
+def eb_axion_driver(outpath, variables, priors, datafile=None, mapname=None,  output_plots='output_plots'):
     info_dict = get_eb_axion_infodict(outpath, variables, priors)
     init_params = info_dict['params']
 
     
-    bin_starts, raw_cl = load_bicep_data(plot=True, mapname=mapname)
+    bin_centers = load_bicep_data(plot=True, mapname=mapname, output_plots=output_plots)
     
-    #bin_starts, raw_cl = load_eskilt_data()
-    load_ede_data(bin_starts, raw_cl=raw_cl, plot=False)
     # test to make sure the likelihood function works 
     log_test = eb_axion_mcmc_runner(init_params['aplusb']['ref'], 
                                     init_params['gMpl']['ref'])
@@ -645,30 +747,31 @@ def eb_axion_driver(outpath, variables, priors, datafile=None, mapname=None):
     updated_info, sampler = run(info_dict, resume=True)
     
     
-    return updated_info, sampler, bin_starts
+    return updated_info, sampler, bin_centers
 
 
 def main():
-    print('testin123')
+    print('~~~~~~~~~~~~~~ Start MCMC ~~~~~~~~~~~~~~')
+    output_plots = 'output_plots_ede_lensdust_trunccov'
+    if(not os.path.exists(output_plots)):
+        os.mkdir(output_plots)
     variables, priors = get_priors_and_variables(aplusb_minmax=(-5,5))
-    mapnames = bicep_data_consts.SPECTRA_DATASETS
-    for i in range(17):
-        map = mapnames[i]
-        outpath = 'mcmc_chains/' + map + '_zeroede/'
-        updated_info, sampler, bin_starts = eb_axion_driver(outpath, variables, priors, mapname=map)
-        gMpl, aplusb, gMpl_std, aplusb_std = plot_best_fit(sampler, bin_edges=bin_starts, mapname=map)
+    maps = ['BK18_B95', 'BK18_K95', 'BK18_150', 'BK18_220', 'BK18_B95ext']
+    table_str = ''
+    for map in maps:
+        outpath = 'mcmc_chains_ede_lensdust_trunccov/' + map + '/'
+        print(outpath)
+        updated_info, sampler, bin_centers = eb_axion_driver(outpath, variables, priors, mapname=map,  output_plots=output_plots)
+        gMpl, aplusb, gMpl_std, aplusb_std = plot_best_fit(sampler, bin_centers=bin_centers, mapname=map, output_plots=output_plots)
         print(gMpl, aplusb, gMpl_std, aplusb_std)
-        plot_info(variables, updated_info, sampler, mapname=map, outfile=map+'_triagplot.png')
-    '''
-    outpath = 'axion_test/'
-    
-    
-    updated_info, sampler, bin_starts = eb_axion_driver(outpath, variables, priors)
-    plot_best_fit(sampler, bin_edges=bin_starts)
-    plot_info(variables, updated_info, sampler)
-    
-    print(variables)
-    print(priors)
-    '''
+        plot_info(variables, updated_info, sampler, mapname=map, outfile=map+'_triagplot.png', output_plots=output_plots)
+        table_str += map + ': ' + str(aplusb) + ' +- ' + str(aplusb_std) 
+        
+        aplusb_bestfit, std = polar_rotation_likelihood()
+        table_str += ', ' + str(np.round(aplusb_bestfit,3)) + ' +- ' + str(np.round(std,3))
+        table_str += '\n'
+    print(table_str)
+    print('~~~~~~~~~~~~~~ End ~~~~~~~~~~~~~~')
 if __name__ == '__main__':
+    #load_dust_lensing_model()
     main()
