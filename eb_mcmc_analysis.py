@@ -9,7 +9,8 @@ import time
 import pickle
 import argparse
 import matplotlib
-#matplotlib.use('Agg')
+from matplotlib.gridspec import GridSpec
+matplotlib.use('Agg')
 
 import pandas as pd
 from cobaya.run import run
@@ -71,6 +72,102 @@ def eb_log_likelihood_vector(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_c
         total_log_likelihood = -np.sum(bin_loglike)
     return total_log_likelihood
 
+def read_sampler(filepath):
+    df = pd.read_csv(filepath, delim_whitespace=True, comment='#', header=None)
+        
+    # Assign column names based on the data structure
+    df.columns = ['weight', 'minuslogpost', 'gMpl', 'aplusb_b95', 'aplusb_b95ext', 
+                    'aplusb_k95', 'aplusb_150', 'aplusb_220', 'minuslogprior', 
+                    'minuslogprior__0', 'chi2', 'chi2__power']
+    return df
+
+def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots):
+    aplusb_dict = {
+        'BK18_B95':'aplusb_b95', 
+        'BK18_K95':'aplusb_k95', 
+        'BK18_150':'aplusb_150', 
+        'BK18_220':'aplusb_220', 
+        'BK18_B95ext': 'aplusb_b95ext'
+    } 
+    fig = plt.figure(figsize=(15, 10))
+    gs = GridSpec(2, 3, figure=fig)
+
+    # Define subplots, leaving one empty spot
+    axes = {
+        MAP_FREQS[i]: fig.add_subplot(gs[i]) for i in range(len(MAP_FREQS)) 
+    }
+    alpha = 0.01
+    diag_ax = fig.add_subplot(gs[5])  # Diagonal plot spot
+    with open(output_plots + '/' + 'sim_results_multicomp.csv', 'w') as file:
+
+        header_str = 'sim_num,gMpl,gMpl_std,'
+        for freq in MAP_FREQS:
+            header_str += aplusb_dict[freq] + ',' + aplusb_dict[freq] + '_std'
+        header_str += ',chisq' 
+        file.write(header_str + '\n')
+        for i,sampler in enumerate(sampler_sims):
+            if(isinstance(sampler, str)):
+                gd_sample = read_sampler(sampler)
+            else:
+                gd_sample = sampler.products()["sample"]
+            var = 'gMpl'
+            n = len(gd_sample[var])
+            
+            gMpl = np.round(gd_sample[var][n//2:].mean(),3)
+            gMpl_std = np.round(gd_sample[var][n//2:].std(),3)
+            sim_line_str = str(i) + ',' + str(gMpl) + ',' + str(gMpl_std) + ','
+            for map_freq in aplusb_dict:
+                ax = axes[map_freq]
+                var = aplusb_dict[map_freq]
+                aplusb = np.round(gd_sample[var][n//2:].mean(),3)
+                aplusb_std = np.round(gd_sample[var][n//2:].std(),3)
+                C_ee_cmb = GLOBAL_VAR['EE_binned' + '_' + map_freq]
+                C_bb_cmb = GLOBAL_VAR['BB_binned'+ '_' + map_freq]
+                C_eb_sim = GLOBAL_VAR['EB_sims_' + map_freq][:, i]
+                
+                
+                C_eb_ede = GLOBAL_VAR['EB_EDE'+ '_' + map_freq]
+                cos_term = np.cos(4 * np.deg2rad(aplusb)) * gMpl * C_eb_ede
+                sin_term = np.sin(4 * np.deg2rad(aplusb)) / 2 * (C_ee_cmb - C_bb_cmb) 
+                if(i == 0):
+                    ax.plot(bin_centers, cos_term, color='blue', 
+                            alpha=alpha, linewidth=1, label = 'gMpl term')
+                    ax.plot(bin_centers, sin_term, color='green', 
+                            alpha=alpha, linewidth=1, label = 'aplusb term')
+                    ax.plot(bin_centers, sin_term+cos_term, color='purple', 
+                            alpha=alpha*10, linewidth=1, label = 'combined')
+                    ax.plot(bin_centers, C_eb_sim, color='red', 
+                            alpha=alpha*10, linewidth=1, label = 'sim curve')
+                else:
+                    ax.plot(bin_centers, cos_term, color='blue', 
+                            alpha=alpha, linewidth=1)
+                    ax.plot(bin_centers, sin_term, color='green', 
+                            alpha=alpha, linewidth=1)
+                    ax.plot(bin_centers, sin_term+cos_term, color='purple', 
+                            alpha=alpha*10, linewidth=1)
+                    ax.plot(bin_centers, C_eb_sim, color='red', 
+                            alpha=alpha*10, linewidth=1)
+                
+                sim_line_str += str(aplusb) + ',' + str(aplusb_std) + ',' 
+            chisq = np.round(gd_sample['chi2'][n//2:].mean(),3)
+            sim_line_str+= str(chisq)
+            file.write(sim_line_str + '\n')
+    for map_freq in aplusb_dict:
+        ax = axes[map_freq]
+        C_eb_observed = GLOBAL_VAR['EB_trueobserved'+ '_' + map_freq]
+        C_eb_var = GLOBAL_VAR['EB_var'+ '_' + map_freq]
+        if(len(C_eb_var.shape)==2 and C_eb_var.shape[0] == C_eb_var.shape[1]):
+            C_eb_var = np.diag(C_eb_var)
+        ax.errorbar(bin_centers, C_eb_observed, yerr=np.sqrt(C_eb_var), 
+                    linewidth=3, alpha=1, label='observed EB')
+        ax.set_title(map_freq)
+        ax.legend()
+        ax.set_xlabel(r'$\ell$')
+        ax.set_ylabel(r'$C_{\ell}^{EB}\cdot\ell(\ell+1)/(2\pi)$  [$\mu K^2$]')
+    plt.suptitle('Multicomponent All Sims')
+    plt.tight_layout()
+    plt.savefig(output_plots + '/multicomp_bestfit_allsims.png')
+    plt.close()
 
 def plot_best_fit(sampler, bin_centers, mapname=None, output_plots='output_plots'):
     bins = bin_centers
@@ -365,10 +462,6 @@ def ensure_directory(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
-def prepare_simulation(mapname, sim_num, zero_ede):
-    """Prepare output paths and directories for a given map and simulation number."""
-    
-    return output_plots, outpath
 
 def run_mcmc_for_simulation(mapname, sim_num, bin_centers, variables, priors, zero_ede=False):
     """Run MCMC analysis for a specific map and simulation number."""
@@ -394,7 +487,11 @@ def run_mcmc_for_real(mapname, bin_centers, variables, priors, zero_ede=False):
                                       likelihood_func=eb_axion_mcmc_runner)
     init_params = info_dict['params']
     log_test = eb_axion_mcmc_runner(init_params['aplusb']['ref'], init_params['gMpl']['ref'])
-    print("Initial chisq value: " + str(log_test))
+    print("Initial chisq value: " + str(-log_test))
+    num_params = len(variables)
+    num_dof = len(bin_centers)
+    red_chisq = -log_test/(num_dof-num_params)
+    print("Reduced chisq:" + str(red_chisq))
     updated_info, sampler = run(info_dict, resume=True)
     gMpl, aplusb, gMpl_std, aplusb_std = plot_best_fit(sampler, bin_centers=bin_centers, mapname=mapname, output_plots=output_plots)
     
@@ -447,7 +544,7 @@ def single_freq_analysis(max_sim):
     
     print('~~~~~~~~~~~~~~ End ~~~~~~~~~~~~~~')
 
-def multi_freq_analysis(max_sim):
+def multi_freq_analysis(max_sim, do_run=True):
     variables, priors = get_priors_and_variables_multi_comp(aplusb_minmax=(-5,5))
     sim_str = 'sim_num,gMpl,gMpl_std,aplusb,aplusb_std\n'
     csv_resultfile = 'sim_results_multicomp.csv'
@@ -460,6 +557,7 @@ def multi_freq_analysis(max_sim):
         GLOBAL_VAR['EB_sims_' + mapname] = spectrum_dict['EB_sims']
         GLOBAL_VAR['EE_binned' + '_' + mapname] = spectrum_dict['EE_binned']
         GLOBAL_VAR['BB_binned'+ '_' + mapname] = spectrum_dict['BB_binned']
+        GLOBAL_VAR['EB_trueobserved'+ '_' + mapname] = spectrum_dict['EB_observed']
         GLOBAL_VAR['EB_observed'+ '_' + mapname] = spectrum_dict['EB_observed']
         GLOBAL_VAR['EB_var'+ '_' + mapname] = spectrum_dict['EB_var']
         GLOBAL_VAR['EB_EDE'+ '_' + mapname] = spectrum_dict['EB_EDE']
@@ -474,12 +572,16 @@ def multi_freq_analysis(max_sim):
                                                    init_params['aplusb_k95']['ref'],
                                                    init_params['aplusb_150']['ref'],
                                                    init_params['aplusb_220']['ref'],)
-    print("Initial chisq value: " + str(log_test))
+    print("Initial chisq value: " + str(-log_test))
+    num_params = len(variables)
+    num_dof = len(bin_centers)
+    red_chisq = -log_test/(num_dof-num_params)
+    print("Reduced chisq:" + str(red_chisq))
     updated_info, sampler = run(info_dict, resume=True)
     mapname = 'Multicomponent'
     plot_info(variables, updated_info, sampler, mapname=mapname, 
               outfile=f'{mapname}_triagplot.png', output_plots=output_plots)
-    
+    all_samplers = []
     for sim_num in range(max_sim): 
         output_plots = f'output_plots_ede{str(not zero_ede)}_multicomp/sim_num{sim_num}/'
         outpath = f'mcmc_chains_ede{str(not zero_ede)}_multicomp/simnum{sim_num}'
@@ -489,14 +591,20 @@ def multi_freq_analysis(max_sim):
         info_dict = get_eb_axion_infodict(outpath, variables, priors,
                                       likelihood_func=eb_axion_multicomponent_mcmc_runner)
         init_params = info_dict['params']
-        updated_info, sampler = run(info_dict, resume=True)
-    
-        plot_info(variables, updated_info, sampler, mapname=mapname, outfile=f'{mapname}_triagplot.png', output_plots=output_plots)
-        
+        if(do_run):
+            updated_info, sampler = run(info_dict, resume=True)
+            all_samplers.append(sampler)
+            plot_info(variables, updated_info, sampler, mapname=mapname, outfile=f'{mapname}_triagplot.png', output_plots=output_plots)
+        else:
+            sampler = outpath + '.1.txt'
+            all_samplers.append(sampler)
+    output_plots = f'output_plots_ede{str(not zero_ede)}_multicomp/'
+    plot_best_fit_multicomponent(sampler_sims=all_samplers, bin_centers=bin_centers, output_plots=output_plots)    
 
 def main():
-    multi_freq_analysis(max_sim=499)
+    multi_freq_analysis(max_sim=200, do_run=False)
     #single_freq_analysis(max_sim=0)
+
 if __name__ == '__main__':
    
     main()
