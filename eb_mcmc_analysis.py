@@ -22,7 +22,7 @@ import getdist.plots as gdplt
 import eb_load_data as eld
 
 GLOBAL_VAR = {}
-
+MAP_FREQS = ['BK18_B95', 'BK18_K95', 'BK18_150', 'BK18_220', 'BK18_B95ext']
 
 def eb_log_likelihood_vector(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_cmb, aplusb, gMpl):
     """
@@ -154,7 +154,7 @@ def plot_info(variables=None, info=None, sampler=None, outfile=None, file_root=N
 
     gdplot = gdplt.get_subplot_plotter(width_inch=5)
     gdplot.triangle_plot(gdsamples, variables, filled=True)
-    plt.title(' mapname=' + str(mapname))
+    plt.suptitle(' mapname=' + str(mapname))
     if outfile is None:
         print('showing plot')
         plt.show()
@@ -192,6 +192,28 @@ def polar_rotation_likelihood():
     print(f'Error bars on aplusb: {error_bars[0]}')
     return best_fit_aplusb, error_bars[0]
 
+def eb_axion_multicomponent_mcmc_runner(gMpl, aplusb_b95, aplusb_b95ext, aplusb_k95,
+                                        aplusb_150, aplusb_220):
+    multi_likelihood = 0
+    aplusb_dict = {
+        'BK18_B95':aplusb_b95, 
+        'BK18_K95':aplusb_k95, 
+        'BK18_150':aplusb_150, 
+        'BK18_220':aplusb_220, 
+        'BK18_B95ext': aplusb_b95ext
+    } 
+    for freq in MAP_FREQS:
+        aplusb = aplusb_dict[freq]
+        C_ee_cmb = GLOBAL_VAR['EE_binned' + '_' + freq]
+        C_bb_cmb = GLOBAL_VAR['BB_binned'+ '_' + freq]
+        C_eb_observed = GLOBAL_VAR['EB_observed'+ '_' + freq]
+        C_eb_var = GLOBAL_VAR['EB_var'+ '_' + freq]
+    
+        C_eb_ede = GLOBAL_VAR['EB_EDE'+ '_' + freq]
+        likelihood = eb_log_likelihood_vector(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_cmb, aplusb, gMpl)
+        multi_likelihood += likelihood
+
+    return multi_likelihood
 def eb_axion_mcmc_runner(aplusb, gMpl):
     # TODO complete this
     
@@ -207,7 +229,7 @@ def eb_axion_mcmc_runner(aplusb, gMpl):
     
     return likelihood
 
-def get_eb_axion_infodict(outpath, variables, priors):
+def get_eb_axion_infodict(outpath, variables, priors, likelihood_func):
     """
     Generates and returns a dictionary containing the configuration information for an MCMC run, tailored to an EB axion model.
 
@@ -238,7 +260,7 @@ def get_eb_axion_infodict(outpath, variables, priors):
     """
     info = {"likelihood": 
         {
-            "power": eb_axion_mcmc_runner
+            "power": likelihood_func
         }
     }
 
@@ -294,103 +316,34 @@ def get_priors_and_variables(gMpl_minmax=(-5, 5), aplusb_minmax=(-5, 5)):
     return variables, priors
 
 
+def get_priors_and_variables_multi_comp(gMpl_minmax=(-5, 5), aplusb_minmax=(-5, 5)):
+    """
+    Defines and returns the model variables and their corresponding prior ranges.
 
-def bin_spectrum_given_centers(bin_centers, spectrum, ell_min=0):
-    '''
-    DEPRECATED
-    Bins a spectrum into specified bin centers.
-
-    Assumes the spectrum starts at l=ell_min and calculates the bin edges based on the given bin centers.
-
-    Parameters
-    ----------
-    bin_centers : array_like
-        An array of bin center values. The function calculates bin edges based on these centers.
-        
-    spectrum : array_like
-        An array representing the spectrum values. The length of this array should be at least as long as the maximum bin edge.
-        
-    ell_min : int, optional
-        The minimum ell value (default is 0). The spectrum is assumed to start at this value. This parameter is used to adjust the starting point of the bin edges.
-
-    Returns
-    -------
-    binned_spectrum : ndarray
-        An array of the binned spectrum values, where each value represents the average spectrum value within the corresponding bin.
-
-    Raises
-    ------
-    ValueError
-        If the length of the spectrum is insufficient to cover the maximum bin edge.
-
-    Notes
-    -----
-    The bin edges are computed such that the center of each bin is the midpoint between the start and end of the bin.
-    The function assumes that the spectrum starts at `ell_min` and is defined for consecutive ell values.
-    '''
-    # Calculate bin edges
-    binned_spectrum = np.zeros(len(bin_centers))
-    bin_starts = np.zeros(len(bin_centers) + 1,dtype=int)
-    bin_starts[0] = ell_min
-
-    for i in range(1, len(bin_starts)):
-        bin_starts[i] = (2 * bin_centers[i - 1] - bin_starts[i - 1] + 1)
-
-    # Check if the spectrum is long enough
-    max_bin_edge = bin_starts[-1]
-    if len(spectrum) < max_bin_edge:
-        raise ValueError(f"Spectrum length is insufficient. Required: {max_bin_edge}, Provided: {len(spectrum)}")
-
-    # Bin the spectrum
-    for i in range(len(bin_centers)):
-        bin_cur = 0
-        for j in range(bin_starts[i], bin_starts[i + 1]):
-            bin_cur += spectrum[j]
-        binned_spectrum[i] = bin_cur / (bin_starts[i + 1] - bin_starts[i])
-
-    return binned_spectrum, bin_starts
-
-def rebin(cur_bins, cur_data, new_bin_starts, raw_cl=False, plot=False):
-    x_binned = []
-    y_binned = []
-
-    # scale from D to C if we're using raw Cls
-    if(raw_cl):
-        cur_data *= 2*np.pi/cur_bins/(cur_bins+1)
-    # Rebin the data
-    for i in range(len(new_bin_starts) - 1):
-        # Find the indices of x that fall within the current bin
-        indices = (cur_bins >= new_bin_starts[i]) & (cur_bins < new_bin_starts[i+1])
-        
-        if np.any(indices):
-            x_bin = np.mean(cur_bins[indices])
-            y_bin = np.mean(cur_data[indices])
-                
-        else:
-            x_bin = (new_bin_starts[i] + new_bin_starts[i+1]) / 2
-            y_bin = np.interp(x_bin, cur_bins, cur_data)
-
-        x_binned.append(x_bin)
-        y_binned.append(y_bin)
-
-    # Convert lists to arrays
-    x_binned = np.array(x_binned)
-    y_binned = np.array(y_binned)
+    Parameters:
+    -----------
+    gMpl_minmax : tuple, optional
+        The minimum and maximum values (min, max) for the 'gMpl' variable. 
+        Defaults to (-5, 5).
     
-    # Optionally plot the rebinned data
-    if(plot):
-        plt.figure(figsize=(10, 6))
-        plt.plot(cur_bins, cur_data, 'o-', label='Original Data')
-        plt.plot(x_binned, y_binned, 's-', label='Rebinned Data', color='red')
-        plt.ylabel(r'Arbitrary Scaled $C_{\ell}^{EB}\cdot\ell(\ell+1)/(2\pi)$  [$\mu K^2$]')
-        plt.xlabel(r'$\ell$')
-        plt.title('Rebinned Data (Averaged y, Ignoring Points Outside Bins)')
-        plt.legend()
-        plt.grid(True)
-        plt.show()
+    aplusb_minmax : tuple, optional
+        The minimum and maximum values (min, max) for the 'aplusb' variable.
+        Defaults to (-5, 5).
 
-    return y_binned
-
+    Returns:
+    --------
+    variables : list of str
+        A list of variable names used in the model:
+      
+    priors : list of tuple
+        A list of tuples specifying the prior ranges for each corresponding variable:
+        
+    """
+    variables = ['gMpl', 'aplusb_b95', 'aplusb_b95ext', 
+                 'aplusb_k95', 'aplusb_150', 'aplusb_220']
+    priors = [gMpl_minmax, aplusb_minmax, aplusb_minmax, 
+              aplusb_minmax, aplusb_minmax, aplusb_minmax]
+    return variables, priors
 
 
 def scatter_sims(sim_results, mapname='BK18_B95ext'):
@@ -407,71 +360,143 @@ def scatter_sims(sim_results, mapname='BK18_B95ext'):
     #plt.show()
     return 
 
-def main():
-    print('~~~~~~~~~~~~~~ Start MCMC ~~~~~~~~~~~~~~')
-    
-    
-    variables, priors = get_priors_and_variables(aplusb_minmax=(-5,5))
-    maps = ['BK18_B95', 'BK18_K95', 'BK18_150', 'BK18_220', 'BK18_B95ext']
-    zero_ede=False
-    table_str = ''
-    max_sim = 1
-    sim_runs = range(0,max_sim)
-    sim_str = 'map_name,sim_num,gMpl,gMpl_std,aplusb,aplusb_std\n'
-    csv_resultfile = 'sim_results.csv'
-    for map in maps:
-        output_plots = 'output_plots_ede' + str(not zero_ede) 
-        outpath = 'mcmc_chains_ede' + str(not zero_ede) + '/' + map + '/'
-        if(not os.path.exists(output_plots)):
-                os.mkdir(output_plots)
-        
-        bin_centers, spectrum_dict = eld.load_bicep_data(plot=True, mapname=map, output_plots=output_plots, zero_ede=zero_ede)
-        GLOBAL_VAR.update(spectrum_dict)
-        for sim_num in sim_runs:
-            output_plots = 'output_plots_ede' + str(not zero_ede) + '/sim' + str(sim_num) + '/'
-            outpath = 'mcmc_chains_ede' + str(not zero_ede) + '/' + map + '/' + 'simnum' + str(sim_num)
-            if(not os.path.exists(output_plots)):
-                os.mkdir(output_plots)
-            GLOBAL_VAR['EB_observed'] = GLOBAL_VAR['EB_sims'][:,sim_num]
-            info_dict = get_eb_axion_infodict(outpath, variables, priors)
-            init_params = info_dict['params']
-            updated_info, sampler = run(info_dict, resume=True)
-            gMpl, aplusb, gMpl_std, aplusb_std = plot_best_fit(sampler, bin_centers=bin_centers, mapname=map, output_plots=output_plots)
+def ensure_directory(path):
+    """Ensure that the directory exists, create it if it doesn't."""
+    if not os.path.exists(path):
+        os.makedirs(path)
 
-            plot_info(variables, updated_info, sampler, mapname=map, outfile=map+'_triagplot.png', output_plots=output_plots)
-            sim_str+= (map + ',' + str(np.round(sim_num,3)) + ',' + 
-                        str(np.round(gMpl,3)) + ',' + str(np.round(gMpl_std,3)) + ',' + 
-                        str(np.round(aplusb,3)) + ',' + str(np.round(aplusb_std,3))) + '\n'
+def prepare_simulation(mapname, sim_num, zero_ede):
+    """Prepare output paths and directories for a given map and simulation number."""
+    
+    return output_plots, outpath
+
+def run_mcmc_for_simulation(mapname, sim_num, bin_centers, variables, priors, zero_ede=False):
+    """Run MCMC analysis for a specific map and simulation number."""
+    output_plots = f'output_plots_ede{str(not zero_ede)}/{mapname}/'
+    outpath = f'mcmc_chains_ede{str(not zero_ede)}/{mapname}/simnum{sim_num}'
+    ensure_directory(output_plots)
+    GLOBAL_VAR['EB_observed'] = GLOBAL_VAR['EB_sims'][:, sim_num]
+    info_dict = get_eb_axion_infodict(outpath, variables, priors,
+                                      likelihood_func=eb_axion_mcmc_runner)
+    init_params = info_dict['params']
+    updated_info, sampler = run(info_dict, resume=True)
+    gMpl, aplusb, gMpl_std, aplusb_std = plot_best_fit(sampler, bin_centers=bin_centers, mapname=mapname, output_plots=output_plots)
+    
+    plot_info(variables, updated_info, sampler, mapname=mapname, outfile=f'{mapname}_triagplot.png', output_plots=output_plots)
+    return gMpl, aplusb, gMpl_std, aplusb_std
+
+def run_mcmc_for_real(mapname, bin_centers, variables, priors, zero_ede=False):
+    """Run MCMC analysis for the real data."""
+    output_plots = f'output_plots_ede{str(not zero_ede)}/real'
+    outpath = f'mcmc_chains_ede{str(not zero_ede)}/{mapname}/real'
+    ensure_directory(output_plots)
+    info_dict = get_eb_axion_infodict(outpath, variables, priors,
+                                      likelihood_func=eb_axion_mcmc_runner)
+    init_params = info_dict['params']
+    log_test = eb_axion_mcmc_runner(init_params['aplusb']['ref'], init_params['gMpl']['ref'])
+    print("Initial chisq value: " + str(log_test))
+    updated_info, sampler = run(info_dict, resume=True)
+    gMpl, aplusb, gMpl_std, aplusb_std = plot_best_fit(sampler, bin_centers=bin_centers, mapname=mapname, output_plots=output_plots)
+    
+    plot_info(variables, updated_info, sampler, mapname=mapname, outfile=f'{mapname}_triagplot.png', output_plots=output_plots)
+    return gMpl, aplusb, gMpl_std, aplusb_std
+
+def update_sim_results(sim_str, mapname, sim_num, gMpl, aplusb, gMpl_std, aplusb_std):
+    """Update the simulation results string with the latest data."""
+    return sim_str + f'{mapname},{np.round(sim_num,3)},{np.round(gMpl,3)},{np.round(gMpl_std,3)},{np.round(aplusb,3)},{np.round(aplusb_std,3)}\n'
+
+def update_table_str(table_str, mapname, aplusb, aplusb_std, aplusb_bestfit, std, two_var_chisq, one_var_chisq):
+    """Update the table string with the latest data."""
+    table_str += f'{mapname}: {aplusb} +- {aplusb_std}, {np.round(aplusb_bestfit,3)} +- {np.round(std,3)}\n'
+    table_str += f'twovar_chisq: {two_var_chisq} onevar_chisq: {one_var_chisq}\n'
+    return table_str
+
+def single_freq_analysis(max_sim):
+    """Main function to run the frequency analysis."""
+    print('~~~~~~~~~~~~~~ Start MCMC ~~~~~~~~~~~~~~')
+
+    variables, priors = get_priors_and_variables(aplusb_minmax=(-5,5))
+    sim_str = 'map_name,sim_num,gMpl,gMpl_std,aplusb,aplusb_std\n'
+    table_str = ''
+    csv_resultfile = 'sim_results.csv'
+    zero_ede = False
+    for mapname in MAP_FREQS:
+        output_plots = f'output_plots_ede{str(not zero_ede)}'
+        ensure_directory(output_plots)
         
-        output_plots = 'output_plots_ede' + str(not zero_ede) + '/' + 'real' 
-        outpath = 'mcmc_chains_ede' + str(not zero_ede) + '/' + map + '/' + 'real' 
-        if(not os.path.exists(output_plots)):
-                os.mkdir(output_plots)
-        info_dict = get_eb_axion_infodict(outpath, variables, priors)
-        init_params = info_dict['params']
-        # test to make sure the likelihood function works 
-        log_test = eb_axion_mcmc_runner(init_params['aplusb']['ref'], 
-                                        init_params['gMpl']['ref'])
-        print("Initial chisq value: " + str(log_test))
-        updated_info, sampler = run(info_dict, resume=True)
-        gMpl, aplusb, gMpl_std, aplusb_std = plot_best_fit(sampler, bin_centers=bin_centers, mapname=map, output_plots=output_plots)
-   
-        plot_info(variables, updated_info, sampler, mapname=map, outfile=map+'_triagplot.png', output_plots=output_plots)
-        table_str += map + ': ' + str(aplusb) + ' +- ' + str(aplusb_std) 
+        bin_centers, spectrum_dict = eld.load_bicep_data(plot=True, mapname=mapname, output_plots=output_plots, zero_ede=False)
+        GLOBAL_VAR.update(spectrum_dict)
+        gMpl, aplusb, gMpl_std, aplusb_std = run_mcmc_for_real(mapname, bin_centers, variables, priors)
         
         aplusb_bestfit, std = polar_rotation_likelihood()
-        table_str += ', ' + str(np.round(aplusb_bestfit,3)) + ' +- ' + str(np.round(std,3))
-        table_str += '\n'
-        
         two_var_chisq = eb_axion_mcmc_runner(aplusb, gMpl)
         one_var_chisq = eb_axion_mcmc_runner(aplusb_bestfit, 0)
-        table_str += 'twovar_chisq: ' + str(two_var_chisq) + ' onevar_chisq: ' + str(one_var_chisq) + '\n'
+        table_str = update_table_str(table_str, mapname, aplusb, aplusb_std, aplusb_bestfit, std, two_var_chisq, one_var_chisq)
+    
+        for sim_num in range(max_sim): 
+            gMpl, aplusb, gMpl_std, aplusb_std = run_mcmc_for_simulation(mapname, sim_num, bin_centers, variables, priors)
+            sim_str = update_sim_results(sim_str, mapname, sim_num, gMpl, aplusb, gMpl_std, aplusb_std)
+        
+        
     with open(csv_resultfile, 'w') as file:
         file.write(sim_str)
+    
     print(table_str)
-    for mapname in maps:
+    for mapname in MAP_FREQS:
         scatter_sims(csv_resultfile, mapname=mapname)
+    
     print('~~~~~~~~~~~~~~ End ~~~~~~~~~~~~~~')
+
+def multi_freq_analysis(max_sim):
+    variables, priors = get_priors_and_variables_multi_comp(aplusb_minmax=(-5,5))
+    sim_str = 'sim_num,gMpl,gMpl_std,aplusb,aplusb_std\n'
+    csv_resultfile = 'sim_results_multicomp.csv'
+    zero_ede = False
+    output_plots = f'output_plots_ede{str(not zero_ede)}_multicomp/real'
+    outpath = f'mcmc_chains_ede{str(not zero_ede)}_multicomp/real'
+    ensure_directory(output_plots)
+    for mapname in MAP_FREQS:
+        bin_centers, spectrum_dict = eld.load_bicep_data(plot=True, mapname=mapname, output_plots=output_plots, zero_ede=False)
+        GLOBAL_VAR['EB_sims_' + mapname] = spectrum_dict['EB_sims']
+        GLOBAL_VAR['EE_binned' + '_' + mapname] = spectrum_dict['EE_binned']
+        GLOBAL_VAR['BB_binned'+ '_' + mapname] = spectrum_dict['BB_binned']
+        GLOBAL_VAR['EB_observed'+ '_' + mapname] = spectrum_dict['EB_observed']
+        GLOBAL_VAR['EB_var'+ '_' + mapname] = spectrum_dict['EB_var']
+        GLOBAL_VAR['EB_EDE'+ '_' + mapname] = spectrum_dict['EB_EDE']
+
+    
+    info_dict = get_eb_axion_infodict(outpath, variables, priors,
+                                      likelihood_func=eb_axion_multicomponent_mcmc_runner)
+    init_params = info_dict['params']
+    log_test = eb_axion_multicomponent_mcmc_runner( init_params['gMpl']['ref'],
+                                                   init_params['aplusb_b95']['ref'],
+                                                   init_params['aplusb_b95ext']['ref'],
+                                                   init_params['aplusb_k95']['ref'],
+                                                   init_params['aplusb_150']['ref'],
+                                                   init_params['aplusb_220']['ref'],)
+    print("Initial chisq value: " + str(log_test))
+    updated_info, sampler = run(info_dict, resume=True)
+    mapname = 'Multicomponent'
+    plot_info(variables, updated_info, sampler, mapname=mapname, 
+              outfile=f'{mapname}_triagplot.png', output_plots=output_plots)
+    
+    for sim_num in range(max_sim): 
+        output_plots = f'output_plots_ede{str(not zero_ede)}_multicomp/sim_num{sim_num}/'
+        outpath = f'mcmc_chains_ede{str(not zero_ede)}_multicomp/simnum{sim_num}'
+        ensure_directory(output_plots) 
+        for mapname in MAP_FREQS:
+            GLOBAL_VAR['EB_observed'+ '_' + mapname] = GLOBAL_VAR['EB_sims_' + mapname][:, sim_num]
+        info_dict = get_eb_axion_infodict(outpath, variables, priors,
+                                      likelihood_func=eb_axion_multicomponent_mcmc_runner)
+        init_params = info_dict['params']
+        updated_info, sampler = run(info_dict, resume=True)
+    
+        plot_info(variables, updated_info, sampler, mapname=mapname, outfile=f'{mapname}_triagplot.png', output_plots=output_plots)
+        
+
+def main():
+    multi_freq_analysis(max_sim=499)
+    #single_freq_analysis(max_sim=0)
 if __name__ == '__main__':
    
     main()

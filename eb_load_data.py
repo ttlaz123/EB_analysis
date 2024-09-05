@@ -346,9 +346,8 @@ def read_ede_data(data_path='input_data/fEDE0.07_cl.dat'):
 
 def load_eskilt_data(data_path = 'input_data/HFI_f_sky_092_EB_o.npy'):
     raw_cl = True
-    load_data('all', raw_cls=raw_cl)
+    spectrum_dict = load_data('all', raw_cls=raw_cl)
     c_l_EB_o_mean_std = np.load(data_path)
-    spectrum_dict = {}
     spectrum_dict['EB_observed'] = c_l_EB_o_mean_std[:, 0]
     spectrum_dict['EB_var'] = np.square(c_l_EB_o_mean_std[:, 1])
     ell_min = 51
