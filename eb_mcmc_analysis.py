@@ -10,7 +10,7 @@ import pickle
 import argparse
 import matplotlib
 from matplotlib.gridspec import GridSpec
-matplotlib.use('Agg')
+
 
 import pandas as pd
 from cobaya.run import run
@@ -81,7 +81,7 @@ def read_sampler(filepath):
                     'minuslogprior__0', 'chi2', 'chi2__power']
     return df
 
-def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots):
+def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots, residuals=False):
     aplusb_dict = {
         'BK18_B95':'aplusb_b95', 
         'BK18_K95':'aplusb_k95', 
@@ -96,13 +96,13 @@ def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots):
     axes = {
         MAP_FREQS[i]: fig.add_subplot(gs[i]) for i in range(len(MAP_FREQS)) 
     }
-    alpha = 0.01
+    alpha = 0.05
     diag_ax = fig.add_subplot(gs[5])  # Diagonal plot spot
     with open(output_plots + '/' + 'sim_results_multicomp.csv', 'w') as file:
 
         header_str = 'sim_num,gMpl,gMpl_std,'
         for freq in MAP_FREQS:
-            header_str += aplusb_dict[freq] + ',' + aplusb_dict[freq] + '_std'
+            header_str += aplusb_dict[freq] + ',' + aplusb_dict[freq] + '_std,'
         header_str += ',chisq' 
         file.write(header_str + '\n')
         for i,sampler in enumerate(sampler_sims):
@@ -130,23 +130,37 @@ def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots):
                 cos_term = np.cos(4 * np.deg2rad(aplusb)) * gMpl * C_eb_ede
                 sin_term = np.sin(4 * np.deg2rad(aplusb)) / 2 * (C_ee_cmb - C_bb_cmb) 
                 if(i == 0):
-                    ax.plot(bin_centers, cos_term, color='blue', 
-                            alpha=alpha, linewidth=1, label = 'gMpl term')
-                    ax.plot(bin_centers, sin_term, color='green', 
-                            alpha=alpha, linewidth=1, label = 'aplusb term')
-                    ax.plot(bin_centers, sin_term+cos_term, color='purple', 
-                            alpha=alpha*10, linewidth=1, label = 'combined')
-                    ax.plot(bin_centers, C_eb_sim, color='red', 
-                            alpha=alpha*10, linewidth=1, label = 'sim curve')
+                    if(residuals):
+                        ax.plot(bin_centers, sin_term+cos_term-C_eb_sim, color='red', 
+                            alpha=alpha*10, linewidth=1, label = 'residual')
+                    else:
+                        ax.plot(bin_centers, cos_term, color='blue', 
+                                alpha=alpha, linewidth=1, label = 'gMpl term')
+                        ax.plot(bin_centers, sin_term, color='green', 
+                                alpha=alpha, linewidth=1, label = 'aplusb term')
+                        
+                        ax.plot(bin_centers, sin_term+cos_term, color='purple', 
+                                alpha=alpha*10, linewidth=1, label = 'combined')
+                        ax.plot(bin_centers, C_eb_sim, color='red', 
+                                alpha=alpha*10, linewidth=1, label = 'sim curve')
+                        
+                    
                 else:
-                    ax.plot(bin_centers, cos_term, color='blue', 
-                            alpha=alpha, linewidth=1)
-                    ax.plot(bin_centers, sin_term, color='green', 
-                            alpha=alpha, linewidth=1)
-                    ax.plot(bin_centers, sin_term+cos_term, color='purple', 
+                    if(residuals):
+                        ax.plot(bin_centers, sin_term+cos_term-C_eb_sim, color='red', 
                             alpha=alpha*10, linewidth=1)
-                    ax.plot(bin_centers, C_eb_sim, color='red', 
-                            alpha=alpha*10, linewidth=1)
+                    else:
+                        ax.plot(bin_centers, cos_term, color='blue', 
+                                alpha=alpha, linewidth=1)
+                        ax.plot(bin_centers, sin_term, color='green', 
+                                alpha=alpha, linewidth=1)
+                        
+                        ax.plot(bin_centers, sin_term+cos_term, color='purple', 
+                                alpha=alpha*10, linewidth=1)
+                        ax.plot(bin_centers, C_eb_sim, color='red', 
+                                alpha=alpha*10, linewidth=1)
+                        
+                    
                 
                 sim_line_str += str(aplusb) + ',' + str(aplusb_std) + ',' 
             chisq = np.round(gd_sample['chi2'][n//2:].mean(),3)
@@ -158,6 +172,7 @@ def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots):
         C_eb_var = GLOBAL_VAR['EB_var'+ '_' + map_freq]
         if(len(C_eb_var.shape)==2 and C_eb_var.shape[0] == C_eb_var.shape[1]):
             C_eb_var = np.diag(C_eb_var)
+    
         ax.errorbar(bin_centers, C_eb_observed, yerr=np.sqrt(C_eb_var), 
                     linewidth=3, alpha=1, label='observed EB')
         ax.set_title(map_freq)
@@ -166,7 +181,10 @@ def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots):
         ax.set_ylabel(r'$C_{\ell}^{EB}\cdot\ell(\ell+1)/(2\pi)$  [$\mu K^2$]')
     plt.suptitle('Multicomponent All Sims')
     plt.tight_layout()
-    plt.savefig(output_plots + '/multicomp_bestfit_allsims.png')
+    if(residuals):
+        plt.savefig(output_plots + '/multicomp_bestfit_residuals_allsims.png')
+    else:
+        plt.savefig(output_plots + '/multicomp_bestfit_allsims.png')
     plt.close()
 
 def plot_best_fit(sampler, bin_centers, mapname=None, output_plots='output_plots'):
@@ -599,13 +617,51 @@ def multi_freq_analysis(max_sim, do_run=True):
             sampler = outpath + '.1.txt'
             all_samplers.append(sampler)
     output_plots = f'output_plots_ede{str(not zero_ede)}_multicomp/'
-    plot_best_fit_multicomponent(sampler_sims=all_samplers, bin_centers=bin_centers, output_plots=output_plots)    
+    plot_best_fit_multicomponent(sampler_sims=all_samplers, bin_centers=bin_centers, 
+                                 output_plots=output_plots, residuals=False)    
 
+def plot_chisq_hist(sim_results_file):
+    df = pd.read_csv(sim_results_file)
+    plt.figure(figsize=(8, 6))
+    plt.hist(df['chisq'], bins=30, color='blue', edgecolor='black')
+    chisq=162
+    plt.axvline(x=chisq, color='red', linestyle='--', 
+                linewidth=2, label='Real chisq at ' + str(chisq))
+    plt.legend()
+    plt.title('Histogram of Chi-squared Values')
+    plt.xlabel('Chi-squared')
+    plt.ylabel('Frequency')
+    plt.grid(True)
+    plt.show()
+
+def plot_corner(sim_results_file, real_results_file):
+    import corner
+    df_sim = pd.read_csv(sim_results_file)
+    df_real = pd.read_csv(real_results_file, delim_whitespace=True, header=0)
+    param_names = ['gMpl', 'aplusb_b95', 'aplusb_k95', 'aplusb_150', 'aplusb_220', 'aplusb_b95ext']
+    print(df_real.columns)
+    data_sim = df_sim[param_names].values
+    data_real = df_real[param_names].values
+    # Plot the first corner plot
+    print('first plot')
+    fig = corner.corner(data_sim, labels=param_names, show_titles=True, title_fmt=".2f", plot_contours=True, color='blue')
+    print('second plot')
+    # Overlay the second corner plot
+    corner.corner(data_real, labels=param_names, show_titles=True, title_fmt=".2f", plot_contours=True, color='red', fig=fig)
+
+# Add legend
+    plt.legend(['Aggregate Sim Dataset', 'Real Dataset'])
+
+    plt.show()
+  
 def main():
-    multi_freq_analysis(max_sim=200, do_run=False)
+    matplotlib.use('Agg')
+    multi_freq_analysis(max_sim=499, do_run=False)
     #single_freq_analysis(max_sim=0)
 
 if __name__ == '__main__':
-   
-    main()
+    #main()
+    plot_corner('output_plots_edeTrue_multicomp/sim_results_multicomp.csv',
+                'mcmc_chains_edeTrue_multicomp/real.1.txt')
+    
     
