@@ -5,3 +5,4 @@
 *.progress
 *.dill_pickle
 *.png
+*.locked

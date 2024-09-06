@@ -534,14 +534,14 @@ def single_freq_analysis(max_sim):
     sim_str = 'map_name,sim_num,gMpl,gMpl_std,aplusb,aplusb_std\n'
     table_str = ''
     csv_resultfile = 'sim_results.csv'
-    zero_ede = False
+    zero_ede = True
     for mapname in MAP_FREQS:
         output_plots = f'output_plots_ede{str(not zero_ede)}'
         ensure_directory(output_plots)
         
-        bin_centers, spectrum_dict = eld.load_bicep_data(plot=True, mapname=mapname, output_plots=output_plots, zero_ede=False)
+        bin_centers, spectrum_dict = eld.load_bicep_data(plot=True, mapname=mapname, output_plots=output_plots, zero_ede=zero_ede)
         GLOBAL_VAR.update(spectrum_dict)
-        gMpl, aplusb, gMpl_std, aplusb_std = run_mcmc_for_real(mapname, bin_centers, variables, priors)
+        gMpl, aplusb, gMpl_std, aplusb_std = run_mcmc_for_real(mapname, bin_centers, variables, priors, zero_ede=zero_ede)
         
         aplusb_bestfit, std = polar_rotation_likelihood()
         two_var_chisq = eb_axion_mcmc_runner(aplusb, gMpl)
@@ -549,7 +549,7 @@ def single_freq_analysis(max_sim):
         table_str = update_table_str(table_str, mapname, aplusb, aplusb_std, aplusb_bestfit, std, two_var_chisq, one_var_chisq)
     
         for sim_num in range(max_sim): 
-            gMpl, aplusb, gMpl_std, aplusb_std = run_mcmc_for_simulation(mapname, sim_num, bin_centers, variables, priors)
+            gMpl, aplusb, gMpl_std, aplusb_std = run_mcmc_for_simulation(mapname, sim_num, bin_centers, variables, priors, zero_ede=zero_ede)
             sim_str = update_sim_results(sim_str, mapname, sim_num, gMpl, aplusb, gMpl_std, aplusb_std)
         
         
@@ -564,14 +564,12 @@ def single_freq_analysis(max_sim):
 
 def multi_freq_analysis(max_sim, do_run=True):
     variables, priors = get_priors_and_variables_multi_comp(aplusb_minmax=(-5,5))
-    sim_str = 'sim_num,gMpl,gMpl_std,aplusb,aplusb_std\n'
-    csv_resultfile = 'sim_results_multicomp.csv'
     zero_ede = False
     output_plots = f'output_plots_ede{str(not zero_ede)}_multicomp/real'
     outpath = f'mcmc_chains_ede{str(not zero_ede)}_multicomp/real'
     ensure_directory(output_plots)
     for mapname in MAP_FREQS:
-        bin_centers, spectrum_dict = eld.load_bicep_data(plot=True, mapname=mapname, output_plots=output_plots, zero_ede=False)
+        bin_centers, spectrum_dict = eld.load_bicep_data(plot=True, mapname=mapname, output_plots=output_plots, zero_ede=zero_ede)
         GLOBAL_VAR['EB_sims_' + mapname] = spectrum_dict['EB_sims']
         GLOBAL_VAR['EE_binned' + '_' + mapname] = spectrum_dict['EE_binned']
         GLOBAL_VAR['BB_binned'+ '_' + mapname] = spectrum_dict['BB_binned']
@@ -656,12 +654,12 @@ def plot_corner(sim_results_file, real_results_file):
   
 def main():
     matplotlib.use('Agg')
-    multi_freq_analysis(max_sim=499, do_run=False)
+    multi_freq_analysis(max_sim=499, do_run=True)
     #single_freq_analysis(max_sim=0)
 
 if __name__ == '__main__':
-    #main()
-    plot_corner('output_plots_edeTrue_multicomp/sim_results_multicomp.csv',
-                'mcmc_chains_edeTrue_multicomp/real.1.txt')
+    main()
+    #plot_corner('output_plots_edeTrue_multicomp/sim_results_multicomp.csv',
+    #            'mcmc_chains_edeTrue_multicomp/real.1.txt')
     
     

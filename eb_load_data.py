@@ -204,7 +204,7 @@ def load_data(spectrum_type, datafile=None, raw_cls=False):
         GLOBAL_VAR['errs'] = errs
     return GLOBAL_VAR
 
-def load_dust_lensing_model(bin_start=2, bin_end=10, mapname='BK18_B95', 
+def load_dust_lensing_model(bin_start=1, bin_end=10, mapname='BK18_B95', 
                             dust_path='input_data/model_dust.npy', 
                             lensing_path='input_data/model_lens.npy', 
                             bandpowerwindowfunction_path='input_data/bpwf.npy',
@@ -258,7 +258,7 @@ def load_dust_lensing_model(bin_start=2, bin_end=10, mapname='BK18_B95',
     
     return bpwf_ls, bpwf_cls[:,:,EE], spectrum_dict
 
-def load_bicep_sim_data(map_name, bin_start=2, bin_end=10, EB_index=5, data_path='input_data/dust_simulations.npy'):
+def load_bicep_sim_data(map_name, bin_start=1, bin_end=10, EB_index=5, data_path='input_data/dust_simulations.npy'):
     dust_sims = np.load(data_path, allow_pickle=True)
     dataset_index = bicep_data_consts.SPECTRA_DATASETS.index(map_name)
     eb_dust_spectra = dust_sims[dataset_index][bin_start:bin_end,EB_index,:]
@@ -274,7 +274,7 @@ def load_bicep_data(plot=False, mapname=None, output_plots='output_plots', zero_
     #cov_file = 'input_data/bicep_cov.npy'
     offdiag = 2
     data_path= 'input_data/bicep_norot_realspectra.npy'
-    cov_file = 'input_data/bicep_norot_covar.npy'
+    cov_file = 'input_data/bicep_cov_simdust.npy'
     bin_start = 1
     bin_end=10
     scale = 100
@@ -313,7 +313,7 @@ def load_bicep_data(plot=False, mapname=None, output_plots='output_plots', zero_
 
     # Extract the data
     if(zero_ede):
-        eb_ede_binned = np.zeros(bin_end-bin_start)
+        eb_ede_binned = np.zeros(bin_end)
     else:
         eb_ede_theory_provided = read_ede_data()[bpwf_ls]
         eb_ede_binned = np.matmul(eb_ede_theory_provided,ee_bpwf_cls)
