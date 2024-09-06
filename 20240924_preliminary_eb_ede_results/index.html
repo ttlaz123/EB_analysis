@@ -11,8 +11,7 @@
             TeX: { equationNumbers: { autoNumber: "AMS" } }
         });
     </script>
-    <script type="text/javascript" src="../mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-</head>
+  </head>
 
 <body>
     <!-- Add my custom pager script -->
@@ -40,27 +39,124 @@
         https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20201221_BK18_polrot/
 
         <figure>
-            <img alt="Cold Spot Maps" id="maps" src="#" width="750" height="750" />
-            <figcaption>Map pager</figcaption>
+            <img alt="polrot" id="polrot" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
+            <figcaption>
+                Plot Pager
+            </figcaption>
             <script type="text/javascript">
-                pager.link("#maps",
-                    {{ pager_config | safe }}
+          
+                pager.link("#polrot",
+                    {
+                        'Map Frequency|mapfreq':[
+                            'BICEP 95GHz|BK18_B95',
+                            'Keck 95GHz|BK18_K95',
+                            'BICEP 95GHz Extended|BK18_B95ext',
+                            'BICEP 150GHz|BK18_150',
+                            'BICEP 220GHz|BK18_220',
+                        ],
+                        'Map type|map_type':[
+                            'Best Fit|_bestfit',
+                            'Triangle Plot|_triagplot',
+                            'Component Spectra Dls|_spectra_Dls',
+                            'Component Spectra Cls|_spectra_Cls',
+                        ],
+                        'Bins used|bin_num': [
+                            '2-10|',
+                            '2-17|_bin17'
+                        ],
+                        'Add EDE Spectrum?|ede':[
+                            'Yes|True',
+                            'No|False'
+                        ]
+                    },
+                    function (params) {
+                        let dirpath = '../output_plots_ede' + params.ede;
+                        dirpath = dirpath + params.bin_num;
+                        sim_folder = 'real' ;
+                        polrot_plot = params.mapfreq + params.map_type + '.png';
+                        let name = dirpath + '/' + sim_folder + '/' + polrot_plot;
+                        console.log(name);
+                        return name;
+                    }
                 );
-
+        
                 pager.setparams(
-                    {{ pager_params | safe }}
+                    {
+                        'mapfreq': 'BK18_B95',
+                        'map_type': '_triagplot',
+                        'bin_num': '',
+                        'ede': 'False'
+                    }
                 );
             </script>
         </figure>
-        
     </section>
 
     <section>
         <h2>Adding Early Dark Energy EB Spectrum</h2>
         
-
         <figure>
-            <img alt="Plot" id="plot" src="#" width="750" height="750" />
+            <img alt="polrot" id="multicomp" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
+            <figcaption>
+                Plot Pager
+            </figcaption>
+            <script type="text/javascript">
+          
+                pager.link("#multicomp",
+                    {
+                        'Map Frequency|mapfreq':[
+                            'BICEP 95GHz|BK18_B95',
+                            'Keck 95GHz|BK18_K95',
+                            'BICEP 95GHz Extended|BK18_B95ext',
+                            'BICEP 150GHz|BK18_150',
+                            'BICEP 220GHz|BK18_220',
+                        ],
+                        'Map type|multi_map_type':[
+                            'Best Fit|_bestfit',
+                            'Triangle Plot|_triagplot',
+                            'Component Spectra Dls|_spectra_Dls',
+                            'Component Spectra Cls|_spectra_Cls',
+                        ],
+                        'Bins used|bin_num': [
+                            '2-10|',
+                            '2-17|_bin17'
+                        ],
+                        'Add EDE Spectrum?|ede':[
+                            'Yes|True',
+                            'No|False'
+                        ]
+                    },
+                    function (params) {
+                        let dirpath = '../output_plots_ede' + params.ede + '_multicomp';
+                        dirpath = dirpath + params.bin_num;
+                        sim_folder = 'real' ;
+                        ede_plot = '';
+                        if(params.multi_map_type == '_triagplot'){
+                            ede_plot = 'Multicomponent_triagplot.png'
+                        } else if(params.multi_map_type == '_bestfit'){
+                            ede_plot = 'multicomp_bestfit_' + params.mapfreq + '.png';
+                        } else {
+                            ede_plot = params.mapfreq + params.multi_map_type + '.png';
+                        }
+                        let name = dirpath + '/' + sim_folder + '/' + ede_plot;
+                        console.log(name);
+                        return name;
+                    }
+                );
+        
+                pager.setparams(
+                    {
+                        'mapfreq': 'BK18_B95',
+                        'multi_map_type': '_triagplot',
+                        'bin_num': '',
+                        'ede': 'False'
+                    }
+                );
+            </script>
+        </figure>
+        
+        <figure>
+            <img alt="Plot" id="multisim" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
             <figcaption>
                 Plot Pager
             </figcaption>
@@ -69,39 +165,35 @@
                 function generateSimNumOptions(start, end) {
                     let options = [];
                     for (let i = start; i <= end; i++) {
-                        let num = i.toString().padStart(2, '0'); // Format numbers as two digits
-                        options.push(`${num}|sim_num${num}`);
+                        let num = i.toString().padStart(1, '0'); // Format numbers as two digits
+                        options.push(`${num}|${num}`);
                     }
                     return options;
                 }
         
                 // Generate options for simulation numbers from 0 to 499
-                const simNumOptions = generateSimNumOptions(0, 499);
+                const simNumOptions = generateSimNumOptions(0, 9);
         
-                pager.link("#plot",
+                pager.link("#multisim",
                     {
-                        'Simulation Number|simnum': simNumOptions,
-                        'Plot Type|plot': [
-                            'Best Fit All Sims|multicomp_bestfit_allsims.png',
-                            'BK18 150|real_multicomp_bestfit_BK18_150.png',
-                            'BK18 220|real_multicomp_bestfit_BK18_220.png',
-                            'BK18 B95|real_multicomp_bestfit_BK18_B95.png',
-                            'BK18 B95ext|real_multicomp_bestfit_BK18_B95ext.png',
-                            'BK18 K95|real_multicomp_bestfit_BK18_K95.png',
-                            'Results|sim_results_multicomp.csv'
+                        'Map Sim Num Digit1|digit1': simNumOptions,
+                        'Digit2|digit2': simNumOptions,
+                        'Digit3|digit3': simNumOptions,
+                        'Bins used|bin_num': [
+                            '2-10|',
+                            '2-17|_bin17'
                         ]
                     },
                     function (params) {
-                        let dirpath = '../';
-                        let filename = '';
-        
-                        if (params.plot === 'sim_results_multicomp.csv') {
-                            filename = params.plot;
-                        } else {
-                            filename = params.plot;
-                        }
-        
-                        let name = dirpath + filename;
+                        let dirpath = '../output_plots_edeTrue_multicomp';
+                        dirpath = dirpath + params.bin_num;
+
+                        simNumber = params.digit1 + params.digit2 + params.digit3;
+                   
+                        sim_folder = 'sim_num' + parseInt(simNumber, 10); // Remove leading zeros
+                   
+                        sim_triag_plot_name = 'BK18_B95ext_triagplot.png' //this is misnamed
+                        let name = dirpath + '/' + sim_folder + '/' + sim_triag_plot_name;
                         console.log(name);
                         return name;
                     }
@@ -109,8 +201,10 @@
         
                 pager.setparams(
                     {
-                        'simnum': '00', // Default to the first simulation number
-                        'plot': 'multicomp_bestfit_allsims.png'
+                        'digit1': '0',
+                        'digit2': '0',
+                        'digit3': '0',
+                        'bin_num': ''
                     }
                 );
             </script>
@@ -120,21 +214,44 @@
 
     <section>
         <h2>Maps Pager</h2>
-        
-
         <figure>
-            <img alt="Cold Spot Maps" id="maps" src="#" width="750" height="750" />
-            <figcaption>Map pager</figcaption>
+            <img alt="summaryplot" id="summaryplot" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
+            <figcaption>
+                Plot Pager
+            </figcaption>
             <script type="text/javascript">
-                pager.link("#maps",
-                    {{ pager_config | safe }}
+          
+                pager.link("#summaryplot",
+                    {
+                        'Map type|sum_map_type':[
+                            'Best Fit|multicomp_bestfit_allsims',
+                            'Triangle Plot|real_and_sims_corner',
+                        ],
+                        'Bins used|bin_num': [
+                            '2-10|',
+                            '2-17|_bin17'
+                        ],
+                    },
+                    function (params) {
+                        let dirpath = '../output_plots_edeTrue_multicomp';
+                        dirpath = dirpath + params.bin_num;
+                        sim_folder = 'real' ;
+                        summary_plot = params.sum_map_type + '.png';
+                        let name = dirpath +  '/' + summary_plot;
+                        console.log(name);
+                        return name;
+                    }
                 );
-
+        
                 pager.setparams(
-                    {{ pager_params | safe }}
+                    {
+                        'sum_map_type': 'multicomp_bestfit_allsims',
+                        'bin_num': '',
+                    }
                 );
             </script>
         </figure>
+
         
     </section>
     <section>

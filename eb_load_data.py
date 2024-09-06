@@ -331,7 +331,7 @@ def load_bicep_data(plot=False, mapname=None, output_plots='output_plots', zero_
         plt.xlabel(r'$\ell$')
         plt.legend()
         plt.title('Map: ' + str(mapname))
-        outpath = output_plots + '/' + mapname + '_spectra.png'
+        outpath = output_plots + '/' + mapname + '_spectra_Dls.png'
         print('Saving to ' + outpath)
         plt.savefig(outpath) 
         plt.close()
@@ -345,11 +345,11 @@ def load_bicep_data(plot=False, mapname=None, output_plots='output_plots', zero_
         plt.errorbar(l_bins[:], spectrum_dict['EB_observed']*scale/d_to_c_conver, yerr=np.sqrt(vars)*scale/d_to_c_conver,
                 label='C_EB bicep data scaled by ' + str(scale))
         #plt.ylim([-0.00001, 0.00002])
-        plt.ylabel(r'$C_{\ell}^{EB}\cdot\ell(\ell+1)/(2\pi)$  [$\mu K^2$]')
+        plt.ylabel(r'$C_{\ell}^{EB}$  [$\mu K^2$]')
         plt.xlabel(r'$\ell$')
         plt.legend()
         plt.title('Map: ' + str(mapname))
-        outpath = output_plots + '/' + mapname + '_spectra_Dls.png'
+        outpath = output_plots + '/' + mapname + '_spectra_Cls.png'
         print('Saving to ' + outpath)
         plt.savefig(outpath) 
         plt.close()
