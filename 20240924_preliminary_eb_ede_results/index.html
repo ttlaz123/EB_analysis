@@ -32,13 +32,15 @@
 
     <section>
         <h2>Introduction</h2>
-        <p>In Eskilt et al. (<a href="https://arxiv.org/pdf/2303.15369" target="_blank">
-            Constraint on Early Dark Energy from Isotropic Cosmic Birefringence</a>), 
+        <p>
+            In Eskilt et al. (<a href="https://arxiv.org/pdf/2303.15369" target="_blank">
+                Constraint on Early Dark Energy from Isotropic Cosmic Birefringence</a>), 
             the authors investigate the presence of Early Dark Energy (EDE) 
             by analyzing its potential impact on the polarization of the Cosmic 
             Microwave Background (CMB). They explore the possibility that the EDE field, 
             \( \phi \), is a pseudoscalar "axionlike" field that interacts with electromagnetism 
-            in a parity-violating manner. The Lagrangian density for such a field is given by:</p>
+            in a parity-violating manner. The Lagrangian density for such a field is given by:
+        </p>
     
         <p>
             \[
@@ -46,12 +48,13 @@
             \]
         </p>
     
-        <p>where \( g \) represents the photon-axion coupling constant. 
-            The term involving \( g \phi F_{\mu\nu} \tilde{F}^{\mu\nu} \) is a Chern-Simons term that
-            breaks parity symmetry due to the spacetime-dependent condensate of \( \phi \). 
+        <p>
+            where \( g \) represents the photon-axion coupling constant. The term involving \( g \phi F_{\mu\nu} \tilde{F}^{\mu\nu} \) is a Chern-Simons term that breaks parity symmetry.
         </p>
     
-        <p>The authors use a "canonical" EDE potential:</p>
+        <p>
+            The authors use a "canonical" EDE potential:
+        </p>
     
         <p>
             \[
@@ -59,17 +62,54 @@
             \]
         </p>
     
-        <p>which has been proposed as a solution to the Hubble tension. Additional constraints and alternative EDE models are discussed in the references listed in the paper.</p>
-    
-        <p>The study explored constraints on early dark energy (EDE) axions and found them to be 
-            \( g = (0.04 \pm 0.16) \, \text{M}^{-1}_{\text{Pl}} \) (68% CL). 
-            Using Planck's polarization data, they investigated cosmic birefringence and its relation 
-            to EDE, calculating power spectra and sampling parameters with MCMC methods. Their goal was to differentiate
-            between standard \(\Lambda\text{CDM}\) and EDE models, providing stronger constraints by 
-            incorporating local Hubble constant measurements like SH0ES.
+        <p>
+            This model has been proposed as a solution to the Hubble tension. Additional constraints and 
+            alternative EDE models are discussed in the references listed in the paper.
         </p>
     
-        <p>We reproduce their findings and apply a similar methodology to analyze 
+        <p>
+            They constrain the coupling constant \( g \) for pre-recombination Early Dark Energy (EDE), while accounting for post-recombination cosmic birefringence and miscalibration angles, \( \alpha + \beta \). To achieve this, the authors fit the stacked EB power spectrum for both \( g \) and \( \alpha + \beta \) simultaneously.
+        </p>
+    
+        <p>
+            The analysis uses a Markov Chain Monte Carlo (MCMC) sampler, <em>emcee</em>, to sample these parameters. The log-likelihood function is given by:
+        </p>
+    
+        <p>
+            \[
+            -2 \ln L = \sum_b \frac{v_b^2}{\text{Var}(C_{EB,o}^b)},
+            \]
+        </p>
+    
+        <p>
+            where \( v_b \) is defined as:
+        </p>
+    
+        <p>
+            \[
+            v_b \equiv \bar{C}^{EB,o}_b - \cos[4(\alpha + \beta)] \, 
+            g M_{\text{Pl}} C^{EB,\text{EDE}}_b - \sin[4(\alpha + \beta)] 
+            \frac{1}{2} \left(C^{EE,\text{CMB}}_b - C^{BB,\text{CMB}}_b\right).
+            \]
+        </p>
+    
+        <p>
+            The CMB EE and BB power spectra are computed using CAMB3 with the best-fitting
+            \(\Lambda\text{CDM}\) parameters from the Planck 2018 analysis. The EDE EB power 
+            spectrum is calculated using a modified version of the CLASS code, with 
+            \( g = M_{\text{Pl}}^{-1} \) as the coupling constant. The reduced Planck mass is 
+            approximately \( 2.4 \times 10^{18} \) GeV.
+        </p>
+    
+        <p>
+            The study explored constraints on early dark energy (EDE) axions and found them to be 
+            \( g = (0.04 \pm 0.16) \, \text{M}^{-1}_{\text{Pl}} \) (68% CL). Using Planck's and SH0ES's polarization data, they investigated cosmic birefringence and its relation 
+            to EDE, calculating power spectra and sampling parameters with MCMC methods. Their goal was to differentiate
+            between standard \(\Lambda\text{CDM}\) and EDE models.
+        </p>
+    
+        <p>
+            We reproduce their findings and apply a similar methodology to analyze 
             BICEP/Keck 18 (BK18) data, focusing on the EB spectra. Aligning with Eskilt’s approach, 
             we account for post-recombination birefringence and polarization calibration angles, 
             comparing BICEP data with their results. We utilize the
@@ -79,26 +119,55 @@
             constraints on \( g \) and Kenny's polarization rotation angles.
         </p>
     
-        <p>Additionally, we extend the analysis by performing MCMC calculations on 
+        <p>
+            Additionally, we extend the analysis by performing MCMC calculations on 
             individual frequencies and conducting a multicomponent analysis combining several 
             frequencies. We examine different bin ranges, using both 
             2-10 and 2-17 bin configurations to evaluate improvements in constraint precision. 
         </p>
     </section>
-    
-
     <section>
         <h2>Reproducing BK18 Polarization Rotation</h2>
+    
         <p>
             This section reproduces Kenny's findings on BK18 polarization rotation using the Cobaya MCMC framework. 
-            The aim is to verify the robustness of Kenny's results across various configurations, such as 
-            different frequencies, binning schemes, and the inclusion of the Early Dark Energy (EDE) spectrum. 
-            By adjusting these settings, we can assess the fidelity of the polarization angle measurement.
-            The original analysis can be found at 
+            The goal is to verify consistency with Kenny's results across various configurations, including different frequencies, 
+            binning schemes, and the inclusion of the Early Dark Energy (EDE) spectrum. The original analysis can be found in 
             <a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20201221_BK18_polrot/" target="_blank">
                 Kenny's Analysis Logbook
             </a>.
         </p>
+    
+        <p>
+            The CMB signal can be modified by applying a uniform rotation. The modified spectrum is given by:
+        </p>
+    
+        <p>
+            \[
+            C'_{EB\ell} = \frac{1}{2} (C_{EE\ell} - C_{BB\ell}) \sin(4(\alpha + \beta))
+            \]
+        </p>
+    
+        <p>
+            To assess the fit of the modified spectra to observed data, we calculate the difference between the model expectation values 
+            \( C^{EB}_{b, \text{expected}} \) and the real bandpowers \( C^{EB}_{b, \text{observed}} \), where \( b \) denotes binned bandpowers 
+            over a range in \( \ell \). The \(\chi^2\) value is computed using the bandpower covariance matrix \( C_{XY} \):
+        </p>
+    
+        <p>
+            \[
+            \chi^2 = ( C^{EB}_{b, \text{observed}} - C^{EB}_{b, \text{expected}} )^\top ( C_{XY} )^{-1} 
+            ( C^{EB}_{b, \text{observed}} - C^{EB}_{b, \text{expected}} )
+            \]
+        </p>
+    
+        <p>
+            This analysis is similar to Eskilt's MCMC analysis with \( C^{EB, \text{EDE}}_b \) set to zero, with a few differences:
+            Eskilt zeros out all nondiagonal terms of the covariance matrix, while Kenny retains up to the second off-diagonal term. 
+            Eskilt uses MCMC for the analysis, whereas Kenny employs matmin to minimize the \(\chi^2\). 
+            Additionally, Eskilt uses around 70 bins up to \( \ell = 1500 \), whereas the BICEP spectra analysis uses 10-15 bins up to \( \ell = 500 \).
+        </p>
+    
         <figure>
             <img alt="BK18 Polarization Rotation" id="polrot" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
             <figcaption>
@@ -109,7 +178,7 @@
                         <ul>
                             <li>Best Fit: Displays the best fit polarization rotation angle.</li>
                             <li>Triangle Plot: Shows correlations between analysis parameters in a triangular plot.</li>
-                            <li>Component Spectra Dls/Cls: Illustrates power spectra related to polarization rotation for different components.</li>
+                            <li>Component Spectra Dls/Cls: Illustrates power spectra related to polarization rotation for different components. Some values are scaled by 100 for easier visualization.</li>
                         </ul>
                     </li>
                     <li><strong>Bins Used</strong>: Compare results with different binning schemes (2-10 or 2-17) to evaluate the impact on measurements.</li>
@@ -118,70 +187,69 @@
             </figcaption>
             <script type="text/javascript">
                 let dirbase = '..';
-                //let dirbase ='/liuto/home/GitHub/EB_analysis/';
-                pager.link("#polrot",
-                    {
-                        'Map Frequency|mapfreq':[ 
-                            'BICEP 95GHz|BK18_B95',
-                            'Keck 95GHz|BK18_K95',
-                            'BICEP 95GHz Extended|BK18_B95ext',
-                            'BICEP 150GHz|BK18_150',
-                            'BICEP 220GHz|BK18_220',
-                        ],
-                        'Map type|map_type':[ 
-                            'Best Fit|_bestfit',
-                            'Triangle Plot|_triagplot',
-                            'Component Spectra Dls|_spectra_Dls',
-                            'Component Spectra Cls|_spectra_Cls',
-                        ],
-                        'Bins used|bin_num': [
-                            '2-10|',
-                            '2-17|_bin17'
-                        ],
-                        'Add EDE Spectrum?|ede':[ 
-                            'Yes|True',
-                            'No|False'
-                        ]
-                    },
-                    function (params) {
-                        let dirpath = dirbase + '/output_plots_ede' + params.ede;
-                        dirpath = dirpath + params.bin_num;
-                        sim_folder = 'real' ;
-                        polrot_plot = params.mapfreq + params.map_type + '.png';
-                        let name = dirpath + '/' + sim_folder + '/' + polrot_plot;
-                        console.log(name);
-                        return name;
-                    }
-                );
-        
-                pager.setparams(
-                    {
-                        'mapfreq': 'BK18_B95',
-                        'map_type': '_triagplot',
-                        'bin_num': '',
-                        'ede': 'False'
-                    }
-                );
+                //let dirbase ='/liuto/home/GitHub/EB_analysis/'; // Uncomment if running locally
+                pager.link("#polrot", {
+                    'Map Frequency|mapfreq': [ 
+                        'BICEP 95GHz|BK18_B95',
+                        'Keck 95GHz|BK18_K95',
+                        'BICEP 95GHz Extended|BK18_B95ext',
+                        'BICEP 150GHz|BK18_150',
+                        'BICEP 220GHz|BK18_220'
+                    ],
+                    'Map Type|map_type': [ 
+                        'Best Fit|_bestfit',
+                        'Triangle Plot|_triagplot',
+                        'Component Spectra Dls|_spectra_Dls',
+                        'Component Spectra Cls|_spectra_Cls'
+                    ],
+                    'Bins Used|bin_num': [
+                        '2-10|',
+                        '2-17|_bin17'
+                    ],
+                    'Add EDE Spectrum?|ede': [ 
+                        'Yes|True',
+                        'No|False'
+                    ]
+                },
+                function (params) {
+                    let dirpath = dirbase + '/output_plots_ede' + params.ede;
+                    dirpath = dirpath + params.bin_num;
+                    let sim_folder = 'real';
+                    let polrot_plot = params.mapfreq + params.map_type + '.png';
+                    let name = dirpath + '/' + sim_folder + '/' + polrot_plot;
+                    console.log(name);
+                    return name;
+                });
+    
+                pager.setparams({
+                    'mapfreq': 'BK18_B95',
+                    'map_type': '_triagplot',
+                    'bin_num': '',
+                    'ede': 'False'
+                });
             </script>
         </figure>
+    
+        <p>
+            With the EDE set to zero, the results are within a hundredth of a degree of Kenny's results. Including extra bins does not change the results beyond a few hundredths of a degree within the margin of error, suggesting a robust measurement. With EDE set to zero, the triangle plots show \( gM_{\text{Pl}} \) roughly uniform, with the angle \( \alpha + \beta \) (aplusb) centered around the same polarization rotation calculated by Kenny.
+        </p>
+    
         <table>
             <thead>
                 <tr>
                     <th>Data Set</th>
-                    <th>Kenny's Angle Bins 2-10</th>
-                    <th>MCMC Angle Bins 2-10</th>
-                    <th>Kenny's Angle Bins 2-14</th>
-                    <th>MCMC Angle Bins 2-17</th>
+                    <th>Kenny's Angle (Bins 2-10)</th>
+                    <th>MCMC Angle (Bins 2-10)</th>
+                    <th>Kenny's Angle (Bins 2-14)</th>
+                    <th>MCMC Angle (Bins 2-17)</th>
                 </tr>
             </thead>
             <tbody>
-               
                 <tr>
                     <td>BK18 B95</td>
                     <td>-0.380 ± 0.100 °</td>
                     <td>-0.384 ± 0.075 °</td>
                     <td>-0.370 ± 0.068 °</td>
-                    
                     <td>-0.367 ± 0.049 °</td>
                 </tr>
                 <tr>
@@ -189,7 +257,6 @@
                     <td>-0.164 ± 0.239 °</td>
                     <td>-0.155 ± 0.182 °</td>
                     <td>-0.141 ± 0.225 °</td>
-                    
                     <td>-0.132 ± 0.168 °</td>
                 </tr>
                 <tr>
@@ -197,7 +264,6 @@
                     <td>-0.495 ± 0.119 °</td>
                     <td>-0.494 ± 0.096 °</td>
                     <td>-0.524 ± 0.086 °</td>
-                    
                     <td>-0.527 ± 0.060 °</td>
                 </tr>
                 <tr>
@@ -205,7 +271,6 @@
                     <td>1.012 ± 0.266 °</td>
                     <td>1.005 ± 0.200 °</td>
                     <td>0.933 ± 0.171 °</td>
-                    
                     <td>0.906 ± 0.122 °</td>
                 </tr>
                 <tr>
@@ -213,46 +278,60 @@
                     <td>-0.400 ± 0.085 °</td>
                     <td>-0.401 ± 0.066 °</td>
                     <td>-0.371 ± 0.057 °</td>
-                    
                     <td>-0.381 ± 0.040 °</td>
                 </tr>
             </tbody>
         </table>
+    
         <p>
-            
-            
-        </p>
-        <p>
-            Exploring these plots enables us to verify Kenny's findings by examining how polarization angles behave 
-            under varying conditions. Switching between frequencies, plot types, and binning allows cross-validation 
-            with our reproduction using BK18 data. Additionally, including the EDE spectrum helps compare our results 
-            with constraints set by Eskilt et al.
+            The component spectra plots show that the EDE curve and the EE curve are quite similar up to \( \ell \) of 300, after which there is a more significant divergence. Because BB is much smaller than EE, its contribution to the parameters is negligible. Thus, with the EDE spectrum included in the analysis, using bins 2-10, the \( gM_{\text{Pl}} \) term and \( \alpha + \beta \) term exhibit a negative correlation that cancels each other out, resulting in a very wide spread. However, once higher \( \ell \) bins are included, the spread for \( gM_{\text{Pl}} \) dramatically decreases and centers around 0, suggesting that the EDE additions do not fit the data better than a simple polarization rotation.
         </p>
     </section>
+    
 
     <section>
-        <h2>Adding Early Dark Energy EB Spectrum</h2>
-        
+        <h2>Adding Early Dark Energy EB Spectrum and Simplified Multicomponent Analysis</h2>
+    
+        <p>
+            We perform a simplified version of the multicomponent analysis on the 5 measured EB spectra from the 5 different frequency bands. 
+            We fit six parameters: the photon-axion coupling constant \( gM_{\text{Pl}} \) and five different angles \( \text{aplusb}_{\text{freq}} \), one for each frequency band. 
+            Instead of including all the cross-spectra and covariances between the 5 different frequency bands, we sum the likelihood functions to quickly produce initial results.
+        </p>
+    
+        <p>
+            When the EDE spectrum is set to zero, the results align with those from single component analyses with the EDE spectrum set to zero. Any deviations can be attributed to inherent variability in the MCMC software.
+        </p>
+    
+        <p>
+            When the EDE spectrum is included, the triangle plots show \( gM_{\text{Pl}} \) centered around -1.5, but with a large spread that is consistent with \( gM_{\text{Pl}} = 0 \). This is likely due to the similarity between the EDE and EE spectra at those \( \ell \) bins. As additional bins are added, \( gM_{\text{Pl}} \) centers around 0 with a smaller spread. We obtain a sigma of 0.25, which is slightly larger than Eskilt's 0.16.
+        </p>
+    
         <figure>
             <img alt="Multicomponent Analysis EB Spectrum" id="multicomp" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
             <figcaption>
                 <p>Interactive plot pager for multicomponent analysis of the Early Dark Energy (EDE) spectrum. Below are the options you can adjust:</p>
                 <ul>
                     <li><strong>Map Frequency</strong>: Select the frequency map for analysis:
-                   
+                        <ul>
+                            <li>BICEP 95GHz|BK18_B95</li>
+                            <li>Keck 95GHz|BK18_K95</li>
+                            <li>BICEP 95GHz Extended|BK18_B95ext</li>
+                            <li>BICEP 150GHz|BK18_150</li>
+                            <li>BICEP 220GHz|BK18_220</li>
+                        </ul>
                     </li>
                     <li><strong>Map Type</strong>: Choose the type of plot to visualize:
                         <ul>
                             <li><strong>Best Fit</strong>: Displays the best fit analysis results for the selected frequency.</li>
                             <li><strong>Triangle Plot</strong>: Shows a triangular plot illustrating correlations between parameters.</li>
-                            <li><strong>Component Spectra Dls</strong>: Displays power spectra for different components in Dls format.</li>
-                            <li><strong>Component Spectra Cls</strong>: Displays power spectra for different components in Cls format.</li>
+                            <li><strong>Component Spectra Dls</strong>: Displays power spectra for different components in \( D_\ell \) format.</li>
+                            <li><strong>Component Spectra Cls</strong>: Displays power spectra for different components in \( C_\ell \) format.</li>
                         </ul>
                     </li>
                     <li><strong>Bins Used</strong>: Select the binning configuration for analysis:
                         <ul>
                             <li><strong>2-10</strong>: Binning scheme ranging from 2 to 10.</li>
-                            <li><strong>2-17</strong> Binning scheme ranging from 2 to 17.</li>
+                            <li><strong>2-17</strong>: Binning scheme ranging from 2 to 17.</li>
                         </ul>
                     </li>
                     <li><strong>Add EDE Spectrum?</strong>: Toggle to include or exclude the Early Dark Energy (EDE) spectrum in the analysis:
@@ -265,66 +344,65 @@
                 <p>This interactive plot allows exploration of various aspects of the multicomponent analysis, enabling detailed investigation by adjusting frequencies, map types, binning schemes, and the inclusion of the EDE spectrum.</p>
             </figcaption>
             <script type="text/javascript">
-                pager.link("#multicomp",
-                    {
-                        'Map Frequency|mapfreq':[ 
-                            'BICEP 95GHz|BK18_B95',
-                            'Keck 95GHz|BK18_K95',
-                            'BICEP 95GHz Extended|BK18_B95ext',
-                            'BICEP 150GHz|BK18_150',
-                            'BICEP 220GHz|BK18_220',
-                        ],
-                        'Map type|multi_map_type':[ 
-                            'Best Fit|_bestfit',
-                            'Triangle Plot|_triagplot',
-                            'Component Spectra Dls|_spectra_Dls',
-                            'Component Spectra Cls|_spectra_Cls',
-                        ],
-                        'Bins used|bin_num': [
-                            '2-10|',
-                            '2-17|_bin17'
-                        ],
-                        'Add EDE Spectrum?|ede':[ 
-                            'Yes|True',
-                            'No|False'
-                        ]
-                    },
-                    function (params) {
-                        let dirpath = dirbase + '/output_plots_ede' + params.ede + '_multicomp';
-                        dirpath = dirpath + params.bin_num;
-                        sim_folder = 'real' ;
-                        ede_plot = '';
-                        if(params.multi_map_type == '_triagplot'){
-                            ede_plot = 'Multicomponent_triagplot.png'
-                        } else if(params.multi_map_type == '_bestfit'){
-                            ede_plot = 'multicomp_bestfit_' + params.mapfreq + '.png';
-                        } else {
-                            ede_plot = params.mapfreq + params.multi_map_type + '.png';
-                        }
-                        let name = dirpath + '/' + sim_folder + '/' + ede_plot;
-                        console.log(name);
-                        return name;
+                pager.link("#multicomp", {
+                    'Map Frequency|mapfreq': [ 
+                        'BICEP 95GHz|BK18_B95',
+                        'Keck 95GHz|BK18_K95',
+                        'BICEP 95GHz Extended|BK18_B95ext',
+                        'BICEP 150GHz|BK18_150',
+                        'BICEP 220GHz|BK18_220',
+                    ],
+                    'Map Type|multi_map_type': [ 
+                        'Best Fit|_bestfit',
+                        'Triangle Plot|_triagplot',
+                        'Component Spectra Dls|_spectra_Dls',
+                        'Component Spectra Cls|_spectra_Cls',
+                    ],
+                    'Bins Used|bin_num': [
+                        '2-10|',
+                        '2-17|_bin17'
+                    ],
+                    'Add EDE Spectrum?|ede': [ 
+                        'Yes|True',
+                        'No|False'
+                    ]
+                },
+                function (params) {
+                    let dirpath = dirbase + '/output_plots_ede' + params.ede + '_multicomp';
+                    dirpath = dirpath + params.bin_num;
+                    let sim_folder = 'real';
+                    let ede_plot = '';
+                    if (params.multi_map_type === '_triagplot') {
+                        ede_plot = 'Multicomponent_triagplot.png';
+                    } else if (params.multi_map_type === '_bestfit') {
+                        ede_plot = 'multicomp_bestfit_' + params.mapfreq + '.png';
+                    } else {
+                        ede_plot = params.mapfreq + params.multi_map_type + '.png';
                     }
-                );
-        
-                pager.setparams(
-                    {
-                        'mapfreq': 'BK18_B95',
-                        'multi_map_type': '_triagplot',
-                        'bin_num': '',
-                        'ede': 'False'
-                    }
-                );
+                    let name = dirpath + '/' + sim_folder + '/' + ede_plot;
+                    console.log(name);
+                    return name;
+                });
+    
+                pager.setparams({
+                    'mapfreq': 'BK18_B95',
+                    'multi_map_type': '_triagplot',
+                    'bin_num': '',
+                    'ede': 'False'
+                });
             </script>
         </figure>
-        
+    
+        <p>
+            We perform the same MCMC analysis on the 499 simulations using the simplified multicomponent approach. Again, using only bins 2-10 results in a greater spread for every variable due to the similarity between the EDE EB curve and the EE curve, which can cancel each other out with a negative correlation.
+        </p>
+    
         <figure>
             <img alt="Multicomponent Simulation" id="multisim" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
             <figcaption>
                 <p>Interactive plot pager for multicomponent simulation results. Below are the options you can adjust:</p>
                 <ul>
-                    <li><strong>Map Sim Num Digit1, Digit2, Digit3</strong>: Select the digits for the simulation number. Simulations go from 000 to 498.
-                    </li>
+                    <li><strong>Map Sim Num Digit1, Digit2, Digit3</strong>: Select the digits for the simulation number. Simulations range from 000 to 498.</li>
                     <li><strong>Bins Used</strong>: Choose the binning scheme for the analysis:
                         <ul>
                             <li><strong>2-10</strong>: Binning scheme ranging from 2 to 10.</li>
@@ -339,112 +417,155 @@
                 function generateSimNumOptions(start, end) {
                     let options = [];
                     for (let i = start; i <= end; i++) {
-                        let num = i.toString().padStart(1, '0'); // Format numbers as two digits
+                        let num = i.toString().padStart(3, '0'); // Format numbers as three digits
                         options.push(`${num}|${num}`);
                     }
                     return options;
                 }
-        
-                // Generate options for simulation numbers from 0 to 499
+    
+                // Generate options for simulation numbers from 0 to 498
                 const simNumOptions = generateSimNumOptions(0, 9);
-        
-                pager.link("#multisim",
-                    {
-                        'Map Sim Num Digit1|digit1': simNumOptions,
-                        'Digit2|digit2': simNumOptions,
-                        'Digit3|digit3': simNumOptions,
-                        'Bins used|bin_num': [
-                            '2-10|',
-                            '2-17|_bin17'
-                        ]
-                    },
-                    function (params) {
-                        let dirpath = dirbase + '/output_plots_edeTrue_multicomp';
-                        dirpath = dirpath + params.bin_num;
-
-                        simNumber = params.digit1 + params.digit2 + params.digit3;
-                   
-                        sim_folder = 'sim_num' + parseInt(simNumber, 10); // Remove leading zeros
-                   
-                        sim_triag_plot_name = 'BK18_B95ext_triagplot.png' //this is misnamed
-                        let name = dirpath + '/' + sim_folder + '/' + sim_triag_plot_name;
-                        console.log(name);
-                        return name;
-                    }
-                );
-        
-                pager.setparams(
-                    {
-                        'digit1': '0',
-                        'digit2': '0',
-                        'digit3': '0',
-                        'bin_num': ''
-                    }
-                );
+    
+                pager.link("#multisim", {
+                    'Map Sim Num Digit1|digit1': simNumOptions,
+                    'Digit2|digit2': simNumOptions,
+                    'Digit3|digit3': simNumOptions,
+                    'Bins Used|bin_num': [
+                        '2-10|',
+                        '2-17|_bin17'
+                    ]
+                },
+                function (params) {
+                    let dirpath = dirbase + '/output_plots_edeTrue_multicomp';
+                    dirpath = dirpath + params.bin_num;
+                    let simNumber = params.digit1 + params.digit2 + params.digit3;
+                    let sim_folder = 'sim_num' + parseInt(simNumber, 10); // Remove leading zeros
+                    let sim_triag_plot_name = 'BK18_B95ext_triagplot.png'; // Correct name for the triag plot
+                    let name = dirpath + '/' + sim_folder + '/' + sim_triag_plot_name;
+                    console.log(name);
+                    return name;
+                });
+    
+                pager.setparams({
+                    'digit1': '0',
+                    'digit2': '0',
+                    'digit3': '0',
+                    'bin_num': ''
+                });
             </script>
         </figure>
-        
-    </section>
-
-    <section>
-        <h2>Maps Pager</h2>
+    
+        <p>
+            By plotting the peaks of all simulations, we observe that the parameters are centered around 0 for both \( gM_{\text{Pl}} \) and each polarization rotation angle. This aligns with simulations that do not include Early Dark Energy or polarization rotations.
+        </p>
+    
+        <p>
+            For both bins 2-10 and 2-17, the measured EB spectra differ from the simulations in the polarization rotation but are consistent in \( gM_{\text{Pl}} \). This discrepancy is due to the real data being measured by detectors that likely have some inherent polarization rotation. However, since the \( gM_{\text{Pl}} \) results align with simulations that exclude Early Dark Energy, we further constrain the parameter \( gM_{\text{Pl}} \), supporting Eskilt's result that it is consistent with zero.
+        </p>
+    
         <figure>
             <img alt="Summary Plot" id="summaryplot" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
             <figcaption>
-                Allows comparison of multicomponent best fit results and triangle plots of real and simulated data.
-                <p>
-                    This pager allows you to view summary plots of the multicomponent analysis:
-                    <ul>
-                        <li><strong>Map Type</strong>: Choose between best fit results or triangle plots:
-                            <ul>
-                                <li>Best Fit: Displays the best fit results for the multicomponent analysis across all simulations.</li>
-                                <li>Triangle Plot: Provides a corner plot comparing real and simulated data across different parameters.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Bins Used</strong>: Select between different binning schemes (2-10 or 2-17) to observe their effect on the summary results.</li>
-                    </ul>
-                    Comparing these plots helps in understanding the overall performance and fit of the multicomponent analysis, offering insights into how well the simulation results align with real data.
-                </p>
+                <p>Summary plot comparing multicomponent best fit results and triangle plots of real and simulated data. The peaks of the simulations are plotted in blue, while the MCMC results of a single realization are plotted in red.</p>
+                <p>This pager allows you to view summary plots of the multicomponent analysis:</p>
+                <ul>
+                    <li><strong>Map Type</strong>: Choose between best fit results or triangle plots:
+                        <ul>
+                            <li>Best Fit: Displays the best fit results for the multicomponent analysis across all simulations.</li>
+                            <li>Triangle Plot: Provides a corner plot comparing real and simulated data across different parameters.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Bins Used</strong>: Select between different binning schemes (2-10 or 2-17) to observe their effect on the summary results.</li>
+                </ul>
+                <p>Comparing these plots helps in understanding the overall performance and fit of the multicomponent analysis, offering insights into how well the simulation results align with real data.</p>
             </figcaption>
             <script type="text/javascript">
-                pager.link("#summaryplot",
-                    {
-                        'Map type|sum_map_type':[ 
-                            'Best Fit|multicomp_bestfit_allsims',
-                            'Triangle Plot|real_and_sims_corner',
-                        ],
-                        'Bins used|bin_num': [
-                            '2-10|',
-                            '2-17|_bin17'
-                        ],
-                    },
-                    function (params) {
-                        let dirpath = dirbase + '/output_plots_edeTrue_multicomp';
-                        dirpath = dirpath + params.bin_num;
-                        sim_folder = 'real' ;
-                        summary_plot = params.sum_map_type + '.png';
-                        let name = dirpath + '/' + summary_plot;
-                        console.log(name);
-                        return name;
-                    }
-                );
-        
-                pager.setparams(
-                    {
-                        'sum_map_type': 'multicomp_bestfit_allsims',
-                        'bin_num': '',
-                    }
-                );
+                pager.link("#summaryplot", {
+                    'Map Type|sum_map_type': [ 
+                        'Best Fit|multicomp_bestfit_allsims',
+                        'Triangle Plot|real_and_sims_corner',
+                    ],
+                    'Bins Used|bin_num': [
+                        '2-10|',
+                        '2-17|_bin17'
+                    ],
+                },
+                function (params) {
+                    let dirpath = dirbase + '/output_plots_edeTrue_multicomp';
+                    dirpath = dirpath + params.bin_num;
+                    let sim_folder = 'real';
+                    let summary_plot = params.sum_map_type + '.png';
+                    let name = dirpath + '/' + summary_plot;
+                    console.log(name);
+                    return name;
+                });
+    
+                pager.setparams({
+                    'sum_map_type': 'multicomp_bestfit_allsims',
+                    'bin_num': '',
+                });
             </script>
         </figure>
-       
     </section>
-
+    
+    <section>
+        <h2>Next Steps</h2>
+    
+        <ol>
+            <li>
+                <strong>Investigate the Discrepancy in Peak Spreads:</strong>
+                <p>
+                    We still need to understand why the peak spreads in the simulated data are significantly wider than the spread of a single realization. 
+                    This discrepancy might indicate a problem with the covariance calculations. Understanding whether this discrepancy impacts the overall 
+                    analysis and its conclusions will help in making necessary adjustments to improve the fidelity of the analysis.
+                </p>
+            </li>
+            
+            <li>
+                <strong>Perform Full Multicomponent Analysis:</strong>
+                <p>
+                    A full multicomponent analysis involves analyzing all available cross-spectra to capture the complete picture of the polarization data. 
+                    By including all the cross-spectra in the analysis and calculating the full covariance matrix, we can better account for the interactions 
+                    between different frequencies.
+                </p>
+            </li>
+            
+            <li>
+                <strong>Combine BICEP Data with Planck and Other Spectra:</strong>
+                <p>
+                    Integrating the BICEP data with Planck and other spectral datasets will help us obtain a more robust and accurate representation of the 
+                    polarization signals. This combined approach will help in cross-validating results, reducing uncertainties, and enhancing the overall 
+                    reliability of our conclusions.
+                </p>
+            </li>
+        </ol>
+    </section>
+    
     <section>
         <h2>Appendix</h2>
-        <p>Path to mat files:</p>
-        <pre>{{ appendix | safe }}</pre>
+        <p>All code, input files, and output files are available at:</p>
+        <pre>   /n/home08/liuto/GitHub/EB_analysis</pre>
+    
+        <p>The output plots are stored in directories labeled as:</p>
+        <pre>   /n/home08/liuto/GitHub/EB_analysis/output_plots_*/</pre>
+    
+        <p>The input data are the real norot files converted to npy files:</p>
+        <pre>
+    final/3553x1459x5260x5261/
+        real_fgh_filtp3_weight3_gs_dp1102_jack0_aabdefgh_dp1102_aabdefgh_dp1100_fgh_dp1102_fgh_dp1100_matrix_cm_overall_norot_directbpwf.mat
+        </pre>
+    
+        <p>Expected model spectra are obtained from:</p>
+        <pre>
+    model_lens = load_cmbfast('input_maps/official_cl/camb_planck2013_r0_lensing.fits');
+    model_dust.BK18_B95 = load_cmbfast('input_maps/official_cl/dust_B95_3p75.fits');
+    model_dust.BK18_K95 = load_cmbfast('input_maps/official_cl/dust_95_3p75.fits');
+    model_dust.BK18_150 = load_cmbfast('input_maps/official_cl/dust_150_3p75.fits');
+    model_dust.BK18_220 = load_cmbfast('input_maps/official_cl/dust_220_3p75.fits');
+    model_dust.BK18_B95ext = model_dust.BK18_B95;
+        </pre>
     </section>
+    
 
 </body>
 
