@@ -754,7 +754,7 @@ def main():
     file156 =  mcmc_dir + ' simnum156.1.txt'
     file2 =  mcmc_dir + 'simnum2.1.txt'
     outfile = plots_dir + 'real_and_sims_corner.png'
-    multi_freq_analysis(max_sim=200, do_run=False)
+    multi_freq_analysis(max_sim=499, do_run=False)
     plot_corner(outfile,  file_all_sims, file_real)
     
     matplotlib.use('Agg')

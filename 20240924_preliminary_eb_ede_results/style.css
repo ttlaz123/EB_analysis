@@ -90,10 +90,11 @@ dt {
 
 ul {
     padding-left: 0;
+    margin-left: 20px;
 }
 
 ul li, ol li {
-    margin: 1em 0;
+    margin: 0.5em 0;
 }
 
 code {
@@ -114,6 +115,14 @@ code.block {
 table {
     border-collapse: collapse;
 }
+th, td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+th {
+    background-color: #f2f2f2;
+}
 
 table td {
     padding: 0.1em 0.2em;
@@ -122,6 +131,10 @@ table td {
 }
 
 table thead td {
+    font-weight: bold;
+}
+.highlight {
+    background-color: #d9ead3;
     font-weight: bold;
 }
 

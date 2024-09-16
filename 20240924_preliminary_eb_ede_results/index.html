@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Early Dark Energy EB spectrum multicomponent analysis</title>
+    <title>Early Dark Energy EB Spectrum Multicomponent Analysis</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <!-- Load up MathJax for math notation -->
     <script type="text/x-mathjax-config">
@@ -11,7 +11,7 @@
             TeX: { equationNumbers: { autoNumber: "AMS" } }
         });
     </script>
-  </head>
+</head>
 
 <body>
     <!-- Add my custom pager script -->
@@ -19,9 +19,9 @@
     <link rel="stylesheet" type="text/css" href="scripts/pager.css">
 
     <header>
-        <h1>Early Dark Energy EB spectrum multicomponent analysis</h1>
+        <h1>Early Dark Energy EB Spectrum Multicomponent Analysis</h1>
 
-        <time datetime="{{ last_updated | safe }}" class="published updated">
+        <time datetime="2024 September 24" class="published updated">
             2024 September 24
         </time> —
         Tongtian Liu, Dominic Beck
@@ -31,30 +31,102 @@
 
     <section>
         <h2>Introduction</h2>
-        <p>{{ introduction }}</p>
+        <p>In Eskilt et al. (<a href="https://arxiv.org/pdf/2303.15369" target="_blank">
+            Constraint on Early Dark Energy from Isotropic Cosmic Birefringence</a>), 
+            the authors investigate the presence of Early Dark Energy (EDE) 
+            by analyzing its potential impact on the polarization of the Cosmic 
+            Microwave Background (CMB). They explore the possibility that the EDE field, 
+            \( \phi \), is a pseudoscalar "axionlike" field that interacts with electromagnetism 
+            in a parity-violating manner. The Lagrangian density for such a field is given by:</p>
+    
+        <p>
+            \[
+            \mathcal{L} = -\frac{1}{2} (\partial \phi)^2 - V(\phi) - \frac{1}{4} F_{\mu\nu} F^{\mu\nu} - \frac{1}{4} g \phi F_{\mu\nu} \tilde{F}^{\mu\nu},
+            \]
+        </p>
+    
+        <p>where \( g \) represents the photon-axion coupling constant. 
+            The term involving \( g \phi F_{\mu\nu} \tilde{F}^{\mu\nu} \) is a Chern-Simons term that
+            breaks parity symmetry due to the spacetime-dependent condensate of \( \phi \). 
+        </p>
+    
+        <p>The authors use a "canonical" EDE potential:</p>
+    
+        <p>
+            \[
+            V(\phi) = V_0 [1 - \cos(\phi/f)]^3,
+            \]
+        </p>
+    
+        <p>which has been proposed as a solution to the Hubble tension. Additional constraints and alternative EDE models are discussed in the references listed in the paper.</p>
+    
+        <p>The study explored constraints on early dark energy (EDE) axions and found them to be 
+            \( g = (0.04 \pm 0.16) \, \text{M}^{-1}_{\text{Pl}} \) (68% CL). 
+            Using Planck's polarization data, they investigated cosmic birefringence and its relation 
+            to EDE, calculating power spectra and sampling parameters with MCMC methods. Their goal was to differentiate
+            between standard \(\Lambda\text{CDM}\) and EDE models, providing stronger constraints by 
+            incorporating local Hubble constant measurements like SH0ES.
+        </p>
+    
+        <p>We reproduce their findings and apply a similar methodology to analyze 
+            BICEP/Keck 18 (BK18) data, focusing on the EB spectra. Aligning with Eskilt’s approach, 
+            we account for post-recombination birefringence and polarization calibration angles, 
+            comparing BICEP data with their results. We utilize the
+            <a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20201221_BK18_polrot/" 
+            target="_blank">BK18 polarization rotation analysis</a> performed by Kenny with 
+            Cobaya MCMC to verify consistency, finding results aligned with Eskilt’s 
+            constraints on \( g \) and Kenny's polarization rotation angles.
+        </p>
+    
+        <p>Additionally, we extend the analysis by performing MCMC calculations on 
+            individual frequencies and conducting a multicomponent analysis combining several 
+            frequencies. We examine different bin ranges, using both 
+            2-10 and 2-17 bin configurations to evaluate improvements in constraint precision. 
+        </p>
     </section>
+    
 
     <section>
         <h2>Reproducing BK18 Polarization Rotation</h2>
-        https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20201221_BK18_polrot/
-
+        <p>
+            This section reproduces Kenny's findings on BK18 polarization rotation using the Cobaya MCMC framework. 
+            The aim is to verify the robustness of Kenny's results across various configurations, such as 
+            different frequencies, binning schemes, and the inclusion of the Early Dark Energy (EDE) spectrum. 
+            By adjusting these settings, we can assess the fidelity of the polarization angle measurement.
+            The original analysis can be found at 
+            <a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20201221_BK18_polrot/" target="_blank">
+                Kenny's Analysis Logbook
+            </a>.
+        </p>
         <figure>
-            <img alt="polrot" id="polrot" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
+            <img alt="BK18 Polarization Rotation" id="polrot" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
             <figcaption>
-                Plot Pager
+                Interactive plot pager for BK18 polarization rotation results. Allows exploration of different map frequencies, types, binning schemes, and inclusion of the EDE spectrum.
+                <ul>
+                    <li><strong>Map Frequency</strong>: Choose from BICEP and Keck frequencies (95 GHz, 150 GHz, 220 GHz) to observe variations in polarization angles.</li>
+                    <li><strong>Map Type</strong>: Select different plot types:
+                        <ul>
+                            <li>Best Fit: Displays the best fit polarization rotation angle.</li>
+                            <li>Triangle Plot: Shows correlations between analysis parameters in a triangular plot.</li>
+                            <li>Component Spectra Dls/Cls: Illustrates power spectra related to polarization rotation for different components.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Bins Used</strong>: Compare results with different binning schemes (2-10 or 2-17) to evaluate the impact on measurements.</li>
+                    <li><strong>Add EDE Spectrum</strong>: Toggle to include or exclude the Early Dark Energy (EDE) component, which may affect polarization rotation measurements.</li>
+                </ul>
             </figcaption>
             <script type="text/javascript">
-          
+                let dirbase = '..';
                 pager.link("#polrot",
                     {
-                        'Map Frequency|mapfreq':[
+                        'Map Frequency|mapfreq':[ 
                             'BICEP 95GHz|BK18_B95',
                             'Keck 95GHz|BK18_K95',
                             'BICEP 95GHz Extended|BK18_B95ext',
                             'BICEP 150GHz|BK18_150',
                             'BICEP 220GHz|BK18_220',
                         ],
-                        'Map type|map_type':[
+                        'Map type|map_type':[ 
                             'Best Fit|_bestfit',
                             'Triangle Plot|_triagplot',
                             'Component Spectra Dls|_spectra_Dls',
@@ -64,13 +136,13 @@
                             '2-10|',
                             '2-17|_bin17'
                         ],
-                        'Add EDE Spectrum?|ede':[
+                        'Add EDE Spectrum?|ede':[ 
                             'Yes|True',
                             'No|False'
                         ]
                     },
                     function (params) {
-                        let dirpath = '../output_plots_ede' + params.ede;
+                        let dirpath = dirbase + '/output_plots_ede' + params.ede;
                         dirpath = dirpath + params.bin_num;
                         sim_folder = 'real' ;
                         polrot_plot = params.mapfreq + params.map_type + '.png';
@@ -90,28 +162,117 @@
                 );
             </script>
         </figure>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data Set</th>
+                    <th>Kenny's Angle Bins 2-10</th>
+                    <th>MCMC Angle Bins 2-10</th>
+                    <th>Kenny's Angle Bins 2-14</th>
+                    <th>MCMC Angle Bins 2-17</th>
+                </tr>
+            </thead>
+            <tbody>
+               
+                <tr>
+                    <td>BK18 B95</td>
+                    <td>-0.380 ± 0.100 °</td>
+                    <td>-0.384 ± 0.075 °</td>
+                    <td>-0.370 ± 0.068 °</td>
+                    
+                    <td>-0.367 ± 0.049 °</td>
+                </tr>
+                <tr>
+                    <td>BK18 K95</td>
+                    <td>-0.164 ± 0.239 °</td>
+                    <td>-0.155 ± 0.182 °</td>
+                    <td>-0.141 ± 0.225 °</td>
+                    
+                    <td>-0.132 ± 0.168 °</td>
+                </tr>
+                <tr>
+                    <td>BK18 150</td>
+                    <td>-0.495 ± 0.119 °</td>
+                    <td>-0.494 ± 0.096 °</td>
+                    <td>-0.524 ± 0.086 °</td>
+                    
+                    <td>-0.527 ± 0.060 °</td>
+                </tr>
+                <tr>
+                    <td>BK18 220</td>
+                    <td>1.012 ± 0.266 °</td>
+                    <td>1.005 ± 0.200 °</td>
+                    <td>0.933 ± 0.171 °</td>
+                    
+                    <td>0.906 ± 0.122 °</td>
+                </tr>
+                <tr>
+                    <td>BK18 B95ext</td>
+                    <td>-0.400 ± 0.085 °</td>
+                    <td>-0.401 ± 0.066 °</td>
+                    <td>-0.371 ± 0.057 °</td>
+                    
+                    <td>-0.381 ± 0.040 °</td>
+                </tr>
+            </tbody>
+        </table>
+        <p>
+            
+            
+        </p>
+        <p>
+            Exploring these plots enables us to verify Kenny's findings by examining how polarization angles behave 
+            under varying conditions. Switching between frequencies, plot types, and binning allows cross-validation 
+            with our reproduction using BK18 data. Additionally, including the EDE spectrum helps compare our results 
+            with constraints set by Eskilt et al.
+        </p>
     </section>
 
     <section>
         <h2>Adding Early Dark Energy EB Spectrum</h2>
         
         <figure>
-            <img alt="polrot" id="multicomp" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
+            <img alt="Multicomponent Analysis EB Spectrum" id="multicomp" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
             <figcaption>
-                Plot Pager
+                <p>Interactive plot pager for multicomponent analysis of the Early Dark Energy (EDE) spectrum. Below are the options you can adjust:</p>
+                <ul>
+                    <li><strong>Map Frequency</strong>: Select the frequency map for analysis:
+                   
+                    </li>
+                    <li><strong>Map Type</strong>: Choose the type of plot to visualize:
+                        <ul>
+                            <li><strong>Best Fit</strong>: Displays the best fit analysis results for the selected frequency.</li>
+                            <li><strong>Triangle Plot</strong>: Shows a triangular plot illustrating correlations between parameters.</li>
+                            <li><strong>Component Spectra Dls</strong>: Displays power spectra for different components in Dls format.</li>
+                            <li><strong>Component Spectra Cls</strong>: Displays power spectra for different components in Cls format.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Bins Used</strong>: Select the binning configuration for analysis:
+                        <ul>
+                            <li><strong>2-10</strong>: Binning scheme ranging from 2 to 10.</li>
+                            <li><strong>2-17</strong> Binning scheme ranging from 2 to 17.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Add EDE Spectrum?</strong>: Toggle to include or exclude the Early Dark Energy (EDE) spectrum in the analysis:
+                        <ul>
+                            <li><strong>Yes</strong> (True): Include the EDE spectrum in the analysis.</li>
+                            <li><strong>No</strong> (False): Exclude the EDE spectrum from the analysis.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p>This interactive plot allows exploration of various aspects of the multicomponent analysis, enabling detailed investigation by adjusting frequencies, map types, binning schemes, and the inclusion of the EDE spectrum.</p>
             </figcaption>
             <script type="text/javascript">
-          
                 pager.link("#multicomp",
                     {
-                        'Map Frequency|mapfreq':[
+                        'Map Frequency|mapfreq':[ 
                             'BICEP 95GHz|BK18_B95',
                             'Keck 95GHz|BK18_K95',
                             'BICEP 95GHz Extended|BK18_B95ext',
                             'BICEP 150GHz|BK18_150',
                             'BICEP 220GHz|BK18_220',
                         ],
-                        'Map type|multi_map_type':[
+                        'Map type|multi_map_type':[ 
                             'Best Fit|_bestfit',
                             'Triangle Plot|_triagplot',
                             'Component Spectra Dls|_spectra_Dls',
@@ -121,13 +282,13 @@
                             '2-10|',
                             '2-17|_bin17'
                         ],
-                        'Add EDE Spectrum?|ede':[
+                        'Add EDE Spectrum?|ede':[ 
                             'Yes|True',
                             'No|False'
                         ]
                     },
                     function (params) {
-                        let dirpath = '../output_plots_ede' + params.ede + '_multicomp';
+                        let dirpath = dirbase + '/output_plots_ede' + params.ede + '_multicomp';
                         dirpath = dirpath + params.bin_num;
                         sim_folder = 'real' ;
                         ede_plot = '';
@@ -156,9 +317,20 @@
         </figure>
         
         <figure>
-            <img alt="Plot" id="multisim" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
+            <img alt="Multicomponent Simulation" id="multisim" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
             <figcaption>
-                Plot Pager
+                <p>Interactive plot pager for multicomponent simulation results. Below are the options you can adjust:</p>
+                <ul>
+                    <li><strong>Map Sim Num Digit1, Digit2, Digit3</strong>: Select the digits for the simulation number. Simulations go from 000 to 498.
+                    </li>
+                    <li><strong>Bins Used</strong>: Choose the binning scheme for the analysis:
+                        <ul>
+                            <li><strong>2-10</strong>: Binning scheme ranging from 2 to 10.</li>
+                            <li><strong>2-17</strong>: Binning scheme ranging from 2 to 17.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p>This interactive plot allows exploration of different simulation results by adjusting the simulation number digits and binning schemes. The selected simulation number and binning scheme will affect the displayed multicomponent simulation results.</p>
             </figcaption>
             <script type="text/javascript">
                 // Function to generate simulation numbers
@@ -185,7 +357,7 @@
                         ]
                     },
                     function (params) {
-                        let dirpath = '../output_plots_edeTrue_multicomp';
+                        let dirpath = dirbase + '/output_plots_edeTrue_multicomp';
                         dirpath = dirpath + params.bin_num;
 
                         simNumber = params.digit1 + params.digit2 + params.digit3;
@@ -215,15 +387,27 @@
     <section>
         <h2>Maps Pager</h2>
         <figure>
-            <img alt="summaryplot" id="summaryplot" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
+            <img alt="Summary Plot" id="summaryplot" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
             <figcaption>
-                Plot Pager
+                Allows comparison of multicomponent best fit results and triangle plots of real and simulated data.
+                <p>
+                    This pager allows you to view summary plots of the multicomponent analysis:
+                    <ul>
+                        <li><strong>Map Type</strong>: Choose between best fit results or triangle plots:
+                            <ul>
+                                <li>Best Fit: Displays the best fit results for the multicomponent analysis across all simulations.</li>
+                                <li>Triangle Plot: Provides a corner plot comparing real and simulated data across different parameters.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Bins Used</strong>: Select between different binning schemes (2-10 or 2-17) to observe their effect on the summary results.</li>
+                    </ul>
+                    Comparing these plots helps in understanding the overall performance and fit of the multicomponent analysis, offering insights into how well the simulation results align with real data.
+                </p>
             </figcaption>
             <script type="text/javascript">
-          
                 pager.link("#summaryplot",
                     {
-                        'Map type|sum_map_type':[
+                        'Map type|sum_map_type':[ 
                             'Best Fit|multicomp_bestfit_allsims',
                             'Triangle Plot|real_and_sims_corner',
                         ],
@@ -233,11 +417,11 @@
                         ],
                     },
                     function (params) {
-                        let dirpath = '../output_plots_edeTrue_multicomp';
+                        let dirpath = dirbase + '/output_plots_edeTrue_multicomp';
                         dirpath = dirpath + params.bin_num;
                         sim_folder = 'real' ;
                         summary_plot = params.sum_map_type + '.png';
-                        let name = dirpath +  '/' + summary_plot;
+                        let name = dirpath + '/' + summary_plot;
                         console.log(name);
                         return name;
                     }
@@ -251,9 +435,9 @@
                 );
             </script>
         </figure>
-
-        
+       
     </section>
+
     <section>
         <h2>Appendix</h2>
         <p>Path to mat files:</p>
