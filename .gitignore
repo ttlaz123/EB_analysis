@@ -2,6 +2,7 @@
 *.yaml
 *.checkpoint
 *.covmat
+*.mat
 *.progress
 *.dill_pickle
 *.png
