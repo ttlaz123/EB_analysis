@@ -36,8 +36,8 @@
             In Eskilt et al. (<a href="https://arxiv.org/pdf/2303.15369" target="_blank">
                 Constraint on Early Dark Energy from Isotropic Cosmic Birefringence</a>), 
             the authors investigate the presence of Early Dark Energy (EDE) 
-            by analyzing its potential impact on the polarization of the Cosmic 
-            Microwave Background (CMB). They explore the possibility that the EDE field, 
+            by analyzing its potential impact on the polarization of the CMB. They explore the 
+            possibility that the EDE field, 
             \( \phi \), is a pseudoscalar "axionlike" field that interacts with electromagnetism 
             in a parity-violating manner. The Lagrangian density for such a field is given by:
         </p>
@@ -94,7 +94,7 @@
         </p>
     
         <p>
-            The CMB EE and BB power spectra are computed using CAMB3 with the best-fitting
+            The CMB EE and BB power spectra are computed using CAMB with the best-fitting
             \(\Lambda\text{CDM}\) parameters from the Planck 2018 analysis. The EDE EB power 
             spectrum is calculated using a modified version of the CLASS code, with 
             \( g = M_{\text{Pl}}^{-1} \) as the coupling constant. The reduced Planck mass is 
@@ -102,10 +102,10 @@
         </p>
     
         <p>
-            The study explored constraints on early dark energy (EDE) axions and found them to be 
-            \( g = (0.04 \pm 0.16) \, \text{M}^{-1}_{\text{Pl}} \) (68% CL). Using Planck's and SH0ES's polarization data, they investigated cosmic birefringence and its relation 
+             Using Planck's and SH0ES's polarization data, they investigated cosmic birefringence and its relation 
             to EDE, calculating power spectra and sampling parameters with MCMC methods. Their goal was to differentiate
-            between standard \(\Lambda\text{CDM}\) and EDE models.
+            between standard \(\Lambda\text{CDM}\) and EDE models. The study found  
+            \( g = (0.04 \pm 0.16) \, \text{M}^{-1}_{\text{Pl}} \) (68% CL).
         </p>
     
         <p>
@@ -131,8 +131,8 @@
     
         <p>
             This section reproduces Kenny's findings on BK18 polarization rotation using the Cobaya MCMC framework. 
-            The goal is to verify consistency with Kenny's results across various configurations, including different frequencies, 
-            binning schemes, and the inclusion of the Early Dark Energy (EDE) spectrum. The original analysis can be found in 
+            The goal is to verify consistency with Kenny's results across various configurations and including different frequencies, 
+            binning schemes. The original analysis can be found in 
             <a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20201221_BK18_polrot/" target="_blank">
                 Kenny's Analysis Logbook
             </a>.
@@ -144,45 +144,48 @@
     
         <p>
             \[
-            C'_{EB\ell} = \frac{1}{2} (C_{EE\ell} - C_{BB\ell}) \sin(4(\alpha + \beta))
+            C^{EB}_{\ell, expected} = \frac{1}{2} (C^{EE}_{\ell} - C^{BB}_{\ell}) \sin(4(\alpha + \beta))
             \]
         </p>
     
         <p>
+            \(C^{EE}_{\ell}\) and \(C^{BB}_{\ell}\) are obtained from the summation of model_lens and model_dust 
+            with paths as stated in the appendix.
             To assess the fit of the modified spectra to observed data, we calculate the difference between the model expectation values 
             \( C^{EB}_{b, \text{expected}} \) and the real bandpowers \( C^{EB}_{b, \text{observed}} \), where \( b \) denotes binned bandpowers 
-            over a range in \( \ell \). The \(\chi^2\) value is computed using the bandpower covariance matrix \( C_{XY} \):
+            over a range in \( \ell \). The \(\chi^2\) value is computed using the bandpower covariance matrix \(  \text{C}_{EB} \):
         </p>
     
         <p>
             \[
-            \chi^2 = ( C^{EB}_{b, \text{observed}} - C^{EB}_{b, \text{expected}} )^\top ( C_{XY} )^{-1} 
+            \chi^2 = ( C^{EB}_{b, \text{observed}} - C^{EB}_{b, \text{expected}} )^\top ( \text{C}_{EB} )^{-1} 
             ( C^{EB}_{b, \text{observed}} - C^{EB}_{b, \text{expected}} )
             \]
         </p>
     
         <p>
-            This analysis is similar to Eskilt's MCMC analysis with \( C^{EB, \text{EDE}}_b \) set to zero, with a few differences:
+            This analysis is similar to Eskilt's MCMC analysis where \( C^{EB, \text{EDE}}_b \) is set to zero, with a few differences:
             Eskilt zeros out all nondiagonal terms of the covariance matrix, while Kenny retains up to the second off-diagonal term. 
             Eskilt uses MCMC for the analysis, whereas Kenny employs matmin to minimize the \(\chi^2\). 
-            Additionally, Eskilt uses around 70 bins up to \( \ell = 1500 \), whereas the BICEP spectra analysis uses 10-15 bins up to \( \ell = 500 \).
+            Additionally, Eskilt uses around 70 bins up to \( \ell = 1500 \), whereas the BICEP spectra analysis uses less than 20 bins up to \( \ell = 500 \).
         </p>
     
         <figure>
             <img alt="BK18 Polarization Rotation" id="polrot" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
             <figcaption>
-                Interactive plot pager for BK18 polarization rotation results. Allows exploration of different map frequencies, types, binning schemes, and inclusion of the EDE spectrum.
+                 BK18 polarization rotation angle results.
                 <ul>
                     <li><strong>Map Frequency</strong>: Choose from BICEP and Keck frequencies (95 GHz, 150 GHz, 220 GHz) to observe variations in polarization angles.</li>
                     <li><strong>Map Type</strong>: Select different plot types:
                         <ul>
-                            <li>Best Fit: Displays the best fit polarization rotation angle.</li>
+                            <li>Best Fit: Displays the best fit curve for the calculated polarization rotation angle.</li>
                             <li>Triangle Plot: Shows correlations between analysis parameters in a triangular plot.</li>
-                            <li>Component Spectra Dls/Cls: Illustrates power spectra related to polarization rotation for different components. Some values are scaled by 100 for easier visualization.</li>
+                            <li>Component Spectra Dls/Cls: Illustrates power spectra of different components. 
+                                Some values are scaled by 100 for easier visualization.</li>
                         </ul>
                     </li>
                     <li><strong>Bins Used</strong>: Compare results with different binning schemes (2-10 or 2-17) to evaluate the impact on measurements.</li>
-                    <li><strong>Add EDE Spectrum</strong>: Toggle to include or exclude the Early Dark Energy (EDE) component, which may affect polarization rotation measurements.</li>
+                    <li><strong>Add EDE Spectrum</strong>: Toggle to include or exclude the Early Dark Energy (EDE) component.</li>
                 </ul>
             </figcaption>
             <script type="text/javascript">
@@ -231,7 +234,12 @@
         </figure>
     
         <p>
-            With the EDE set to zero, the results are within a hundredth of a degree of Kenny's results. Including extra bins does not change the results beyond a few hundredths of a degree within the margin of error, suggesting a robust measurement. With EDE set to zero, the triangle plots show \( gM_{\text{Pl}} \) roughly uniform, with the angle \( \alpha + \beta \) (aplusb) centered around the same polarization rotation calculated by Kenny.
+            With the EDE set to zero, the results are within a hundredth of a degree of Kenny's results. 
+            Including extra bins does not change the results beyond a few hundredths of a degree, 
+            which is within the margin of error, suggesting a robust measurement. 
+            With EDE set to zero, the triangle plots show \( gM_{\text{Pl}} \) roughly uniform, 
+            with the angle \( \alpha + \beta \) (aplusb) centered around the same polarization 
+            rotation calculated by Kenny.
         </p>
     
         <table>
@@ -284,7 +292,15 @@
         </table>
     
         <p>
-            The component spectra plots show that the EDE curve and the EE curve are quite similar up to \( \ell \) of 300, after which there is a more significant divergence. Because BB is much smaller than EE, its contribution to the parameters is negligible. Thus, with the EDE spectrum included in the analysis, using bins 2-10, the \( gM_{\text{Pl}} \) term and \( \alpha + \beta \) term exhibit a negative correlation that cancels each other out, resulting in a very wide spread. However, once higher \( \ell \) bins are included, the spread for \( gM_{\text{Pl}} \) dramatically decreases and centers around 0, suggesting that the EDE additions do not fit the data better than a simple polarization rotation.
+            The component spectra plots show that the EDE curve and the EE curve are quite similar up to 
+            \( \ell \) of 300, after which there is a more significant divergence.
+             Because BB is much smaller than EE, its contribution to the parameters is negligible. 
+             Thus, with the EDE spectrum included in the analysis, using bins 2-10, the \( gM_{\text{Pl}} \)
+              term and \( \alpha + \beta \) term exhibit a negative correlation that cancels each other out, 
+              resulting in a very wide spread. However, once higher \( \ell \) bins are included, 
+              the spread for \( gM_{\text{Pl}} \) dramatically decreases and centers around 0, 
+              suggesting that the EDE additions do not fit the data better than a 
+              simple polarization rotation.
         </p>
     </section>
     
@@ -293,17 +309,27 @@
         <h2>Adding Early Dark Energy EB Spectrum and Simplified Multicomponent Analysis</h2>
     
         <p>
-            We perform a simplified version of the multicomponent analysis on the 5 measured EB spectra from the 5 different frequency bands. 
-            We fit six parameters: the photon-axion coupling constant \( gM_{\text{Pl}} \) and five different angles \( \text{aplusb}_{\text{freq}} \), one for each frequency band. 
-            Instead of including all the cross-spectra and covariances between the 5 different frequency bands, we sum the likelihood functions to quickly produce initial results.
+            We perform a simplified version of the multicomponent analysis on the 5 measured EB spectra 
+            from the 5 different frequency bands. 
+            We fit six parameters: the photon-axion coupling constant \( gM_{\text{Pl}} \) and five 
+            different angles \( \text{aplusb}_{\text{freq}} \), one for each frequency band. 
+            Instead of including all the cross-spectra and covariances between the 5 different frequency 
+            bands, we sum the likelihood functions to quickly produce initial results.
         </p>
     
         <p>
-            When the EDE spectrum is set to zero, the results align with those from single component analyses with the EDE spectrum set to zero. Any deviations can be attributed to inherent variability in the MCMC software.
+            When the EDE spectrum is set to zero, the results align with those from single 
+            component analyses with the EDE spectrum set to zero. Any deviations can be attributed
+             to inherent variability in the MCMC software.
         </p>
     
         <p>
-            When the EDE spectrum is included, the triangle plots show \( gM_{\text{Pl}} \) centered around -1.5, but with a large spread that is consistent with \( gM_{\text{Pl}} = 0 \). This is likely due to the similarity between the EDE and EE spectra at those \( \ell \) bins. As additional bins are added, \( gM_{\text{Pl}} \) centers around 0 with a smaller spread. We obtain a sigma of 0.25, which is slightly larger than Eskilt's 0.16.
+            When the EDE spectrum is included, the triangle plots show \( gM_{\text{Pl}} \) 
+            centered around -1.5, but with a large spread that is consistent with \( gM_{\text{Pl}} = 0 \).
+             This is likely due to the similarity between the EDE and EE spectra at those 
+             \( \ell \) bins. As additional bins are added, \( gM_{\text{Pl}} \) centers around
+              0 with a smaller spread. We obtain a sigma of 0.25, which is slightly larger than 
+              Eskilt's 0.16.
         </p>
     
         <figure>
@@ -394,7 +420,10 @@
         </figure>
     
         <p>
-            We perform the same MCMC analysis on the 499 simulations using the simplified multicomponent approach. Again, using only bins 2-10 results in a greater spread for every variable due to the similarity between the EDE EB curve and the EE curve, which can cancel each other out with a negative correlation.
+            We perform the same MCMC analysis on the 499 simulations using the simplified multicomponent 
+            approach. Again, using only bins 2-10 results in a greater spread for every variable
+             due to the similarity between the EDE EB curve and the EE curve, which can cancel 
+             each other out with a negative correlation.
         </p>
     
         <figure>
@@ -456,11 +485,18 @@
         </figure>
     
         <p>
-            By plotting the peaks of all simulations, we observe that the parameters are centered around 0 for both \( gM_{\text{Pl}} \) and each polarization rotation angle. This aligns with simulations that do not include Early Dark Energy or polarization rotations.
+            By plotting the peaks of all simulations, we observe that the parameters
+             are centered around 0 for both \( gM_{\text{Pl}} \) and each polarization rotation angle. 
+             This aligns with simulations that do not include Early Dark Energy or polarization rotations.
         </p>
     
         <p>
-            For both bins 2-10 and 2-17, the measured EB spectra differ from the simulations in the polarization rotation but are consistent in \( gM_{\text{Pl}} \). This discrepancy is due to the real data being measured by detectors that likely have some inherent polarization rotation. However, since the \( gM_{\text{Pl}} \) results align with simulations that exclude Early Dark Energy, we further constrain the parameter \( gM_{\text{Pl}} \), supporting Eskilt's result that it is consistent with zero.
+            For both bins 2-10 and 2-17, the measured EB spectra differ from the simulations 
+            in the polarization rotation but are consistent in \( gM_{\text{Pl}} \). 
+            This discrepancy is due to the real data being measured by detectors that likely 
+            have some inherent polarization rotation. However, since the \( gM_{\text{Pl}} \) 
+            results align with simulations that exclude Early Dark Energy, we further constrain 
+            the parameter \( gM_{\text{Pl}} \), supporting Eskilt's result that it is consistent with zero.
         </p>
     
         <figure>
