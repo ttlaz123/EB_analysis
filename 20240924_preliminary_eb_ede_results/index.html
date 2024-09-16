@@ -417,7 +417,7 @@
                 function generateSimNumOptions(start, end) {
                     let options = [];
                     for (let i = start; i <= end; i++) {
-                        let num = i.toString().padStart(3, '0'); // Format numbers as three digits
+                        let num = i.toString().padStart(1, '0'); // Format numbers as three digits
                         options.push(`${num}|${num}`);
                     }
                     return options;
@@ -495,7 +495,7 @@
                     dirpath = dirpath + params.bin_num;
                     let sim_folder = 'real';
                     let summary_plot = params.sum_map_type + '.png';
-                    let name = dirpath + '/' + summary_plot;
+                    let name = dirpath + '/' + sim_folder + '/' + summary_plot;
                     console.log(name);
                     return name;
                 });
