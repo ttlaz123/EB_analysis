@@ -358,6 +358,9 @@
             different angles \( \text{aplusb}_{\text{freq}} \), one for each frequency band. 
             Instead of including all the cross-spectra and covariances between the 5 different frequency 
             bands, we sum the likelihood functions to quickly produce initial results.
+            We further differ from Eskilt's analysis by using up to two off-diagonal terms in the covariance 
+            matrix when calculating the likelihood. We also use the lensing + dust model provided by 
+            the input files with the linked paths noted in the appendix rather than from CAMB. 
         </p>
     
         <p>
@@ -367,7 +370,8 @@
         </p>
     
         <p>
-            We perform the analysis on the first three simulation realizations. 
+            We perform the analysis on the first three simulation realizations to visualize what the 
+            real data may look like when there is no rotation or EDE. 
             When the EDE spectrum is included, the triangle plots show \( gM_{\text{Pl}} \) 
             a spread that is consistent with \( gM_{\text{Pl}} = 0 \).
              Again, when using fewer bins, the large spread is due to the degeneracy
@@ -483,13 +487,14 @@
         <p>
             For both bins 2-10 and 2-17, we expect the measured EB spectra to
             differ from the simulations in the polarization rotation, 
-            due to the real data being measured by detectors that likely 
+            because the real data are measured by detectors that likely 
             have some inherent polarization rotation.
             If the \( gM_{\text{Pl}} \) 
-            results align with simulations that exclude Early Dark Energy, we further constrain 
+            results align with the simulations that exclude Early Dark Energy, we further constrain 
             the parameter \( gM_{\text{Pl}} \), supporting Eskilt's result that it is consistent with zero.
             On the other hand, if the \( gM_{\text{Pl}} \) results fall to the left or right of the 
-            simulated peaks, that would suggest the addition of an EDE curve better matches our observations. 
+            simulated peaks in blue, that would suggest the addition of an EDE curve better matches our 
+            observations, and we can provide an initial estimate of the parameter. 
         </p>
     
         <figure>
@@ -561,27 +566,31 @@
             <li>
                 <strong>Investigate the Discrepancy in Peak Spreads:</strong>
                 <p>
-                    We still need to understand why the peak spreads in the simulated data are significantly wider than the spread of a single realization. 
-                    This discrepancy might indicate a problem with the covariance calculations. Understanding whether this discrepancy impacts the overall 
-                    analysis and its conclusions will help in making necessary adjustments to improve the fidelity of the analysis.
+                    We still need to understand why the peak spreads in the simulated data are 
+                    significantly wider than the spread of a single realization. 
+                    This discrepancy might indicate a problem with the covariance 
+                    calculations. Understanding whether this discrepancy impacts the overall 
+                    analysis and its conclusions will help in making necessary adjustments 
+                    to improve the fidelity of the analysis.
                 </p>
             </li>
             
             <li>
                 <strong>Perform Full Multicomponent Analysis:</strong>
                 <p>
-                    A full multicomponent analysis involves analyzing all available cross-spectra to capture the complete picture of the polarization data. 
-                    By including all the cross-spectra in the analysis and calculating the full covariance matrix, we can better account for the interactions 
+                    A full multicomponent analysis involves analyzing all available cross-spectra 
+                    to capture the complete picture of the polarization data. 
+                    By including all the cross-spectra in the analysis and 
+                    calculating the full covariance matrix, we can better 
+                    account for the interactions 
                     between different frequencies.
                 </p>
             </li>
             
             <li>
-                <strong>Combine BICEP Data with Planck and Other Spectra:</strong>
+                <strong>Combine BICEP Data with Planck and Others:</strong>
                 <p>
-                    Integrating the BICEP data with Planck and other spectral datasets will help us obtain a more robust and accurate representation of the 
-                    polarization signals. This combined approach will help in cross-validating results, reducing uncertainties, and enhancing the overall 
-                    reliability of our conclusions.
+                    We will add the BICEP data on top of the data used by Eskilt's analysis.
                 </p>
             </li>
         </ol>
