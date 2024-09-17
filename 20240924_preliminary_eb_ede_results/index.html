@@ -87,9 +87,9 @@
     
         <p>
             \begin{equation}
-            v_b \equiv {C}^{EB,o}_b - \cos[4(\alpha + \beta)] \, 
-            g M_{\text{Pl}} C^{EB,\text{EDE}}_b - \sin[4(\alpha + \beta)] 
-            \frac{1}{2} \left(C^{EE,\text{CMB}}_b - C^{BB,\text{CMB}}_b\right)
+            v_b \equiv {C}^{EB,o}_b -  \, 
+            g M_{\text{Pl}} C^{EB,\text{EDE}}_b \cos[4(\alpha + \beta)] - 
+            \frac{1}{2} \left(C^{EE,\text{CMB}}_b - C^{BB,\text{CMB}}_b\right)  \sin[4(\alpha + \beta)]
             \end{equation}
         </p>
     
@@ -135,7 +135,7 @@
             The goal is to verify consistency with Kenny's results across various configurations and including different frequencies, 
             binning schemes. The original analysis can be found in 
             <a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20201221_BK18_polrot/" target="_blank">
-                Kenny's Analysis Logbook
+                Kenny's Polarization Rotation Analysis 
             </a>.
         </p>
     
@@ -146,6 +146,14 @@
         <p>
             \begin{equation}
             C^{EB}_{\ell, \text{expected}} = \frac{1}{2} (C^{EE}_{\ell} - C^{BB}_{\ell}) \sin(4(\alpha + \beta))
+            \end{equation}
+        </p>
+        This is equivalent to the following when the \(C^{EB,\text{EDE}}_b\) term is set to zero:
+        <p>
+            \begin{equation}
+            C^{EB}_{\ell, \text{expected}} = \frac{1}{2} (C^{EE}_{\ell} - 
+            C^{BB}_{\ell}) \sin(4(\alpha + \beta))
+            + g M_{\text{Pl}} C^{EB,\text{EDE}}_b \cos[4(\alpha + \beta)]
             \end{equation}
         </p>
     
@@ -251,7 +259,8 @@
             which is within the margin of error, suggesting a robust measurement. 
             With EDE set to zero, the triangle plots show \( gM_{\text{Pl}} \) roughly uniform, 
             with the angle \( \alpha + \beta \) (aplusb) centered around the same polarization 
-            rotation calculated by Kenny.
+            rotation calculated by Kenny. The \( gM_{\text{Pl}} \) term should be uniform 
+            because it has no effect on the likelihood when the EDE curve is set to zero. 
         </p>
     
         <table>
