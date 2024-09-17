@@ -37,15 +37,15 @@
                 Constraint on Early Dark Energy from Isotropic Cosmic Birefringence</a>), 
             the authors investigate the presence of Early Dark Energy (EDE) 
             by analyzing its potential impact on the polarization of the CMB. They explore the 
-            possibility that the EDE field, 
-            \( \phi \), is a pseudoscalar "axionlike" field that interacts with electromagnetism 
-            in a parity-violating manner. The Lagrangian density for such a field is given by:
+            possibility that the EDE field, \( \phi \), is a pseudoscalar "axionlike" field that interacts 
+            with electromagnetism in a parity-violating manner. The Lagrangian density for such a field is given by:
         </p>
     
         <p>
-            \[
-            \mathcal{L} = -\frac{1}{2} (\partial \phi)^2 - V(\phi) - \frac{1}{4} F_{\mu\nu} F^{\mu\nu} - \frac{1}{4} g \phi F_{\mu\nu} \tilde{F}^{\mu\nu},
-            \]
+            \begin{equation}
+            \mathcal{L} = -\frac{1}{2} (\partial \phi)^2 - V(\phi) - \frac{1}{4} F_{\mu\nu} F^{\mu\nu} - 
+            \frac{1}{4} g \phi F_{\mu\nu} \tilde{F}^{\mu\nu}
+            \end{equation}
         </p>
     
         <p>
@@ -57,9 +57,9 @@
         </p>
     
         <p>
-            \[
-            V(\phi) = V_0 [1 - \cos(\phi/f)]^3,
-            \]
+            \begin{equation}
+            V(\phi) = V_0 [1 - \cos(\phi/f)]^3
+            \end{equation}
         </p>
     
         <p>
@@ -76,9 +76,9 @@
         </p>
     
         <p>
-            \[
-            -2 \ln L = \sum_b \frac{v_b^2}{\text{Var}(C_{EB,o}^b)},
-            \]
+            \begin{equation}
+            -2 \ln L = \sum_b \frac{v_b^2}{\text{Var}(C_{EB,o}^b)}
+            \end{equation}
         </p>
     
         <p>
@@ -86,11 +86,11 @@
         </p>
     
         <p>
-            \[
-            v_b \equiv \bar{C}^{EB,o}_b - \cos[4(\alpha + \beta)] \, 
+            \begin{equation}
+            v_b \equiv {C}^{EB,o}_b - \cos[4(\alpha + \beta)] \, 
             g M_{\text{Pl}} C^{EB,\text{EDE}}_b - \sin[4(\alpha + \beta)] 
-            \frac{1}{2} \left(C^{EE,\text{CMB}}_b - C^{BB,\text{CMB}}_b\right).
-            \]
+            \frac{1}{2} \left(C^{EE,\text{CMB}}_b - C^{BB,\text{CMB}}_b\right)
+            \end{equation}
         </p>
     
         <p>
@@ -102,7 +102,7 @@
         </p>
     
         <p>
-             Using Planck's and SH0ES's polarization data, they investigated cosmic birefringence and its relation 
+            Using Planck's and SH0ES's polarization data, they investigated cosmic birefringence and its relation 
             to EDE, calculating power spectra and sampling parameters with MCMC methods. Their goal was to differentiate
             between standard \(\Lambda\text{CDM}\) and EDE models. The study found  
             \( g = (0.04 \pm 0.16) \, \text{M}^{-1}_{\text{Pl}} \) (68% CL).
@@ -126,6 +126,7 @@
             2-10 and 2-17 bin configurations to evaluate improvements in constraint precision. 
         </p>
     </section>
+    
     <section>
         <h2>Reproducing BK18 Polarization Rotation</h2>
     
@@ -143,33 +144,32 @@
         </p>
     
         <p>
-            \[
-            C^{EB}_{\ell, expected} = \frac{1}{2} (C^{EE}_{\ell} - C^{BB}_{\ell}) \sin(4(\alpha + \beta))
-            \]
+            \begin{equation}
+            C^{EB}_{\ell, \text{expected}} = \frac{1}{2} (C^{EE}_{\ell} - C^{BB}_{\ell}) \sin(4(\alpha + \beta))
+            \end{equation}
         </p>
     
         <p>
             \(C^{EE}_{\ell}\) and \(C^{BB}_{\ell}\) are obtained from the summation of model_lens and model_dust 
-            with paths as stated in the appendix.
-            To assess the fit of the modified spectra to observed data, we calculate the difference between the model expectation values 
-            \( C^{EB}_{b, \text{expected}} \) and the real bandpowers \( C^{EB}_{b, \text{observed}} \), where \( b \) denotes binned bandpowers 
-            over a range in \( \ell \). The \(\chi^2\) value is computed using the bandpower covariance matrix \(  \text{C}_{EB} \):
+            with paths as stated in the appendix. To assess the fit of the modified spectra to observed data, we calculate the difference 
+            between the model expectation values \( C^{EB}_{b, \text{expected}} \) and the real bandpowers \( C^{EB}_{b, \text{observed}} \), 
+            where \( b \) denotes binned bandpowers over a range in \( \ell \). The \(\chi^2\) value is computed using the bandpower covariance 
+            matrix \( \text{C}_{EB} \):
         </p>
     
         <p>
-            \[
-            \chi^2 = ( C^{EB}_{b, \text{observed}} - C^{EB}_{b, \text{expected}} )^\top ( \text{C}_{EB} )^{-1} 
-            ( C^{EB}_{b, \text{observed}} - C^{EB}_{b, \text{expected}} )
-            \]
+            \begin{equation}
+            \chi^2 = ( C^{EB}_{b, \text{observed}} - C^{EB}_{b, \text{expected}} )^\top 
+            ( \text{C}_{EB} )^{-1} ( C^{EB}_{b, \text{observed}} - C^{EB}_{b, \text{expected}} )
+            \end{equation}
         </p>
     
         <p>
             This analysis is similar to Eskilt's MCMC analysis where \( C^{EB, \text{EDE}}_b \) is set to zero, with a few differences:
             Eskilt zeros out all nondiagonal terms of the covariance matrix, while Kenny retains up to the second off-diagonal term. 
-            Eskilt uses MCMC for the analysis, whereas Kenny employs matmin to minimize the \(\chi^2\). 
-            Additionally, Eskilt uses around 70 bins up to \( \ell = 1500 \), whereas the BICEP spectra analysis uses less than 20 bins up to \( \ell = 500 \).
+            Eskilt uses MCMC for the analysis, whereas Kenny employs matmin to minimize the \(\chi^2\). Additionally, Eskilt uses around 
+            70 bins up to \( \ell = 1500 \), whereas the BICEP spectra analysis uses less than 20 bins up to \( \ell = 500 \).
         </p>
-    
         <figure>
             <img alt="BK18 Polarization Rotation" id="polrot" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
             <figcaption>
@@ -303,15 +303,45 @@
         </table>
     
         <p>
-            The component spectra plots show that the EDE curve and the EE curve are quite similar up to 
-            \( \ell \) of 300, after which there is a more significant divergence.
-             Because BB is much smaller than EE, its contribution to the parameters is negligible. 
-             Thus, with the EDE spectrum included in the analysis, using bins 2-10, the \( gM_{\text{Pl}} \)
-              term and \( \alpha + \beta \) term exhibit a negative correlation that cancels each other out, 
-              resulting in a very wide spread. However, once higher \( \ell \) bins are included, 
-              the spread for \( gM_{\text{Pl}} \) dramatically decreases and centers around 0, 
-              suggesting that the EDE additions do not fit the data better than a 
-              simple polarization rotation.
+            When we only use bins 2-10, the \( gM_{\text{Pl}} \) term and \( \alpha + \beta \) term 
+            exhibit a negative correlation with a very wide spread.
+        </p>
+        
+        <p>
+            To understand this feature, we examine \( v_b \) from equation (4). Because BB is much smaller 
+            than EE, its contribution to the parameters is negligible. Our angle \( \alpha + \beta \) is quite small, 
+            so if we also apply the small angle approximation, the \( v_b \) from equation (4) becomes:
+        </p>
+        
+        <p>
+            \[
+            v_b \equiv {C}^{EB,o}_b - 
+            g M_{\text{Pl}} C^{EB,\text{EDE}}_b - 
+            \frac{(\alpha + \beta)}{2} \left(C^{EE,\text{CMB}}_b\right)
+            \]
+        </p>
+        
+        <p>
+            The component spectra plots show that the EDE curve and the EE curve are quite proportional 
+            up to \( \ell \) of 300. Approximating this observation, our \( v_b \) from equation (4) becomes:
+        </p>
+        
+        <p>
+            \[
+            v_b \equiv {C}^{EB,o}_b - 
+            \left(g M_{\text{Pl}} \times \text{scale} - \frac{(\alpha + \beta)}{2}\right) C^{EE,\text{CMB}}_b
+            \]
+        </p>
+        
+        <p>
+            Where \(\text{scale}\) is some arbitrary scale factor that would be baked into \( gM_{\text{Pl}} \). 
+            This gives a degeneracy between \( gM_{\text{Pl}} \) and \( \alpha + \beta \), causing the observed correlation.
+        </p>
+        
+        <p>
+            However, once higher \( \ell \) bins are included, we see that the EDE curve begins to diverge 
+            more significantly from the EE curve. This causes the spread for \( gM_{\text{Pl}} \) to decrease and center 
+            around 0. This suggests that the EDE contributions do not fit the data better than a simple polarization rotation.
         </p>
     </section>
     
@@ -429,7 +459,7 @@
                 pager.setparams({
                     'sim_num':'0',
                     'mapfreq': 'BK18_B95',
-                    'multi_map_type': '_triagplot',
+                    'multi_map_type': '_bestfit',
                     'bin_num': '_bin10',
                     'ede': 'False'
                 });
