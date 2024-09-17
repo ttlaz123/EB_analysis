@@ -268,6 +268,43 @@ def load_bicep_sim_data(map_name, bin_start=1, bin_end=10, EB_index=5, data_path
     return spectrum_dict
 
 
+def plot_cldl(l_bins, spectrum_dict,  output_plots, mapname,scale=100):
+
+    vars = np.diag(spectrum_dict['EB_var'+ '_' + mapname])
+    plt.figure()
+    #plt.plot(GLOBAL_VAR['EE'], label='CAMB theory')
+    plt.plot(l_bins, spectrum_dict['EE_binned'+ '_' + mapname], label='Binned EE camb')
+    plt.plot(l_bins, spectrum_dict['BB_binned'+ '_' + mapname], label='Binned BB camb')
+    plt.plot(l_bins, spectrum_dict['EB_EDE'+ '_' + mapname]*scale, label='Binned EB EDE scaled by ' + str(scale))
+    plt.errorbar(l_bins[:], spectrum_dict['EB_observed'+ '_' + mapname]*scale, yerr=np.sqrt(vars)*scale,
+            label='C_EB bicep data scaled by ' + str(scale))
+    #plt.ylim([-0.00001, 0.00002])
+    plt.ylabel(r'$C_{\ell}^{EB}\cdot\ell(\ell+1)/(2\pi)$  [$\mu K^2$]')
+    plt.xlabel(r'$\ell$')
+    plt.legend()
+    plt.title('Map: ' + str(mapname))
+    outpath = output_plots + '/' + mapname + '_spectra_Dls.png'
+    print('Saving to ' + outpath)
+    plt.savefig(outpath) 
+    plt.close()
+
+    plt.figure()
+    #plt.plot(GLOBAL_VAR['EE'], label='CAMB theory')
+    d_to_c_conver = l_bins*(l_bins+1)/(2*np.pi)
+    plt.plot(l_bins, spectrum_dict['EE_binned'+ '_' + mapname]/d_to_c_conver, label='Binned EE camb')
+    plt.plot(l_bins, spectrum_dict['BB_binned'+ '_' + mapname]/d_to_c_conver, label='Binned BB camb')
+    plt.plot(l_bins, spectrum_dict['EB_EDE'+ '_' + mapname]*scale/d_to_c_conver, label='Binned EB EDE scaled by ' + str(scale))
+    plt.errorbar(l_bins[:], spectrum_dict['EB_observed'+ '_' + mapname]*scale/d_to_c_conver, yerr=np.sqrt(vars)*scale/d_to_c_conver,
+            label='C_EB bicep data scaled by ' + str(scale))
+    #plt.ylim([-0.00001, 0.00002])
+    plt.ylabel(r'$C_{\ell}^{EB}$  [$\mu K^2$]')
+    plt.xlabel(r'$\ell$')
+    plt.legend()
+    plt.title('Map: ' + str(mapname))
+    outpath = output_plots + '/' + mapname + '_spectra_Cls.png'
+    print('Saving to ' + outpath)
+    plt.savefig(outpath) 
+    plt.close()
 
 def load_bicep_data(plot=False, mapname=None, output_plots='output_plots', zero_ede=False, bin_end = 17):
     #data_path= 'input_data/real_spectra_bicep.npy'
@@ -297,7 +334,7 @@ def load_bicep_data(plot=False, mapname=None, output_plots='output_plots', zero_
     # Apply the mask to the covariance matrix
     truncated_cov_matrix = cov * mask
 
-    vars = np.diag(cov)[bin_start:bin_end]
+    
     np_mat = np.load(data_path, allow_pickle=True, encoding='latin1')
     spectra = np_mat[dataset_index][0] 
     
@@ -318,41 +355,6 @@ def load_bicep_data(plot=False, mapname=None, output_plots='output_plots', zero_
         eb_ede_binned = np.matmul(eb_ede_theory_provided,ee_bpwf_cls)
     spectrum_dict['EB_EDE'] = eb_ede_binned[bin_start:bin_end]
 
-    if(plot):
-        plt.figure()
-        #plt.plot(GLOBAL_VAR['EE'], label='CAMB theory')
-        plt.plot(l_bins, spectrum_dict['EE_binned'], label='Binned EE camb')
-        plt.plot(l_bins, spectrum_dict['BB_binned'], label='Binned BB camb')
-        plt.plot(l_bins, spectrum_dict['EB_EDE']*scale, label='Binned EB EDE scaled by ' + str(scale))
-        plt.errorbar(l_bins[:], spectrum_dict['EB_observed']*scale, yerr=np.sqrt(vars)*scale,
-                label='C_EB bicep data scaled by ' + str(scale))
-        #plt.ylim([-0.00001, 0.00002])
-        plt.ylabel(r'$C_{\ell}^{EB}\cdot\ell(\ell+1)/(2\pi)$  [$\mu K^2$]')
-        plt.xlabel(r'$\ell$')
-        plt.legend()
-        plt.title('Map: ' + str(mapname))
-        outpath = output_plots + '/' + mapname + '_spectra_Dls.png'
-        print('Saving to ' + outpath)
-        plt.savefig(outpath) 
-        plt.close()
-
-        plt.figure()
-        #plt.plot(GLOBAL_VAR['EE'], label='CAMB theory')
-        d_to_c_conver = l_bins*(l_bins+1)/(2*np.pi)
-        plt.plot(l_bins, spectrum_dict['EE_binned']/d_to_c_conver, label='Binned EE camb')
-        plt.plot(l_bins, spectrum_dict['BB_binned']/d_to_c_conver, label='Binned BB camb')
-        plt.plot(l_bins, spectrum_dict['EB_EDE']*scale/d_to_c_conver, label='Binned EB EDE scaled by ' + str(scale))
-        plt.errorbar(l_bins[:], spectrum_dict['EB_observed']*scale/d_to_c_conver, yerr=np.sqrt(vars)*scale/d_to_c_conver,
-                label='C_EB bicep data scaled by ' + str(scale))
-        #plt.ylim([-0.00001, 0.00002])
-        plt.ylabel(r'$C_{\ell}^{EB}$  [$\mu K^2$]')
-        plt.xlabel(r'$\ell$')
-        plt.legend()
-        plt.title('Map: ' + str(mapname))
-        outpath = output_plots + '/' + mapname + '_spectra_Cls.png'
-        print('Saving to ' + outpath)
-        plt.savefig(outpath) 
-        plt.close()
 
     return l_bins, spectrum_dict
 

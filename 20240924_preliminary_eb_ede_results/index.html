@@ -205,8 +205,9 @@
                         'Component Spectra Dls|_spectra_Dls',
                         'Component Spectra Cls|_spectra_Cls'
                     ],
-                    'Bins Used|bin_num': [
-                        '2-10|',
+                    'Bins Used|bin_num1': [
+                        '2-10|_bin10',
+                        '2-15|_bin15',
                         '2-17|_bin17'
                     ],
                     'Add EDE Spectrum?|ede': [ 
@@ -216,7 +217,7 @@
                 },
                 function (params) {
                     let dirpath = dirbase + '/output_plots_ede' + params.ede;
-                    dirpath = dirpath + params.bin_num;
+                    dirpath = dirpath + params.bin_num1;
                     let sim_folder = 'real';
                     let polrot_plot = params.mapfreq + params.map_type + '.png';
                     let name = dirpath + '/' + sim_folder + '/' + polrot_plot;
@@ -227,7 +228,7 @@
                 pager.setparams({
                     'mapfreq': 'BK18_B95',
                     'map_type': '_triagplot',
-                    'bin_num': '',
+                    'bin_num1': '_bin10',
                     'ede': 'False'
                 });
             </script>
@@ -248,7 +249,8 @@
                     <th>Data Set</th>
                     <th>Kenny's Angle (Bins 2-10)</th>
                     <th>MCMC Angle (Bins 2-10)</th>
-                    <th>Kenny's Angle (Bins 2-14)</th>
+                    <th>Kenny's Angle (Bins 2-15)</th>
+                    <th>MCMC Angle (Bins 2-15)</th>
                     <th>MCMC Angle (Bins 2-17)</th>
                 </tr>
             </thead>
@@ -258,6 +260,7 @@
                     <td>-0.380 ± 0.100 °</td>
                     <td>-0.384 ± 0.075 °</td>
                     <td>-0.370 ± 0.068 °</td>
+                    <td>-0.366 ± 0.050 °</td>
                     <td>-0.367 ± 0.049 °</td>
                 </tr>
                 <tr>
@@ -265,28 +268,36 @@
                     <td>-0.164 ± 0.239 °</td>
                     <td>-0.155 ± 0.182 °</td>
                     <td>-0.141 ± 0.225 °</td>
+                    <td>-0.139 ± 0.172 °</td>
                     <td>-0.132 ± 0.168 °</td>
+                    
                 </tr>
                 <tr>
                     <td>BK18 150</td>
                     <td>-0.495 ± 0.119 °</td>
                     <td>-0.494 ± 0.096 °</td>
                     <td>-0.524 ± 0.086 °</td>
+                    <td>-0.519 ± 0.062 °</td>
                     <td>-0.527 ± 0.060 °</td>
+                    
                 </tr>
                 <tr>
                     <td>BK18 220</td>
                     <td>1.012 ± 0.266 °</td>
                     <td>1.005 ± 0.200 °</td>
                     <td>0.933 ± 0.171 °</td>
+                    <td>0.931 ± 0.128 °</td>
                     <td>0.906 ± 0.122 °</td>
+                    
                 </tr>
                 <tr>
                     <td>BK18 B95ext</td>
                     <td>-0.400 ± 0.085 °</td>
                     <td>-0.401 ± 0.066 °</td>
                     <td>-0.371 ± 0.057 °</td>
+                    <td>-0.370 ± 0.040 °</td>
                     <td>-0.381 ± 0.040 °</td>
+                    
                 </tr>
             </tbody>
         </table>
@@ -371,6 +382,11 @@
             </figcaption>
             <script type="text/javascript">
                 pager.link("#multicomp", {
+                    'Sim number|sim_num': [
+                        '0|0',
+                        '1|1',
+                        '2|2',
+                    ],
                     'Map Frequency|mapfreq': [ 
                         'BICEP 95GHz|BK18_B95',
                         'Keck 95GHz|BK18_K95',
@@ -385,7 +401,7 @@
                         'Component Spectra Cls|_spectra_Cls',
                     ],
                     'Bins Used|bin_num': [
-                        '2-10|',
+                        '2-10|_bin10',
                         '2-17|_bin17'
                     ],
                     'Add EDE Spectrum?|ede': [ 
@@ -396,7 +412,7 @@
                 function (params) {
                     let dirpath = dirbase + '/output_plots_ede' + params.ede + '_multicomp';
                     dirpath = dirpath + params.bin_num;
-                    let sim_folder = 'real';
+                    let sim_folder = 'sim_num' + params.sim_num;
                     let ede_plot = '';
                     if (params.multi_map_type === '_triagplot') {
                         ede_plot = 'Multicomponent_triagplot.png';
@@ -411,9 +427,10 @@
                 });
     
                 pager.setparams({
+                    'sim_num':'0',
                     'mapfreq': 'BK18_B95',
                     'multi_map_type': '_triagplot',
-                    'bin_num': '',
+                    'bin_num': '_bin10',
                     'ede': 'False'
                 });
             </script>
@@ -426,64 +443,7 @@
              each other out with a negative correlation.
         </p>
     
-        <figure>
-            <img alt="Multicomponent Simulation" id="multisim" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
-            <figcaption>
-                <p>Interactive plot pager for multicomponent simulation results. Below are the options you can adjust:</p>
-                <ul>
-                    <li><strong>Map Sim Num Digit1, Digit2, Digit3</strong>: Select the digits for the simulation number. Simulations range from 000 to 498.</li>
-                    <li><strong>Bins Used</strong>: Choose the binning scheme for the analysis:
-                        <ul>
-                            <li><strong>2-10</strong>: Binning scheme ranging from 2 to 10.</li>
-                            <li><strong>2-17</strong>: Binning scheme ranging from 2 to 17.</li>
-                        </ul>
-                    </li>
-                </ul>
-                <p>This interactive plot allows exploration of different simulation results by adjusting the simulation number digits and binning schemes. The selected simulation number and binning scheme will affect the displayed multicomponent simulation results.</p>
-            </figcaption>
-            <script type="text/javascript">
-                // Function to generate simulation numbers
-                function generateSimNumOptions(start, end) {
-                    let options = [];
-                    for (let i = start; i <= end; i++) {
-                        let num = i.toString().padStart(1, '0'); // Format numbers as three digits
-                        options.push(`${num}|${num}`);
-                    }
-                    return options;
-                }
-    
-                // Generate options for simulation numbers from 0 to 498
-                const simNumOptions = generateSimNumOptions(0, 9);
-    
-                pager.link("#multisim", {
-                    'Map Sim Num Digit1|digit1': simNumOptions,
-                    'Digit2|digit2': simNumOptions,
-                    'Digit3|digit3': simNumOptions,
-                    'Bins Used|bin_num': [
-                        '2-10|',
-                        '2-17|_bin17'
-                    ]
-                },
-                function (params) {
-                    let dirpath = dirbase + '/output_plots_edeTrue_multicomp';
-                    dirpath = dirpath + params.bin_num;
-                    let simNumber = params.digit1 + params.digit2 + params.digit3;
-                    let sim_folder = 'sim_num' + parseInt(simNumber, 10); // Remove leading zeros
-                    let sim_triag_plot_name = 'BK18_B95ext_triagplot.png'; // Correct name for the triag plot
-                    let name = dirpath + '/' + sim_folder + '/' + sim_triag_plot_name;
-                    console.log(name);
-                    return name;
-                });
-    
-                pager.setparams({
-                    'digit1': '0',
-                    'digit2': '0',
-                    'digit3': '0',
-                    'bin_num': ''
-                });
-            </script>
-        </figure>
-    
+       
         <p>
             By plotting the peaks of all simulations, we observe that the parameters
              are centered around 0 for both \( gM_{\text{Pl}} \) and each polarization rotation angle. 
@@ -519,18 +479,29 @@
                 pager.link("#summaryplot", {
                     'Map Type|sum_map_type': [ 
                         'Best Fit|multicomp_bestfit_allsims',
-                        'Triangle Plot|real_and_sims_corner',
+                        'Triangle Plot|_and_sims_corner',
+                    ],
+                    'Sim Number|sim_num': [
+                        '0|0',
+                        '1|1',
+                        '2|2',
                     ],
                     'Bins Used|bin_num': [
-                        '2-10|',
+                        '2-10|_bin10',
                         '2-17|_bin17'
                     ],
                 },
                 function (params) {
                     let dirpath = dirbase + '/output_plots_edeTrue_multicomp';
                     dirpath = dirpath + params.bin_num;
-                    let sim_folder = 'real';
-                    let summary_plot = params.sum_map_type + '.png';
+                    //let sim_folder = 'real';
+                    sim_folder = 'sim_num' + params.sim_num;
+                    if(params.sum_map_type == 'multicomp_bestfit_allsims'){
+                        summary_plot = params.sum_map_type + sim_folder + '.png';
+                    } else {
+                        sim = 'simnum' + params.sim_num;
+                        summary_plot = sim + params.sum_map_type +  '.png';
+                    }
                     let name = dirpath + '/' + sim_folder + '/' + summary_plot;
                     console.log(name);
                     return name;
@@ -538,7 +509,8 @@
     
                 pager.setparams({
                     'sum_map_type': 'multicomp_bestfit_allsims',
-                    'bin_num': '',
+                    'bin_num': '_bin10',
+                    'sim_num': '0'
                 });
             </script>
         </figure>

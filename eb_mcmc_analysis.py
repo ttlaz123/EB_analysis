@@ -81,7 +81,8 @@ def read_sampler(filepath):
                     'minuslogprior__0', 'chi2', 'chi2__power']
     return df
 
-def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots, residuals=False, real_sampler = None):
+def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots, 
+                                 residuals=False, real_sampler = None, sim_num = None):
     aplusb_dict = {
         'BK18_B95':'aplusb_b95', 
         'BK18_K95':'aplusb_k95', 
@@ -89,6 +90,7 @@ def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots, residu
         'BK18_220':'aplusb_220', 
         'BK18_B95ext': 'aplusb_b95ext'
     } 
+    
     fig = plt.figure(figsize=(15, 10))
     gs = GridSpec(2, 3, figure=fig)
 
@@ -103,7 +105,7 @@ def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots, residu
         header_str = 'sim_num,gMpl,gMpl_std,'
         for freq in MAP_FREQS:
             header_str += aplusb_dict[freq] + ',' + aplusb_dict[freq] + '_std,'
-        header_str += ',chisq' 
+        header_str += 'chisq' 
         file.write(header_str + '\n')
         for i,sampler in enumerate(sampler_sims):
             if(isinstance(sampler, str)):
@@ -170,6 +172,8 @@ def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots, residu
     for map_freq in aplusb_dict:
         ax = axes[map_freq]
         C_eb_observed = GLOBAL_VAR['EB_trueobserved'+ '_' + map_freq]
+        if(not sim_num is None):
+            C_eb_observed = GLOBAL_VAR['EB_sims_' + map_freq][:, sim_num]
         C_eb_var = GLOBAL_VAR['EB_var'+ '_' + map_freq]
         if(len(C_eb_var.shape)==2 and C_eb_var.shape[0] == C_eb_var.shape[1]):
             C_eb_var = np.diag(C_eb_var)
@@ -183,14 +187,18 @@ def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots, residu
     plt.suptitle('Multicomponent All Sims')
     plt.tight_layout()
     if(residuals):
-        outpath = output_plots + '/multicomp_bestfit_residuals_allsims.png'
+        outpath = output_plots + '/multicomp_bestfit_residuals_allsims'
        
     else:
-        outpath = output_plots + '/multicomp_bestfit_allsims.png'
+        outpath = output_plots + '/multicomp_bestfit_allsims'
+    if(sim_num is None):
+        outpath = outpath + '_real.png'
+    else:
+        outpath = outpath + 'sim_num' + str(sim_num) + '.png'
     print('Saving ' + outpath)
     plt.savefig(outpath)
     plt.close()
-
+    
     if(real_sampler is None):
         return 
     if(isinstance(real_sampler, str)):
@@ -208,7 +216,7 @@ def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots, residu
         aplusb = np.round(gd_sample[var][n//2:].mean(),3)
         aplusb_std = np.round(gd_sample[var][n//2:].std(),3)
         
-        C_eb_observed = GLOBAL_VAR['EB_trueobserved'+ '_' + map_freq]
+        C_eb_observed = GLOBAL_VAR['EB_observed'+ '_' + map_freq]
         C_eb_var = GLOBAL_VAR['EB_var'+ '_' + map_freq]
         if(len(C_eb_var.shape)==2 and C_eb_var.shape[0] == C_eb_var.shape[1]):
             C_eb_var = np.diag(C_eb_var)
@@ -235,7 +243,7 @@ def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots, residu
         plt.legend()
         plt.xlabel(r'$\ell$')
         plt.ylabel(r'$C_{\ell}^{EB}\cdot\ell(\ell+1)/(2\pi)$  [$\mu K^2$]')
-        outpath = output_plots + '/real/multicomp_bestfit_' + map_freq + '.png'
+        outpath = output_plots + '/multicomp_bestfit_' + map_freq + '.png'
         print('Saving ' + outpath)
         plt.savefig(outpath)
 
@@ -581,7 +589,7 @@ def update_table_str(table_str, mapname, aplusb, aplusb_std, aplusb_bestfit, std
     table_str += f'twovar_chisq: {two_var_chisq} onevar_chisq: {one_var_chisq}\n'
     return table_str
 
-def single_freq_analysis(max_sim):
+def single_freq_analysis(max_sim, bin_num = 10, zero_ede=True):
     """Main function to run the frequency analysis."""
     print('~~~~~~~~~~~~~~ Start MCMC ~~~~~~~~~~~~~~')
 
@@ -589,8 +597,7 @@ def single_freq_analysis(max_sim):
     sim_str = 'map_name,sim_num,gMpl,gMpl_std,aplusb,aplusb_std\n'
     table_str = ''
     csv_resultfile = 'sim_results.csv'
-    zero_ede = False
-    bin_num = 10
+    
     bin_str = '_bin' + str(bin_num)
     #bin_str = ''
     for mapname in MAP_FREQS:
@@ -623,17 +630,17 @@ def single_freq_analysis(max_sim):
     
     print('~~~~~~~~~~~~~~ End ~~~~~~~~~~~~~~')
 
-def multi_freq_analysis(max_sim, do_run=True):
+def multi_freq_analysis(max_sim, do_run=True, bin_num=17, zero_ede=True):
     variables, priors = get_priors_and_variables_multi_comp(aplusb_minmax=(-5,5))
-    zero_ede = False
-    bin_num = 17
     bin_str = '_bin' + str(bin_num)
     #bin_str = ''
     output_plots = f'output_plots_ede{str(not zero_ede)}_multicomp{bin_str}/real'
     outpath = f'mcmc_chains_ede{str(not zero_ede)}_multicomp{bin_str}/real'
+
     ensure_directory(output_plots)
     for mapname in MAP_FREQS:
         bin_centers, spectrum_dict = eld.load_bicep_data(plot=True, mapname=mapname, output_plots=output_plots, zero_ede=zero_ede, bin_end=bin_num)
+  
         GLOBAL_VAR['EB_sims_' + mapname] = spectrum_dict['EB_sims']
         GLOBAL_VAR['EE_binned' + '_' + mapname] = spectrum_dict['EE_binned']
         GLOBAL_VAR['BB_binned'+ '_' + mapname] = spectrum_dict['BB_binned']
@@ -641,7 +648,7 @@ def multi_freq_analysis(max_sim, do_run=True):
         GLOBAL_VAR['EB_observed'+ '_' + mapname] = spectrum_dict['EB_observed']
         GLOBAL_VAR['EB_var'+ '_' + mapname] = spectrum_dict['EB_var']
         GLOBAL_VAR['EB_EDE'+ '_' + mapname] = spectrum_dict['EB_EDE']
-
+        eld.plot_cldl(bin_centers, GLOBAL_VAR,  output_plots, mapname)
     
     info_dict = get_eb_axion_infodict(outpath, variables, priors,
                                       likelihood_func=eb_axion_multicomponent_mcmc_runner)
@@ -669,19 +676,27 @@ def multi_freq_analysis(max_sim, do_run=True):
         ensure_directory(output_plots) 
         for mapname in MAP_FREQS:
             GLOBAL_VAR['EB_observed'+ '_' + mapname] = GLOBAL_VAR['EB_sims_' + mapname][:, sim_num]
+            if(do_run):
+                eld.plot_cldl(bin_centers, GLOBAL_VAR,  output_plots, mapname)
         info_dict = get_eb_axion_infodict(outpath, variables, priors,
                                       likelihood_func=eb_axion_multicomponent_mcmc_runner)
         init_params = info_dict['params']
         if(do_run):
             updated_info, sampler = run(info_dict, resume=True)
             all_samplers.append(sampler)
+            mapname = 'Multicomponent'
+            
             plot_info(variables, updated_info, sampler, mapname=mapname, outfile=f'{mapname}_triagplot.png', output_plots=output_plots)
+            plot_best_fit_multicomponent(sampler_sims=all_samplers, bin_centers=bin_centers, 
+                                 output_plots=output_plots, residuals=False, real_sampler=sampler) 
         else:
             sampler = outpath + '.1.txt'
             all_samplers.append(sampler)
-    output_plots = f'output_plots_ede{str(not zero_ede)}_multicomp{bin_str}/'
-    plot_best_fit_multicomponent(sampler_sims=all_samplers, bin_centers=bin_centers, 
-                                 output_plots=output_plots, residuals=False, real_sampler=real_sampler)    
+    
+    for sim_num in range(3):
+        output_plots = f'output_plots_ede{str(not zero_ede)}_multicomp{bin_str}/sim_num{sim_num}/'
+        plot_best_fit_multicomponent(sampler_sims=all_samplers, bin_centers=bin_centers, 
+                                 output_plots=output_plots, residuals=False, real_sampler=None, sim_num=sim_num)    
 
 def plot_chisq_hist(sim_results_file):
     df = pd.read_csv(sim_results_file)
@@ -746,20 +761,30 @@ def plot_corner(outfile, sim_results_file, real_results_file):
   
 
 def main():
+    for bins in [10, 17]:
+        for zero_ede in [False]:
+            multi_freq_analysis(max_sim=499, do_run=False, bin_num=bins, zero_ede=zero_ede)
+
+
+
+            mcmc_dir = 'mcmc_chains_ede' + str(not zero_ede) + '_multicomp_bin' + str(bins) + '/'
+            plots_dir = 'output_plots_ede' + str(not zero_ede) + '_multicomp_bin' + str(bins) + '/'
+            for sims in range(3):
+                file_all_sims = plots_dir + 'sim_results_multicomp.csv'
+
+                simnum = 'simnum' + str(sims)
+                #simnum = 'real'
+                file_real = mcmc_dir + simnum + '.1.txt'
+                
+                sim_dir = 'sim_num' + str(sims)
+                
+                outfile = plots_dir + '/' + sim_dir + '/' + simnum + '_and_sims_corner.png'
+                
+                plot_corner(outfile,  file_all_sims, file_real)
     
-    mcmc_dir = 'mcmc_chains_edeTrue_multicomp_bin17/'
-    plots_dir = 'output_plots_edeTrue_multicomp_bin17/'
-    file_all_sims = plots_dir + 'sim_results_multicomp.csv'
-    file_real = mcmc_dir + 'real.1.txt'
-    file156 =  mcmc_dir + ' simnum156.1.txt'
-    file2 =  mcmc_dir + 'simnum2.1.txt'
-    outfile = plots_dir + 'real_and_sims_corner.png'
-    multi_freq_analysis(max_sim=499, do_run=False)
-    plot_corner(outfile,  file_all_sims, file_real)
+    #matplotlib.use('Agg')
     
-    matplotlib.use('Agg')
-    
-    #single_freq_analysis(max_sim=0)
+    #single_freq_analysis(max_sim=0, bin_num=bins)
 
 if __name__ == '__main__':
     main()
