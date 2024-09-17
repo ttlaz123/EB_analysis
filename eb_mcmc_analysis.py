@@ -746,11 +746,13 @@ def plot_corner(outfile, sim_results_file, real_results_file):
     data_real = df_real[param_names].values
     # Plot the first corner plot
     print('first plot')
-    fig = corner.corner(data_sim, labels=param_names, show_titles=True, title_fmt=".2f", plot_contours=True, color='blue')
+    fig = corner.corner(data_sim, labels=param_names, 
+                        show_titles=True, title_fmt=".2f", plot_contours=True, color='red')
     print('second plot')
     print(df_real)
     # Overlay the second corner plot
-    corner.corner(data_real, labels=param_names, show_titles=True, title_fmt=".2f", plot_contours=True, color='red', fig=fig)
+    corner.corner(data_real, labels=param_names, 
+                  show_titles=True, title_fmt=".2f", plot_contours=True, color='blue', fig=fig)
 
 # Add legend
     plt.legend(['Aggregate Sim Dataset', 'Real Dataset'])
@@ -763,7 +765,7 @@ def plot_corner(outfile, sim_results_file, real_results_file):
 def main():
     for bins in [10, 17]:
         for zero_ede in [False]:
-            multi_freq_analysis(max_sim=499, do_run=False, bin_num=bins, zero_ede=zero_ede)
+            #multi_freq_analysis(max_sim=499, do_run=False, bin_num=bins, zero_ede=zero_ede)
 
 
 

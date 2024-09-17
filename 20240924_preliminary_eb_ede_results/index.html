@@ -477,11 +477,11 @@
     
        
         <p>
-            In the triangle plots, we plot the peaks of all simulations in blue, 
+            In the triangle plots, we plot the peaks of all simulations in red, 
             and we observe that the parameters
              are centered around 0 for both \( gM_{\text{Pl}} \) and each polarization rotation angle. 
              This aligns with simulations that do not include Early Dark Energy or polarization rotations.
-            In red, we plot the spread of a single simulation, whose peaks land within the blue contour plot. 
+            In blue, we plot the spread of a single simulation, whose peaks land within the red contour plot. 
         </p>
     
         <p>
@@ -493,14 +493,20 @@
             results align with the simulations that exclude Early Dark Energy, we further constrain 
             the parameter \( gM_{\text{Pl}} \), supporting Eskilt's result that it is consistent with zero.
             On the other hand, if the \( gM_{\text{Pl}} \) results fall to the left or right of the 
-            simulated peaks in blue, that would suggest the addition of an EDE curve better matches our 
+            simulated peaks in red, that would suggest the addition of an EDE curve better matches our 
             observations, and we can provide an initial estimate of the parameter. 
         </p>
     
         <figure>
             <img alt="Summary Plot" id="summaryplot" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
             <figcaption>
-                <p>Summary plot comparing multicomponent best fit results and triangle plots of real and simulated data. The peaks of the simulations are plotted in blue, while the MCMC results of a single realization are plotted in red.</p>
+                <p>Summary plot comparing multicomponent best fit results and 
+                    triangle plots of real and simulated data. 
+                    In the triangle plots, the peaks of the simulations are plotted in red, 
+                    while the MCMC results of a single realization are plotted in blue.
+                    In the Best Fit plots, the "observed" EB curve is plotted over the 
+                    499 simulation realization EB curves. The purple is the best fit for each of 
+                the 499 simulations. </p>
                 <p>Does not use real observations.</p>
                 <ul>
                     <li><strong>Map Type</strong>: Choose between best fit results or triangle plots:
@@ -586,7 +592,21 @@
                     between different frequencies.
                 </p>
             </li>
-            
+            <li>
+                <strong>Perform the fit across different EDE curves:</strong>
+                <p>
+                    The Early Dark Energy EB curve depends on three parameters:
+                    the maximum energy density fraction \(f_{EDE}\) reached at a redshift
+                   \(z_c\), and the dimensionless initial value of the EDE field \(\theta_i\). 
+                   Eskilt's analysis takes the best fitting parameters from Planck and BOSS data, 
+                   then fixes them in the MCMC analysis. To account for the potential impact of 
+                   the parameters \( gM_{\text{Pl}} \) and rotation angle, Eskilt repeats the analysis 
+                   for different values of \(f_{EDE}\) and shows that the 
+                   change in chi squared varies less than 0.1. Instead of taking fixed values,
+                   we may consider marginalizing these three 
+                   parameters when fitting for \( gM_{\text{Pl}} \).   
+                </p>
+            </li>
             <li>
                 <strong>Combine BICEP Data with Planck and Others:</strong>
                 <p>
