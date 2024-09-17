@@ -213,6 +213,7 @@ def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots,
     gMpl_std = np.round(gd_sample[var][n//2:].std(),3)
     for map_freq in aplusb_dict:
         var = aplusb_dict[map_freq]
+        chisq = np.round(gd_sample['chi2'][n//2:].mean(),3)
         aplusb = np.round(gd_sample[var][n//2:].mean(),3)
         aplusb_std = np.round(gd_sample[var][n//2:].std(),3)
         
@@ -238,7 +239,7 @@ def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots,
                     linewidth=3, label='observed EB')
         title_str = ('gMpl=' + str(gMpl) + '+-' + str(gMpl_std) + 
                  ' aplusb=' + str(aplusb) + '+-' + str(aplusb_std) + 
-                 '\n mapname=' + str(map_freq))
+                 '\n chisq=' + str(chisq) + ' mapname=' + str(map_freq))
         plt.title(title_str)
         plt.legend()
         plt.xlabel(r'$\ell$')
@@ -255,7 +256,7 @@ def plot_best_fit(sampler, bin_centers, mapname=None, output_plots='output_plots
     n = len(gd_sample['gMpl'])
     gMpl = np.round(gd_sample['gMpl'][n//2:].mean(),3)
     aplusb = np.round(gd_sample['aplusb'][n//2:].mean(),3)
-
+    chisq = np.round(gd_sample['chi2'][n//2:].mean(),3)
     gMpl_std = np.round(gd_sample['gMpl'][n//2:].std(),3)
     aplusb_std = np.round(gd_sample['aplusb'][n//2:].std(),3)
     C_eb_ede = GLOBAL_VAR['EB_EDE']
@@ -278,7 +279,7 @@ def plot_best_fit(sampler, bin_centers, mapname=None, output_plots='output_plots
     plt.legend()
     title_str = ('gMpl=' + str(gMpl) + '+-' + str(gMpl_std) + 
                  ' aplusb=' + str(aplusb) + '+-' + str(aplusb_std) + 
-                 '\n mapname=' + str(mapname))
+                 '\n chisq=' + str(chisq) + ' mapname=' + str(mapname))
     plt.title(title_str)
     outpath = output_plots + '/' + mapname + '_bestfit.png'
     plt.savefig(outpath)
@@ -764,11 +765,11 @@ def plot_corner(outfile, sim_results_file, real_results_file):
 
 def main():
     for bins in [10, 17]:
-        for zero_ede in [False]:
-            #multi_freq_analysis(max_sim=499, do_run=False, bin_num=bins, zero_ede=zero_ede)
+        for zero_ede in [True, False]:
+            multi_freq_analysis(max_sim=499, do_run=False, bin_num=bins, zero_ede=zero_ede)
 
 
-
+    '''
             mcmc_dir = 'mcmc_chains_ede' + str(not zero_ede) + '_multicomp_bin' + str(bins) + '/'
             plots_dir = 'output_plots_ede' + str(not zero_ede) + '_multicomp_bin' + str(bins) + '/'
             for sims in range(3):
@@ -783,6 +784,7 @@ def main():
                 outfile = plots_dir + '/' + sim_dir + '/' + simnum + '_and_sims_corner.png'
                 
                 plot_corner(outfile,  file_all_sims, file_real)
+    '''
     
     #matplotlib.use('Agg')
     
