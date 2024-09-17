@@ -213,12 +213,22 @@
                     'Add EDE Spectrum?|ede': [ 
                         'Yes|True',
                         'No|False'
-                    ]
+                    ],
+                    'Sim number|sim_num1': [
+                        'Real|real',
+                        '0|0',
+                        '1|1',
+                        '2|2',
+                    ],
                 },
                 function (params) {
                     let dirpath = dirbase + '/output_plots_ede' + params.ede;
                     dirpath = dirpath + params.bin_num1;
-                    let sim_folder = 'real';
+                    if(params.sim_num1 == 'real'){ 
+                        sim_folder = 'real';
+                    } else{
+                        sim_folder = 'simnum' + params.sim_num1;
+                    }
                     let polrot_plot = params.mapfreq + params.map_type + '.png';
                     let name = dirpath + '/' + sim_folder + '/' + polrot_plot;
                     console.log(name);
@@ -229,6 +239,7 @@
                     'mapfreq': 'BK18_B95',
                     'map_type': '_triagplot',
                     'bin_num1': '_bin10',
+                    'sim_num1': 'real',
                     'ede': 'False'
                 });
             </script>

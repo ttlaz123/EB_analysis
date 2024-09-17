@@ -100,104 +100,105 @@ def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots,
     }
     alpha = 0.05
     diag_ax = fig.add_subplot(gs[5])  # Diagonal plot spot
-    with open(output_plots + '/' + 'sim_results_multicomp.csv', 'w') as file:
+    if(len(sampler_sims) > 100):
+        with open(output_plots + '/' + 'sim_results_multicomp.csv', 'w') as file:
 
-        header_str = 'sim_num,gMpl,gMpl_std,'
-        for freq in MAP_FREQS:
-            header_str += aplusb_dict[freq] + ',' + aplusb_dict[freq] + '_std,'
-        header_str += 'chisq' 
-        file.write(header_str + '\n')
-        for i,sampler in enumerate(sampler_sims):
-            if(isinstance(sampler, str)):
-                print('Reading file: ' +sampler)
-                gd_sample = read_sampler(sampler)
-            else:
-                gd_sample = sampler.products()["sample"]
-            var = 'gMpl'
-            n = len(gd_sample[var])
-            
-            gMpl = np.round(gd_sample[var][n//2:].mean(),3)
-            gMpl_std = np.round(gd_sample[var][n//2:].std(),3)
-            sim_line_str = str(i) + ',' + str(gMpl) + ',' + str(gMpl_std) + ','
-            for map_freq in aplusb_dict:
-                ax = axes[map_freq]
-                var = aplusb_dict[map_freq]
-                aplusb = np.round(gd_sample[var][n//2:].mean(),3)
-                aplusb_std = np.round(gd_sample[var][n//2:].std(),3)
-                C_ee_cmb = GLOBAL_VAR['EE_binned' + '_' + map_freq]
-                C_bb_cmb = GLOBAL_VAR['BB_binned'+ '_' + map_freq]
-                C_eb_sim = GLOBAL_VAR['EB_sims_' + map_freq][:, i]
-                
-                
-                C_eb_ede = GLOBAL_VAR['EB_EDE'+ '_' + map_freq]
-                cos_term = np.cos(4 * np.deg2rad(aplusb)) * gMpl * C_eb_ede
-                sin_term = np.sin(4 * np.deg2rad(aplusb)) / 2 * (C_ee_cmb - C_bb_cmb) 
-                if(i == 0):
-                    if(residuals):
-                        ax.plot(bin_centers, sin_term+cos_term-C_eb_sim, color='red', 
-                            alpha=alpha*10, linewidth=1, label = 'residual')
-                    else:
-                        ax.plot(bin_centers, cos_term, color='blue', 
-                                alpha=alpha, linewidth=1, label = 'gMpl term')
-                        ax.plot(bin_centers, sin_term, color='green', 
-                                alpha=alpha, linewidth=1, label = 'aplusb term')
-                        
-                        ax.plot(bin_centers, sin_term+cos_term, color='purple', 
-                                alpha=alpha*10, linewidth=1, label = 'combined')
-                        ax.plot(bin_centers, C_eb_sim, color='red', 
-                                alpha=alpha*10, linewidth=1, label = 'sim curve')
-                        
-                    
+            header_str = 'sim_num,gMpl,gMpl_std,'
+            for freq in MAP_FREQS:
+                header_str += aplusb_dict[freq] + ',' + aplusb_dict[freq] + '_std,'
+            header_str += 'chisq' 
+            file.write(header_str + '\n')
+            for i,sampler in enumerate(sampler_sims):
+                if(isinstance(sampler, str)):
+                    print('Reading file: ' +sampler)
+                    gd_sample = read_sampler(sampler)
                 else:
-                    if(residuals):
-                        ax.plot(bin_centers, sin_term+cos_term-C_eb_sim, color='red', 
-                            alpha=alpha*10, linewidth=1)
-                    else:
-                        ax.plot(bin_centers, cos_term, color='blue', 
-                                alpha=alpha, linewidth=1)
-                        ax.plot(bin_centers, sin_term, color='green', 
-                                alpha=alpha, linewidth=1)
+                    gd_sample = sampler.products()["sample"]
+                var = 'gMpl'
+                n = len(gd_sample[var])
+                
+                gMpl = np.round(gd_sample[var][n//2:].mean(),3)
+                gMpl_std = np.round(gd_sample[var][n//2:].std(),3)
+                sim_line_str = str(i) + ',' + str(gMpl) + ',' + str(gMpl_std) + ','
+                for map_freq in aplusb_dict:
+                    ax = axes[map_freq]
+                    var = aplusb_dict[map_freq]
+                    aplusb = np.round(gd_sample[var][n//2:].mean(),3)
+                    aplusb_std = np.round(gd_sample[var][n//2:].std(),3)
+                    C_ee_cmb = GLOBAL_VAR['EE_binned' + '_' + map_freq]
+                    C_bb_cmb = GLOBAL_VAR['BB_binned'+ '_' + map_freq]
+                    C_eb_sim = GLOBAL_VAR['EB_sims_' + map_freq][:, i]
+                    
+                    
+                    C_eb_ede = GLOBAL_VAR['EB_EDE'+ '_' + map_freq]
+                    cos_term = np.cos(4 * np.deg2rad(aplusb)) * gMpl * C_eb_ede
+                    sin_term = np.sin(4 * np.deg2rad(aplusb)) / 2 * (C_ee_cmb - C_bb_cmb) 
+                    if(i == 0):
+                        if(residuals):
+                            ax.plot(bin_centers, sin_term+cos_term-C_eb_sim, color='red', 
+                                alpha=alpha*10, linewidth=1, label = 'residual')
+                        else:
+                            ax.plot(bin_centers, cos_term, color='blue', 
+                                    alpha=alpha, linewidth=1, label = 'gMpl term')
+                            ax.plot(bin_centers, sin_term, color='green', 
+                                    alpha=alpha, linewidth=1, label = 'aplusb term')
+                            
+                            ax.plot(bin_centers, sin_term+cos_term, color='purple', 
+                                    alpha=alpha*10, linewidth=1, label = 'combined')
+                            ax.plot(bin_centers, C_eb_sim, color='red', 
+                                    alpha=alpha*10, linewidth=1, label = 'sim curve')
+                            
                         
-                        ax.plot(bin_centers, sin_term+cos_term, color='purple', 
+                    else:
+                        if(residuals):
+                            ax.plot(bin_centers, sin_term+cos_term-C_eb_sim, color='red', 
                                 alpha=alpha*10, linewidth=1)
-                        ax.plot(bin_centers, C_eb_sim, color='red', 
-                                alpha=alpha*10, linewidth=1)
+                        else:
+                            ax.plot(bin_centers, cos_term, color='blue', 
+                                    alpha=alpha, linewidth=1)
+                            ax.plot(bin_centers, sin_term, color='green', 
+                                    alpha=alpha, linewidth=1)
+                            
+                            ax.plot(bin_centers, sin_term+cos_term, color='purple', 
+                                    alpha=alpha*10, linewidth=1)
+                            ax.plot(bin_centers, C_eb_sim, color='red', 
+                                    alpha=alpha*10, linewidth=1)
+                            
                         
                     
-                
-                sim_line_str += str(aplusb) + ',' + str(aplusb_std) + ',' 
-            chisq = np.round(gd_sample['chi2'][n//2:].mean(),3)
-            sim_line_str+= str(chisq)
-            file.write(sim_line_str + '\n')
-    for map_freq in aplusb_dict:
-        ax = axes[map_freq]
-        C_eb_observed = GLOBAL_VAR['EB_trueobserved'+ '_' + map_freq]
-        if(not sim_num is None):
-            C_eb_observed = GLOBAL_VAR['EB_sims_' + map_freq][:, sim_num]
-        C_eb_var = GLOBAL_VAR['EB_var'+ '_' + map_freq]
-        if(len(C_eb_var.shape)==2 and C_eb_var.shape[0] == C_eb_var.shape[1]):
-            C_eb_var = np.diag(C_eb_var)
-    
-        ax.errorbar(bin_centers, C_eb_observed, yerr=np.sqrt(C_eb_var), 
-                    linewidth=3, alpha=1, label='observed EB')
-        ax.set_title(map_freq)
-        ax.legend()
-        ax.set_xlabel(r'$\ell$')
-        ax.set_ylabel(r'$C_{\ell}^{EB}\cdot\ell(\ell+1)/(2\pi)$  [$\mu K^2$]')
-    plt.suptitle('Multicomponent All Sims')
-    plt.tight_layout()
-    if(residuals):
-        outpath = output_plots + '/multicomp_bestfit_residuals_allsims'
-       
-    else:
-        outpath = output_plots + '/multicomp_bestfit_allsims'
-    if(sim_num is None):
-        outpath = outpath + '_real.png'
-    else:
-        outpath = outpath + 'sim_num' + str(sim_num) + '.png'
-    print('Saving ' + outpath)
-    plt.savefig(outpath)
-    plt.close()
+                    sim_line_str += str(aplusb) + ',' + str(aplusb_std) + ',' 
+                chisq = np.round(gd_sample['chi2'][n//2:].mean(),3)
+                sim_line_str+= str(chisq)
+                file.write(sim_line_str + '\n')
+        for map_freq in aplusb_dict:
+            ax = axes[map_freq]
+            C_eb_observed = GLOBAL_VAR['EB_trueobserved'+ '_' + map_freq]
+            if(not sim_num is None):
+                C_eb_observed = GLOBAL_VAR['EB_sims_' + map_freq][:, sim_num]
+            C_eb_var = GLOBAL_VAR['EB_var'+ '_' + map_freq]
+            if(len(C_eb_var.shape)==2 and C_eb_var.shape[0] == C_eb_var.shape[1]):
+                C_eb_var = np.diag(C_eb_var)
+        
+            ax.errorbar(bin_centers, C_eb_observed, yerr=np.sqrt(C_eb_var), 
+                        linewidth=3, alpha=1, label='observed EB')
+            ax.set_title(map_freq)
+            ax.legend()
+            ax.set_xlabel(r'$\ell$')
+            ax.set_ylabel(r'$C_{\ell}^{EB}\cdot\ell(\ell+1)/(2\pi)$  [$\mu K^2$]')
+        plt.suptitle('Multicomponent All Sims')
+        plt.tight_layout()
+        if(residuals):
+            outpath = output_plots + '/multicomp_bestfit_residuals_allsims'
+        
+        else:
+            outpath = output_plots + '/multicomp_bestfit_allsims'
+        if(sim_num is None):
+            outpath = outpath + '_real.png'
+        else:
+            outpath = outpath + 'sim_num' + str(sim_num) + '.png'
+        print('Saving ' + outpath)
+        plt.savefig(outpath)
+        plt.close()
     
     if(real_sampler is None):
         return 
@@ -235,6 +236,7 @@ def plot_best_fit_multicomponent(sampler_sims, bin_centers, output_plots,
         
         plt.plot(bin_centers, sin_term+cos_term, color='purple', 
                  linewidth=3, label = 'combined')
+        
         plt.errorbar(bin_centers, C_eb_observed, yerr=np.sqrt(C_eb_var), 
                     linewidth=3, label='observed EB')
         title_str = ('gMpl=' + str(gMpl) + '+-' + str(gMpl_std) + 
@@ -549,7 +551,7 @@ def ensure_directory(path):
 
 def run_mcmc_for_simulation(mapname, sim_num, bin_centers, variables, priors, bin_str='', zero_ede=False):
     """Run MCMC analysis for a specific map and simulation number."""
-    output_plots = f'output_plots_ede{str(not zero_ede)}{bin_str}/{mapname}/'
+    output_plots = f'output_plots_ede{str(not zero_ede)}{bin_str}/simnum{sim_num}'
     outpath = f'mcmc_chains_ede{str(not zero_ede)}{bin_str}/{mapname}/simnum{sim_num}'
     ensure_directory(output_plots)
     GLOBAL_VAR['EB_observed'] = GLOBAL_VAR['EB_sims'][:, sim_num]
@@ -695,9 +697,16 @@ def multi_freq_analysis(max_sim, do_run=True, bin_num=17, zero_ede=True):
             all_samplers.append(sampler)
     
     for sim_num in range(3):
-        output_plots = f'output_plots_ede{str(not zero_ede)}_multicomp{bin_str}/sim_num{sim_num}/'
+        if(not sim_num is None):
+            output_plots = f'output_plots_ede{str(not zero_ede)}_multicomp{bin_str}/sim_num{sim_num}/'
+            for mapname in MAP_FREQS:
+                GLOBAL_VAR['EB_observed'+ '_' + mapname] = GLOBAL_VAR['EB_sims_' + mapname][:, sim_num]
+     
+        else:
+            output_plots = f'output_plots_ede{str(not zero_ede)}_multicomp{bin_str}/real/'
+        
         plot_best_fit_multicomponent(sampler_sims=all_samplers, bin_centers=bin_centers, 
-                                 output_plots=output_plots, residuals=False, real_sampler=None, sim_num=sim_num)    
+                                 output_plots=output_plots, residuals=False, real_sampler=all_samplers[sim_num], sim_num=sim_num)    
 
 def plot_chisq_hist(sim_results_file):
     df = pd.read_csv(sim_results_file)
@@ -764,9 +773,10 @@ def plot_corner(outfile, sim_results_file, real_results_file):
   
 
 def main():
-    for bins in [10, 17]:
+    for bins in [15]:
         for zero_ede in [True, False]:
-            multi_freq_analysis(max_sim=499, do_run=False, bin_num=bins, zero_ede=zero_ede)
+            single_freq_analysis(max_sim=3, bin_num=bins, zero_ede=zero_ede)
+            #multi_freq_analysis(max_sim=3, do_run=False, bin_num=bins, zero_ede=zero_ede)
 
 
     '''
@@ -788,7 +798,7 @@ def main():
     
     #matplotlib.use('Agg')
     
-    #single_freq_analysis(max_sim=0, bin_num=bins)
+    #
 
 if __name__ == '__main__':
     main()
