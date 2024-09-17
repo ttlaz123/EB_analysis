@@ -206,11 +206,11 @@ a.posting {
 figure {
     text-align: center;
     background-color: #ffffff;
-    padding: 8px;
+    padding: 1px;
     /* In fallback mode, use a full 1000px and center around the body
      * text */
     width: 1000px;
-    margin-left: -100px;
+    margin-left: 0px;
     /* Figures should span the entire page width even though the body
      * doesn't necessarily span that far. */
     width: -webkit-calc(100vw - 2 * 32px);
@@ -236,6 +236,8 @@ figure {
 figure img {
     max-width: 100%;
     object-fit: scale-down;
+    display: block;
+    margin: 0 auto;
 }
 
 figure table {
@@ -245,7 +247,7 @@ figure table {
 
 figure figcaption {
     max-width: 800px;
-    margin: 8px auto;
+    margin: 1px auto;
     text-align: left;
     font-size: 10pt;
 }
