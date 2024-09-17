@@ -173,7 +173,7 @@
         <figure>
             <img alt="BK18 Polarization Rotation" id="polrot" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
             <figcaption>
-                 BK18 polarization rotation angle results.
+                 BK18 polarization rotation angle results with real data, path noted in appendix.
                 <ul>
                     <li><strong>Map Frequency</strong>: Choose from BICEP and Keck frequencies (95 GHz, 150 GHz, 220 GHz) to observe variations in polarization angles.</li>
                     <li><strong>Map Type</strong>: Select different plot types:
@@ -303,7 +303,9 @@
         </table>
     
         <p>
-            When we only use bins 2-10, the \( gM_{\text{Pl}} \) term and \( \alpha + \beta \) term 
+            Examining the triangle plots when including the EDE spectrum in the analysis,
+            we see that when we only use bins 2-10, the \( gM_{\text{Pl}} \) term and 
+            \( \alpha + \beta \) term 
             exhibit a negative correlation with a very wide spread.
         </p>
         
@@ -360,55 +362,52 @@
     
         <p>
             When the EDE spectrum is set to zero, the results align with those from single 
-            component analyses with the EDE spectrum set to zero. Any deviations can be attributed
-             to inherent variability in the MCMC software.
+            component analyses with the EDE spectrum set to zero as there is no coupling term 
+            between the different angles beyond the \( gM_{\text{Pl}} \) term.
         </p>
     
         <p>
+            We perform the analysis on the first three simulation realizations. 
             When the EDE spectrum is included, the triangle plots show \( gM_{\text{Pl}} \) 
-            centered around -1.5, but with a large spread that is consistent with \( gM_{\text{Pl}} = 0 \).
-             This is likely due to the similarity between the EDE and EE spectra at those 
+            a spread that is consistent with \( gM_{\text{Pl}} = 0 \).
+             Again, when using fewer bins, the large spread is due to the degeneracy
+              between the EDE and EE spectra at those 
              \( \ell \) bins. As additional bins are added, \( gM_{\text{Pl}} \) centers around
-              0 with a smaller spread. We obtain a sigma of 0.25, which is slightly larger than 
-              Eskilt's 0.16.
+              0 with a smaller spread. We see a sigma of about 0.25 for each simulation, 
+              which is slightly larger than Eskilt's 0.16.
         </p>
     
         <figure>
             <img alt="Multicomponent Analysis EB Spectrum" id="multicomp" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
             <figcaption>
-                <p>Interactive plot pager for multicomponent analysis of the Early Dark Energy (EDE) spectrum. Below are the options you can adjust:</p>
+                <p>Interactive plot pager for multicomponent analysis of the Early Dark Energy (EDE) spectrum. 
+                    Does not use real data.</p>
                 <ul>
-                    <li><strong>Map Frequency</strong>: Select the frequency map for analysis:
-                        <ul>
-                            <li>BICEP 95GHz|BK18_B95</li>
-                            <li>Keck 95GHz|BK18_K95</li>
-                            <li>BICEP 95GHz Extended|BK18_B95ext</li>
-                            <li>BICEP 150GHz|BK18_150</li>
-                            <li>BICEP 220GHz|BK18_220</li>
-                        </ul>
+                    <li><strong>Map Frequency</strong>: Select the frequency map for analysis.
+                        Each frequency is a different receiver.
+                    
                     </li>
                     <li><strong>Map Type</strong>: Choose the type of plot to visualize:
                         <ul>
-                            <li><strong>Best Fit</strong>: Displays the best fit analysis results for the selected frequency.</li>
-                            <li><strong>Triangle Plot</strong>: Shows a triangular plot illustrating correlations between parameters.</li>
-                            <li><strong>Component Spectra Dls</strong>: Displays power spectra for different components in \( D_\ell \) format.</li>
-                            <li><strong>Component Spectra Cls</strong>: Displays power spectra for different components in \( C_\ell \) format.</li>
-                        </ul>
+                            <li>Best Fit: Displays the best fit analysis results for the selected frequency.</li>
+                            <li>Triangle Plot: Shows correlations between parameters.</li>
+                            <li>Component Spectra Dls/Cls: Illustrates power spectra of different components. 
+                                Some values are scaled by 100 for easier visualization.</li></ul>
                     </li>
-                    <li><strong>Bins Used</strong>: Select the binning configuration for analysis:
-                        <ul>
-                            <li><strong>2-10</strong>: Binning scheme ranging from 2 to 10.</li>
-                            <li><strong>2-17</strong>: Binning scheme ranging from 2 to 17.</li>
-                        </ul>
+                    <li><strong>Bins Used</strong>: Select which bins are used in the analysis
                     </li>
-                    <li><strong>Add EDE Spectrum?</strong>: Toggle to include or exclude the Early Dark Energy (EDE) spectrum in the analysis:
-                        <ul>
-                            <li><strong>Yes</strong> (True): Include the EDE spectrum in the analysis.</li>
-                            <li><strong>No</strong> (False): Exclude the EDE spectrum from the analysis.</li>
-                        </ul>
+                    <li><strong>Add EDE Spectrum?</strong>: Toggle to include 
+                        or exclude the Early Dark Energy (EDE) spectrum in the analysis
+                       
+                    </li>
+                    <li><strong>Simulation Number</strong>: Choose the simulation 
+                        number to view simulated "observed".
+            
                     </li>
                 </ul>
-                <p>This interactive plot allows exploration of various aspects of the multicomponent analysis, enabling detailed investigation by adjusting frequencies, map types, binning schemes, and the inclusion of the EDE spectrum.</p>
+                <p>This interactive plot allows exploration of various aspects of the multicomponent analysis, 
+                    enabling detailed investigation by adjusting frequencies, map types,
+                     binning schemes, EDE spectrum inclusion, and simulation numbers.</p>
             </figcaption>
             <script type="text/javascript">
                 pager.link("#multicomp", {
@@ -455,7 +454,7 @@
                     console.log(name);
                     return name;
                 });
-    
+        
                 pager.setparams({
                     'sim_num':'0',
                     'mapfreq': 'BK18_B95',
@@ -465,7 +464,6 @@
                 });
             </script>
         </figure>
-    
         <p>
             We perform the same MCMC analysis on the 499 simulations using the simplified multicomponent 
             approach. Again, using only bins 2-10 results in a greater spread for every variable
@@ -475,33 +473,44 @@
     
        
         <p>
-            By plotting the peaks of all simulations, we observe that the parameters
+            In the triangle plots, we plot the peaks of all simulations in blue, 
+            and we observe that the parameters
              are centered around 0 for both \( gM_{\text{Pl}} \) and each polarization rotation angle. 
              This aligns with simulations that do not include Early Dark Energy or polarization rotations.
+            In red, we plot the spread of a single simulation, whose peaks land within the blue contour plot. 
         </p>
     
         <p>
-            For both bins 2-10 and 2-17, the measured EB spectra differ from the simulations 
-            in the polarization rotation but are consistent in \( gM_{\text{Pl}} \). 
-            This discrepancy is due to the real data being measured by detectors that likely 
-            have some inherent polarization rotation. However, since the \( gM_{\text{Pl}} \) 
+            For both bins 2-10 and 2-17, we expect the measured EB spectra to
+            differ from the simulations in the polarization rotation, 
+            due to the real data being measured by detectors that likely 
+            have some inherent polarization rotation.
+            If the \( gM_{\text{Pl}} \) 
             results align with simulations that exclude Early Dark Energy, we further constrain 
             the parameter \( gM_{\text{Pl}} \), supporting Eskilt's result that it is consistent with zero.
+            On the other hand, if the \( gM_{\text{Pl}} \) results fall to the left or right of the 
+            simulated peaks, that would suggest the addition of an EDE curve better matches our observations. 
         </p>
     
         <figure>
             <img alt="Summary Plot" id="summaryplot" src="#" width="750" height="750" onerror="javascript:this.src='dne.png'" />
             <figcaption>
                 <p>Summary plot comparing multicomponent best fit results and triangle plots of real and simulated data. The peaks of the simulations are plotted in blue, while the MCMC results of a single realization are plotted in red.</p>
-                <p>This pager allows you to view summary plots of the multicomponent analysis:</p>
+                <p>Does not use real observations.</p>
                 <ul>
                     <li><strong>Map Type</strong>: Choose between best fit results or triangle plots:
                         <ul>
-                            <li>Best Fit: Displays the best fit results for the multicomponent analysis across all simulations.</li>
-                            <li>Triangle Plot: Provides a corner plot comparing real and simulated data across different parameters.</li>
+                            <li>Best Fit: Displays the best fit results for the multicomponent analysis 
+                                    on top of all simulations.</li>
+                            <li>Triangle Plot: Shows correlations between different parameters.
+                                 "Real Dataset" is selected by Sim Number and does not use real observations.
+                            </li>
                         </ul>
                     </li>
                     <li><strong>Bins Used</strong>: Select between different binning schemes (2-10 or 2-17) to observe their effect on the summary results.</li>
+                    <li><strong>Simulation Number</strong>: Choose the simulation number to view simulated "observed". 
+                   
+                    </li>
                 </ul>
                 <p>Comparing these plots helps in understanding the overall performance and fit of the multicomponent analysis, offering insights into how well the simulation results align with real data.</p>
             </figcaption>
@@ -524,7 +533,6 @@
                 function (params) {
                     let dirpath = dirbase + '/output_plots_edeTrue_multicomp';
                     dirpath = dirpath + params.bin_num;
-                    //let sim_folder = 'real';
                     sim_folder = 'sim_num' + params.sim_num;
                     if(params.sum_map_type == 'multicomp_bestfit_allsims'){
                         summary_plot = params.sum_map_type + sim_folder + '.png';
@@ -536,7 +544,7 @@
                     console.log(name);
                     return name;
                 });
-    
+        
                 pager.setparams({
                     'sum_map_type': 'multicomp_bestfit_allsims',
                     'bin_num': '_bin10',
