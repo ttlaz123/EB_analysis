@@ -2,7 +2,7 @@ import numpy as np
 from astropy.io import fits
 import sys, os
 import pandas as pd
-import matplotlib.pyplot as plt
+
 #Assume installed from github using "git clone --recursive https://github.com/cmbant/CAMB.git"
 #This file is then in the docs folders
 camb_path = os.path.realpath(os.path.join(os.getcwd(),'..'))
@@ -31,17 +31,15 @@ def bin_spectrum(n_bins, delta_ell, ell_min, spectrum):
         The minimum value of `ell` corresponding to the starting index of the spectrum.
 
     spectrum : ndarray
-        The input spectrum to be binned, with values indexed by `ell`. The length of `spectrum` should be sufficient to cover all bins.
+        The input spectrum to be binned, with values indexed by `ell`.
 
     Returns:
     --------
     binned_spectrum : ndarray
         An array of length `n_bins` containing the average values of the spectrum within each bin.
 
-    Notes:
-    ------
-    The function assumes that the `spectrum` array is indexed by `ell` values and that the total length of `spectrum` is at least `ell_min + n_bins * delta_ell`.
-    Each bin is computed by summing the values of `spectrum` within the bin range and then dividing by the number of elements (`delta_ell`) in that bin.
+    bin_starts : ndarray
+        An array containing the starting index of each bin.
     """
     
     binned_spectrum = np.zeros(n_bins)
@@ -85,27 +83,11 @@ def read_planck(filepath, spectrum_type):
     
     errs : ndarray
         Array of errors associated with the power spectrum values.
-    
-    Notes:
-    ------
-    The function raises an AttributeError if an unsupported `spectrum_type` is provided.
-    
-    The specific data being extracted from the FITS file corresponds to:
-        - low l (unbinned) data for l < ~30 (based on specific spectrum type)
-        - high l (binned and unbinned) data for l > ~30
-    
-    Spectrum types and corresponding data indices:
-        - Type 0: TT spectrum
-            - low l: index 1
-            - high l: index 8
-        - Type 1: EE spectrum
-            - low l: index 3
-            - high l: index 12
-        - Type 3: TE spectrum
-            - low l: index 2
-            - high l: index 10
-    
-    The BB spectrum (type 2) is not available and will raise an AttributeError.
+
+    Raises:
+    -------
+    AttributeError:
+        If an unsupported `spectrum_type` is provided or if data for the spectrum type is unavailable.
     """
     spectrum_data = fits.open(filepath)
 
@@ -140,42 +122,27 @@ def read_planck(filepath, spectrum_type):
 
 def load_data(spectrum_type, datafile=None, raw_cls=False):
     """
-    Loads and sets global variables with the data to be used for fitting the power spectrum.
+    Loads power spectrum data from either a Planck data file or generates a theoretical spectrum using CAMB.
 
     Parameters:
     -----------
     spectrum_type : int
         The type of power spectrum to load:
-        - 0: TT (Temperature-Temperature) spectrum
-        - 1: EE (E-mode Polarization) spectrum
-        - 2: BB (B-mode Polarization) spectrum
-        - 3: TE (Temperature-E-mode Polarization) spectrum
+        - 0: TT (Temperature-Temperature)
+        - 1: EE (E-mode Polarization)
+        - 2: BB (B-mode Polarization)
+        - 3: TE (Temperature-E-mode Polarization)
+
     datafile : str, optional
-        The path to a data file (e.g., Planck data in FITS format). If provided, the function reads the power spectrum
-        from this file. If not provided, the function calculates the lensed scalar CMB power spectra using the CAMB 
-        results for the specified `spectrum_type`.
+        The path to the Planck data file. If provided, the function reads the spectrum from the file.
 
-    Sets:
-    -----
-    global_var['results'] : CAMBresults object
-        The results from the CAMB cosmology model, used to generate theoretical power spectra.
-    
-    global_var['measured'] : ndarray
-        The measured or calculated power spectrum data (Dl) for the specified `spectrum_type`.
-    
-    global_var['ls'] : ndarray or range
-        The multipole moments (l) corresponding to the `measured` power spectrum data.
-    
-    global_var['errs'] : ndarray, optional
-        The errors associated with the measured power spectrum data. Only set if `datafile` is provided.
+    raw_cls : bool, optional
+        If True, returns raw Cl values from CAMB results.
 
-    Notes:
-    ------
-    - If `datafile` is provided, the power spectrum is read from the file, and the corresponding `ls`, `dls`, and `errs`
-      are extracted using the `read_planck` function. 
-    - If `datafile` is not provided, the function calculates the lensed scalar CMB power spectra using the default 
-      cosmological parameters set in the CAMB model and stores the corresponding power spectrum for the given 
-      `spectrum_type`.
+    Returns:
+    --------
+    GLOBAL_VAR : dict
+        Dictionary containing the power spectrum data and cosmological results.
     """
     GLOBAL_VAR = {}
     # TODO add ability to do multiple spectra
@@ -209,9 +176,43 @@ def load_dust_lensing_model(bin_start=1, bin_end=10, mapname='BK18_B95',
                             lensing_path='input_data/model_lens.npy', 
                             bandpowerwindowfunction_path='input_data/bpwf.npy',
                             plot=False):
-    '''
-    Assumes specific structure for the npy files
-    '''
+    """
+    Loads the dust and lensing model spectra, applies the bandpower window function, and returns the binned results.
+
+    Parameters:
+    -----------
+    bin_start : int, optional
+        Starting bin for analysis.
+
+    bin_end : int, optional
+        Ending bin for analysis.
+
+    mapname : str, optional
+        Name of the map or dataset to load the spectra for.
+
+    dust_path : str, optional
+        Path to the dust model data file.
+
+    lensing_path : str, optional
+        Path to the lensing model data file.
+
+    bandpowerwindowfunction_path : str, optional
+        Path to the bandpower window function data file.
+
+    plot : bool, optional
+        If True, plots the binned EE and BB spectra.
+
+    Returns:
+    --------
+    bpwf_ls : ndarray
+        The multipole moments after applying the bandpower window function.
+
+    bpwf_cls : ndarray
+        The binned spectra after applying the bandpower window function.
+
+    spectrum_dict : dict
+        Dictionary containing the binned EE and BB spectra.
+    """
     TT = 0; TE = 1; EE = 2;
     BB = 3; TB = 4; EB = 5;
     ET = 6; BT = 7; BE = 8;
@@ -259,6 +260,31 @@ def load_dust_lensing_model(bin_start=1, bin_end=10, mapname='BK18_B95',
     return bpwf_ls, bpwf_cls[:,:,EE], spectrum_dict
 
 def load_bicep_sim_data(map_name, bin_start=1, bin_end=10, EB_index=5, data_path='input_data/dust_simulations.npy'):
+    """
+    Loads simulated BICEP dust data for a specified map and bin range.
+
+    Parameters:
+    -----------
+    map_name : str
+        The name of the map or dataset.
+
+    bin_start : int, optional
+        The starting bin for the data.
+
+    bin_end : int, optional
+        The ending bin for the data.
+
+    EB_index : int, optional
+        The index corresponding to the EB spectra in the simulations.
+
+    data_path : str, optional
+        Path to the dust simulation data file.
+
+    Returns:
+    --------
+    spectrum_dict : dict
+        Dictionary containing the EB simulated spectra.
+    """
     dust_sims = np.load(data_path, allow_pickle=True)
     dataset_index = bicep_data_consts.SPECTRA_DATASETS.index(map_name)
     eb_dust_spectra = dust_sims[dataset_index][bin_start:bin_end,EB_index,:]
@@ -268,45 +294,35 @@ def load_bicep_sim_data(map_name, bin_start=1, bin_end=10, EB_index=5, data_path
     return spectrum_dict
 
 
-def plot_cldl(l_bins, spectrum_dict,  output_plots, mapname,scale=100):
-
-    vars = np.diag(spectrum_dict['EB_var'+ '_' + mapname])
-    plt.figure()
-    #plt.plot(GLOBAL_VAR['EE'], label='CAMB theory')
-    plt.plot(l_bins, spectrum_dict['EE_binned'+ '_' + mapname], label='Binned EE camb')
-    plt.plot(l_bins, spectrum_dict['BB_binned'+ '_' + mapname], label='Binned BB camb')
-    plt.plot(l_bins, spectrum_dict['EB_EDE'+ '_' + mapname]*scale, label='Binned EB EDE scaled by ' + str(scale))
-    plt.errorbar(l_bins[:], spectrum_dict['EB_observed'+ '_' + mapname]*scale, yerr=np.sqrt(vars)*scale,
-            label='C_EB bicep data scaled by ' + str(scale))
-    #plt.ylim([-0.00001, 0.00002])
-    plt.ylabel(r'$C_{\ell}^{EB}\cdot\ell(\ell+1)/(2\pi)$  [$\mu K^2$]')
-    plt.xlabel(r'$\ell$')
-    plt.legend()
-    plt.title('Map: ' + str(mapname))
-    outpath = output_plots + '/' + mapname + '_spectra_Dls.png'
-    print('Saving to ' + outpath)
-    plt.savefig(outpath) 
-    plt.close()
-
-    plt.figure()
-    #plt.plot(GLOBAL_VAR['EE'], label='CAMB theory')
-    d_to_c_conver = l_bins*(l_bins+1)/(2*np.pi)
-    plt.plot(l_bins, spectrum_dict['EE_binned'+ '_' + mapname]/d_to_c_conver, label='Binned EE camb')
-    plt.plot(l_bins, spectrum_dict['BB_binned'+ '_' + mapname]/d_to_c_conver, label='Binned BB camb')
-    plt.plot(l_bins, spectrum_dict['EB_EDE'+ '_' + mapname]*scale/d_to_c_conver, label='Binned EB EDE scaled by ' + str(scale))
-    plt.errorbar(l_bins[:], spectrum_dict['EB_observed'+ '_' + mapname]*scale/d_to_c_conver, yerr=np.sqrt(vars)*scale/d_to_c_conver,
-            label='C_EB bicep data scaled by ' + str(scale))
-    #plt.ylim([-0.00001, 0.00002])
-    plt.ylabel(r'$C_{\ell}^{EB}$  [$\mu K^2$]')
-    plt.xlabel(r'$\ell$')
-    plt.legend()
-    plt.title('Map: ' + str(mapname))
-    outpath = output_plots + '/' + mapname + '_spectra_Cls.png'
-    print('Saving to ' + outpath)
-    plt.savefig(outpath) 
-    plt.close()
-
 def load_bicep_data(plot=False, mapname=None, output_plots='output_plots', zero_ede=False, bin_end = 17):
+    """
+    Loads real BICEP data, extracts EB observed data, and computes EB EDE binned spectra.
+
+    Parameters:
+    -----------
+    plot : bool, optional
+        If True, generates plots for the EE, BB, and EB spectra.
+
+    mapname : str, optional
+        Name of the map or dataset. Default is 'BK18_B95'.
+
+    output_plots : str, optional
+        Directory path for saving output plots.
+
+    zero_ede : bool, optional
+        If True, sets the EDE spectrum to zero.
+
+    bin_end : int, optional
+        Ending bin for the analysis.
+
+    Returns:
+    --------
+    l_bins : ndarray
+        Array of multipole moments (l) corresponding to the binned spectra.
+
+    spectrum_dict : dict
+        Dictionary containing the observed EB data, simulated EB spectra, and binned EE/BB spectra.
+    """
     #data_path= 'input_data/real_spectra_bicep.npy'
     #cov_file = 'input_data/bicep_cov.npy'
     offdiag = 2
@@ -359,6 +375,17 @@ def load_bicep_data(plot=False, mapname=None, output_plots='output_plots', zero_
     return l_bins, spectrum_dict
 
 def read_ede_data(data_path='input_data/fEDE0.07_cl.dat'):
+    """
+    Reads EDE data from a specified file, extracts the EB spectrum, 
+    and returns the processed EB values.
+
+
+    Parameters:
+    data_path (str): Path to the input data file (default is 'input_data/fEDE0.07_cl.dat').
+
+    Returns:
+    np.ndarray: Processed EB spectrum values, converted to µK^2 and scaled by 2π.
+    """
     k_to_uk = 1e6
     data = pd.read_csv(data_path, delim_whitespace=True, comment='#', header=None)
     data.columns = ['l', 'TT', 'EE', 'TE', 'BB', 'EB', 'TB', 'phiphi', 'TPhi', 'Ephi']
@@ -367,6 +394,18 @@ def read_ede_data(data_path='input_data/fEDE0.07_cl.dat'):
     return -EB_values * np.square(k_to_uk) * 2 * np.pi
 
 def load_eskilt_data(data_path = 'input_data/HFI_f_sky_092_EB_o.npy'):
+    """
+    Loads Eskilt data, computes and bins EE and BB spectra, and returns the spectrum dictionary.
+
+    Parameters:
+    data_path (str): Path to the Eskilt EB data file (default is 'input_data/HFI_f_sky_092_EB_o.npy').
+
+    Returns:
+    tuple: Contains the following elements:
+        - bin_starts (np.ndarray): Starting values of each bin.
+        - raw_cl (bool): Whether raw Cl data is being used.
+        - spectrum_dict (dict): Dictionary containing binned and observed spectra.
+    """
     raw_cl = True
     spectrum_dict = load_data('all', raw_cls=raw_cl)
     c_l_EB_o_mean_std = np.load(data_path)
