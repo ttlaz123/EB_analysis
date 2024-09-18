@@ -630,8 +630,13 @@
                 <p>
                     We still need to understand why the peak spreads in the simulated data are 
                     significantly wider than the spread of a single realization. 
-                    This discrepancy might indicate a problem with the covariance 
-                    calculations. 
+                    Because the ratio between the peak spread and the 
+                    posterior likelihood spread is about the same as the reduced chi-squared value, 
+                    this discrepancy might indicate a problem with the covariance 
+                    calculations. The reduced-chi squared hovers around 2 instead of 1,
+                    suggesting an underestimate of the error variance. This may be 
+                    caused by a nongaussian distribution of the bandpowers, especially 
+                    at lower \(\ell\). 
                 </p>
             </li>
             

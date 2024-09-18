@@ -329,8 +329,6 @@ def load_bicep_data(plot=False, mapname=None, output_plots='output_plots', zero_
     data_path= 'input_data/bicep_norot_realspectra.npy'
     cov_file = 'input_data/bicep_cov_simdust.npy'
     bin_start = 1
-    scale = 100
-    raw_cl = False
 
     spectrum_dict = {}
     if(mapname is None):

@@ -72,10 +72,52 @@ def eb_log_likelihood_vector(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_c
 
 
 def objective_function(aplusb, C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_cmb, gMpl):
+    """
+    Objective function to be minimized during the optimization process.
+
+    Parameters:
+    -----------
+    aplusb : float
+        The sum of angle parameters `a` and `b` used in the rotation of polarization modes.
+    
+    C_eb_observed : ndarray
+        The observed EB power spectrum (Dl) values.
+    
+    C_eb_var : ndarray
+        The variance of the observed EB power spectrum.
+    
+    C_eb_ede : ndarray
+        The predicted EB power spectrum contribution from early dark energy (EDE).
+    
+    C_ee_cmb : ndarray
+        The predicted EE power spectrum from the CMB.
+    
+    C_bb_cmb : ndarray
+        The predicted BB power spectrum from the CMB.
+    
+    gMpl : float
+        A scaling factor related to the effective gravitational constant.
+
+    Returns:
+    --------
+    negative_log_likelihood : float
+        The negative log-likelihood value for the EB power spectrum.
+    """
     return -eb_log_likelihood_vector(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_cmb, aplusb, gMpl)
 
 
 def polar_rotation_likelihood():
+    """
+    Optimizes the `aplusb` parameter for the polar rotation likelihood model and computes its error bars.
+
+    Returns:
+    --------
+    best_fit_aplusb : float
+        The best-fit value for the `aplusb` parameter.
+    
+    error_bars : float
+        The error bars for the `aplusb` parameter.
+    """
     C_ee_cmb = GLOBAL_VAR['EE_binned']
     C_bb_cmb = GLOBAL_VAR['BB_binned']
     C_eb_observed = GLOBAL_VAR['EB_observed']
@@ -103,6 +145,22 @@ def polar_rotation_likelihood():
 
 def eb_axion_multicomponent_mcmc_runner(gMpl, aplusb_b95, aplusb_b95ext, aplusb_k95,
                                         aplusb_150, aplusb_220):
+    """
+    Computes the total log-likelihood for the multi-component EB axion model.
+
+    Parameters:
+    -----------
+    gMpl : float
+        A scaling factor related to the effective gravitational constant.
+    
+    aplusb_b95, aplusb_b95ext, aplusb_k95, aplusb_150, aplusb_220 : float
+        The `aplusb` parameters for different frequency bands.
+
+    Returns:
+    --------
+    multi_likelihood : float
+        The total log-likelihood value for the multi-component model, summed over all frequency bands.
+    """
     multi_likelihood = 0
     aplusb_dict = {
         'BK18_B95':aplusb_b95, 
@@ -124,6 +182,22 @@ def eb_axion_multicomponent_mcmc_runner(gMpl, aplusb_b95, aplusb_b95ext, aplusb_
 
     return multi_likelihood
 def eb_axion_mcmc_runner(aplusb, gMpl):
+    """
+    Computes the log-likelihood for the EB axion model with the given `aplusb` and `gMpl` parameters.
+
+    Parameters:
+    -----------
+    aplusb : float
+        The sum of angle parameters `a` and `b` used in the rotation of polarization modes.
+    
+    gMpl : float
+        A scaling factor related to the effective gravitational constant.
+
+    Returns:
+    --------
+    likelihood : float
+        The log-likelihood value for the EB axion model.
+    """
     # TODO complete this
     
     C_ee_cmb = GLOBAL_VAR['EE_binned']
@@ -153,19 +227,13 @@ def get_eb_axion_infodict(outpath, variables, priors, likelihood_func):
     priors : list of tuple
         A list of tuples specifying the prior ranges for each variable. Each tuple contains the minimum and maximum values (min, max) for the corresponding variable.
 
+    likelihood_func : callable
+        The function used to compute the likelihood, which should be compatible with the MCMC sampler.
+
     Returns:
     --------
     info : dict
-        A dictionary structured to define the settings and parameters for running an MCMC sampling. The dictionary contains:
-        - `likelihood`: Specifies the likelihood function to be used in the sampling, here defined as `eb_axion_mcmc_runner`.
-        - `params`: A dictionary of parameters, where each parameter is associated with its prior range, reference value, and proposal width.
-        - `sampler`: Settings for the MCMC sampler, including stopping criteria (`Rminus1_stop`) and the maximum number of attempts (`max_tries`).
-        - `output`: The file path where the results will be saved, set to the provided `outpath`.
-
-    Notes:
-    ------
-    - The reference value (`ref`) and proposal width (`proposal`) for each parameter are set to 0. These values can be adjusted as needed for different models or sampling strategies.
-    - The sampler settings are configured for a typical MCMC run but can be fine-tuned according to specific requirements.
+        A dictionary structured to define the settings and parameters for running an MCMC sampling.
     """
     info = {"likelihood": 
         {
