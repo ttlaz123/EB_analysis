@@ -64,7 +64,7 @@ def eb_log_likelihood_vector(C_eb_observed, C_eb_var, C_eb_ede, C_ee_cmb, C_bb_c
     else:
         bin_loglike = np.square(v) / C_eb_var
         total_log_likelihood = -np.sum(bin_loglike)
-    return total_log_likelihood
+    return total_log_likelihood/2
 
 
 
@@ -497,13 +497,13 @@ def multi_freq_analysis(max_sim, do_run=True, bin_num=17, zero_ede=True):
   
 
 def main():
-    for bins in [15]:
-        for zero_ede in [True, False]:
-            single_freq_analysis(max_sim=3, bin_num=bins, zero_ede=zero_ede)
-            #multi_freq_analysis(max_sim=3, do_run=False, bin_num=bins, zero_ede=zero_ede)
+    for bins in [17]:
+        for zero_ede in [True]:
+            single_freq_analysis(max_sim=0, bin_num=bins, zero_ede=zero_ede)
+            #multi_freq_analysis(max_sim=1, do_run=True, bin_num=bins, zero_ede=zero_ede)
 
 
-    '''
+            '''
             mcmc_dir = 'mcmc_chains_ede' + str(not zero_ede) + '_multicomp_bin' + str(bins) + '/'
             plots_dir = 'output_plots_ede' + str(not zero_ede) + '_multicomp_bin' + str(bins) + '/'
             for sims in range(3):
@@ -518,7 +518,8 @@ def main():
                 outfile = plots_dir + '/' + sim_dir + '/' + simnum + '_and_sims_corner.png'
                 
                 epd.plot_corner(outfile,  file_all_sims, file_real)
-    '''
+            '''
+    
     
     #matplotlib.use('Agg')
     
