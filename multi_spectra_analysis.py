@@ -279,7 +279,8 @@ class BK18_multicomp(Likelihood):
         num_maps = len(self.map_reference_header)-1
         num_bins = matrix.shape[0] / num_maps
         assert isinstance(num_bins, int), (f"Number of maps {num_maps} and "
-                                        f"size of covar matrix {matrix.shape[0]} don't fit")
+                                        f"size of covar matrix {matrix.shape[0]} don't fit, "
+                                        f"num_bins {num_bins} is not an integer")
 
         # we subtract 1 because the first element in the reference is a #
         filter_cols = [self.map_reference_header.index(cross_map)-1 for cross_map in used_maps]
