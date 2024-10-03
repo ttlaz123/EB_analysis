@@ -77,6 +77,7 @@ class BK18_multicomp(Likelihood):
             merely an index or identifier (hence the addition of 1 to the indices).
         """
         reference_header = self.map_reference_header
+        print("Loading: " + str(observed_data_path))
         self.map_reference_header = self.check_file_header(observed_data_path, reference_header)
         used_cols = [self.map_reference_header.index(cross_map) for cross_map in used_maps]
         obs_data = np.loadtxt(observed_data_path)
@@ -114,6 +115,7 @@ class BK18_multicomp(Likelihood):
         bpwf_data = []
 
         for file in bpwf_files:
+            print("Loading: " + str(file))
             # Read the header and check consistency
             self.map_reference_header = self.check_file_header(file, reference_header)
             # Load data, ignoring the first column
@@ -140,6 +142,7 @@ class BK18_multicomp(Likelihood):
             by checking that the number of rows equals the number of columns. It validates the file's header 
             against the existing reference header, stored in `self.map_reference_header`, before loading the matrix data.
         """
+        print("Loading: " + str(covmat_path))
         self.map_reference_header = self.check_file_header(covmat_path, self.map_reference_header)
         full_covmat = np.loadtxt(covmat_path)
         shap = full_covmat.shape
@@ -147,11 +150,14 @@ class BK18_multicomp(Likelihood):
         return full_covmat
     
     def load_cmb_spectra(self, lensing_path, dust_paths):
+    
         theory_dict = {}
+        print("Loading: " + str(lensing_path))
         with open(lensing_path) as hdul_lens:
             EE_lens = hdul_lens[1].data['E-mode C_l']
             BB_lens = hdul_lens[1].data['B-mode C_l']
         for map_freq in dust_paths:
+            print("Loading: " + str(dust_paths[map_freq]))
             with open(dust_paths[map_freq]) as hdul_dust:
                 EE_dust = hdul_dust[1].data['E-mode C_l']
                 BB_dust = hdul_dust[1].data['B-mode C_l']
