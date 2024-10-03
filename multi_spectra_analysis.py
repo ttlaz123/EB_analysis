@@ -308,7 +308,7 @@ class BK18_multicomp(Likelihood):
         requirements = {
             "theory": self.params_names  # List of parameters that require theoretical predictions
         }
-        return requirements
+        return None
 
     def logp(self, **params_values):
         """
@@ -369,11 +369,6 @@ def run_bk18_likelihood(params_dict, used_maps, outpath, rstop = 0.02, max_tries
             }
         },
         "params": params_dict,
-        "theory": {
-            "camb": {
-                "stop_at_error": True,
-            }
-        },  # Define theory requirements as needed
         "sampler":{
             "mcmc": {
                 "Rminus1_stop": rstop,
@@ -435,16 +430,15 @@ def main():
     # Check if the overwrite flag is set
     if args.overwrite:
         # Check if the output path exists
-        if os.path.exists(args.output_path):
+        # Construct the glob pattern to match all files and directories with the specified prefix
+        pattern = os.path.join(os.path.dirname(args.output_path), os.path.basename(args.output_path) + '*')
+
+        # Use glob to find all matching files and directories
+        matching_items = glob.glob(pattern)
+        if len(matching_items) > 1:
             # Prompt user for confirmation
             confirm = input(f"Are you sure you want to delete the existing chains at: {args.output_path}? (y/n): ")
             if confirm.lower() == 'y':
-                 # Construct the glob pattern to match all files and directories with the specified prefix
-                pattern = os.path.join(os.path.dirname(path_prefix), os.path.basename(path_prefix) + '*')
-
-                # Use glob to find all matching files and directories
-                matching_items = glob.glob(pattern)
-
                 # Iterate through the matching items and delete them
                 for item in matching_items:
                     if os.path.isdir(item):
