@@ -426,6 +426,6 @@ def main():
                 print("Deletion cancelled. Existing chains will be kept.")
         else:
             print(f"No existing chains to overwrite at: {args.output_path}")
-    multicomp_mcmc_driver(args.outpath)
+    multicomp_mcmc_driver(args.output_path)
 if __name__ == '__main__':
     main()
