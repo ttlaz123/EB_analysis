@@ -29,14 +29,23 @@ class BK18_multicomp(Likelihood):
     def initialize(self):
         # Load any data or set up anything that needs to happen before likelihood calculation
         self.map_reference_header = None
+        
+        # BPWF and header check
         self.bpwf = self.load_bpwf(FILE_PATHS["bpwf"])
-        self.full_covmat = self.load_covariance_matrix(FILE_PATHS['covariance_matrix'])
+        self.used_maps = self.filter_used_maps(self.used_maps)
+
+        # Theory
         self.dl_theory = self.load_cmb_spectra(FILE_PATHS['camb_lensing'],
                                                FILE_PATHS['dust_models'])
         self.binned_dl_theory_dict = self.apply_bpwf(self.dl_theory, self.bpwf, self.used_maps)
+
+        # Real Data
         self.binned_dl_observed_dict = self.load_observed_spectra(FILE_PATHS['observed_data'], 
                                                              self.used_maps)
         self.binned_dl_observed_vec = self.dict_to_vec(self.binned_dl_observed_dict, self.used_maps)
+        
+        # Covar matrix
+        self.full_covmat = self.load_covariance_matrix(FILE_PATHS['covariance_matrix'])
         self.filtered_covmat = self.filter_matrix(self.full_covmat, self.used_maps)
         self.cov_inv = self.calc_inverse_covmat(self.filtered_covmat)
 
@@ -46,6 +55,7 @@ class BK18_multicomp(Likelihood):
                 # Assuming the relevant header is the one with 'BxB' in it
                 if line.startswith("#") and "BxB" in line:
                     current_header = line.strip()
+                    print(current_header)
                     if reference_header is None:
                         reference_header = current_header.split()
                     elif current_header.split() != reference_header:
@@ -53,6 +63,24 @@ class BK18_multicomp(Likelihood):
                     break  # Stop reading further header lines
         return reference_header
     
+    def filter_used_maps(self, used_maps):
+        """
+        Remove elements from used_maps that are not in reference_maps.
+
+        Parameters:
+        - used_maps: List of maps to filter.
+        - reference_maps: List of valid reference maps.
+
+        Returns:
+        - A filtered list containing only elements from used_maps that are present in reference_maps.
+        """
+        maps = [map_ for map_ in used_maps if map_ in self.reference_maps]
+        print(" ~~~~~~~~~~ Using the following maps in analysis: ~~~~~~~~~~")
+        print(maps)
+        return maps
+
+
+
     def load_observed_spectra(self, observed_data_path, used_maps):
         """
         Load observed spectra data from a specified file and filter the data based on the used maps.
@@ -82,8 +110,9 @@ class BK18_multicomp(Likelihood):
         used_cols = [self.map_reference_header.index(cross_map) for cross_map in used_maps]
         obs_data = np.loadtxt(observed_data_path)
 
-        # Add one because the first index is just a list from 1 to n
-        return obs_data[:, np.array(used_cols) + 1]
+        # Add one because the 0th index is just a list from 1 to n
+        # But minus one because the 0th element in the reference is a # 
+        return obs_data[:, np.array(used_cols)]
     
     def load_bpwf(self, bpwf_directory):
         """
@@ -118,8 +147,8 @@ class BK18_multicomp(Likelihood):
             print("Loading: " + str(file))
             # Read the header and check consistency
             self.map_reference_header = self.check_file_header(file, reference_header)
-            # Load data, ignoring the first column
-            bpwf_data.append(np.loadtxt(file)[:, 1:])
+            # Load data, don't ignore the first column
+            bpwf_data.append(np.loadtxt(file))
 
         # Concatenate and return all BPWF data
         return np.stack(bpwf_data, axis=0)
@@ -146,6 +175,7 @@ class BK18_multicomp(Likelihood):
         self.map_reference_header = self.check_file_header(covmat_path, self.map_reference_header)
         full_covmat = np.loadtxt(covmat_path)
         shap = full_covmat.shape
+        
         assert shap[0] == shap[1], "Covariance matrix must be square."
         return full_covmat
     
@@ -248,7 +278,8 @@ class BK18_multicomp(Likelihood):
         assert isinstance(num_bins, int), (f"Number of maps {num_maps} and "
                                         f"size of covar matrix {matrix.shape[0]} don't fit")
 
-        filter_cols = [self.map_reference_header.index(cross_map) for cross_map in used_maps]
+        # we subtract 1 because the first element in the reference is a #
+        filter_cols = [self.map_reference_header.index(cross_map)-1 for cross_map in used_maps]
         all_bins = [index + i * num_maps for i in range(num_bins) for index in filter_cols]
         # Use np.ix_ to filter both rows and columns in the given indices
         return matrix[np.ix_(all_bins, all_bins)]
@@ -339,6 +370,8 @@ def generate_cross_spectra(spectra):
     for spec1 in spectra:
         for spec2 in spectra:
             cross_spectrum = f"{spec1}_Ex{spec2}_B"
+            cross_spectra.append(cross_spectrum)
+            cross_spectrum = f"{spec1}_Bx{spec2}_E"
             cross_spectra.append(cross_spectrum)
     return  cross_spectra
 
