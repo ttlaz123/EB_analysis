@@ -297,9 +297,18 @@ class BK18_multicomp(Likelihood):
         return np.linalg.inv(filtered_covmat)
     
     def get_requirements(self):
-        # Specify what is needed from other components, such as theory predictions
-        # Here we're asking for 'theory' calculations for the parameters in params_names
-        return {"theory": None}
+        """
+        Specify what is needed from other components, such as theory predictions.
+        
+        Returns:
+            dict: A dictionary that specifies the requirements for the likelihood calculation,
+                including 'theory' calculations for the parameters in params_names.
+        """
+        # Specify that this likelihood requires theoretical predictions based on the parameters defined in params_names
+        requirements = {
+            "theory": self.params_names  # List of parameters that require theoretical predictions
+        }
+        return requirements
 
     def logp(self, **params_values):
         """
