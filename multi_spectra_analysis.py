@@ -4,6 +4,9 @@ import os
 import numpy as np
 import argparse
 import glob
+import shutil
+
+
 from astropy.io import fits
 from cobaya.model import get_model
 from cobaya.run import run
@@ -55,7 +58,6 @@ class BK18_multicomp(Likelihood):
                 # Assuming the relevant header is the one with 'BxB' in it
                 if line.startswith("#") and "BxB" in line:
                     current_header = line.strip()
-                    print(current_header)
                     if reference_header is None:
                         reference_header = current_header.split()
                     elif current_header.split() != reference_header:
@@ -402,13 +404,28 @@ def multicomp_mcmc_driver(outpath):
 
 
 def main():
+    # Set up argument parsing
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--output_path', default='chains/default',
                         help='directory to save the mcmc chains and plots')
+    parser.add_argument('-o', '--overwrite', action='store_true',
+                        help='whether to overwrite current chains')
     args = parser.parse_args()
 
-    
-    multicomp_mcmc_driver(args.output_path)
+    # Check if the overwrite flag is set
+    if args.overwrite:
+        # Check if the output path exists
+        if os.path.exists(args.output_path):
+            # Prompt user for confirmation
+            confirm = input(f"Are you sure you want to delete the existing chains at: {args.output_path}? (y/n): ")
+            if confirm.lower() == 'y':
+                # Delete the output path and its contents
+                shutil.rmtree(args.output_path)
+                print(f"Deleted existing chains at: {args.output_path}")
+            else:
+                print("Deletion cancelled. Existing chains will be kept.")
+        else:
+            print(f"No existing chains to overwrite at: {args.output_path}")
 
 if __name__ == '__main__':
     main()
