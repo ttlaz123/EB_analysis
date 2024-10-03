@@ -369,6 +369,11 @@ def run_bk18_likelihood(params_dict, used_maps, outpath, rstop = 0.02, max_tries
             }
         },
         "params": params_dict,
+        "theory": {
+            "camb": {
+                "stop_at_error": True,
+            }
+        },  # Define theory requirements as needed
         "sampler":{
             "mcmc": {
                 "Rminus1_stop": rstop,
