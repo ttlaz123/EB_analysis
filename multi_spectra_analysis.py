@@ -76,7 +76,7 @@ class BK18_multicomp(Likelihood):
         Returns:
         - A filtered list containing only elements from used_maps that are present in reference_maps.
         """
-        maps = [map_ for map_ in used_maps if map_ in self.reference_maps]
+        maps = [map_ for map_ in used_maps if map_ in self.map_reference_header]
         print(" ~~~~~~~~~~ Using the following maps in analysis: ~~~~~~~~~~")
         print(maps)
         return maps
@@ -426,6 +426,6 @@ def main():
                 print("Deletion cancelled. Existing chains will be kept.")
         else:
             print(f"No existing chains to overwrite at: {args.output_path}")
-
+    multicomp_mcmc_driver(args.outpath)
 if __name__ == '__main__':
     main()
