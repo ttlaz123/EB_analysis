@@ -153,12 +153,12 @@ class BK18_multicomp(Likelihood):
     
         theory_dict = {}
         print("Loading: " + str(lensing_path))
-        with open(lensing_path) as hdul_lens:
+        with fits.open(lensing_path) as hdul_lens:
             EE_lens = hdul_lens[1].data['E-mode C_l']
             BB_lens = hdul_lens[1].data['B-mode C_l']
         for map_freq in dust_paths:
             print("Loading: " + str(dust_paths[map_freq]))
-            with open(dust_paths[map_freq]) as hdul_dust:
+            with fits.open(dust_paths[map_freq]) as hdul_dust:
                 EE_dust = hdul_dust[1].data['E-mode C_l']
                 BB_dust = hdul_dust[1].data['B-mode C_l']
             theory_dict[map_freq + '_Ex' + map_freq + '_E'] = EE_lens + EE_dust
