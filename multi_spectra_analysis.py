@@ -28,16 +28,16 @@ class BK18_multicomp(Likelihood):
     # Initialize your likelihood class
     def initialize(self):
         # Load any data or set up anything that needs to happen before likelihood calculation
-        self.frequency_header = None
+        self.map_reference_header = None
         self.bpwf = self.load_bpwf(FILE_PATHS["bpwf"])
         self.full_covmat = self.load_covariance_matrix(FILE_PATHS['covariance_matrix'])
         self.dl_theory = self.load_cmb_spectra(FILE_PATHS['camb_lensing'],
                                                FILE_PATHS['dust_models'])
-        self.binned_dl_theory = self.apply_bpwf(self.dl_theory, self.bpwf)
-        self.binned_dl_observed = self.load_observed_spectra(self, FILE_PATHS['observed_data'], 
+        self.binned_dl_theory_dict = self.apply_bpwf(self.dl_theory, self.bpwf, self.used_maps)
+        self.binned_dl_observed_dict = self.load_observed_spectra(self, FILE_PATHS['observed_data'], 
                                                              self.used_maps)
-
-        self.filtered_covmat = self.filter_matrix(self.full_covmat)
+        self.binned_dl_observed_vec = self.dict_to_vec(self.binned_dl_observed_dict, self.used_maps)
+        self.filtered_covmat = self.filter_matrix(self.full_covmat, self.used_maps)
         self.cov_inv = self.calc_inverse_covmat(self.filtered_covmat)
 
     def check_file_header(self, file_path, reference_header):
@@ -53,36 +53,97 @@ class BK18_multicomp(Likelihood):
                     break  # Stop reading further header lines
         return reference_header
     
-    def load_observed_spectra():
-        
-        return 
+    def load_observed_spectra(self, observed_data_path, used_maps):
+        """
+        Load observed spectra data from a specified file and filter the data based on the used maps.
+
+        Args:
+            observed_data_path (str): The file path to the observed spectra data in a text format.
+            used_maps (list of str): A list of map names to be used for filtering the observed data.
+
+        Returns:
+            ndarray: A 2D NumPy array containing the filtered observed spectra data, 
+                    with each row representing a spectrum for the specified used maps.
+
+        Raises:
+            AssertionError: If the provided map names in `used_maps` do not match the reference header.
+            
+        Description:
+            The function first verifies the header of the observed data file against the 
+            reference header (`self.map_reference_header`). It then identifies the indices 
+            of the specified `used_maps` within the validated header. After loading the data 
+            from the file, the function extracts the relevant columns corresponding to the 
+            used maps, adjusting for the fact that the first column in the loaded data is 
+            merely an index or identifier (hence the addition of 1 to the indices).
+        """
+        reference_header = self.map_reference_header
+        self.map_reference_header = self.check_file_header(observed_data_path, reference_header)
+        used_cols = [self.map_reference_header.index(cross_map) for cross_map in used_maps]
+        obs_data = np.loadtxt(observed_data_path)
+
+        # Add one because the first index is just a list from 1 to n
+        return obs_data[:, np.array(used_cols) + 1]
     
     def load_bpwf(self, bpwf_directory):
         """
-        Load BPWF from the specified directory.
+        Load BPWF (Band Power Window Function) data from the specified directory.
+
+        Args:
+            bpwf_directory (str): The file path or pattern specifying the directory where BPWF files are located.
+
+        Returns:
+            ndarray: A 3D NumPy array containing the concatenated BPWF data from all files in the specified directory. 
+                    The first dimension corresponds to the number of files, and the subsequent dimensions 
+                    correspond to the BPWF data.
+
+        Raises:
+            ValueError: If no BPWF files are found in the specified directory.
+
+        Description:
+            This function searches for BPWF files in the provided directory, ensuring that there is at least 
+            one file to load. It checks the consistency of the file headers against a reference header, 
+            which is stored in `self.map_reference_header`. Each file's data is read (excluding the first column) 
+            and stored in a list, which is then stacked into a 3D NumPy array before being returned.
         """
         bpwf_files = sorted(glob.glob(bpwf_directory))
-        if(len(bpwf_files) < 1):
+        if len(bpwf_files) < 1:
             raise ValueError("No files found in " + str(bpwf_directory))
         # Initialize variable to store the header line to compare
-        reference_header = self.frequency_header
+        reference_header = self.map_reference_header
         # List to hold all loaded data
         bpwf_data = []
 
         for file in bpwf_files:
             # Read the header and check consistency
-            self.frequency_header = self.check_file_header(file, reference_header)
+            self.map_reference_header = self.check_file_header(file, reference_header)
             # Load data, ignoring the first column
             bpwf_data.append(np.loadtxt(file)[:, 1:])
 
         # Concatenate and return all BPWF data
-        return np.concatenate(bpwf_data, axis=0)
+        return np.stack(bpwf_data, axis=0)
     
     def load_covariance_matrix(self, covmat_path):
-        self.frequency_header = self.check_file_header(covmat_path, self.frequency_header)
+        """
+        Load the covariance matrix from the specified file.
+
+        Args:
+            covmat_path (str): The file path to the covariance matrix data in a text format.
+
+        Returns:
+            ndarray: A 2D NumPy array containing the covariance matrix.
+
+        Raises:
+            AssertionError: If the loaded covariance matrix is not square (i.e., the number of rows does not equal the number of columns).
+
+        Description:
+            This function reads a covariance matrix from a specified file path, ensuring that the matrix is square 
+            by checking that the number of rows equals the number of columns. It validates the file's header 
+            against the existing reference header, stored in `self.map_reference_header`, before loading the matrix data.
+        """
+        self.map_reference_header = self.check_file_header(covmat_path, self.map_reference_header)
         full_covmat = np.loadtxt(covmat_path)
         shap = full_covmat.shape
-        assert shap[0] == shap[1]
+        assert shap[0] == shap[1], "Covariance matrix must be square."
         return full_covmat
     
     def load_cmb_spectra(self, lensing_path, dust_paths):
@@ -94,22 +155,97 @@ class BK18_multicomp(Likelihood):
             with open(dust_paths[map_freq]) as hdul_dust:
                 EE_dust = hdul_dust[1].data['E-mode C_l']
                 BB_dust = hdul_dust[1].data['B-mode C_l']
-            theory_dict[map_freq + '_E'] = EE_lens + EE_dust
-            theory_dict[map_freq + '_B'] = BB_lens + BB_dust
+            theory_dict[map_freq + '_Ex' + map_freq + '_E'] = EE_lens + EE_dust
+            theory_dict[map_freq + '_Bx' + map_freq + '_B'] = BB_lens + BB_dust
         return theory_dict
  
-    def apply_bpwf(self, theory_dict, bpwf_mat):
+    def apply_bpwf(self, theory_dict, bpwf_mat, used_maps):
+        """
+        Apply the bandpower window function (BPWF) to a given theory power spectrum.
+
+        Parameters:
+        -----------
+        theory_dict : dict
+            Dictionary containing theoretical power spectra for different map combinations. 
+            The keys should be in the format 'mapxmap' and the values are arrays of power spectra.
+        bpwf_mat : numpy.ndarray
+            3D array representing the bandpower window function matrix.
+            The shape is (number_of_ells, number_of_bands, number_of_columns).
+        used_maps : list of str
+            List of strings representing the cross maps (e.g., 'BK18_150xBK18_220').
+
+        Returns:
+        --------
+        binned_theory_dict : dict
+            Dictionary containing binned theoretical power spectra.
+            Keys are the same as in `theory_dict`, and values are the binned power spectra arrays.
+
+        Notes:
+        ------
+        - The function performs matrix multiplication to apply the BPWF to each element in `theory_dict`.
+        - The result is a new dictionary where the theoretical power spectra have been binned according to the BPWF.
+        """
         binned_theory_dict = {}
-        # TODO fix this to actually work
-        for map in theory_dict:
-            col = self.used_maps[map]
-            binned_theory_dict[map] = bpwf_mat[col]*theory_dict[map]
+        for cross_map in used_maps:
+            maps = cross_map.split('x')
+            for freq_map in maps:
+                map0 = freq_map + 'x' + freq_map
+                col = self.map_reference_header.index(map0)
+                num_ells = bpwf_mat.shape[0]
+                binned_theory_dict[map0] = np.matmul(bpwf_mat[:,:,col],theory_dict[map0][num_ells])
         return binned_theory_dict
     
+    def dict_to_vec(self, spectra_dict):
+        """
+        Concatenates spectra from a dictionary into one large vector, following the order in `map_reference_header`.
+
+        Args:
+            spectra_dict (dict): A dictionary where keys are map names and values are corresponding spectra (numpy arrays).
+
+
+        Returns:
+            ndarray: A concatenated 1D array containing all the spectra in the given order, 
+                    only including maps that exist in `spectra_dict`.
+        """
+        big_vector = []
+
+        for map_name in self.map_reference_header:
+            if map_name in spectra_dict:
+                big_vector.append(spectra_dict[map_name])
+
+        # Concatenate all spectra arrays into a single 1D array
+        return np.concatenate(big_vector, axis=0)
     
-    def filter_matrix(matrix, filter_cols):
+    def filter_matrix(self, matrix, used_maps):
+        """
+        Filters a given matrix to extract rows and columns that correspond to specific map cross-correlations.
+
+        Args:
+            matrix (ndarray): The covariance matrix to be filtered.
+            used_maps (list of str): List of cross-correlation map names to be used for filtering.
+
+        Returns:
+            ndarray: The filtered covariance matrix, containing only the rows and columns 
+                    corresponding to the specified cross-correlation maps in `used_maps`.
+
+        Raises:
+            AssertionError: If the number of maps and the size of the covariance matrix do not fit 
+                            the expected structure.
+        
+        Notes:
+            This function determines which rows and columns of the covariance matrix should be
+            selected based on the `used_maps` provided. It uses `np.ix_` to filter the specified 
+            rows and columns simultaneously.
+        """
+        num_maps = len(self.map_reference_header)
+        num_bins = matrix.shape[0] / num_maps
+        assert isinstance(num_bins, int), (f"Number of maps {num_maps} and "
+                                        f"size of covar matrix {matrix.shape[0]} don't fit")
+
+        filter_cols = [self.map_reference_header.index(cross_map) for cross_map in used_maps]
+        all_bins = [index + i * num_maps for i in range(num_bins) for index in filter_cols]
         # Use np.ix_ to filter both rows and columns in the given indices
-        return matrix[np.ix_(filter_cols, filter_cols)]
+        return matrix[np.ix_(all_bins, all_bins)]
     
     def calc_inverse_covmat(self, filtered_covmat):
         return np.linalg.inv(filtered_covmat)
@@ -126,10 +262,11 @@ class BK18_multicomp(Likelihood):
         # Extract parameter values dynamically for Cobaya
         params = [params_values[name] for name in self.params_names]
         # Get the theoretical predictions based on the parameter values
-        theory_prediction = self.theory(params_values)
+        theory_prediction = self.theory(params_values, 
+                                        self.binned_dl_theory_dict, self.used_maps)
         
         # Calculate the residuals
-        residuals = self.binned_dl_observed - theory_prediction
+        residuals = self.binned_dl_observed_vec - theory_prediction
         
         # Calculate the Mahalanobis distance using the inverse covariance matrix
         chi_squared = residuals.T @ self.cov_inv @ residuals
@@ -139,13 +276,28 @@ class BK18_multicomp(Likelihood):
 
         return log_likelihood
 
-    def theory(self, params_values):
+    def theory(self, params_values, binned_dl_theory_dict, used_maps):
         # Compute the model prediction based on the parameter values
         # This is a placeholder for your theory calculation
-        binned_dl_theory = self.binned_dl_theory
+        rotated_dict = {}
+        for cross_map in used_maps:
+            maps = cross_map.split('x')
+            angle1_name = 'alpha_' + maps[0]
+            angle2_name = 'alpha_' + maps[1]
+            angle1 = params_values[angle1_name]
+            angle2 = params_values[angle2_name]
+            
+            e1e2_name = maps[0] + 'x' + maps[1]
 
-        ## TODO figure out how to perform rotation of cross spectra
-        return params_values["param1"] + params_values["param2"] + params_values["param3"]
+            D_e1e2 = (binned_dl_theory_dict[e1e2_name] * 
+                      np.cos(2*np.deg2rad(angle1)) * 
+                      np.sin(2*np.deg2rad(angle2)))
+            D_b1e2 = 0
+            D_e1b2 = 0
+            D_b1b2 = 0
+            D_eb = D_e1e2 - D_b1b2 + D_e1b2 - D_b1e2  
+            rotated_dict[cross_map] = D_eb
+        return self.dict_to_vec(rotated_dict, used_maps)
 
 # Function to create and run a Cobaya model with the custom likelihood
 def run_bk18_likelihood(params_dict, used_maps, outpath, rstop = 0.02, max_tries=10000):
@@ -176,6 +328,13 @@ def run_bk18_likelihood(params_dict, used_maps, outpath, rstop = 0.02, max_tries
     updated_info, sampler = run(info)
     return updated_info, sampler
 
+def generate_cross_spectra(spectra):
+    cross_spectra = []
+    for spec1 in spectra:
+        for spec2 in spectra:
+            cross_spectrum = f"{spec1}_Ex{spec2}_B"
+            cross_spectra.append(cross_spectrum)
+    return  cross_spectra
 
 def multicomp_mcmc_driver(outpath):
     ### define variables and priors
@@ -189,8 +348,8 @@ def multicomp_mcmc_driver(outpath):
     ### plot results
     # Example of running the function
     
-    calc_spectra = ['K95', '150', '220']
-    all_cross_spectra = []
+    calc_spectra = ['BK18_K95', 'BK18_150', 'BK18_220']
+    all_cross_spectra = generate_cross_spectra(calc_spectra)
     angle_priors = {"prior": {"min": -3, "max": 3}, "ref": 0}
     params_dict = {'alpha_' + spectrum: angle_priors for spectrum in calc_spectra    }
 
