@@ -233,7 +233,7 @@ class BK18_multicomp(Likelihood):
                 binned_theory_dict[map0] = np.matmul(bpwf_mat[:,:,col],theory_dict[map0][:num_ells])
         return binned_theory_dict
     
-    def dict_to_vec(self, spectra_dict):
+    def dict_to_vec(self, spectra_dict, used_maps):
         """
         Concatenates spectra from a dictionary into one large vector, following the order in `map_reference_header`.
 
@@ -248,7 +248,7 @@ class BK18_multicomp(Likelihood):
         big_vector = []
 
         for map_name in self.map_reference_header:
-            if map_name in spectra_dict:
+            if map_name in used_maps:
                 big_vector.append(spectra_dict[map_name])
 
         # Concatenate all spectra arrays into a single 1D array
