@@ -197,8 +197,8 @@ class BK18_multicomp(Likelihood):
             for freq_map in maps:
                 map0 = freq_map + 'x' + freq_map
                 col = self.map_reference_header.index(map0)
-                num_ells = bpwf_mat.shape[0]
-                binned_theory_dict[map0] = np.matmul(bpwf_mat[:,:,col],theory_dict[map0][num_ells])
+                num_ells = bpwf_mat.shape[1]
+                binned_theory_dict[map0] = np.matmul(bpwf_mat[:,:,col],theory_dict[map0][:num_ells])
         return binned_theory_dict
     
     def dict_to_vec(self, spectra_dict):
