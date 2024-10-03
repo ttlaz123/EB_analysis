@@ -34,7 +34,7 @@ class BK18_multicomp(Likelihood):
         self.dl_theory = self.load_cmb_spectra(FILE_PATHS['camb_lensing'],
                                                FILE_PATHS['dust_models'])
         self.binned_dl_theory_dict = self.apply_bpwf(self.dl_theory, self.bpwf, self.used_maps)
-        self.binned_dl_observed_dict = self.load_observed_spectra(self, FILE_PATHS['observed_data'], 
+        self.binned_dl_observed_dict = self.load_observed_spectra(FILE_PATHS['observed_data'], 
                                                              self.used_maps)
         self.binned_dl_observed_vec = self.dict_to_vec(self.binned_dl_observed_dict, self.used_maps)
         self.filtered_covmat = self.filter_matrix(self.full_covmat, self.used_maps)
