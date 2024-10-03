@@ -92,8 +92,8 @@ class BK18_multicomp(Likelihood):
             used_maps (list of str): A list of map names to be used for filtering the observed data.
 
         Returns:
-            ndarray: A 2D NumPy array containing the filtered observed spectra data, 
-                    with each row representing a spectrum for the specified used maps.
+            dict: A dict containing the filtered observed spectra data, 
+                    with each entry representing a spectrum for the specified used maps.
 
         Raises:
             AssertionError: If the provided map names in `used_maps` do not match the reference header.
@@ -112,9 +112,10 @@ class BK18_multicomp(Likelihood):
         used_cols = [self.map_reference_header.index(cross_map) for cross_map in used_maps]
         obs_data = np.loadtxt(observed_data_path)
 
-        # Add one because the 0th index is just a list from 1 to n
-        # But minus one because the 0th element in the reference is a # 
-        return obs_data[:, np.array(used_cols)]
+        observed_spectra_dict = {}
+        for i in range(len(used_cols)):
+            observed_spectra_dict[used_maps[i]] = obs_data[:, used_cols[i]]
+        return observed_spectra_dict
     
     def load_bpwf(self, bpwf_directory):
         """
