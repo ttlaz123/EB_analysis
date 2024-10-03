@@ -314,8 +314,7 @@ class BK18_multicomp(Likelihood):
         """
         Calculate the log-likelihood based on the current parameter values.
         """
-        # Extract parameter values dynamically for Cobaya
-        params = [params_values[name] for name in self.params_names]
+       
         # Get the theoretical predictions based on the parameter values
         theory_prediction = self.theory(params_values, 
                                         self.binned_dl_theory_dict, self.used_maps)
