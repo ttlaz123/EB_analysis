@@ -439,8 +439,18 @@ def main():
             # Prompt user for confirmation
             confirm = input(f"Are you sure you want to delete the existing chains at: {args.output_path}? (y/n): ")
             if confirm.lower() == 'y':
-                # Delete the output path and its contents
-                shutil.rmtree(args.output_path)
+                 # Construct the glob pattern to match all files and directories with the specified prefix
+                pattern = os.path.join(os.path.dirname(path_prefix), os.path.basename(path_prefix) + '*')
+
+                # Use glob to find all matching files and directories
+                matching_items = glob.glob(pattern)
+
+                # Iterate through the matching items and delete them
+                for item in matching_items:
+                    if os.path.isdir(item):
+                        shutil.rmtree(item)  # Remove directory
+                    else:
+                        os.remove(item)  # Remove file
                 print(f"Deleted existing chains at: {args.output_path}")
             else:
                 print("Deletion cancelled. Existing chains will be kept.")
