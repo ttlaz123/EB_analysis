@@ -308,7 +308,7 @@ class BK18_multicomp(Likelihood):
         requirements = {
             "theory": self.params_names  # List of parameters that require theoretical predictions
         }
-        return None
+        return []
 
     def logp(self, **params_values):
         """
