@@ -276,7 +276,7 @@ class BK18_multicomp(Likelihood):
             selected based on the `used_maps` provided. It uses `np.ix_` to filter the specified 
             rows and columns simultaneously.
         """
-        num_maps = len(self.map_reference_header)
+        num_maps = len(self.map_reference_header)-1
         num_bins = matrix.shape[0] / num_maps
         assert isinstance(num_bins, int), (f"Number of maps {num_maps} and "
                                         f"size of covar matrix {matrix.shape[0]} don't fit")
