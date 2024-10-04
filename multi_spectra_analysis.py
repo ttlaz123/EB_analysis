@@ -334,6 +334,7 @@ class BK18_multicomp(Likelihood):
     def theory(self, params_values, binned_dl_theory_dict, used_maps):
         # Compute the model prediction based on the parameter values
         # This is a placeholder for your theory calculation
+        # currently assumes it is only calculating EB
         rotated_dict = {}
         for cross_map in used_maps:
             maps = cross_map.split('x')
@@ -345,8 +346,15 @@ class BK18_multicomp(Likelihood):
             angle1 = params_values[angle1_name]
             angle2 = params_values[angle2_name]
             
-            e1e2_name = maps[0] + 'x' + maps[1]
-
+            e1 = maps[0] if maps[0].endswith('_E') else None 
+            e2 = maps[1] if maps[1].endswith('_E') else None
+            if(e1):
+                e1e2_name = e1 + 'x' + e1
+            elif(e2):
+                e1e2_name = e2 + 'x' + e2
+            else:
+                raise ValueError("There is no EE spectrum: " + str(cross_map))
+            
             D_e1e2 = (binned_dl_theory_dict[e1e2_name] * 
                       np.cos(2*np.deg2rad(angle1)) * 
                       np.sin(2*np.deg2rad(angle2)))
