@@ -5,6 +5,7 @@ import numpy as np
 import argparse
 import glob
 import shutil
+import re
 
 
 from astropy.io import fits
@@ -338,6 +339,9 @@ class BK18_multicomp(Likelihood):
             maps = cross_map.split('x')
             angle1_name = 'alpha_' + maps[0]
             angle2_name = 'alpha_' + maps[1]
+            # Use regex to remove _B, _E, or any other suffix ending with _ followed by letters
+            angle1_name = re.sub(r'_[BE]$', '', angle1_name)
+            angle2_name = re.sub(r'_[BE]$', '', angle2_name)
             angle1 = params_values[angle1_name]
             angle2 = params_values[angle2_name]
             
