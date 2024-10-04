@@ -13,6 +13,10 @@ from cobaya.model import get_model
 from cobaya.run import run
 from cobaya.likelihood import Likelihood
 
+from getdist import plots, MCSamples
+from getdist.mcsamples import loadMCSamples
+
+
 # Global dictionary for file paths
 FILE_PATHS = {
     "camb_lensing": '/n/holylfs04/LABS/kovac_lab/general/input_maps/official_cl/camb_planck2013_r0_lensing.fits',
@@ -434,6 +438,35 @@ def multicomp_mcmc_driver(outpath):
     print("Sampler:", sampler)
     return 
 
+def plot_triangle(root):
+    # Load MCMC samples from the specified root
+    samples = loadMCSamples(root)
+    print([name.name for name in samples.getParamNames().names])
+    
+    param_names = [name.name for name in samples.getParamNames().names
+                   if ('chi2' not in name.name and
+                       'weight' not in name.name and
+                       'betadust' not in name.name and
+                       'betasync' not in name.name and
+                       'minuslogprior' not in name.name)]
+    
+    # Get the mean and std of the parameters for titles
+    mean_std_strings = []
+    for param in param_names:
+        mean = samples.mean(param)
+        std = samples.std(param)
+        mean_std_strings.append(f"{param}: {mean:.2f} ± {std:.2f}")
+
+    # Create a triangle plot with all variables
+    g = plots.get_subplot_plotter()
+    g.triangle_plot(samples, param_names, filled=True)
+
+    # Add the mean and std to the plot title
+    plt.suptitle("\n".join(mean_std_strings), fontsize=10)
+
+    # Save the plot
+    plt.savefig(f"{root}_triangle_plot.png")
+    print(f"Triangle plot saved as {root}_triangle_plot.png")
 
 def main():
     # Set up argument parsing
@@ -468,5 +501,6 @@ def main():
         else:
             print(f"No existing chains to overwrite at: {args.output_path}")
     multicomp_mcmc_driver(args.output_path)
+    plot_triangle(args.output_path)
 if __name__ == '__main__':
     main()
