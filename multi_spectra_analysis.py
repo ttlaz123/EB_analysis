@@ -413,16 +413,7 @@ def generate_cross_spectra(spectra):
     return  cross_spectra
 
 def multicomp_mcmc_driver(outpath):
-    ### define variables and priors
 
-    ### load in data
-
-    ### define likelihoods
-
-    ### run mcmc
-
-    ### plot results
-    # Example of running the function
     
     calc_spectra = ['BK18_150']#, 'BK18_150', 'BK18_220']
     all_cross_spectra = generate_cross_spectra(calc_spectra)
@@ -462,7 +453,7 @@ def plot_triangle(root):
 
     # Add the mean and std to the plot title
     plt.suptitle("\n".join(mean_std_strings), fontsize=10)
-
+    plt.tight_layout()
     # Save the plot
     plt.savefig(f"{root}_triangle_plot.png")
     print(f"Triangle plot saved as {root}_triangle_plot.png")
