@@ -317,6 +317,7 @@ class BK18_multicomp(Likelihood):
         """
        
         # Get the theoretical predictions based on the parameter values
+        print(params_values)
         theory_prediction = self.theory(params_values, 
                                         self.binned_dl_theory_dict, self.used_maps)
         
