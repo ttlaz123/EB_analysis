@@ -1,4 +1,4 @@
-
+import matplotlib.pyplot as plt
 
 import os
 import numpy as np
@@ -195,8 +195,13 @@ class BK18_multicomp(Likelihood):
             with fits.open(dust_paths[map_freq]) as hdul_dust:
                 EE_dust = hdul_dust[1].data['E-mode C_l']
                 BB_dust = hdul_dust[1].data['B-mode C_l']
-            theory_dict[map_freq + '_Ex' + map_freq + '_E'] = EE_lens + EE_dust
-            theory_dict[map_freq + '_Bx' + map_freq + '_B'] = BB_lens + BB_dust
+            ee_spectrum = EE_lens + EE_dust
+            bb_spectrum =  BB_lens + BB_dust
+            ee_spectrum *= 1e12
+            bb_spectrum *= 1e12
+            cl_to_dl = np.array([l*(l+1) for l in range(len(ee_spectrum))])/2/np.pi
+            theory_dict[map_freq + '_Ex' + map_freq + '_E'] = ee_spectrum*cl_to_dl            
+            theory_dict[map_freq + '_Bx' + map_freq + '_B'] = bb_spectrum*cl_to_dl
         return theory_dict
  
     def apply_bpwf(self, theory_dict, bpwf_mat, used_maps):
@@ -320,10 +325,9 @@ class BK18_multicomp(Likelihood):
         print(params_values)
         theory_prediction = self.theory(params_values, 
                                         self.binned_dl_theory_dict, self.used_maps)
-        
+         
         # Calculate the residuals
         residuals = self.binned_dl_observed_vec - theory_prediction
-        
         # Calculate the Mahalanobis distance using the inverse covariance matrix
         chi_squared = residuals.T @ self.cov_inv @ residuals
         
@@ -364,7 +368,8 @@ class BK18_multicomp(Likelihood):
             D_b1b2 = 0
             D_eb = D_e1e2 - D_b1b2 + D_e1b2 - D_b1e2  
             rotated_dict[cross_map] = D_eb
-        return self.dict_to_vec(rotated_dict, used_maps)
+        theory_vec = self.dict_to_vec(rotated_dict, used_maps)
+        return theory_vec
 
 # Function to create and run a Cobaya model with the custom likelihood
 def run_bk18_likelihood(params_dict, used_maps, outpath, rstop = 0.02, max_tries=10000):
@@ -416,7 +421,7 @@ def multicomp_mcmc_driver(outpath):
     ### plot results
     # Example of running the function
     
-    calc_spectra = ['BK18_K95', 'BK18_150', 'BK18_220']
+    calc_spectra = ['BK18_150']#, 'BK18_150', 'BK18_220']
     all_cross_spectra = generate_cross_spectra(calc_spectra)
     angle_priors = {"prior": {"min": -3, "max": 3}, "ref": 0}
     params_dict = {'alpha_' + spectrum: angle_priors for spectrum in calc_spectra    }
