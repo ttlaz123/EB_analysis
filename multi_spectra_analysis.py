@@ -304,7 +304,11 @@ class BK18_multicomp(Likelihood):
         return matrix[np.ix_(all_bins, all_bins)]
     
     def calc_inverse_covmat(self, filtered_covmat):
-        return np.linalg.inv(filtered_covmat)
+        
+        diag_covmat = np.diag(np.diag(filtered_covmat))
+        inverted_mat = np.linalg.inv(diag_covmat)
+        print(inverted_mat)
+        return inverted_mat
     
     def get_requirements(self):
         """
@@ -326,7 +330,6 @@ class BK18_multicomp(Likelihood):
         """
        
         # Get the theoretical predictions based on the parameter values
-        print(params_values)
         theory_prediction = self.theory(params_values, 
                                         self.binned_dl_theory_dict, self.used_maps)
          
@@ -425,7 +428,7 @@ def multicomp_mcmc_driver(outpath):
     ### plot results
     # Example of running the function
     
-    calc_spectra = ['BK18_150']#, 'BK18_150', 'BK18_220']
+    calc_spectra = ['BK18_220']#, 'BK18_150', 'BK18_K95']
     all_cross_spectra = generate_cross_spectra(calc_spectra)
     angle_priors = {"prior": {"min": -3, "max": 3}, "ref": 0}
     params_dict = {'alpha_' + spectrum: angle_priors for spectrum in calc_spectra    }
@@ -463,7 +466,7 @@ def plot_triangle(root):
 
     # Add the mean and std to the plot title
     plt.suptitle("\n".join(mean_std_strings), fontsize=10)
-
+    plt.tight_layout()
     # Save the plot
     plt.savefig(f"{root}_triangle_plot.png")
     print(f"Triangle plot saved as {root}_triangle_plot.png")
