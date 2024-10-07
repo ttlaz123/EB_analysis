@@ -417,16 +417,7 @@ def generate_cross_spectra(spectra):
     return  cross_spectra
 
 def multicomp_mcmc_driver(outpath):
-    ### define variables and priors
 
-    ### load in data
-
-    ### define likelihoods
-
-    ### run mcmc
-
-    ### plot results
-    # Example of running the function
     
     calc_spectra = ['BK18_220']#, 'BK18_150', 'BK18_K95']
     all_cross_spectra = generate_cross_spectra(calc_spectra)
