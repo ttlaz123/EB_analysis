@@ -1,18 +1,18 @@
+print("Loading Modules")
 import matplotlib.pyplot as plt
-
 import os
 import numpy as np
 import argparse
 import glob
 import shutil
 import re
-
-
 from astropy.io import fits
+
+print("Loading Cobaya Modules")
 from cobaya.model import get_model
 from cobaya.run import run
 from cobaya.likelihood import Likelihood
-
+print("Loading getdist Modules")
 from getdist import plots, MCSamples
 from getdist.mcsamples import loadMCSamples
 
@@ -21,10 +21,15 @@ from getdist.mcsamples import loadMCSamples
 FILE_PATHS = {
     "camb_lensing": '/n/holylfs04/LABS/kovac_lab/general/input_maps/official_cl/camb_planck2013_r0_lensing.fits',
     "dust_models": {
-        "BK18_B95": '/n/holylfs04/LABS/kovac_lab/general/input_maps/official_cl/dust_B95_3p75.fits',
+        "BK18_B95e": '/n/holylfs04/LABS/kovac_lab/general/input_maps/official_cl/dust_B95_3p75.fits',
         "BK18_K95": '/n/holylfs04/LABS/kovac_lab/general/input_maps/official_cl/dust_95_3p75.fits',
         "BK18_150": '/n/holylfs04/LABS/kovac_lab/general/input_maps/official_cl/dust_150_3p75.fits',
         "BK18_220": '/n/holylfs04/LABS/kovac_lab/general/input_maps/official_cl/dust_220_3p75.fits',
+        "P030e": '/n/holylfs04/LABS/kovac_lab/general/input_maps/official_cl/dust_30_3p75.fits',
+        "P044e":'/n/holylfs04/LABS/kovac_lab/general/input_maps/official_cl/dust_41_3p75.fits',
+        "P143e":'/n/holylfs04/LABS/kovac_lab/general/input_maps/official_cl/dust_150_3p75.fits',
+        "P353e":'/n/holylfs04/LABS/kovac_lab/general/input_maps/official_cl/dust_270_3p75.fits',
+        "P217e":'/n/holylfs04/LABS/kovac_lab/general/input_maps/official_cl/dust_220_3p75.fits',
     },
     "bpwf": '/n/home08/liuto/cosmo_package/data/bicep_keck_2018/BK18_cosmomc/data/BK18lf_dust_incEE_norot/windows/BK18lfnorot_bpwf_bin*.txt',
     "covariance_matrix": '/n/home08/liuto/cosmo_package/data/bicep_keck_2018/BK18_cosmomc/data/BK18lf_dust_incEE_norot/BK18lfnorot_covmat_dust.dat',
@@ -33,11 +38,19 @@ FILE_PATHS = {
 class BK18_multicomp(Likelihood):
     params_names = []
     used_maps = []
-    # Initialize your likelihood class
+    
+    def __init__(self,*args,**kwargs):
+        if('used_maps' in kwargs):
+            self.used_maps = kwargs['used_maps']
+            print("New used maps: " + str(self.used_maps))
+            self.initialize()
+        else:
+            super().__init__(*args,**kwargs)
+        
+        # Initialize your likelihood class
     def initialize(self):
         # Load any data or set up anything that needs to happen before likelihood calculation
         self.map_reference_header = None
-        
         # BPWF and header check
         self.bpwf = self.load_bpwf(FILE_PATHS["bpwf"])
         self.used_maps = self.filter_used_maps(self.used_maps)
@@ -81,7 +94,7 @@ class BK18_multicomp(Likelihood):
         Returns:
         - A filtered list containing only elements from used_maps that are present in reference_maps.
         """
-        maps = [map_ for map_ in used_maps if map_ in self.map_reference_header]
+        maps = [map_ for map_ in self.map_reference_header if map_ in used_maps]
         print(" ~~~~~~~~~~ Using the following maps in analysis: ~~~~~~~~~~")
         print(maps)
         return maps
@@ -239,6 +252,10 @@ class BK18_multicomp(Likelihood):
             maps = cross_map.split('x')
             for freq_map in maps:
                 map0 = freq_map + 'x' + freq_map
+                if(map0 not in theory_dict):
+                    print("Key " + map0 +" not in dict")
+                    print(theory_dict.keys())
+
                 col = self.map_reference_header.index(map0)
                 num_ells = bpwf_mat.shape[1]
                 binned_theory_dict[map0] = np.matmul(bpwf_mat[:,:,col],theory_dict[map0][:num_ells])
@@ -263,8 +280,10 @@ class BK18_multicomp(Likelihood):
                 big_vector.append(spectra_dict[map_name])
 
         # Concatenate all spectra arrays into a single 1D array
-        return np.concatenate(big_vector, axis=0)
-    
+        concat_vec =   np.concatenate(big_vector, axis=0)
+
+        return concat_vec   
+
     def filter_matrix(self, matrix, used_maps):
         """
         Filters a given matrix to extract rows and columns that correspond to specific map cross-correlations.
@@ -301,13 +320,69 @@ class BK18_multicomp(Likelihood):
         filter_cols = [self.map_reference_header.index(cross_map)-1 for cross_map in used_maps]
         all_bins = [index + i * num_maps for i in range(num_bins) for index in filter_cols]
         # Use np.ix_ to filter both rows and columns in the given indices
-        return matrix[np.ix_(all_bins, all_bins)]
+        filtered_mat = matrix[np.ix_(all_bins, all_bins)]
+
+        plot_covar_matrix(filtered_mat, self.used_maps)
+        reordered_mat = self.reorder_cov_matrix(filtered_mat, 
+                                    num_bins, len(self.used_maps))
+        plot_covar_matrix(reordered_mat, self.used_maps, "reordered")
+        offdiag= 1#reordered_mat.shape[0]
+        trunc_covmat = self.truncate_covariance_matrix(reordered_mat,
+                                            offdiag=offdiag)
+        plot_covar_matrix(trunc_covmat, self.used_maps, "truncated")
+
+        return trunc_covmat
+
+    def reorder_cov_matrix(self, cov_matrix, n_bins, n_maps):
+        """
+        Reorder a covariance matrix from bin-major order to map-major order.    
+    
+        Args:
+        - cov_matrix (numpy.ndarray): The original covariance matrix (shape: [n_bins * n_maps, n_bins * n_maps]).
+        - n_bins (int): Number of bins.
+        - n_maps (int): Number of maps.
+        
+        Returns:
+        - numpy.ndarray: The reordered covariance matrix.
+        """
+        # Calculate the new order of indices
+        old_indices = np.arange(n_bins * n_maps)
+        new_indices = np.zeros_like(old_indices)
+        for map_idx in range(n_maps):
+            for bin_idx in range(n_bins):
+                old_pos = bin_idx * n_maps + map_idx
+                new_pos = map_idx * n_bins + bin_idx
+                new_indices[new_pos] = old_indices[old_pos]
+        # Reorder rows and columns of the covariance matrix
+        reordered_matrix = cov_matrix[np.ix_(new_indices, new_indices)]
+    
+        return reordered_matrix
+
+    def truncate_covariance_matrix(self, cov_matrix, offdiag=1):
+        """
+        Truncate the covariance matrix by keeping only the diagonal and specified number of off-diagonals.
+
+        Parameters:
+        cov_matrix (np.ndarray): The covariance matrix to truncate.
+        offdiag (int): The number of off-diagonals to keep.
+    
+        Returns:
+        np.ndarray: The truncated covariance matrix.
+        """
+        size = cov_matrix.shape[0]
+    
+        # Create a mask to retain diagonal and `offdiag` number of off-diagonals
+        mask = np.abs(np.arange(size)[:, None] - np.arange(size)) <= offdiag
+    
+        # Apply the mask to the covariance matrix
+        truncated_cov_matrix = cov_matrix * mask
+    
+        return truncated_cov_matrix
     
     def calc_inverse_covmat(self, filtered_covmat):
-        
-        diag_covmat = np.diag(np.diag(filtered_covmat))
-        inverted_mat = np.linalg.inv(diag_covmat)
-        print(inverted_mat)
+        inverted_mat = np.linalg.inv(filtered_covmat)
+        plot_covar_matrix(inverted_mat, self.used_maps, 
+                        title='Log of diag inverse matrix')
         return inverted_mat
     
     def get_requirements(self):
@@ -342,48 +417,189 @@ class BK18_multicomp(Likelihood):
         log_likelihood = -0.5 * chi_squared
 
         return log_likelihood
+    
+    def rotate_spectrum(self, cross_map, binned_dl_theory_dict, params_values):
+        maps = cross_map.split('x')
+        angle1_name = 'alpha_' + maps[0]
+        angle2_name = 'alpha_' + maps[1]
+        # Use regex to remove _B, _E, or any other suffix ending with _ followed by letters
+        angle1_name = re.sub(r'_[BE]$', '', angle1_name)
+        angle2_name = re.sub(r'_[BE]$', '', angle2_name)
+        angle1 = params_values[angle1_name]
+        angle2 = params_values[angle2_name]
+        
+        e1 = maps[0] if maps[0].endswith('_E') else None 
+        e2 = maps[1] if maps[1].endswith('_E') else None
+        if(e1):
+            e1e2_name = e1 + 'x' + e1
+        elif(e2):
+            e1e2_name = e2 + 'x' + e2
+        else:
+            raise ValueError("There is no EE spectrum: " + str(cross_map))
+        # spectrum is EB
+        if(e1):
+            D_e1e2 = (binned_dl_theory_dict[e1e2_name] * 
+                  np.cos(2*np.deg2rad(angle1)) * 
+                  np.sin(2*np.deg2rad(angle2)))
+            D_b1e2 = 0
+            D_e1b2 = 0
+            D_b1b2 = 0
+            D_eb = D_e1e2 - D_b1b2 + D_e1b2 - D_b1e2  
+        # spectrum is BE
+        if(e2):
+            D_e1e2 = (binned_dl_theory_dict[e1e2_name] * 
+                  np.cos(2*np.deg2rad(angle2)) * 
+                  np.sin(2*np.deg2rad(angle1)))
+            D_b1e2 = 0
+            D_e1b2 = 0
+            D_b1b2 = 0
+            D_eb = D_e1e2 - D_b1b2 + D_e1b2 - D_b1e2  
+    
+        return D_eb
 
     def theory(self, params_values, binned_dl_theory_dict, used_maps):
         # Compute the model prediction based on the parameter values
         # This is a placeholder for your theory calculation
         # currently assumes it is only calculating EB
-        rotated_dict = {}
+        self.rotated_dict = {}
+
         for cross_map in used_maps:
-            maps = cross_map.split('x')
-            angle1_name = 'alpha_' + maps[0]
-            angle2_name = 'alpha_' + maps[1]
-            # Use regex to remove _B, _E, or any other suffix ending with _ followed by letters
-            angle1_name = re.sub(r'_[BE]$', '', angle1_name)
-            angle2_name = re.sub(r'_[BE]$', '', angle2_name)
-            angle1 = params_values[angle1_name]
-            angle2 = params_values[angle2_name]
-            
-            e1 = maps[0] if maps[0].endswith('_E') else None 
-            e2 = maps[1] if maps[1].endswith('_E') else None
-            if(e1):
-                e1e2_name = e1 + 'x' + e1
-            elif(e2):
-                e1e2_name = e2 + 'x' + e2
-            else:
-                raise ValueError("There is no EE spectrum: " + str(cross_map))
-            
-            D_e1e2 = (binned_dl_theory_dict[e1e2_name] * 
-                      np.cos(2*np.deg2rad(angle1)) * 
-                      np.sin(2*np.deg2rad(angle2)))
-            D_b1e2 = 0
-            D_e1b2 = 0
-            D_b1b2 = 0
-            D_eb = D_e1e2 - D_b1b2 + D_e1b2 - D_b1e2  
-            rotated_dict[cross_map] = D_eb
-        theory_vec = self.dict_to_vec(rotated_dict, used_maps)
+           self.rotated_dict[cross_map] = self.rotate_spectrum(cross_map,
+                                            binned_dl_theory_dict, params_values)
+        theory_vec = self.dict_to_vec(self.rotated_dict, used_maps)
         return theory_vec
 
+def plot_covar_matrix(mat, used_maps, title='Log of covar matrix'):
+    plt.figure()
+    plt.imshow(np.log(np.abs(mat)))
+    plt.title(title + ":\n" + str(used_maps))
+    plt.colorbar()
+    plt.show()
+
+def plot_best_fit(used_maps, param_names, 
+                        param_bestfit, param_stats):
+    eb_like_cls = BK18_multicomp(used_maps=used_maps)
+    observed_datas = eb_like_cls.binned_dl_observed_dict
+    theory_spectra = eb_like_cls.binned_dl_theory_dict
+    param_values = {param_names[i]:param_bestfit[i] 
+                            for i in range(len(param_names))}
+    eb_like_cls.theory(param_values, 
+                    theory_spectra, eb_like_cls.used_maps)
+    rotated_dict = eb_like_cls.rotated_dict
+    keys = list(rotated_dict.keys())
+    # Initialize lists to store unique maps ending with _E and _B
+    maps_B = set()
+    maps_E = set()
+
+    for key in keys:
+        parts = key.split('x')
+        if parts[0].endswith('_B'):
+            maps_B.add(parts[0])
+        if parts[0].endswith('_E'):
+            maps_E.add(parts[0])
+        if parts[1].endswith('_B'):
+            maps_B.add(parts[1])
+        if parts[1].endswith('_E'):
+            maps_E.add(parts[1])
+    maps_B = sorted(list(maps_B))
+    maps_E = sorted(list(maps_E))
+    param_stats = sorted(param_stats)
+    num_columns = len(maps_B)  # Unique maps for columns
+    num_rows = len(maps_E)      # Unique maps for rows
+
+    # Create subplots
+    fig, axes = plt.subplots(num_rows, num_columns, 
+                    figsize=(num_columns * 4, num_rows * 4))
+    try:
+        axes = axes.flatten()  # Flatten axes array for easy indexing
+    except AttributeError:
+        print("Only one axis!")
+        axes = [axes]
+    # Plot each spectrum
+    for idx, key in enumerate(keys):
+        observed_data = observed_datas[key]
+        best_fit_data = rotated_dict[key]
+        
+        # Split key to find row and column indices
+        parts = key.split('x')
+        row_idx = (maps_E).index(parts[0]) if parts[0].endswith('_E') else (maps_E).index(parts[1])
+        col_idx = (maps_B).index(parts[0]) if parts[0].endswith('_B') else (maps_B).index(parts[1])
+        map_index = eb_like_cls.used_maps.index(key)
+        num_bin = len(observed_data)
+        covar_mat = eb_like_cls.filtered_covmat
+        var = np.diag(covar_mat)[map_index*num_bin:num_bin*(map_index+1)]
+        # Plotting observed data
+        axes[row_idx * num_columns + col_idx].errorbar(
+                            x = range(len(observed_data)),
+                            y=(observed_data), 
+                            yerr = np.sqrt(var),
+                            label='Observed', color='blue')
+        # Plotting best fit data
+        axes[row_idx * num_columns + col_idx].plot(best_fit_data, label='Best Fit', color='red')
+
+        axes[row_idx * num_columns + col_idx].set_title(key)
+        axes[row_idx * num_columns + col_idx].legend()
+    for row_idx, map_E in enumerate(maps_E):
+        angle = f"alpha_{map_E}"
+        axes[row_idx].text(
+            0.05, 1.4,  # X and Y position (top-left corner)
+            param_stats[row_idx],  # The parameter stats
+            transform=axes[row_idx].transAxes,  # Use axes coordinates
+            fontsize=10, color='black',
+            verticalalignment='top'
+        )
+    # Remove empty subplots if any
+    for j in range(idx + 1, len(axes)):
+        fig.delaxes(axes[j])
+    plt.tight_layout(pad = 2)
+    plt.show()
+    return 
+
+
+def plot_triangle(root, replace_dict={}):
+    # Load MCMC samples from the specified root
+    samples = loadMCSamples(root)
+    print([name.name for name in samples.getParamNames().names])
+    
+    param_names = [name.name for name in samples.getParamNames().names
+                   if ('chi2' not in name.name and
+                       'weight' not in name.name and
+                       'betadust' not in name.name and
+                       'betasync' not in name.name and
+                       'minuslogprior' not in name.name)]
+    
+    # Get the mean and std of the parameters for titles
+    mean_std_strings = []
+    means = []
+    for param in param_names:
+        
+        mean = samples.mean(param)
+        if(param in replace_dict):
+            mean = replace_dict[param]
+        std = samples.std(param)
+        mean_std_strings.append(f"{param}: {mean:.2f} ± {std:.2f}")
+        means.append(mean)
+
+    # Create a triangle plot with all variables
+    g = plots.get_subplot_plotter()
+    g.triangle_plot(samples, param_names, filled=True)
+
+    # Add the mean and std to the plot title
+    plt.suptitle("\n".join(mean_std_strings), fontsize=10)
+    plt.tight_layout()
+    # Save the plot
+    plt.savefig(f"{root}_triangle_plot.png")
+    print(f"Triangle plot saved as {root}_triangle_plot.png")
+    plt.show()
+    return param_names, means, mean_std_strings
+
+
 # Function to create and run a Cobaya model with the custom likelihood
-def run_bk18_likelihood(params_dict, used_maps, outpath, rstop = 0.02, max_tries=10000):
+def run_bk18_likelihood(params_dict, used_maps, outpath, 
+                            rstop = 0.02, max_tries=10000):
     # Set up the custom likelihood with provided params
     likelihood_class = BK18_multicomp
     likelihood_class.params_names = list(params_dict.keys())
-
     # Create Cobaya info dictionary
     info = {
         "likelihood": {
@@ -399,7 +615,8 @@ def run_bk18_likelihood(params_dict, used_maps, outpath, rstop = 0.02, max_tries
                 "max_tries": max_tries,
             }
         },
-        "output": outpath
+        "output": outpath,
+        "resume": True
     }
 
     # Run Cobaya
@@ -410,6 +627,9 @@ def generate_cross_spectra(spectra):
     cross_spectra = []
     for spec1 in spectra:
         for spec2 in spectra:
+            # don't do cross spectra
+            #if(not spec1 == spec2):
+            #    continue
             cross_spectrum = f"{spec1}_Ex{spec2}_B"
             cross_spectra.append(cross_spectrum)
             cross_spectrum = f"{spec1}_Bx{spec2}_E"
@@ -419,48 +639,40 @@ def generate_cross_spectra(spectra):
 def multicomp_mcmc_driver(outpath):
 
     
-    calc_spectra = ['BK18_220']#, 'BK18_150', 'BK18_K95']
+    calc_spectra = [
+                    'BK18_220', 
+                    'BK18_150', 
+                    'BK18_K95', 
+                    'BK18_B95e',
+                    #'P030e', 
+                    #'P044e', 
+                    #'P143e',
+                    #'P217e'
+                    ]
     all_cross_spectra = generate_cross_spectra(calc_spectra)
-    angle_priors = {"prior": {"min": -3, "max": 3}, "ref": 0}
-    params_dict = {'alpha_' + spectrum: angle_priors for spectrum in calc_spectra    }
-
-    updated_info, sampler = run_bk18_likelihood(params_dict, all_cross_spectra, 
+    angle_priors = {"prior": {"min": -10, "max": 10}, "ref": 0}
+    params_dict = {
+        'alpha_' + spectrum: {
+                **angle_priors,
+                'latex': ("\\alpha_{" + 
+                            spectrum.replace('_', '\\_') +
+                            "}")
+                }
+                for spectrum in calc_spectra    
+    }
+    dorun=True
+    if(dorun):
+        updated_info, sampler = run_bk18_likelihood(params_dict, 
+                                                all_cross_spectra, 
                                                 outpath=outpath)
 
     # Print results
-    print("Updated Info:", updated_info)
-    print("Sampler:", sampler)
+    #print("Updated Info:", updated_info)
+    #print("Sampler:", sampler)
+    replace_dict = {}#{"alpha_BK18_220":1.0}
+    param_names, means, mean_std_strs = plot_triangle(outpath, replace_dict)
+    plot_best_fit(all_cross_spectra, param_names, means, mean_std_strs)
     return 
-
-def plot_triangle(root):
-    # Load MCMC samples from the specified root
-    samples = loadMCSamples(root)
-    print([name.name for name in samples.getParamNames().names])
-    
-    param_names = [name.name for name in samples.getParamNames().names
-                   if ('chi2' not in name.name and
-                       'weight' not in name.name and
-                       'betadust' not in name.name and
-                       'betasync' not in name.name and
-                       'minuslogprior' not in name.name)]
-    
-    # Get the mean and std of the parameters for titles
-    mean_std_strings = []
-    for param in param_names:
-        mean = samples.mean(param)
-        std = samples.std(param)
-        mean_std_strings.append(f"{param}: {mean:.2f} ± {std:.2f}")
-
-    # Create a triangle plot with all variables
-    g = plots.get_subplot_plotter()
-    g.triangle_plot(samples, param_names, filled=True)
-
-    # Add the mean and std to the plot title
-    plt.suptitle("\n".join(mean_std_strings), fontsize=10)
-    plt.tight_layout()
-    # Save the plot
-    plt.savefig(f"{root}_triangle_plot.png")
-    print(f"Triangle plot saved as {root}_triangle_plot.png")
 
 def main():
     # Set up argument parsing
@@ -494,7 +706,8 @@ def main():
                 print("Deletion cancelled. Existing chains will be kept.")
         else:
             print(f"No existing chains to overwrite at: {args.output_path}")
+    
     multicomp_mcmc_driver(args.output_path)
-    plot_triangle(args.output_path)
+    
 if __name__ == '__main__':
     main()
