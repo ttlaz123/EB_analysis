@@ -28,7 +28,8 @@ from getdist.mcsamples import loadMCSamples
 CAMB_BASE_PATH = '/n/holylfs04/LABS/kovac_lab/general/input_maps/official_cl/'
 BK18_BASE_PATH = '/n/home08/liuto/cosmo_package/data/bicep_keck_2018/BK18_cosmomc/data/BK18lf_dust_incEE_norot_allbins/'
 DOMINIC_BASE_PATH = '/n/home01/dbeck/cobaya/data/bicep_keck_2018/BK18_cosmomc/data/'
-
+BK18_SIM_PATH = '/n/home01/dbeck/cobaya/data/bicep_keck_2018/BK18_cosmomc/data/BK18lf_dust_incEE/'
+BK18_SIM_NAME = 'BK18lf_cl_hat_simXXX.dat'
 # Consolidate file paths into a dictionary
 FILE_PATHS = {
     "camb_lensing": CAMB_BASE_PATH + 'camb_planck2013_r0_lensing.fits',
@@ -57,6 +58,7 @@ class BK18_multicomp(Likelihood):
     used_maps = []
     include_EDE = False    
     zero_offdiag = False
+    signal_params = {}
     def __init__(self,*args,**kwargs):
         if('used_maps' in kwargs):
             self.used_maps = kwargs['used_maps']
@@ -85,7 +87,11 @@ class BK18_multicomp(Likelihood):
         
         # Real Data
         self.binned_dl_observed_dict = self.load_observed_spectra(FILE_PATHS['observed_data'], 
-                                                             self.used_maps)
+                                    self.used_maps)
+        # inject signal
+        if(len(self.signal_params) > 0):
+            self.binned_dl_observed_dict = self.inject_signal(self.signal_params, 
+                    self.binned_dl_theory_dict, self.binned_dl_observed_dict)
         self.binned_dl_observed_vec = self.dict_to_vec(self.binned_dl_observed_dict, 
                                                     self.used_maps)
          
@@ -511,6 +517,65 @@ class BK18_multicomp(Likelihood):
 
         return log_likelihood
     
+    def inject_signal(self, signal_params, 
+                    binned_dl_theory_dict, binned_dl_observed_dict):
+        """
+        Injects a signal into the observed binned power spectrum based on 
+        the provided signal parameters, theory spectra, and observed spectra.
+
+        Parameters
+        ----------
+        signal_params : dict
+            A dictionary containing signal parameters such as 'gMpl' (if not defined, set to 0) 
+            and rotation angles for different maps (e.g., 'alpha_map'). Each map-specific angle 
+            will be extracted or initialized to 0 if not present.
+            
+        binned_dl_theory_dict : dict
+            A dictionary containing the binned theoretical power spectra for 
+            different cross-maps, where each entry corresponds to a map pair (e.g., 'map1xmap2').
+            
+        binned_dl_observed_dict : dict
+            A dictionary containing the observed binned power spectra for 
+            different cross-maps, to which the injected signal will be added.
+            
+        Returns
+        -------
+        binned_dl_observed_dict : dict
+            Updated observed binned power spectra with the injected signal 
+            for each cross-map. This includes both a rotated spectrum and an Early Dark Energy (EDE) shift.
+
+        Notes
+        -----
+        - For each cross-map in `self.used_maps`, this method computes the rotation angles and injects 
+        the rotated spectrum (D_eb) and EDE shift into the observed power spectrum.
+        - The `rotate_spectrum` method computes the EB rotation based on the cross-map and signal parameters.
+        - The `apply_EDE_shift` method adds any additional shift due to Early Dark Energy (EDE).
+        - If certain signal parameters are missing (e.g., 'gMpl' or map-specific angles), 
+        default values of 0 are used.
+        """
+        # set undefined signal to 0
+        if('gMpl' not in signal_params):
+            signal_params['gMpl'] = 0
+        for cross_map in self.used_maps:
+            maps = cross_map.split('x')
+            angle_name0 = 'alpha_' + maps[0]
+            angle_name1 = 'alpha_' + maps[1]
+            angle_name0 = re.sub(r'_[BE]$', '', angle_name0)
+            angle_name1 = re.sub(r'_[BE]$', '', angle_name1)
+            if(angle_name0 not in signal_params):
+                signal_params[angle_name0] = 0
+            if(angle_name1 not in signal_params):
+                signal_params[angle_name1] = 0
+        
+            D_eb = self.rotate_spectrum(cross_map, binned_dl_theory_dict, signal_params)
+            
+        
+            ede_shift = self.apply_EDE_shift(cross_map, 
+                            binned_dl_theory_dict, signal_params)
+            binned_dl_observed_dict[cross_map] += D_eb + ede_shift
+        return binned_dl_observed_dict
+
+
     def rotate_spectrum(self, cross_map, binned_dl_theory_dict, params_values):
         maps = cross_map.split('x')
         angle1_name = 'alpha_' + maps[0]
@@ -829,7 +894,7 @@ def plot_eigenvalues_eigenvectors(matrix):
 # Function to create and run a Cobaya model with the custom likelihood
 def run_bk18_likelihood(params_dict, used_maps, outpath, 
                             include_ede = False, zero_offdiag = True,
-                            rstop = 0.02, max_tries=10000):
+                            rstop = 0.02, max_tries=10000, signal_params = {}):
 
     # Set up the custom likelihood with provided params
     likelihood_class = BK18_multicomp
@@ -842,6 +907,7 @@ def run_bk18_likelihood(params_dict, used_maps, outpath,
                 "used_maps": used_maps,
                 "include_EDE": include_ede,
                 "zero_offdiag": zero_offdiag,
+                "signal_params": signal_params,
             }
         },
         "params": params_dict,
@@ -872,7 +938,7 @@ def generate_cross_spectra(spectra, do_crosses=True):
             cross_spectra.append(cross_spectrum)
     return  cross_spectra
 
-def multicomp_mcmc_driver(outpath, dorun):
+def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
 
     
     calc_spectra = [
@@ -888,6 +954,11 @@ def multicomp_mcmc_driver(outpath, dorun):
     do_crosses =True
     zero_offdiag = False#True
     include_ede = False
+    if(sim_num != 'real'):
+        formatted_simnum = str(sim_num).zfill(3)
+        BK18_SIM_NAME = BK18_SIM_NAME.replace("XXX", formatted_simnum)
+        FILE_PATHS['observed_data'] = BK18_SIM_PATH + BK18_SIM_NAME
+    signal_params = {}
     
     all_cross_spectra = generate_cross_spectra(calc_spectra, do_crosses=do_crosses)
     #all_cross_spectra = ['BK18_K95_BxBK18_220_E', 
@@ -1008,6 +1079,8 @@ def main():
                         help='directory to save the mcmc chains and plots')
     parser.add_argument('-o', '--overwrite', action='store_true',
                         help='whether to overwrite current chains')
+    parser.add_argument('-n', '--simnum', default=-1, type=int,
+                        help='Simulation num to extract params from, defaults to real data')
     args = parser.parse_args()
 
     # Check if the overwrite flag is set
@@ -1033,8 +1106,9 @@ def main():
                 print("Deletion cancelled. Existing chains will be kept.")
         else:
             print(f"No existing chains to overwrite at: {args.output_path}")
-    
-    multicomp_mcmc_driver(args.output_path, args.overwrite)
+    if(args.sim_num == -1):
+        args.sim_num = 'real'
+    multicomp_mcmc_driver(args.output_path, args.overwrite, args.sim_num)
     
 if __name__ == '__main__':
     #load_dominic_invcovmat('/n/home01/dbeck/keckpipe/Cinv_K95K150K220.dat')
