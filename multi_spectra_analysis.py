@@ -1,6 +1,6 @@
 print("Loading Modules")
 import matplotlib
-matplotlib.use('TkAgg')
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import os
 import numpy as np
@@ -489,13 +489,13 @@ class BK18_multicomp(Likelihood):
         size = cov_matrix.shape[0]
         N = size
         # Create a mask of zeros (False) initially
-        mask = np.zeros((N, N), dtype=bool)
+        mask = np.zeros((N, N), dtype=bool) + 1
         # Iterate over diagonal blocks
         for i in range(0, N, block_size):
             # Set True for the elements in the current diagonal block and its off-diagonal band
             start = i
             end = min(i+(offdiag+1) * block_size, N)
-            mask[start:end, start:end] = True
+            mask[start:end, start:end] = 1
         
         # Apply the mask to the covariance matrix
         truncated_cov_matrix = cov_matrix * mask
@@ -763,7 +763,8 @@ def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix'):
                                 rotation=30, ha='right')
         plt.yticks(tick_positions, used_maps)
     plt.colorbar()
-    plt.show()
+    plt.savefig(title + '.png')
+    #plt.show()
 
 def plot_best_fit(outpath, used_maps, zero_offdiag, param_names, 
                         param_bestfit, param_stats, signal_params={}):
@@ -1083,7 +1084,7 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
                     #'P217e'
                     ]
     do_crosses =True
-    zero_offdiag = False#True
+    zero_offdiag = True
     include_ede = False#True
     if(sim_num != 'real'):
         formatted_simnum = str(sim_num).zfill(3)
@@ -1098,11 +1099,11 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
                     }
     
     all_cross_spectra = generate_cross_spectra(calc_spectra, do_crosses=do_crosses)
-    #all_cross_spectra = ['BK18_K95_BxBK18_220_E', 
-    #                    'BK18_150_ExBK18_220_B', 
-    #                    'BK18_K95_BxBK18_B95e_E', 
-    #                    'BK18_K95_ExBK18_220_B',
-    
+    #all_cross_spectra = ['BK18_150_BxBK18_150_E', 
+    #                    'BK18_150_BxBK18_220_E', 
+    #                    'BK18_150_BxBK18_B95e_E', 
+    #                    'BK18_K95_ExBK18_150_B',
+    # 
     #                    ] 
     angle_priors = {"prior": {"min": -3, "max": 3}, "ref": 0}
     params_dict = {
