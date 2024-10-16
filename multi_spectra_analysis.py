@@ -1003,6 +1003,7 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
 
 def load_dominic_invcovmat(covmat_path, truncate=False):
     keys = [
+    '''
     'BK18_K95_BxBK18_K95_B',
     'BK18_K95_ExBK18_K95_E',
     'BK18_150_BxBK18_150_B',
@@ -1025,7 +1026,47 @@ def load_dominic_invcovmat(covmat_path, truncate=False):
     'BK18_K95_ExBK18_220_E',
     'BK18_K95_BxBK18_220_E'
     ]
+    [
+    '''
+    'BK18_K95_ExBK18_K95_E',
+    'BK18_K95_BxBK18_K95_B',
+    'BK18_150_ExBK18_150_E',
+    'BK18_150_BxBK18_150_B',
+    'BK18_220_ExBK18_220_E',
+    'BK18_220_BxBK18_220_B',
+    'BK18_B95e_ExBK18_B95e_E',
+    'BK18_B95e_BxBK18_B95e_B',
+    'BK18_K95_ExBK18_K95_B',
+    'BK18_K95_BxBK18_150_E',
+    'BK18_150_ExBK18_150_B',
+    'BK18_150_BxBK18_220_E',
+    'BK18_220_ExBK18_220_B',
+    'BK18_220_BxBK18_B95e_E',
+    'BK18_B95e_ExBK18_B95e_B',
+    'BK18_K95_ExBK18_150_E',
+    'BK18_K95_BxBK18_150_B',
+    'BK18_150_ExBK18_220_E',
+    'BK18_150_BxBK18_220_B',
+    'BK18_220_ExBK18_B95e_E',
+    'BK18_220_BxBK18_B95e_B',
+    'BK18_K95_ExBK18_150_B',
+    'BK18_K95_BxBK18_220_E',
+    'BK18_150_ExBK18_220_B',
+    'BK18_150_BxBK18_B95e_E',
+    'BK18_220_ExBK18_B95e_B',
+    'BK18_K95_ExBK18_220_E',
+    'BK18_K95_BxBK18_220_B',
+    'BK18_150_ExBK18_B95e_E',
+    'BK18_150_BxBK18_B95e_B',
+    'BK18_K95_ExBK18_220_B',
+    'BK18_K95_BxBK18_B95e_E',
+    'BK18_150_ExBK18_B95e_B',
+    'BK18_K95_ExBK18_B95e_E',
+    'BK18_K95_BxBK18_B95e_B',
+    'BK18_K95_ExBK18_B95e_B'
+]
     used_maps = [
+    '''
     'BK18_K95_BxBK18_K95_E',
     'BK18_K95_ExBK18_150_B',
 
@@ -1039,6 +1080,25 @@ def load_dominic_invcovmat(covmat_path, truncate=False):
     'BK18_150_BxBK18_220_E',
     'BK18_K95_BxBK18_220_E'
     ]
+    [
+    '''
+    "BK18_K95_ExBK18_K95_B",
+    "BK18_K95_BxBK18_150_E",
+    "BK18_150_ExBK18_150_B",
+    "BK18_150_BxBK18_220_E",
+    "BK18_220_ExBK18_220_B",
+    "BK18_220_BxBK18_B95e_E",
+    "BK18_B95e_ExBK18_B95e_B",
+    "BK18_K95_ExBK18_150_B",
+    "BK18_K95_BxBK18_220_E",
+    "BK18_150_ExBK18_220_B",
+    "BK18_150_BxBK18_B95e_E",
+    "BK18_220_ExBK18_B95e_B",
+    "BK18_K95_ExBK18_220_B",
+    "BK18_K95_BxBK18_B95e_E",
+    "BK18_150_ExBK18_B95e_B",
+    "BK18_K95_ExBK18_B95e_B"
+]
     invcovmat = np.loadtxt(covmat_path)
     n_maps = len(keys)
     n_bins = int(invcovmat.shape[0]/n_maps)
