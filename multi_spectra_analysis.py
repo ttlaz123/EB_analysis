@@ -11,7 +11,7 @@ import shutil
 import re
 import pandas as pd
 from astropy.io import fits
-
+from scipy.stats import gaussian_kde
 print("Loading Cobaya Modules")
 from cobaya.model import get_model
 from cobaya.run import run
@@ -19,14 +19,14 @@ from cobaya.likelihood import Likelihood
 print("Loading getdist Modules")
 from getdist import plots, MCSamples
 from getdist.mcsamples import loadMCSamples
-
+import corner
 
 # Global dictionary for file paths
 
 
 # Define the base directories for the file paths
 CAMB_BASE_PATH = '/n/holylfs04/LABS/kovac_lab/general/input_maps/official_cl/'
-BK18_BASE_PATH = '/n/home08/liuto/cosmo_package/data/bicep_keck_2018/BK18_cosmomc/data/BK18lf_dust_incEE_norot_allbins/'
+BK18_BASE_PATH = '/n/home08/liuto/cosmo_package/data/bicep_keck_2018/BK18_cosmomc/data/BK18lf_dust_incEE_norot/'
 DOMINIC_BASE_PATH = '/n/home01/dbeck/cobaya/data/bicep_keck_2018/BK18_cosmomc/data/'
 BK18_SIM_PATH = '/n/home01/dbeck/cobaya/data/bicep_keck_2018/BK18_cosmomc/data/BK18lf_dust_incEE/'
 BK18_SIM_NAME = 'BK18lf_cl_hat_simXXX.dat'
@@ -65,6 +65,10 @@ class BK18_multicomp(Likelihood):
             print("New used maps: " + str(self.used_maps))
             if('zero_offdiag' in kwargs):
                 self.zero_offdiag = kwargs['zero_offdiag']
+            if('signal_params' in kwargs):
+                self.signal_params = kwargs['signal_params']
+                if('gMpl' in self.signal_params):
+                    self.include_EDE = True
             self.initialize()
         else:
             super().__init__(*args,**kwargs)
@@ -80,6 +84,7 @@ class BK18_multicomp(Likelihood):
         # Theory
         self.dl_theory = self.load_cmb_spectra(FILE_PATHS['camb_lensing'],
                                                FILE_PATHS['dust_models'])
+        print("Include EDE?" + str(self.include_EDE))
         if(self.include_EDE):
             self.dl_theory = self.include_ede_spectra(FILE_PATHS['EDE_spectrum'],
                                                         self.dl_theory)
@@ -89,7 +94,10 @@ class BK18_multicomp(Likelihood):
         self.binned_dl_observed_dict = self.load_observed_spectra(FILE_PATHS['observed_data'], 
                                     self.used_maps)
         # inject signal
+        print('Inject signal?')
         if(len(self.signal_params) > 0):
+            print('Injecting Signal: ')
+            print(self.signal_params)
             self.binned_dl_observed_dict = self.inject_signal(self.signal_params, 
                     self.binned_dl_theory_dict, self.binned_dl_observed_dict)
         self.binned_dl_observed_vec = self.dict_to_vec(self.binned_dl_observed_dict, 
@@ -102,7 +110,7 @@ class BK18_multicomp(Likelihood):
         self.full_covmat = self.load_covariance_matrix(FILE_PATHS[covmat_name])
         #plot_covar_matrix(self.full_covmat, used_maps=None, title='full matrix')
         self.filtered_covmat = self.filter_matrix(self.full_covmat, self.used_maps)
-        plot_covar_matrix(self.filtered_covmat, self.used_maps, title='filtered')
+        #plot_covar_matrix(self.filtered_covmat, self.used_maps, title='filtered')
         self.cov_inv = self.calc_inverse_covmat(self.filtered_covmat)
         #self.cov_inv= self.truncate_covariance_matrix(self.cov_inv, offdiag=0,block_size = int(self.cov_inv.shape[0]/len(self.used_maps)))
         #print(self.cov_inv[0,:])
@@ -129,6 +137,18 @@ class BK18_multicomp(Likelihood):
                     if reference_header is None:
                         reference_header = current_header.split()
                     elif current_header.split() != reference_header:
+                        # Compare the lists element by element and print the differences
+                        list1 = current_header.split()
+                        list2 = reference_header
+                        for i in range(min(len(list1), len(list2))):
+                            if list1[i] != list2[i]:
+                                print(f"Difference at index {i}: {list1[i]} != {list2[i]}")
+
+                            # If the lists have different lengths, print the extra elements
+                            if len(list1) > len(list2):
+                                print(f"Extra elements in list1: {list1[len(list2):]}")
+                            elif len(list2) > len(list1):
+                                print(f"Extra elements in list2: {list2[len(list1):]}")
                         raise ValueError("Header mismatch detected in one or more files.")
                     break  # Stop reading further header lines
         return reference_header
@@ -176,8 +196,33 @@ class BK18_multicomp(Likelihood):
         """
         reference_header = self.map_reference_header
         print("Loading: " + str(observed_data_path))
-        self.map_reference_header = self.check_file_header(observed_data_path, reference_header)
-        used_cols = [self.map_reference_header.index(cross_map) for cross_map in used_maps]
+        try:
+            
+            map_reference_header = self.check_file_header(observed_data_path, reference_header)
+            self.map_reference_header = map_reference_header
+        except ValueError:
+            with open(observed_data_path, 'r') as f:
+                for line in f:
+                    # Assuming the relevant header is the one with 'BxB' in it
+                    if line.startswith("#") and "BxB" in line:
+                        current_header = line.strip()
+                        map_reference_header = current_header.split()
+                        break
+        used_cols = []
+        for cross_map in used_maps:
+            try:
+                used_cols.append(map_reference_header.index(cross_map))
+            except ValueError:
+                # Try to swap _B and _E and check again
+                match = re.match(r'(.+)(_B)(x\1)(_E)', cross_map)
+                if match:
+                    # Swap _B and _E if the parts before _B and _E are identical
+                    swapped_map =  match.group(1) + '_E' + match.group(3) + '_B'
+                else:
+                    raise ValueError("Cross map does not exist")
+                used_cols.append(map_reference_header.index(swapped_map))
+
+
         obs_data = np.loadtxt(observed_data_path)
 
         observed_spectra_dict = {}
@@ -344,7 +389,9 @@ class BK18_multicomp(Likelihood):
 
         for map_name in self.map_reference_header:
             if map_name in used_maps:
-                big_vector.append(spectra_dict[map_name])
+                spec = spectra_dict[map_name].copy()
+                #spec[7:9] = 0
+                big_vector.append(spec)
 
         # Concatenate all spectra arrays into a single 1D array
         concat_vec =   np.concatenate(big_vector, axis=0)
@@ -399,8 +446,8 @@ class BK18_multicomp(Likelihood):
         before_truncate = np.linalg.inv(reordered_mat)
         trunc_covmat = self.truncate_covariance_matrix(reordered_mat,
                                             offdiag=offdiag)
-        after_truncate = np.linalg.inv(trunc_covmat)
-        plot_covar_matrix(after_truncate/before_truncate, self.used_maps, title='ratio of before and after truncate')
+        #after_truncate = np.linalg.inv(trunc_covmat)
+        #pslot_covar_matrix(after_truncate/before_truncate, self.used_maps, title='ratio of before and after truncate')
         return trunc_covmat
 
     def reorder_cov_matrix(self, cov_matrix, n_bins, n_maps):
@@ -457,9 +504,16 @@ class BK18_multicomp(Likelihood):
     
     def calc_inverse_covmat(self, filtered_covmat, block_offdiag = 1):
         inverted_mat = np.linalg.inv(filtered_covmat)
+
+
         num_blocks = len(self.used_maps)
         block_size = int(inverted_mat.shape[0]/num_blocks)
         '''
+        for i in range(inverted_mat.shape[0]):
+            for j in range(inverted_mat.shape[1]):
+                if(i%block_size == 0 or j%block_size == 0):
+                    inverted_mat[i,j] = 0
+        
         i,j = np.indices((block_size, block_size))
         mask = np.abs(i-j) > 2
         # Iterate over the 4x4 grid of blocks
@@ -554,8 +608,8 @@ class BK18_multicomp(Likelihood):
         default values of 0 are used.
         """
         # set undefined signal to 0
-        if('gMpl' not in signal_params):
-            signal_params['gMpl'] = 0
+        #if('gMpl' not in signal_params):
+        #    signal_params['gMpl'] = 0
         for cross_map in self.used_maps:
             maps = cross_map.split('x')
             angle_name0 = 'alpha_' + maps[0]
@@ -568,9 +622,9 @@ class BK18_multicomp(Likelihood):
                 signal_params[angle_name1] = 0
         
             D_eb = self.rotate_spectrum(cross_map, binned_dl_theory_dict, signal_params)
-            
-        
-            ede_shift = self.apply_EDE_shift(cross_map, 
+            ede_shift = 0 
+            if('gMpl' in signal_params): 
+                ede_shift = self.apply_EDE_shift(cross_map, 
                             binned_dl_theory_dict, signal_params)
             binned_dl_observed_dict[cross_map] += D_eb + ede_shift
         return binned_dl_observed_dict
@@ -692,12 +746,13 @@ def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix'):
     import matplotlib.colors as mcolors
     #print(max(mat[(mat<0.99)| (mat > 1.01)] ))
     nonzeros = np.abs(mat[mat!=0])
-    vpercent =max(np.percentile(nonzeros, 90), 1e-25)
-    linthresh = np.percentile(nonzeros, 10)
+    vpercent =150#max(np.percentile(nonzeros, 90), 1e-25)
+    linthresh = 50#np.percentile(nonzeros, 10)
     cmap = plt.get_cmap('seismic')
     norm = mcolors.SymLogNorm(linthresh=linthresh, 
                                 vmin=-vpercent, 
                                 vmax=vpercent, base=10)
+    plt.figure()
     plt.imshow(mat, cmap=cmap, norm=norm)
     plt.title(title)
     if(used_maps is not None):
@@ -710,18 +765,29 @@ def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix'):
     plt.colorbar()
     plt.show()
 
-def plot_best_fit(used_maps, zero_offdiag, param_names, 
-                        param_bestfit, param_stats):
-    eb_like_cls = BK18_multicomp(used_maps=used_maps, zero_offdiag=zero_offdiag)
+def plot_best_fit(outpath, used_maps, zero_offdiag, param_names, 
+                        param_bestfit, param_stats, signal_params={}):
+    eb_like_cls = BK18_multicomp(used_maps=used_maps, 
+                                zero_offdiag=zero_offdiag,
+                                signal_params=signal_params)
     used_maps = eb_like_cls.used_maps
-    np.savetxt('150220_invcovar.txt', eb_like_cls.cov_inv, delimiter=',')
+    #np.savetxt('150220_invcovar.txt', eb_like_cls.cov_inv, delimiter=',')
     observed_datas = eb_like_cls.binned_dl_observed_dict
     theory_spectra = eb_like_cls.binned_dl_theory_dict
     param_values = {param_names[i]:param_bestfit[i] 
                             for i in range(len(param_names))}
-    eb_like_cls.theory(param_values, 
+    #param_values['alpha_BK18_220'] = 1.2
+    #param_values['alpha_BK18_150'] = -0.5
+    theory_vec=eb_like_cls.theory(param_values, 
                     theory_spectra, eb_like_cls.used_maps)
+    observed_vec = eb_like_cls.binned_dl_observed_vec
+    res = theory_vec - observed_vec
+    chisq_mat = np.multiply(eb_like_cls.cov_inv, np.outer(res, res))
+    chisq_tot = 'chisq:' + str(np.sum(chisq_mat))
+    plot_covar_matrix(chisq_mat, used_maps=used_maps, title=chisq_tot )
+
     rotated_dict = eb_like_cls.rotated_dict
+    #print(rotated_dict)
     keys = list(rotated_dict.keys())
     print(keys)
     # Get block chisqs
@@ -736,6 +802,7 @@ def plot_best_fit(used_maps, zero_offdiag, param_names,
             vector2 = observed_datas[cross_map2] - rotated_dict[cross_map2]
             chisq = vector1.T @ block @ vector2
             chisq_map[i,j] = chisq
+            
     plt.figure()
     print(chisq_map)
     print(np.sum(chisq_map))
@@ -744,8 +811,8 @@ def plot_best_fit(used_maps, zero_offdiag, param_names,
     plt.colorbar()
     plt.xticks(np.arange(len(used_maps)), used_maps, rotation = 45)
     plt.yticks(np.arange(len(used_maps)), used_maps)
+    plt.savefig(outpath + '_chisqmap.png')
     plt.show()
-
     # Initialize lists to store unique maps ending with _E and _B
     maps_B = set()
     maps_E = set()
@@ -778,8 +845,8 @@ def plot_best_fit(used_maps, zero_offdiag, param_names,
     for idx, key in enumerate(keys):
         observed_data = observed_datas[key]
         best_fit_data = rotated_dict[key]
-        print(key)
-        print(observed_data - best_fit_data) 
+        #print(key)
+        #print(observed_data - best_fit_data) 
         # Split key to find row and column indices
         parts = key.split('x')
         row_idx = (maps_E).index(parts[0]) if parts[0].endswith('_E') else (maps_E).index(parts[1])
@@ -790,6 +857,8 @@ def plot_best_fit(used_maps, zero_offdiag, param_names,
         var = np.diag(covar_mat)[map_index*num_bin:num_bin*(map_index+1)]
         # Plotting observed data
         axes_index = row_idx * num_columns + col_idx
+        #print(observed_data)
+        
         axes[axes_index].errorbar(
                             x = range(len(observed_data)),
                             y=(observed_data), 
@@ -810,7 +879,7 @@ def plot_best_fit(used_maps, zero_offdiag, param_names,
             verticalalignment='top'
         )
     plt.tight_layout(pad=2)
-    plt.show()
+    plt.savefig(outpath + '_bestfit.png')
     return 
 
 
@@ -855,7 +924,7 @@ def plot_triangle(root, replace_dict={}):
     # Save the plot
     plt.savefig(f"{root}_triangle_plot.png")
     print(f"Triangle plot saved as {root}_triangle_plot.png")
-    plt.show()
+    #plt.show()
     return param_names, means, mean_std_strings
 
 def plot_eigenvalues_eigenvectors(matrix):
@@ -891,6 +960,68 @@ def plot_eigenvalues_eigenvectors(matrix):
     plt.tight_layout()
     plt.show()
     return
+
+def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None):
+    modes_dict = {}
+    single_df = None
+    for i in range(1, sim_nums + 1):
+        file_path = chains_path.replace('XXX', f'{i:02d}')
+        print('loading:' + str(file_path))
+        # Read the first line to get the correct header
+        with open(file_path, 'r') as f:
+            first_line = f.readline().strip()  # Read the first line
+            # Remove the '#' and split to get the correct column names
+            corrected_header = first_line.replace('#', '').split()
+        
+        chain_df = pd.read_csv(file_path, delim_whitespace=True, comment='#')
+        chain_df.columns = corrected_header
+        if(single_sim == i):
+            single_df = chain_df
+        for column in chain_df.columns:
+            if column not in modes_dict:
+                modes_dict[column] = []
+            mode = np.mean(chain_df[column])
+            modes_dict[column].append(mode)
+    # Convert the modes dictionary to a DataFrame
+    modes_df = pd.DataFrame.from_dict(modes_dict)
+    default_cols = ['#', 'weight', 'minuslogpost', 'minuslogprior',
+                   'minuslogprior__0', 'chi2', 'chi2__my_likelihood']
+    param_names = [col for col in modes_df.columns if col not in default_cols]
+    print(param_names)
+    # Create a corner plot of the mean of modes
+    #print(modes_df)
+    #print(modes_df[param_names])
+    
+    
+    fig = corner.corner(modes_df[param_names], 
+                        labels=param_names, 
+                    show_titles=True, 
+                    title_kwargs={"fontsize": 12},
+                    hist_kwargs={'color':'red', 'density':True},
+                    contour_kwargs={'colors':'red'})
+    
+    colors = ['red', 'blue', 'green', 'orange']
+    for i in range(1,2):
+        if(single_path is None):
+            file_path = chains_path.replace('XXX', f'{i:02d}')    
+        else:
+            file_path = single_path
+        single_df = pd.read_csv(file_path, delim_whitespace=True, comment='#')
+        single_df.columns = corrected_header
+        corner.corner(single_df[param_names], labels=param_names,
+                    show_titles=False, 
+                    hist_kwargs={'color': colors[i], 'density':True},
+                    contour_kwargs={'colors': colors[i]}, 
+                    fig=fig)
+    
+    
+    # Show the plot
+    supertitle = 'Sim' + str(single_sim) + ' on top of ' + str(sim_nums) + ' sims'
+    plt.suptitle(supertitle)
+    plt.show()
+
+    return 
+
 # Function to create and run a Cobaya model with the custom likelihood
 def run_bk18_likelihood(params_dict, used_maps, outpath, 
                             include_ede = False, zero_offdiag = True,
@@ -953,12 +1084,18 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
                     ]
     do_crosses =True
     zero_offdiag = False#True
-    include_ede = False
+    include_ede = False#True
     if(sim_num != 'real'):
         formatted_simnum = str(sim_num).zfill(3)
-        BK18_SIM_NAME = BK18_SIM_NAME.replace("XXX", formatted_simnum)
-        FILE_PATHS['observed_data'] = BK18_SIM_PATH + BK18_SIM_NAME
-    signal_params = {}
+        simname = BK18_SIM_NAME.replace("XXX", formatted_simnum)
+        FILE_PATHS['observed_data'] = BK18_SIM_PATH + simname
+    signal_params = {#}
+    #                'gMpl':0.0,
+    #                'alpha_BK18_150':-0.5,
+    #                'alpha_BK18_220': 1,
+    #                'alpha_BK18_K95': -0.1,
+    #                'alpha_BK18_B95e':-0.4
+                    }
     
     all_cross_spectra = generate_cross_spectra(calc_spectra, do_crosses=do_crosses)
     #all_cross_spectra = ['BK18_K95_BxBK18_220_E', 
@@ -978,6 +1115,10 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
                 for spectrum in calc_spectra    
     }
     #params_dict['alpha_BK18_150'] = {"value":-0.5}
+    #params_dict['alpha_BK18_220'] = {"value":1.2}
+    #params_dict['alpha_BK18_K95'] = {"value":-0.1}
+    #params_dict['alpha_BK18_B95e'] = {"value":-0.5}
+    
     if(include_ede):
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
     
@@ -987,19 +1128,20 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
                                                 all_cross_spectra, 
                                                 outpath=outpath,
                                                 include_ede = include_ede,
-                                                zero_offdiag = zero_offdiag)
+                                                zero_offdiag = zero_offdiag,
+                                                signal_params=signal_params)
 
     # Print results
     #print("Updated Info:", updated_info)
     #print("Sampler:", sampler)
     replace_dict ={}# {"alpha_BK18_220":0.6}
     param_names, means, mean_std_strs = plot_triangle(outpath, replace_dict)
-    #param_names.append('alpha_BK18_150')
-    #mean_std_strs.append('alpha_BK18_150: -0.5 +- 0')
-    #means.append(-0.5)
-    plot_best_fit(all_cross_spectra, zero_offdiag,  
-                        param_names, means, mean_std_strs)
+    plot_best_fit(outpath, all_cross_spectra, zero_offdiag,  
+                        param_names, means, mean_std_strs, 
+                        signal_params=signal_params)
     return 
+
+
 
 def load_dominic_invcovmat(covmat_path, truncate=False):
     keys = [
@@ -1046,7 +1188,7 @@ def load_dominic_invcovmat(covmat_path, truncate=False):
     filter_cols = [keys.index(cross_map) for cross_map in used_maps]
     all_bins = [index + i * n_maps for i in range(n_bins) for index in filter_cols]
     filtered_mat = invcovmat[np.ix_(all_bins, all_bins)]
-    plot_covar_matrix(filtered_mat, used_maps)
+   # plot_covar_matrix(filtered_mat, used_maps)
     n_maps = len(used_maps)
 
     old_indices = np.arange(n_bins * n_maps)
@@ -1057,15 +1199,15 @@ def load_dominic_invcovmat(covmat_path, truncate=False):
             new_pos = map_idx * n_bins + bin_idx
             new_indices[new_pos] = old_indices[old_pos]
     # Reorder rows and columns of the covariance matrix
-    print(new_indices)
+    #print(new_indices)
     reordered_matrix = filtered_mat[np.ix_(new_indices, new_indices)]
-    plot_covar_matrix(reordered_matrix, used_maps)
+    #plot_covar_matrix(reordered_matrix, used_maps)
     truncated_matrix = np.zeros((n_maps*n_bins, n_maps*n_bins))
     for i in range(n_bins):
         block_start = i*n_maps
         block_end = (i+1)*n_maps
         truncated_matrix[block_start:block_end, block_start:block_end] = reordered_matrix[block_start:block_end, block_start:block_end]
-    plot_covar_matrix(truncated_matrix, used_maps)
+    #plot_covar_matrix(truncated_matrix, used_maps)
     
     if(truncate):
         return truncated_matrix
@@ -1079,7 +1221,7 @@ def main():
                         help='directory to save the mcmc chains and plots')
     parser.add_argument('-o', '--overwrite', action='store_true',
                         help='whether to overwrite current chains')
-    parser.add_argument('-n', '--simnum', default=-1, type=int,
+    parser.add_argument('-n', '--sim_num', default=-1, type=int,
                         help='Simulation num to extract params from, defaults to real data')
     args = parser.parse_args()
 
@@ -1112,4 +1254,8 @@ def main():
     
 if __name__ == '__main__':
     #load_dominic_invcovmat('/n/home01/dbeck/keckpipe/Cinv_K95K150K220.dat')
+    #plot_sim_peaks('chains/simXXX/mpl00c.1.txt', 1, 10)
+    #                single_path='chains/fullcov_real/mpl00b.1.txt')
     main()
+
+
