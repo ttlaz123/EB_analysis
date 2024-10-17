@@ -45,7 +45,7 @@ FILE_PATHS = {
         "P353e": CAMB_BASE_PATH + 'dust_270_3p75.fits',
         "P217e": CAMB_BASE_PATH + 'dust_220_3p75.fits',
     },
-    "bpwf": BK18_BASE_PATH + 'windows/BK18lfnorot_bpwf_bin*.txt',
+    "bpwf": BK18_BASE_PATH + 'windows/BK18lfnorot_bpwf_bin*.ttxt',
     "covariance_matrix": BK18_BASE_PATH + 'BK18lfnorot_covmat_dust.dat',
     "observed_data": BK18_BASE_PATH + 'BK18lfnorot_cl_hat.dat',
     "EDE_spectrum": '/n/home08/liuto/GitHub/EB_analysis/input_data/fEDE0.07_cl.dat',
@@ -1147,6 +1147,7 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
 
 def load_dominic_invcovmat(covmat_path, truncate=False):
     keys = [
+    '''
     'BK18_K95_BxBK18_K95_B',
     'BK18_K95_ExBK18_K95_E',
     'BK18_150_BxBK18_150_B',
@@ -1169,7 +1170,47 @@ def load_dominic_invcovmat(covmat_path, truncate=False):
     'BK18_K95_ExBK18_220_E',
     'BK18_K95_BxBK18_220_E'
     ]
+    [
+    '''
+    'BK18_K95_ExBK18_K95_E',
+    'BK18_K95_BxBK18_K95_B',
+    'BK18_150_ExBK18_150_E',
+    'BK18_150_BxBK18_150_B',
+    'BK18_220_ExBK18_220_E',
+    'BK18_220_BxBK18_220_B',
+    'BK18_B95e_ExBK18_B95e_E',
+    'BK18_B95e_BxBK18_B95e_B',
+    'BK18_K95_ExBK18_K95_B',
+    'BK18_K95_BxBK18_150_E',
+    'BK18_150_ExBK18_150_B',
+    'BK18_150_BxBK18_220_E',
+    'BK18_220_ExBK18_220_B',
+    'BK18_220_BxBK18_B95e_E',
+    'BK18_B95e_ExBK18_B95e_B',
+    'BK18_K95_ExBK18_150_E',
+    'BK18_K95_BxBK18_150_B',
+    'BK18_150_ExBK18_220_E',
+    'BK18_150_BxBK18_220_B',
+    'BK18_220_ExBK18_B95e_E',
+    'BK18_220_BxBK18_B95e_B',
+    'BK18_K95_ExBK18_150_B',
+    'BK18_K95_BxBK18_220_E',
+    'BK18_150_ExBK18_220_B',
+    'BK18_150_BxBK18_B95e_E',
+    'BK18_220_ExBK18_B95e_B',
+    'BK18_K95_ExBK18_220_E',
+    'BK18_K95_BxBK18_220_B',
+    'BK18_150_ExBK18_B95e_E',
+    'BK18_150_BxBK18_B95e_B',
+    'BK18_K95_ExBK18_220_B',
+    'BK18_K95_BxBK18_B95e_E',
+    'BK18_150_ExBK18_B95e_B',
+    'BK18_K95_ExBK18_B95e_E',
+    'BK18_K95_BxBK18_B95e_B',
+    'BK18_K95_ExBK18_B95e_B'
+]
     used_maps = [
+    '''
     'BK18_K95_BxBK18_K95_E',
     'BK18_K95_ExBK18_150_B',
 
@@ -1184,6 +1225,26 @@ def load_dominic_invcovmat(covmat_path, truncate=False):
     'BK18_K95_BxBK18_220_E'
     ]
 
+    
+    [
+    '''
+    "BK18_K95_ExBK18_K95_B",
+    "BK18_K95_BxBK18_150_E",
+    "BK18_150_ExBK18_150_B",
+    "BK18_150_BxBK18_220_E",
+    "BK18_220_ExBK18_220_B",
+    "BK18_220_BxBK18_B95e_E",
+    "BK18_B95e_ExBK18_B95e_B",
+    "BK18_K95_ExBK18_150_B",
+    "BK18_K95_BxBK18_220_E",
+    "BK18_150_ExBK18_220_B",
+    "BK18_150_BxBK18_B95e_E",
+    "BK18_220_ExBK18_B95e_B",
+    "BK18_K95_ExBK18_220_B",
+    "BK18_K95_BxBK18_B95e_E",
+    "BK18_150_ExBK18_B95e_B",
+    "BK18_K95_ExBK18_B95e_B"
+]
     #invcovmat = np.loadtxt(covmat_path)
     data = scipy.io.loadmat(covmat_path)
     invcovmat = data['bpcm']
