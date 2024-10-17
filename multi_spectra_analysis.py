@@ -1,6 +1,6 @@
 print("Loading Modules")
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import os
 import numpy as np
@@ -12,6 +12,7 @@ import re
 import pandas as pd
 from astropy.io import fits
 from scipy.stats import gaussian_kde
+import scipy.io
 print("Loading Cobaya Modules")
 from cobaya.model import get_model
 from cobaya.run import run
@@ -746,8 +747,8 @@ def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix'):
     import matplotlib.colors as mcolors
     #print(max(mat[(mat<0.99)| (mat > 1.01)] ))
     nonzeros = np.abs(mat[mat!=0])
-    vpercent =150#max(np.percentile(nonzeros, 90), 1e-25)
-    linthresh = 50#np.percentile(nonzeros, 10)
+    vpercent =max(np.percentile(nonzeros, 90), 1e-25)
+    linthresh = np.percentile(nonzeros, 10)
     cmap = plt.get_cmap('seismic')
     norm = mcolors.SymLogNorm(linthresh=linthresh, 
                                 vmin=-vpercent, 
@@ -764,7 +765,7 @@ def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix'):
         plt.yticks(tick_positions, used_maps)
     plt.colorbar()
     plt.savefig(title + '.png')
-    #plt.show()
+    plt.show()
 
 def plot_best_fit(outpath, used_maps, zero_offdiag, param_names, 
                         param_bestfit, param_stats, signal_params={}):
@@ -1182,14 +1183,17 @@ def load_dominic_invcovmat(covmat_path, truncate=False):
     'BK18_150_BxBK18_220_E',
     'BK18_K95_BxBK18_220_E'
     ]
-    invcovmat = np.loadtxt(covmat_path)
+
+    #invcovmat = np.loadtxt(covmat_path)
+    data = scipy.io.loadmat(covmat_path)
+    invcovmat = data['bpcm']
     n_maps = len(keys)
     n_bins = int(invcovmat.shape[0]/n_maps)
     print('Num bins: ' + str(n_bins))
     filter_cols = [keys.index(cross_map) for cross_map in used_maps]
     all_bins = [index + i * n_maps for i in range(n_bins) for index in filter_cols]
     filtered_mat = invcovmat[np.ix_(all_bins, all_bins)]
-   # plot_covar_matrix(filtered_mat, used_maps)
+    plot_covar_matrix(filtered_mat, used_maps)
     n_maps = len(used_maps)
 
     old_indices = np.arange(n_bins * n_maps)
@@ -1202,7 +1206,7 @@ def load_dominic_invcovmat(covmat_path, truncate=False):
     # Reorder rows and columns of the covariance matrix
     #print(new_indices)
     reordered_matrix = filtered_mat[np.ix_(new_indices, new_indices)]
-    #plot_covar_matrix(reordered_matrix, used_maps)
+    plot_covar_matrix(reordered_matrix, used_maps)
     truncated_matrix = np.zeros((n_maps*n_bins, n_maps*n_bins))
     for i in range(n_bins):
         block_start = i*n_maps
@@ -1254,9 +1258,11 @@ def main():
     multicomp_mcmc_driver(args.output_path, args.overwrite, args.sim_num)
     
 if __name__ == '__main__':
+    matlab_covmat = '/n/home08/liuto/GitHub/EB_analysis/bk18covmat.mat'
     #load_dominic_invcovmat('/n/home01/dbeck/keckpipe/Cinv_K95K150K220.dat')
+    load_dominic_invcovmat(matlab_covmat)
     #plot_sim_peaks('chains/simXXX/mpl00c.1.txt', 1, 10)
     #                single_path='chains/fullcov_real/mpl00b.1.txt')
-    main()
+    #main()
 
 
