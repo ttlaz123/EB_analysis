@@ -1,7 +1,4 @@
 print("Loading Modules")
-import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
 import os
 import numpy as np
 import random
@@ -9,25 +6,32 @@ import argparse
 import glob
 import shutil
 import re
+
 import pandas as pd
 from astropy.io import fits
 from scipy.stats import gaussian_kde
 import scipy.io
+
 print("Loading Cobaya Modules")
 from cobaya.model import get_model
 from cobaya.run import run
 from cobaya.likelihood import Likelihood
-print("Loading getdist Modules")
+
+print("Loading Plotting  Modules")
 from getdist import plots, MCSamples
 from getdist.mcsamples import loadMCSamples
 import corner
+import matplotlib
+matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 
 # Global dictionary for file paths
 
 
 # Define the base directories for the file paths
 CAMB_BASE_PATH = '/n/holylfs04/LABS/kovac_lab/general/input_maps/official_cl/'
-BK18_BASE_PATH = '/n/home08/liuto/cosmo_package/data/bicep_keck_2018/BK18_cosmomc/data/BK18lf_dust_incEE_norot/'
+BK18_BASE_PATH = '/n/home08/liuto/cosmo_package/data/bicep_keck_2018/BK18_cosmomc/data/BK18lf_dust_incEE_norot_allbins/'
 DOMINIC_BASE_PATH = '/n/home01/dbeck/cobaya/data/bicep_keck_2018/BK18_cosmomc/data/'
 BK18_SIM_PATH = '/n/home01/dbeck/cobaya/data/bicep_keck_2018/BK18_cosmomc/data/BK18lf_dust_incEE/'
 BK18_SIM_NAME = 'BK18lf_cl_hat_simXXX.dat'
@@ -45,11 +49,14 @@ FILE_PATHS = {
         "P353e": CAMB_BASE_PATH + 'dust_270_3p75.fits',
         "P217e": CAMB_BASE_PATH + 'dust_220_3p75.fits',
     },
-    "bpwf": BK18_BASE_PATH + 'windows/BK18lfnorot_bpwf_bin*.ttxt',
+    "bpwf": BK18_BASE_PATH + 'windows/BK18lfnorot_bpwf_bin*.txt',
     "covariance_matrix": BK18_BASE_PATH + 'BK18lfnorot_covmat_dust.dat',
     "observed_data": BK18_BASE_PATH + 'BK18lfnorot_cl_hat.dat',
     "EDE_spectrum": '/n/home08/liuto/GitHub/EB_analysis/input_data/fEDE0.07_cl.dat',
     "Dominic_invcovmat": '/n/home01/dbeck/keckpipe/Cinv_K95K150K220.dat',
+    "matlab_covmat": '/n/home08/liuto/GitHub/EB_analysis/bk18covmat.mat',
+    "matlab_invcovmat": '/n/home08/liuto/GitHub/EB_analysis/bk18_invcovmat.mat',
+
     "signal_only_covmat": DOMINIC_BASE_PATH + 'BK18lf_dust_incEE_norot/BK18lfnorot_covmat_sigtrimmed_dust.dat',
     'noise_only_covmat': DOMINIC_BASE_PATH + 'BK18lf_dust_incEE_norot/BK18lfnorot_covmat_noi_dust.dat',
 }
@@ -90,7 +97,6 @@ class BK18_multicomp(Likelihood):
             self.dl_theory = self.include_ede_spectra(FILE_PATHS['EDE_spectrum'],
                                                         self.dl_theory)
         self.binned_dl_theory_dict = self.apply_bpwf(self.dl_theory, self.bpwf, self.used_maps)
-        
         # Real Data
         self.binned_dl_observed_dict = self.load_observed_spectra(FILE_PATHS['observed_data'], 
                                     self.used_maps)
@@ -106,29 +112,11 @@ class BK18_multicomp(Likelihood):
          
         # Covar matrix
         covmat_name = 'covariance_matrix'
-        #covmat_name = 'signal_only_covmat'
-        #covmat_name = 'noise_only_covmat'
         self.full_covmat = self.load_covariance_matrix(FILE_PATHS[covmat_name])
-        #plot_covar_matrix(self.full_covmat, used_maps=None, title='full matrix')
         self.filtered_covmat = self.filter_matrix(self.full_covmat, self.used_maps)
-        #plot_covar_matrix(self.filtered_covmat, self.used_maps, title='filtered')
         self.cov_inv = self.calc_inverse_covmat(self.filtered_covmat)
-        #self.cov_inv= self.truncate_covariance_matrix(self.cov_inv, offdiag=0,block_size = int(self.cov_inv.shape[0]/len(self.used_maps)))
-        #print(self.cov_inv[0,:])
-        #self.cov_inv = load_dominic_invcovmat(FILE_PATHS['Dominic_invcovmat'], truncate=self.zero_offdiag)
-        plot_covar_matrix(self.cov_inv, self.used_maps, title='inverse mat') 
-        #plot_eigenvalues_eigenvectors(self.cov_inv)
-        #plot_eigenvalues_eigenvectors(np.linalg.inv(self.cov_inv))
-        #plot_eigenvalues_eigenvectors(self.filtered_covmat)
-        #print(self.cov_inv2[0,:])
-        #plt.imshow(np.log(np.abs(self.cov_inv2-self.cov_inv)))
-        #plt.colorbar()
-        #plt.title('tom - dom')
-        #plt.show()
-        #plt.imshow(np.log(np.abs(self.cov_inv2/self.cov_inv)))
-        #plt.colorbar()
-        #plt.title('tom/dom')
-        #plt.show()
+
+
     def check_file_header(self, file_path, reference_header):
         with open(file_path, 'r') as f:
             for line in f:
@@ -312,12 +300,14 @@ class BK18_multicomp(Likelihood):
                 EE_dust = hdul_dust[1].data['E-mode C_l']
                 BB_dust = hdul_dust[1].data['B-mode C_l']
             ee_spectrum = EE_lens + EE_dust
+            
             bb_spectrum =  BB_lens + BB_dust
             ee_spectrum *= np.square(k_to_uk)
             bb_spectrum *= np.square(k_to_uk)
             cl_to_dl = np.array([l*(l+1) for l in range(len(ee_spectrum))])/2/np.pi
             theory_dict[map_freq + '_Ex' + map_freq + '_E'] = ee_spectrum*cl_to_dl            
             theory_dict[map_freq + '_Bx' + map_freq + '_B'] = bb_spectrum*cl_to_dl
+        #plt.plot(theory_dict[map_freq + '_Ex' + map_freq + '_E'])
         return theory_dict
     
     def include_ede_spectra(self, ede_path, theory_dict):
@@ -325,12 +315,12 @@ class BK18_multicomp(Likelihood):
         data = pd.read_csv(ede_path, delim_whitespace=True, comment='#', header=None)
         data.columns = ['l', 'TT', 'EE', 'TE', 'BB', 'EB', 'TB', 'phiphi', 'TPhi', 'Ephi']
         # Extract 'l' and 'EB' columns
-        EB_values = data['EB']
+        EB_values = data['EB'].to_numpy()
         EB_ede_dls = -EB_values * np.square(k_to_uk) * 2 * np.pi
         theory_dict['EDE_EB'] = EB_ede_dls
         return theory_dict
 
-    def apply_bpwf(self, theory_dict, bpwf_mat, used_maps):
+    def apply_bpwf(self, theory_dict, bpwf_mat, used_maps, do_cross=False):
         """
         Apply the bandpower window function (BPWF) to a given theory power spectrum.
 
@@ -360,7 +350,10 @@ class BK18_multicomp(Likelihood):
         for cross_map in used_maps:
             maps = cross_map.split('x')
             for freq_map in maps:
-                map0 = freq_map + 'x' + freq_map
+                if(do_cross):
+                    map0 = cross_map
+                else:
+                    map0= freq_map + 'x' + freq_map
                 if(map0 not in theory_dict):
                     print("Key " + map0 +" not in dict")
                     print(theory_dict.keys())
@@ -444,12 +437,10 @@ class BK18_multicomp(Likelihood):
             offdiag = 1
         else:
             offdiag= reordered_mat.shape[0]
-        before_truncate = np.linalg.inv(reordered_mat)
-        trunc_covmat = self.truncate_covariance_matrix(reordered_mat,
-                                            offdiag=offdiag)
-        #after_truncate = np.linalg.inv(trunc_covmat)
-        #pslot_covar_matrix(after_truncate/before_truncate, self.used_maps, title='ratio of before and after truncate')
-        return trunc_covmat
+        #before_truncate = np.linalg.inv(reordered_mat)
+        #trunc_covmat = self.truncate_covariance_matrix(reordered_mat,
+        #                                    offdiag=offdiag)
+        return reordered_mat
 
     def reorder_cov_matrix(self, cov_matrix, n_bins, n_maps):
         """
@@ -478,6 +469,7 @@ class BK18_multicomp(Likelihood):
 
     def truncate_covariance_matrix(self, cov_matrix, offdiag=1, block_size=1):
         """
+        ##DEPRECATED
         Truncate the covariance matrix by keeping only the diagonal and specified number of off-diagonals.
 
         Parameters:
@@ -500,44 +492,11 @@ class BK18_multicomp(Likelihood):
         
         # Apply the mask to the covariance matrix
         truncated_cov_matrix = cov_matrix * mask
-    
-        return truncated_cov_matrix
+        ### DEPRECATED 
+        ####return truncated_cov_matrix
     
     def calc_inverse_covmat(self, filtered_covmat, block_offdiag = 1):
         inverted_mat = np.linalg.inv(filtered_covmat)
-
-
-        num_blocks = len(self.used_maps)
-        block_size = int(inverted_mat.shape[0]/num_blocks)
-        '''
-        for i in range(inverted_mat.shape[0]):
-            for j in range(inverted_mat.shape[1]):
-                if(i%block_size == 0 or j%block_size == 0):
-                    inverted_mat[i,j] = 0
-        
-        i,j = np.indices((block_size, block_size))
-        mask = np.abs(i-j) > 2
-        # Iterate over the 4x4 grid of blocks
-        for block_row in range(num_blocks):
-            for block_col in range(num_blocks):
-                # Extract the 9x9 block
-                row_start = block_row * block_size
-                row_end = row_start + block_size
-                col_start = block_col * block_size
-                col_end = col_start + block_size
-
-                # Apply the mask to zero out elements beyond the 2-off diagonals
-                inverted_mat[row_start:row_end, col_start:col_end][mask] = 0
-        
-        zero_blocks = []
-        for i, cross_map in enumerate(self.used_maps):
-            maps = cross_map.split('x')
-            bmap = maps[0] if '_B' in maps[0] else maps[1]
-            for j, cross_map in enumerate(self.used_maps):
-                if(bmap in cross_map and i != j):
-                    inverted_mat[i*block_size:(i+1)*block_size,
-                                j*block_size:(j+1)*block_size] = 0 
-        '''
         return inverted_mat
     
     def get_requirements(self):
@@ -561,7 +520,7 @@ class BK18_multicomp(Likelihood):
        
         # Get the theoretical predictions based on the parameter values
         theory_prediction = self.theory(params_values, 
-                                        self.binned_dl_theory_dict, self.used_maps)
+                                        self.dl_theory, self.used_maps)
          
         # Calculate the residuals
         residuals = self.binned_dl_observed_vec - theory_prediction
@@ -643,10 +602,15 @@ class BK18_multicomp(Likelihood):
         
         e1 = maps[0] if maps[0].endswith('_E') else None 
         e2 = maps[1] if maps[1].endswith('_E') else None
+        b1 = maps[0] if maps[0].endswith('_B') else None 
+        b2 = maps[1] if maps[1].endswith('_B') else None
+
         if(e1):
             e1e2_name = e1 + 'x' + e1
+            b1b2_name = b2 + 'x' + b2
         elif(e2):
             e1e2_name = e2 + 'x' + e2
+            b1b2_name = b1 + 'x' + b1
         else:
             raise ValueError("There is no EE spectrum: " + str(cross_map))
         # TODO include the extra terms to improve approximation 
@@ -657,7 +621,9 @@ class BK18_multicomp(Likelihood):
                   np.sin(2*np.deg2rad(angle2)))
             D_b1e2 = 0
             D_e1b2 = 0
-            D_b1b2 = 0
+            D_b1b2 = (binned_dl_theory_dict[b1b2_name] *
+                    np.sin(2*np.deg2rad(angle1)) *
+                    np.cos(2*np.deg2rad(angle2)))
             D_eb = D_e1e2 - D_b1b2 + D_e1b2 - D_b1e2  
         # spectrum is BE
         if(e2):
@@ -666,7 +632,10 @@ class BK18_multicomp(Likelihood):
                   np.sin(2*np.deg2rad(angle1)))
             D_b1e2 = 0
             D_e1b2 = 0
-            D_b1b2 = 0
+            D_b1b2 = (binned_dl_theory_dict[b1b2_name] *
+                    np.sin(2*np.deg2rad(angle2)) *
+                    np.cos(2*np.deg2rad(angle1)))
+
             D_eb = D_e1e2 - D_b1b2 + D_e1b2 - D_b1e2  
     
         return D_eb
@@ -692,7 +661,7 @@ class BK18_multicomp(Likelihood):
 
 
 
-    def apply_EDE_shift(self, cross_map, binned_dl_theory_dict, params_values):
+    def apply_EDE_shift(self, cross_map, dl_theory_dict, params_values):
         maps = cross_map.split('x')
         map1 = re.sub(r'_{BE}$', '', maps[0])
         map2 = re.sub(r'_{BE}$', '', maps[1])
@@ -704,11 +673,16 @@ class BK18_multicomp(Likelihood):
         angle1 = params_values[angle1_name]
         angle2 = params_values[angle2_name]
 
-        cross_map1, cross_map2 = self.assemble_eb_crossmaps(cross_map,
-                                            binned_dl_theory_dict)
-
-        ede_spec1 = binned_dl_theory_dict[cross_map1]
-        ede_spec2 = binned_dl_theory_dict[cross_map2]
+        #cross_map1, cross_map2 = self.assemble_eb_crossmaps(cross_map,
+        #                                   dl_theory_dict)
+        cross_map1 = 'EDE_EB'
+        cross_map2 = 'EDE_EB'
+        #try:
+        ede_spec1 = dl_theory_dict[cross_map1]
+        ede_spec2 = dl_theory_dict[cross_map2]
+        #except KeyError as e:
+        #    msg = f"Key '{e.args[0]}' not found. Additional info: {cross_map} not in dict. Available keys: {list(dl_theory_dict.keys())}"
+        #    raise KeyError(msg) from e
         gMpl = params_values['gMpl']
         D_e1b2 = (ede_spec1 * np.cos(2*np.deg2rad(angle1)) * 
                                     np.cos(2*np.deg2rad(angle2)))
@@ -716,39 +690,40 @@ class BK18_multicomp(Likelihood):
                                     np.sin(2*np.deg2rad(angle2)))
 
         ede_shift = (D_e1b2 - D_b1e2)
-        
         return ede_shift * gMpl
-    def theory(self, params_values, binned_dl_theory_dict, used_maps):
+
+    def theory(self, params_values, dl_theory_dict, used_maps):
         # Compute the model prediction based on the parameter values
         # currently assumes it is only calculating EB
         # all theory based on 
         # https://bicep.rc.fas.harvard.edu/dbeck/20230202_cmbbirefringence/
         self.rotated_dict = {}
-
-        
         for cross_map in used_maps:
             self.rotated_dict[cross_map] = self.rotate_spectrum(cross_map,
-                                            binned_dl_theory_dict, params_values)
+                                            dl_theory_dict, params_values)
             if(self.include_EDE):
                 ede_shift = self.apply_EDE_shift(cross_map,
-                                                binned_dl_theory_dict, params_values)
-                self.rotated_dict[cross_map] += ede_shift
-                '''
-                plt.figure()
-                plt.plot(ede_shift)
-                plt.plot(self.rotated_dict[cross_map])
-                plt.title(params_values)
-                plt.show()
-                '''
+                                                dl_theory_dict, params_values)
+                if self.rotated_dict[cross_map].shape != ede_shift.shape:
+                    min_size = min(self.rotated_dict[cross_map].size, 
+                                        ede_shift.size)
+                    # Truncate both arrays to the minimum size
+                    self.rotated_dict[cross_map] = self.rotated_dict[cross_map][:min_size]
+                    ede_shift = ede_shift[:min_size]
+                    self.rotated_dict[cross_map] += ede_shift
+
+        self.rotated_dict = self.apply_bpwf(self.rotated_dict, self.bpwf, self.used_maps,do_cross=True)
         theory_vec = self.dict_to_vec(self.rotated_dict, used_maps)
         return theory_vec
 
 def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix'):
-    import matplotlib.colors as mcolors
+    
     #print(max(mat[(mat<0.99)| (mat > 1.01)] ))
-    nonzeros = np.abs(mat[mat!=0])
-    vpercent =max(np.percentile(nonzeros, 90), 1e-25)
-    linthresh = np.percentile(nonzeros, 10)
+    nonzeros = np.abs(mat[(mat!=0) &( ~np.isnan(mat))])
+    vpercent =max(np.percentile(nonzeros, 99), 1e-25)
+    linthresh = np.percentile(nonzeros, 1)
+    #print(nonzeros)
+    #print(vpercent)
     cmap = plt.get_cmap('seismic')
     norm = mcolors.SymLogNorm(linthresh=linthresh, 
                                 vmin=-vpercent, 
@@ -767,15 +742,14 @@ def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix'):
     plt.savefig(title + '.png')
     plt.show()
 
-def plot_best_fit(outpath, used_maps, zero_offdiag, param_names, 
+def plot_best_fit(outpath, used_maps, param_names, 
                         param_bestfit, param_stats, signal_params={}):
     eb_like_cls = BK18_multicomp(used_maps=used_maps, 
-                                zero_offdiag=zero_offdiag,
                                 signal_params=signal_params)
     used_maps = eb_like_cls.used_maps
     #np.savetxt('150220_invcovar.txt', eb_like_cls.cov_inv, delimiter=',')
     observed_datas = eb_like_cls.binned_dl_observed_dict
-    theory_spectra = eb_like_cls.binned_dl_theory_dict
+    theory_spectra = eb_like_cls.dl_theory
     param_values = {param_names[i]:param_bestfit[i] 
                             for i in range(len(param_names))}
     #param_values['alpha_BK18_220'] = 1.2
@@ -786,12 +760,12 @@ def plot_best_fit(outpath, used_maps, zero_offdiag, param_names,
     res = theory_vec - observed_vec
     chisq_mat = np.multiply(eb_like_cls.cov_inv, np.outer(res, res))
     chisq_tot = 'chisq:' + str(np.sum(chisq_mat))
-    plot_covar_matrix(chisq_mat, used_maps=used_maps, title=chisq_tot )
+    #plot_covar_matrix(chisq_mat, used_maps=used_maps, title=chisq_tot )
 
     rotated_dict = eb_like_cls.rotated_dict
     #print(rotated_dict)
     keys = list(rotated_dict.keys())
-    print(keys)
+    #print(keys)
     # Get block chisqs
     num_bins = len(rotated_dict[used_maps[0]])
     chisq_map = np.zeros((len(used_maps), len(used_maps)))
@@ -806,8 +780,7 @@ def plot_best_fit(outpath, used_maps, zero_offdiag, param_names,
             chisq_map[i,j] = chisq
             
     plt.figure()
-    print(chisq_map)
-    print(np.sum(chisq_map))
+    print('Chisq:' + str(np.sum(chisq_map)))
     vrange = np.std(chisq_map)
     plt.imshow(chisq_map, cmap='bwr', vmin=-vrange, vmax=vrange)
     plt.colorbar()
@@ -1026,7 +999,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None):
 
 # Function to create and run a Cobaya model with the custom likelihood
 def run_bk18_likelihood(params_dict, used_maps, outpath, 
-                            include_ede = False, zero_offdiag = True,
+                            include_ede = False, zero_offdiag = False,
                             rstop = 0.02, max_tries=10000, signal_params = {}):
 
     # Set up the custom likelihood with provided params
@@ -1085,8 +1058,7 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
                     #'P217e'
                     ]
     do_crosses =True
-    zero_offdiag = True
-    include_ede = False#True
+    include_ede = True
     if(sim_num != 'real'):
         formatted_simnum = str(sim_num).zfill(3)
         simname = BK18_SIM_NAME.replace("XXX", formatted_simnum)
@@ -1100,12 +1072,6 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
                     }
     
     all_cross_spectra = generate_cross_spectra(calc_spectra, do_crosses=do_crosses)
-    #all_cross_spectra = ['BK18_150_BxBK18_150_E', 
-    #                    'BK18_150_BxBK18_220_E', 
-    #                    'BK18_150_BxBK18_B95e_E', 
-    #                    'BK18_K95_ExBK18_150_B',
-    # 
-    #                    ] 
     angle_priors = {"prior": {"min": -3, "max": 3}, "ref": 0}
     params_dict = {
         'alpha_' + spectrum: {
@@ -1116,10 +1082,6 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
                 }
                 for spectrum in calc_spectra    
     }
-    #params_dict['alpha_BK18_150'] = {"value":-0.5}
-    #params_dict['alpha_BK18_220'] = {"value":1.2}
-    #params_dict['alpha_BK18_K95'] = {"value":-0.1}
-    #params_dict['alpha_BK18_B95e'] = {"value":-0.5}
     
     if(include_ede):
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
@@ -1130,155 +1092,16 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
                                                 all_cross_spectra, 
                                                 outpath=outpath,
                                                 include_ede = include_ede,
-                                                zero_offdiag = zero_offdiag,
                                                 signal_params=signal_params)
 
-    # Print results
-    #print("Updated Info:", updated_info)
-    #print("Sampler:", sampler)
     replace_dict ={}# {"alpha_BK18_220":0.6}
     param_names, means, mean_std_strs = plot_triangle(outpath, replace_dict)
-    plot_best_fit(outpath, all_cross_spectra, zero_offdiag,  
+    plot_best_fit(outpath, all_cross_spectra,  
                         param_names, means, mean_std_strs, 
                         signal_params=signal_params)
     return 
 
 
-
-def load_dominic_invcovmat(covmat_path, truncate=False):
-    keys = [
-    '''
-    'BK18_K95_BxBK18_K95_B',
-    'BK18_K95_ExBK18_K95_E',
-    'BK18_150_BxBK18_150_B',
-    'BK18_150_ExBK18_150_E',
-    'BK18_220_BxBK18_220_B',
-    'BK18_220_ExBK18_220_E',
-    'BK18_K95_BxBK18_K95_E',
-    'BK18_K95_ExBK18_150_B',
-    'BK18_150_BxBK18_150_E',
-    'BK18_150_ExBK18_220_B',
-    'BK18_220_BxBK18_220_E',
-    'BK18_K95_BxBK18_150_B',
-    'BK18_K95_ExBK18_150_E',
-    'BK18_150_BxBK18_220_B',
-    'BK18_150_ExBK18_220_E',
-    'BK18_K95_BxBK18_150_E',
-    'BK18_K95_ExBK18_220_B',
-    'BK18_150_BxBK18_220_E',
-    'BK18_K95_BxBK18_220_B',
-    'BK18_K95_ExBK18_220_E',
-    'BK18_K95_BxBK18_220_E'
-    ]
-    [
-    '''
-    'BK18_K95_ExBK18_K95_E',
-    'BK18_K95_BxBK18_K95_B',
-    'BK18_150_ExBK18_150_E',
-    'BK18_150_BxBK18_150_B',
-    'BK18_220_ExBK18_220_E',
-    'BK18_220_BxBK18_220_B',
-    'BK18_B95e_ExBK18_B95e_E',
-    'BK18_B95e_BxBK18_B95e_B',
-    'BK18_K95_ExBK18_K95_B',
-    'BK18_K95_BxBK18_150_E',
-    'BK18_150_ExBK18_150_B',
-    'BK18_150_BxBK18_220_E',
-    'BK18_220_ExBK18_220_B',
-    'BK18_220_BxBK18_B95e_E',
-    'BK18_B95e_ExBK18_B95e_B',
-    'BK18_K95_ExBK18_150_E',
-    'BK18_K95_BxBK18_150_B',
-    'BK18_150_ExBK18_220_E',
-    'BK18_150_BxBK18_220_B',
-    'BK18_220_ExBK18_B95e_E',
-    'BK18_220_BxBK18_B95e_B',
-    'BK18_K95_ExBK18_150_B',
-    'BK18_K95_BxBK18_220_E',
-    'BK18_150_ExBK18_220_B',
-    'BK18_150_BxBK18_B95e_E',
-    'BK18_220_ExBK18_B95e_B',
-    'BK18_K95_ExBK18_220_E',
-    'BK18_K95_BxBK18_220_B',
-    'BK18_150_ExBK18_B95e_E',
-    'BK18_150_BxBK18_B95e_B',
-    'BK18_K95_ExBK18_220_B',
-    'BK18_K95_BxBK18_B95e_E',
-    'BK18_150_ExBK18_B95e_B',
-    'BK18_K95_ExBK18_B95e_E',
-    'BK18_K95_BxBK18_B95e_B',
-    'BK18_K95_ExBK18_B95e_B'
-]
-    used_maps = [
-    '''
-    'BK18_K95_BxBK18_K95_E',
-    'BK18_K95_ExBK18_150_B',
-
-    'BK18_150_BxBK18_150_E',
-    'BK18_150_ExBK18_220_B',
-
-    'BK18_220_BxBK18_220_E',
-    'BK18_K95_BxBK18_150_E',
-    
-    'BK18_K95_ExBK18_220_B',
-    'BK18_150_BxBK18_220_E',
-    'BK18_K95_BxBK18_220_E'
-    ]
-
-    
-    [
-    '''
-    "BK18_K95_ExBK18_K95_B",
-    "BK18_K95_BxBK18_150_E",
-    "BK18_150_ExBK18_150_B",
-    "BK18_150_BxBK18_220_E",
-    "BK18_220_ExBK18_220_B",
-    "BK18_220_BxBK18_B95e_E",
-    "BK18_B95e_ExBK18_B95e_B",
-    "BK18_K95_ExBK18_150_B",
-    "BK18_K95_BxBK18_220_E",
-    "BK18_150_ExBK18_220_B",
-    "BK18_150_BxBK18_B95e_E",
-    "BK18_220_ExBK18_B95e_B",
-    "BK18_K95_ExBK18_220_B",
-    "BK18_K95_BxBK18_B95e_E",
-    "BK18_150_ExBK18_B95e_B",
-    "BK18_K95_ExBK18_B95e_B"
-]
-    #invcovmat = np.loadtxt(covmat_path)
-    data = scipy.io.loadmat(covmat_path)
-    invcovmat = data['bpcm']
-    n_maps = len(keys)
-    n_bins = int(invcovmat.shape[0]/n_maps)
-    print('Num bins: ' + str(n_bins))
-    filter_cols = [keys.index(cross_map) for cross_map in used_maps]
-    all_bins = [index + i * n_maps for i in range(n_bins) for index in filter_cols]
-    filtered_mat = invcovmat[np.ix_(all_bins, all_bins)]
-    plot_covar_matrix(filtered_mat, used_maps)
-    n_maps = len(used_maps)
-
-    old_indices = np.arange(n_bins * n_maps)
-    new_indices = np.zeros_like(old_indices)
-    for map_idx in range(n_maps):
-        for bin_idx in range(n_bins):
-            old_pos = bin_idx * n_maps + map_idx
-            new_pos = map_idx * n_bins + bin_idx
-            new_indices[new_pos] = old_indices[old_pos]
-    # Reorder rows and columns of the covariance matrix
-    #print(new_indices)
-    reordered_matrix = filtered_mat[np.ix_(new_indices, new_indices)]
-    plot_covar_matrix(reordered_matrix, used_maps)
-    truncated_matrix = np.zeros((n_maps*n_bins, n_maps*n_bins))
-    for i in range(n_bins):
-        block_start = i*n_maps
-        block_end = (i+1)*n_maps
-        truncated_matrix[block_start:block_end, block_start:block_end] = reordered_matrix[block_start:block_end, block_start:block_end]
-    #plot_covar_matrix(truncated_matrix, used_maps)
-    
-    if(truncate):
-        return truncated_matrix
-    else:
-        return reordered_matrix
 
 def main():
     # Set up argument parsing
@@ -1319,11 +1142,9 @@ def main():
     multicomp_mcmc_driver(args.output_path, args.overwrite, args.sim_num)
     
 if __name__ == '__main__':
-    matlab_covmat = '/n/home08/liuto/GitHub/EB_analysis/bk18covmat.mat'
-    #load_dominic_invcovmat('/n/home01/dbeck/keckpipe/Cinv_K95K150K220.dat')
-    load_dominic_invcovmat(matlab_covmat)
+    #matlab_covmat = '/n/home08/liuto/GitHub/EB_analysis/bk18covmat.mat'
     #plot_sim_peaks('chains/simXXX/mpl00c.1.txt', 1, 10)
     #                single_path='chains/fullcov_real/mpl00b.1.txt')
-    #main()
+    main()
 
 
