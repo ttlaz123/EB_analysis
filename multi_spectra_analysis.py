@@ -312,11 +312,12 @@ class BK18_multicomp(Likelihood):
     
     def include_ede_spectra(self, ede_path, theory_dict):
         k_to_uk = 1e6
+        cmb_temp = 2.726
         data = pd.read_csv(ede_path, delim_whitespace=True, comment='#', header=None)
         data.columns = ['l', 'TT', 'EE', 'TE', 'BB', 'EB', 'TB', 'phiphi', 'TPhi', 'Ephi']
         # Extract 'l' and 'EB' columns
         EB_values = data['EB'].to_numpy()
-        EB_ede_dls = -EB_values * np.square(k_to_uk) * 2 * np.pi
+        EB_ede_dls = -EB_values * np.square(k_to_uk) * np.square(cmb_temp)
         theory_dict['EDE_EB'] = EB_ede_dls
         return theory_dict
 
