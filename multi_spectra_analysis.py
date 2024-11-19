@@ -117,7 +117,7 @@ class BK18_multicomp(Likelihood):
          
         # Covar matrix
         covmat_name = 'covariance_matrix'
-        self.full_covmat = ld.load_covariance_matrix(FILE_PATHS[covmat_name])
+        self.full_covmat = ld.load_covariance_matrix(FILE_PATHS[covmat_name], self.map_reference_header)
         self.filtered_covmat = self.filter_matrix(self.full_covmat, self.used_maps)
         #plot_covar_matrix(self.filtered_covmat, used_maps=self.used_maps)
         self.cov_inv = self.calc_inverse_covmat(self.filtered_covmat)
