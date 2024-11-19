@@ -27,14 +27,20 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
 # Global dictionary for file paths
-
+#DATASETNAME = 'BK18lfnorot'
+DATASETNAME = 'BK18lf_fede01'
+#DATASET_DIRNAME = 'BK18lf_dust_incEE_norot_allbins'
+DATASET_DIRNAME = DATASETNAME
 
 # Define the base directories for the file paths
 CAMB_BASE_PATH = '/n/holylfs04/LABS/kovac_lab/general/input_maps/official_cl/'
-BK18_BASE_PATH = '/n/home08/liuto/cosmo_package/data/bicep_keck_2018/BK18_cosmomc/data/BK18lf_dust_incEE_norot_allbins/'
+#BK18_BASE_PATH = '/n/home08/liuto/cosmo_package/data/bicep_keck_2018/BK18_cosmomc/data/BK18lf_dust_incEE_norot_allbins/'
 DOMINIC_BASE_PATH = '/n/home01/dbeck/cobaya/data/bicep_keck_2018/BK18_cosmomc/data/'
-BK18_SIM_PATH = '/n/home01/dbeck/cobaya/data/bicep_keck_2018/BK18_cosmomc/data/BK18lf_dust_incEE/'
-BK18_SIM_NAME = 'BK18lf_cl_hat_simXXX.dat'
+BK18_BASE_PATH = '/n/home08/liuto/cosmo_package/data/bicep_keck_2018/BK18_cosmomc/data/' + DATASET_DIRNAME + '/'
+
+DOMINIC_SIM_PATH = '/n/home01/dbeck/cobaya/data/bicep_keck_2018/BK18_cosmomc/data/' + DATASETNAME +'/'
+BK18_SIM_PATH = BK18_BASE_PATH
+BK18_SIM_NAME = DATASETNAME + '_cl_hat_simXXX.dat'
 # Consolidate file paths into a dictionary
 FILE_PATHS = {
     "camb_lensing": CAMB_BASE_PATH + 'camb_planck2013_r0_lensing.fits',
@@ -49,16 +55,16 @@ FILE_PATHS = {
         "P353e": CAMB_BASE_PATH + 'dust_270_3p75.fits',
         "P217e": CAMB_BASE_PATH + 'dust_220_3p75.fits',
     },
-    "bpwf": BK18_BASE_PATH + 'windows/BK18lfnorot_bpwf_bin*.txt',
-    "covariance_matrix": BK18_BASE_PATH + 'BK18lfnorot_covmat_dust.dat',
-    "observed_data": BK18_BASE_PATH + 'BK18lfnorot_cl_hat.dat',
+    "bpwf": BK18_BASE_PATH + 'windows/' + DATASETNAME + '_bpwf_bin*.txt',
+    "covariance_matrix": BK18_BASE_PATH + DATASETNAME + '_covmat_dust.dat',
+    "observed_data": BK18_BASE_PATH + DATASETNAME + '_cl_hat.dat',
     "EDE_spectrum": '/n/home08/liuto/GitHub/EB_analysis/input_data/fEDE0.07_cl.dat',
-    "Dominic_invcovmat": '/n/home01/dbeck/keckpipe/Cinv_K95K150K220.dat',
-    "matlab_covmat": '/n/home08/liuto/GitHub/EB_analysis/bk18covmat.mat',
-    "matlab_invcovmat": '/n/home08/liuto/GitHub/EB_analysis/bk18_invcovmat.mat',
+    #"Dominic_invcovmat": '/n/home01/dbeck/keckpipe/Cinv_K95K150K220.dat',
+    #"matlab_covmat": '/n/home08/liuto/GitHub/EB_analysis/bk18covmat.mat',
+    #"matlab_invcovmat": '/n/home08/liuto/GitHub/EB_analysis/bk18_invcovmat.mat',
 
-    "signal_only_covmat": DOMINIC_BASE_PATH + 'BK18lf_dust_incEE_norot/BK18lfnorot_covmat_sigtrimmed_dust.dat',
-    'noise_only_covmat': DOMINIC_BASE_PATH + 'BK18lf_dust_incEE_norot/BK18lfnorot_covmat_noi_dust.dat',
+    #"signal_only_covmat": DOMINIC_BASE_PATH + 'BK18lf_dust_incEE_norot/BK18lfnorot_covmat_sigtrimmed_dust.dat',
+    #'noise_only_covmat': DOMINIC_BASE_PATH + 'BK18lf_dust_incEE_norot/BK18lfnorot_covmat_noi_dust.dat',
 }
 
 class BK18_multicomp(Likelihood):
@@ -114,8 +120,43 @@ class BK18_multicomp(Likelihood):
         covmat_name = 'covariance_matrix'
         self.full_covmat = self.load_covariance_matrix(FILE_PATHS[covmat_name])
         self.filtered_covmat = self.filter_matrix(self.full_covmat, self.used_maps)
+        #plot_covar_matrix(self.filtered_covmat, used_maps=self.used_maps)
         self.cov_inv = self.calc_inverse_covmat(self.filtered_covmat)
-
+        
+        # plot 
+        breakpoint()
+        num_bin = 16 
+        for mapi in self.used_maps:
+            #plt.plot(self.binned_dl_observed_dict[mapi])
+            map_index = self.used_maps.index(mapi)
+            covar_mat = self.filtered_covmat
+            var = np.diag(covar_mat)[map_index*num_bin:num_bin*(map_index+1)]
+            observed_data = self.binned_dl_observed_dict[mapi]
+            plt.errorbar( 
+                            x = range(len(observed_data)),
+                            y=(observed_data), 
+                            yerr = np.sqrt(var),
+                            label='Observed', color='blue')
+            angles = {'BK18_B95e':0.4,
+                        'BK18_K95':0.2, 
+                        'BK18_150':0.5, 
+                        'BK18_220':-1} 
+            ede_cont = self.binned_dl_theory_dict[mapi+'_EDE']
+            plt.plot(ede_cont, label='ede curve')
+            parts = mapi.split('x')
+            if(parts[0].endswith('_B')):
+                ind = 0
+            else:
+                ind = 1
+            result = parts[ind][:-2] + '_E'
+            angle = angles[parts[ind][:-2]]
+            result = result + 'x' + result
+            rot_cont = self.binned_dl_theory_dict[result]*np.sin(np.deg2rad(angle))
+            plt.plot(rot_cont, label = result + ' times ' + str(np.sin(np.deg2rad(angle))))
+            plt.plot(ede_cont + rot_cont, label='both')
+            plt.title(mapi)
+            plt.legend()
+            plt.show()
 
     def check_file_header(self, file_path, reference_header):
         with open(file_path, 'r') as f:
@@ -200,7 +241,13 @@ class BK18_multicomp(Likelihood):
         used_cols = []
         for cross_map in used_maps:
             try:
+                if(cross_map  not in map_reference_header):
+                    parts = input_str.split('x')
+
+                    cross_map = f"{parts[1]}x{parts[0]}"
+
                 used_cols.append(map_reference_header.index(cross_map))
+            
             except ValueError:
                 # Try to swap _B and _E and check again
                 match = re.match(r'(.+)(_B)(x\1)(_E)', cross_map)
@@ -216,7 +263,10 @@ class BK18_multicomp(Likelihood):
 
         observed_spectra_dict = {}
         for i in range(len(used_cols)):
-            observed_spectra_dict[used_maps[i]] = obs_data[:, used_cols[i]]
+            input_str = used_maps[i]
+            observed_spectra_dict[input_str] = obs_data[:, used_cols[i]]
+
+        
         return observed_spectra_dict
     
     def load_bpwf(self, bpwf_directory):
@@ -1050,7 +1100,7 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
     calc_spectra = [
                     'BK18_220', 
                     'BK18_150', 
-                    'BK18_K95', 
+                    #'BK18_K95', 
                     'BK18_B95e',
                     #'P030e', 
                     #'P044e', 
