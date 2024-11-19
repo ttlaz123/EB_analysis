@@ -2,6 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import corner
+import re
+import glob
+from astropy.io import fits
 from getdist.mcsamples import MCSamplesFromCobaya
 from getdist.mcsamples import loadMCSamples
 import getdist.plots as gdplt
@@ -10,6 +13,205 @@ from matplotlib.gridspec import GridSpec
 import bicep_data_consts as bdc
 MAP_FREQS = bdc.MAP_FREQS
 
+def check_file_header(file_path, reference_header):
+    with open(file_path, 'r') as f:
+        for line in f:
+            # Assuming the relevant header is the one with 'BxB' in it
+            if line.startswith("#") and "BxB" in line:
+                current_header = line.strip()
+                if reference_header is None:
+                    reference_header = current_header.split()
+                elif current_header.split() != reference_header:
+                    # Compare the lists element by element and print the differences
+                    list1 = current_header.split()
+                    list2 = reference_header
+                    for i in range(min(len(list1), len(list2))):
+                        if list1[i] != list2[i]:
+                            print(f"Difference at index {i}: {list1[i]} != {list2[i]}")
+
+                        # If the lists have different lengths, print the extra elements
+                        if len(list1) > len(list2):
+                            print(f"Extra elements in list1: {list1[len(list2):]}")
+                        elif len(list2) > len(list1):
+                            print(f"Extra elements in list2: {list2[len(list1):]}")
+                    raise ValueError("Header mismatch detected in one or more files.")
+                break  # Stop reading further header lines
+    return reference_header
+
+def load_observed_spectra(observed_data_path, used_maps, map_reference_header):
+    """
+    Load observed spectra data from a specified file and filter the data based on the used maps.
+
+    Args:
+        observed_data_path (str): The file path to the observed spectra data in a text format.
+        used_maps (list of str): A list of map names to be used for filtering the observed data.
+
+    Returns:
+        dict: A dict containing the filtered observed spectra data, 
+                with each entry representing a spectrum for the specified used maps.
+
+    Raises:
+        AssertionError: If the provided map names in `used_maps` do not match the reference header.
+        
+    Description:
+        The function first verifies the header of the observed data file against the 
+        reference header (`self.map_reference_header`). It then identifies the indices 
+        of the specified `used_maps` within the validated header. After loading the data 
+        from the file, the function extracts the relevant columns corresponding to the 
+        used maps, adjusting for the fact that the first column in the loaded data is 
+        merely an index or identifier (hence the addition of 1 to the indices).
+    """
+    reference_header = map_reference_header
+    print("Loading: " + str(observed_data_path))
+    try:
+        
+        map_reference_header = check_file_header(observed_data_path, reference_header)
+        map_reference_header = map_reference_header
+    except ValueError:
+        with open(observed_data_path, 'r') as f:
+            for line in f:
+                # Assuming the relevant header is the one with 'BxB' in it
+                if line.startswith("#") and "BxB" in line:
+                    current_header = line.strip()
+                    map_reference_header = current_header.split()
+                    break
+    used_cols = []
+    for cross_map in used_maps:
+        try:
+            if(cross_map  not in map_reference_header):
+                parts = input_str.split('x')
+
+                cross_map = f"{parts[1]}x{parts[0]}"
+
+            used_cols.append(map_reference_header.index(cross_map))
+        
+        except ValueError:
+            # Try to swap _B and _E and check again
+            match = re.match(r'(.+)(_B)(x\1)(_E)', cross_map)
+            if match:
+                # Swap _B and _E if the parts before _B and _E are identical
+                swapped_map =  match.group(1) + '_E' + match.group(3) + '_B'
+            else:
+                raise ValueError("Cross map does not exist")
+            used_cols.append(map_reference_header.index(swapped_map))
+
+
+    obs_data = np.loadtxt(observed_data_path)
+
+    observed_spectra_dict = {}
+    for i in range(len(used_cols)):
+        input_str = used_maps[i]
+        observed_spectra_dict[input_str] = obs_data[:, used_cols[i]]
+
+    
+    return observed_spectra_dict, map_reference_header
+
+def load_bpwf(bpwf_directory, map_reference_header):
+        """
+        Load BPWF (Band Power Window Function) data from the specified directory.
+
+        Args:
+            bpwf_directory (str): The file path or pattern specifying the directory where BPWF files are located.
+
+        Returns:
+            ndarray: A 3D NumPy array containing the concatenated BPWF data from all files in the specified directory. 
+                    The first dimension corresponds to the number of files, and the subsequent dimensions 
+                    correspond to the BPWF data.
+
+        Raises:
+            ValueError: If no BPWF files are found in the specified directory.
+
+        Description:
+            This function searches for BPWF files in the provided directory, ensuring that there is at least 
+            one file to load. It checks the consistency of the file headers against a reference header, 
+            which is stored in `self.map_reference_header`. Each file's data is read (excluding the first column) 
+            and stored in a list, which is then stacked into a 3D NumPy array before being returned.
+        """
+        
+        bpwf_files = sorted(glob.glob(bpwf_directory), 
+                        key=lambda x: list(map(int,re.findall("(\d+)", x))))
+    
+        if len(bpwf_files) < 1:
+            raise ValueError("No files found in " + str(bpwf_directory))
+        # Initialize variable to store the header line to compare
+        reference_header = map_reference_header
+        # List to hold all loaded data
+        bpwf_data = []
+
+        for file in bpwf_files:
+            print("Loading: " + str(file))
+            # Read the header and check consistency
+            map_reference_header = check_file_header(file, reference_header)
+            # Load data, don't ignore the first column
+            bpwf_data.append(np.loadtxt(file))
+
+        # Concatenate and return all BPWF data
+        return np.stack(bpwf_data, axis=0), map_reference_header
+
+
+def load_covariance_matrix(covmat_path, map_reference_header):
+    """
+    Load the covariance matrix from the specified file.
+
+    Args:
+        covmat_path (str): The file path to the covariance matrix data in a text format.
+
+    Returns:
+        ndarray: A 2D NumPy array containing the covariance matrix.
+
+    Raises:
+        AssertionError: If the loaded covariance matrix is not square (i.e., the number of rows does not equal the number of columns).
+
+    Description:
+        This function reads a covariance matrix from a specified file path, ensuring that the matrix is square 
+        by checking that the number of rows equals the number of columns. It validates the file's header 
+        against the existing reference header, stored in `self.map_reference_header`, before loading the matrix data.
+    """
+    print("Loading: " + str(covmat_path))
+    map_reference_header = check_file_header(covmat_path, map_reference_header)
+    full_covmat = np.loadtxt(covmat_path)
+    shap = full_covmat.shape
+    
+    assert shap[0] == shap[1], "Covariance matrix must be square."
+    return full_covmat
+
+def load_cmb_spectra(lensing_path, dust_paths):
+    k_to_uk = 1e6
+    theory_dict = {}
+    print("Loading: " + str(lensing_path))
+    with fits.open(lensing_path) as hdul_lens:
+        EE_lens = hdul_lens[1].data['E-mode C_l']
+        BB_lens = hdul_lens[1].data['B-mode C_l']
+    for map_freq in dust_paths:
+        print("Loading: " + str(dust_paths[map_freq]))
+        with fits.open(dust_paths[map_freq]) as hdul_dust:
+            EE_dust = hdul_dust[1].data['E-mode C_l']
+            BB_dust = hdul_dust[1].data['B-mode C_l']
+        ee_spectrum = EE_lens + EE_dust
+        
+        bb_spectrum =  BB_lens + BB_dust
+        ee_spectrum *= np.square(k_to_uk)
+        bb_spectrum *= np.square(k_to_uk)
+        cl_to_dl = np.array([l*(l+1) for l in range(len(ee_spectrum))])/2/np.pi
+        theory_dict[map_freq + '_Ex' + map_freq + '_E'] = ee_spectrum*cl_to_dl            
+        theory_dict[map_freq + '_Bx' + map_freq + '_B'] = bb_spectrum*cl_to_dl
+    #plt.plot(theory_dict[map_freq + '_Ex' + map_freq + '_E'])
+    return theory_dict
+
+def include_ede_spectra(ede_path, theory_dict):
+        k_to_uk = 1e6
+        cmb_temp = 2.726
+        data = pd.read_csv(ede_path, delim_whitespace=True, comment='#', header=None)
+        data.columns = ['l', 'TT', 'EE', 'TE', 'BB', 'EB', 'TB', 'phiphi', 'TPhi', 'Ephi']
+        # Extract 'l' and 'EB' columns
+        EB_values = data['EB'].to_numpy()
+        EB_ede_dls = -EB_values * np.square(k_to_uk) * np.square(cmb_temp)
+        theory_dict['EDE_EB'] = EB_ede_dls
+        return theory_dict
+
+'''
+Everything after this is deprecated
+'''
 def read_sampler(filepath):
     """
     Reads MCMC sampler data from a file and returns it as a DataFrame.
