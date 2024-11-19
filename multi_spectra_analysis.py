@@ -123,9 +123,9 @@ class BK18_multicomp(Likelihood):
         #plot_covar_matrix(self.filtered_covmat, used_maps=self.used_maps)
         self.cov_inv = self.calc_inverse_covmat(self.filtered_covmat)
         
-        # plot 
-        breakpoint()
-        num_bin = 16 
+    # plot 
+    def plot_sample_values(self, params):
+        num_bin = len(self.bpwf)
         for mapi in self.used_maps:
             #plt.plot(self.binned_dl_observed_dict[mapi])
             map_index = self.used_maps.index(mapi)
