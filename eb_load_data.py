@@ -40,7 +40,7 @@ def check_file_header(file_path, reference_header):
                 break  # Stop reading further header lines
     return reference_header
 
-def load_observed_spectra(observed_data_path, used_maps, map_reference_header):
+def load_observed_spectra(observed_data_path, used_maps, map_reference_header, num_bins=None):
     """
     Load observed spectra data from a specified file and filter the data based on the used maps.
 
@@ -63,6 +63,7 @@ def load_observed_spectra(observed_data_path, used_maps, map_reference_header):
         used maps, adjusting for the fact that the first column in the loaded data is 
         merely an index or identifier (hence the addition of 1 to the indices).
     """
+    
     reference_header = map_reference_header
     print("Loading: " + str(observed_data_path))
     try:
@@ -103,12 +104,12 @@ def load_observed_spectra(observed_data_path, used_maps, map_reference_header):
     observed_spectra_dict = {}
     for i in range(len(used_cols)):
         input_str = used_maps[i]
-        observed_spectra_dict[input_str] = obs_data[:, used_cols[i]]
+        observed_spectra_dict[input_str] = obs_data[:num_bins, used_cols[i]]
 
     
     return observed_spectra_dict, map_reference_header
 
-def load_bpwf(bpwf_directory, map_reference_header):
+def load_bpwf(bpwf_directory, map_reference_header, num_bins=None):
         """
         Load BPWF (Band Power Window Function) data from the specified directory.
 
@@ -139,13 +140,17 @@ def load_bpwf(bpwf_directory, map_reference_header):
         reference_header = map_reference_header
         # List to hold all loaded data
         bpwf_data = []
-
-        for file in bpwf_files:
-            print("Loading: " + str(file))
+        if(num_bins is None):
+            num_bins = len(bpwf_files)
+        for n, bfile in enumerate(bpwf_files):
+            if(n>=num_bins):
+                print('Skipping ' + str(bfile))
+                continue
+            print("Loading: " + str(bfile))
             # Read the header and check consistency
-            map_reference_header = check_file_header(file, reference_header)
+            map_reference_header = check_file_header(bfile, reference_header)
             # Load data, don't ignore the first column
-            bpwf_data.append(np.loadtxt(file))
+            bpwf_data.append(np.loadtxt(bfile))
 
         # Concatenate and return all BPWF data
         return np.stack(bpwf_data, axis=0), map_reference_header

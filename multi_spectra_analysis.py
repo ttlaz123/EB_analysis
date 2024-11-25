@@ -28,6 +28,7 @@ import matplotlib.colors as mcolors
 # Global dictionary for file paths
 #DATASETNAME = 'BK18lfnorot'
 DATASETNAME = 'BK18lf_fede01'
+#DATASETNAME = 'BK18lf'
 #DATASET_DIRNAME = 'BK18lf_dust_incEE_norot_allbins'
 DATASET_DIRNAME = DATASETNAME
 
@@ -69,7 +70,7 @@ FILE_PATHS = {
 class BK18_multicomp(Likelihood):
     params_names = []
     used_maps = []
-    include_EDE = False    
+    include_EDE = True   
     zero_offdiag = False
     signal_params = {}
     def __init__(self,*args,**kwargs):
@@ -90,8 +91,9 @@ class BK18_multicomp(Likelihood):
     def initialize(self):
         # Load any data or set up anything that needs to happen before likelihood calculation
         self.map_reference_header = None
+        num_bins =16 
         # BPWF and header check
-        self.bpwf, self.map_reference_header = ld.load_bpwf(FILE_PATHS["bpwf"], self.map_reference_header)
+        self.bpwf, self.map_reference_header = ld.load_bpwf(FILE_PATHS["bpwf"], self.map_reference_header, num_bins = num_bins)
         self.used_maps = self.filter_used_maps(self.used_maps)
 
         # Theory
@@ -104,7 +106,7 @@ class BK18_multicomp(Likelihood):
         self.binned_dl_theory_dict = self.apply_bpwf(self.dl_theory, self.bpwf, self.used_maps)
         # Real Data
         self.binned_dl_observed_dict, self.map_reference_header = ld.load_observed_spectra(FILE_PATHS['observed_data'], 
-                                    self.used_maps, self.map_reference_header)
+                                    self.used_maps, self.map_reference_header, num_bins=num_bins)
         # inject signal
         print('Inject signal?')
         if(len(self.signal_params) > 0):
@@ -118,16 +120,16 @@ class BK18_multicomp(Likelihood):
         # Covar matrix
         covmat_name = 'covariance_matrix'
         self.full_covmat = ld.load_covariance_matrix(FILE_PATHS[covmat_name], self.map_reference_header)
-        self.filtered_covmat = self.filter_matrix(self.full_covmat, self.used_maps)
+        self.filtered_covmat = self.filter_matrix(self.full_covmat, self.used_maps, num_bins=num_bins)
         #plot_covar_matrix(self.filtered_covmat, used_maps=self.used_maps)
         self.cov_inv = self.calc_inverse_covmat(self.filtered_covmat)
 
         test_params = {
-                    'gMpl':0.0,
-                    'alpha_BK18_150':-0.5,
-                    'alpha_BK18_220': 1,
-                    'alpha_BK18_K95': -0.1,
-                    'alpha_BK18_B95e':-0.4
+                    'gMpl':1,
+                    'alpha_BK18_150':0.3,
+                    'alpha_BK18_220': 0.3,
+                    'alpha_BK18_K95': 0.3,
+                    'alpha_BK18_B95e':0.3
         }
         self.plot_sample_values(test_params)
         
@@ -152,7 +154,7 @@ class BK18_multicomp(Likelihood):
                             yerr = np.sqrt(var),
             )
             ede_cont = ebe_dict[mapi]
-            plt.plot(ede_cont, label='ede curve')
+            plt.plot(ede_cont, label='EDE contribution')
             parts = mapi.split('x')
             if(parts[0].endswith('_B')):
                 ind = 0
@@ -161,10 +163,22 @@ class BK18_multicomp(Likelihood):
             result = parts[ind][:-2] + '_E'
             result = result + 'x' + result
             rot_cont = rotated_dict[mapi]
-            plt.plot(rot_cont, label = result)
-            plt.plot(tot_dict[mapi], label='both')
-            plt.title(mapi + '\n ' + str(params_values))
+            plt.plot(rot_cont, label = 'Polarization Rotation')
+            plt.plot(tot_dict[mapi], label='Both')
+            # Convert dictionary to string with a newline after every two keys
+            result_lines = []
+            for i, (key, value) in enumerate(params_values.items(), start=1):
+                result_lines.append(f"{key}: {value}")
+                # Add a newline after every two keys
+                if i % 2 == 0:
+                    result_lines.append("\n")  # Blank line for separation
+
+            # Join the lines to form the final string
+            dict_as_string = ", ".join(result_lines)
+            #dict_as_string = "\n".join(f"{key}: {value}" for key, value in params_values.items())
+            plt.title(mapi + '\n ' + str(dict_as_string))
             plt.legend()
+            plt.tight_layout()
             plt.show()
 
     def filter_used_maps(self, used_maps):
@@ -229,7 +243,7 @@ class BK18_multicomp(Likelihood):
                                             theory_dict[map0][:num_ells])
             if('EDE_EB' in theory_dict):
                 binned_theory_dict[cross_map + '_EDE'] = np.matmul(bpwf_mat[:,:,col],
-                                                        theory_dict['EDE_EB'][:num_ells])
+                                                        theory_dict['EDE_EB'][:num_ells])*10
         return binned_theory_dict
     
     def dict_to_vec(self, spectra_dict, used_maps):
@@ -257,7 +271,7 @@ class BK18_multicomp(Likelihood):
 
         return concat_vec   
 
-    def filter_matrix(self, matrix, used_maps):
+    def filter_matrix(self, matrix, used_maps, num_bins=None):
         """
         Filters a given matrix to extract rows and columns that correspond to specific map cross-correlations.
 
@@ -281,16 +295,17 @@ class BK18_multicomp(Likelihood):
         
         num_maps = len(self.map_reference_header) - 1
         
-        num_bins = matrix.shape[0] / num_maps
+        tot_bins = matrix.shape[0] / num_maps
 
-        # Check if num_bins is an integer by checking if the division results in a remainder
-        if num_bins != int(num_bins):
+        # Check if tot_bins is an integer by checking if the division results in a remainder
+        if tot_bins != int(tot_bins):
             raise ValueError(f"Number of maps {num_maps} and "
                             f"size of covar matrix {matrix.shape[0]} don't fit, "
-                            f"num_bins {num_bins} is not an integer.")
+                            f"tot_bins {tot_bins} is not an integer.")
 
-        num_bins = int(num_bins) 
-
+        tot_bins = int(tot_bins) 
+        if(num_bins is None):
+            num_bins = tot_bins
         # we subtract 1 because the first element in the reference is a #
         filter_cols = [self.map_reference_header.index(cross_map)-1 for cross_map in used_maps]
         all_bins = [index + i * num_maps for i in range(num_bins) for index in filter_cols]
@@ -564,6 +579,7 @@ class BK18_multicomp(Likelihood):
         # https://bicep.rc.fas.harvard.edu/dbeck/20230202_cmbbirefringence/
         self.rotated_dict = {}
         self.ebe_dict = {}
+        self.tot_dictt = {}
         self.tot_dict = {}
         for cross_map in used_maps:
             self.rotated_dict[cross_map] = self.rotate_spectrum(cross_map,
@@ -578,8 +594,18 @@ class BK18_multicomp(Likelihood):
                     self.rotated_dict[cross_map] = self.rotated_dict[cross_map][:min_size]
                     ede_shift = ede_shift[:min_size]
                     self.ebe_dict[cross_map] = ede_shift
-                    self.tot_dict[cross_map] = self.rotated_dict[cross_map] + self.ebe_dict[cross_map]
-        self.tot_dict = self.apply_bpwf(self.tot_dict, self.bpwf, self.used_maps,do_cross=True)
+                    self.tot_dictt[cross_map] = self.rotated_dict[cross_map] + self.ebe_dict[cross_map]
+        self.tot_dict = self.apply_bpwf(self.tot_dictt, self.bpwf, self.used_maps,do_cross=True)
+        '''
+        for u in used_maps:
+            plt.plot(self.tot_dictt[u][:600], label='theory')
+            plt.plot(np.array([ 37.5000, 72.5000, 107.5000, 142.5000, 177.5000, 
+              212.5000, 247.5000, 282.5000, 317.5000, 352.5000, 387.5000, 
+              422.5000, 457.5000, 492.5000, 527.5000, 562.5000]), self.tot_dict[u], label='after bpwf')
+            plt.title(u)
+            plt.legend()
+            plt.show()
+        '''
         theory_vec = self.dict_to_vec(self.tot_dict, used_maps)
         return theory_vec
 
@@ -607,7 +633,7 @@ def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix'):
         plt.yticks(tick_positions, used_maps)
     plt.colorbar()
     plt.savefig(title + '.png')
-    plt.show()
+    #plt.show()
 
 def plot_best_fit(outpath, used_maps, param_names, 
                         param_bestfit, param_stats, signal_params={}):
@@ -654,7 +680,7 @@ def plot_best_fit(outpath, used_maps, param_names,
     plt.xticks(np.arange(len(used_maps)), used_maps, rotation = 45)
     plt.yticks(np.arange(len(used_maps)), used_maps)
     plt.savefig(outpath + '_chisqmap.png')
-    plt.show()
+    #plt.show()
     # Initialize lists to store unique maps ending with _E and _B
     maps_B = set()
     maps_E = set()
@@ -757,6 +783,7 @@ def plot_triangle(root, replace_dict={}):
         means.append(mean)
 
     # Create a triangle plot with all variables
+    plt.figure()
     g = plots.get_subplot_plotter()
     g.triangle_plot(samples, param_names, filled=True)
 
@@ -807,7 +834,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None):
     modes_dict = {}
     single_df = None
     for i in range(1, sim_nums + 1):
-        file_path = chains_path.replace('XXX', f'{i:02d}')
+        file_path = chains_path.replace('XXX', f'{i:03d}')
         print('loading:' + str(file_path))
         # Read the first line to get the correct header
         with open(file_path, 'r') as f:
@@ -817,8 +844,6 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None):
         
         chain_df = pd.read_csv(file_path, delim_whitespace=True, comment='#')
         chain_df.columns = corrected_header
-        if(single_sim == i):
-            single_df = chain_df
         for column in chain_df.columns:
             if column not in modes_dict:
                 modes_dict[column] = []
@@ -835,34 +860,39 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None):
     #print(modes_df[param_names])
     
     
-    fig = corner.corner(modes_df[param_names], 
+        
+    colors = ['red', 'blue', 'green', 'orange']
+    for i in range(1,single_sim):
+        fig = corner.corner(modes_df[param_names], 
                         labels=param_names, 
                     show_titles=True, 
                     title_kwargs={"fontsize": 12},
                     hist_kwargs={'color':'red', 'density':True},
                     contour_kwargs={'colors':'red'})
-    
-    colors = ['red', 'blue', 'green', 'orange']
-    for i in range(1,2):
+
         if(single_path is None):
-            file_path = chains_path.replace('XXX', f'{i:02d}')    
+            file_path = chains_path.replace('XXX', f'{i:03d}')    
         else:
             file_path = single_path
         single_df = pd.read_csv(file_path, delim_whitespace=True, comment='#')
         single_df.columns = corrected_header
         corner.corner(single_df[param_names], labels=param_names,
                     show_titles=False, 
-                    hist_kwargs={'color': colors[i], 'density':True},
-                    contour_kwargs={'colors': colors[i]}, 
+                    hist_kwargs={'color': 'blue', 'density':True},
+                    contour_kwargs={'colors': 'blue'}, 
                     fig=fig)
     
     
-    # Show the plot
-    supertitle = 'Sim' + str(single_sim) + ' on top of ' + str(sim_nums) + ' sims'
-    plt.suptitle(supertitle)
-    plt.show()
+        # Show the plot
+        supertitle = 'Sim' + str(i) + ' (blue) on top of ' + str(sim_nums) + ' sims (red)'
+        plt.suptitle(supertitle)
+        outpath = chains_path.split('XXX')[0] + str(i) + '_summary.png'
+        plt.savefig(outpath)
+        print('Saved to ' + outpath)
+        plt.show()
 
     return 
+    
 
 # Function to create and run a Cobaya model with the custom likelihood
 def run_bk18_likelihood(params_dict, used_maps, outpath, 
@@ -917,7 +947,7 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
     calc_spectra = [
                     'BK18_220', 
                     'BK18_150', 
-                    #'BK18_K95', 
+                    'BK18_K95', 
                     'BK18_B95e',
                     #'P030e', 
                     #'P044e', 
@@ -1006,7 +1036,13 @@ def main():
             print(f"No existing chains to overwrite at: {args.output_path}")
     if(args.sim_num == -1):
         args.sim_num = 'real'
-    multicomp_mcmc_driver(args.output_path, args.overwrite, args.sim_num)
+    if(args.sim_num == 500):
+        for s in range(303, args.sim_num):
+            outpath = args.output_path + f"{s:03d}"
+            multicomp_mcmc_driver(outpath, args.overwrite, s)
+
+    else:
+        multicomp_mcmc_driver(args.output_path, args.overwrite, args.sim_num)
     
 if __name__ == '__main__':
     #matlab_covmat = '/n/home08/liuto/GitHub/EB_analysis/bk18covmat.mat'
