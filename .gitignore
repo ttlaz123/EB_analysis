@@ -10,3 +10,4 @@
 *.cleaned
 *.pyc
 *.csv
+/__pycache__
