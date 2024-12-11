@@ -91,7 +91,7 @@ class BK18_multicomp(Likelihood):
         if(self.include_EDE):
             self.dl_theory = ld.include_ede_spectra(FILE_PATHS['EDE_spectrum'],
                                                         self.dl_theory)
-        self.binned_dl_theory_dict = self.apply_bpwf(self.dl_theory, self.bpwf, self.used_maps)
+        self.binned_dl_theory_dict = ec.apply_bpwf(self.map_reference_header,self.dl_theory, self.bpwf, self.used_maps)
         # Real Data
         self.binned_dl_observed_dict, self.map_reference_header = ld.load_observed_spectra(FILE_PATHS['observed_data'], 
                                     self.used_maps, self.map_reference_header, num_bins=num_bins)
@@ -126,8 +126,8 @@ class BK18_multicomp(Likelihood):
         
         theory_prediction = self.theory(params_values, 
                                         self.dl_theory, self.used_maps)
-        rotated_dict = self.apply_bpwf(self.rotated_dict, self.bpwf, self.used_maps,do_cross=True)
-        ebe_dict = self.apply_bpwf(self.ebe_dict, self.bpwf, self.used_maps,do_cross=True)
+        rotated_dict = ec.apply_bpwf(self.map_reference_header,self.rotated_dict, self.bpwf, self.used_maps,do_cross=True)
+        ebe_dict = ec.apply_bpwf(self.map_reference_header,self.ebe_dict, self.bpwf, self.used_maps,do_cross=True)
         tot_dict = self.tot_dict
         num_bin = len(next(iter(rotated_dict.values())))
         for mapi in self.used_maps:
@@ -238,7 +238,7 @@ class BK18_multicomp(Likelihood):
                     ede_shift = ede_shift[:min_size]
                     self.ebe_dict[cross_map] = ede_shift
                     self.tot_dictt[cross_map] = self.rotated_dict[cross_map] + self.ebe_dict[cross_map]
-        self.tot_dict = ec.apply_bpwf(self.tot_dictt, self.bpwf, self.used_maps,do_cross=True)
+        self.tot_dict = ec.apply_bpwf(self.map_reference_header,self.tot_dictt, self.bpwf, self.used_maps,do_cross=True)
   
         theory_vec = self.dict_to_vec(self.tot_dict, used_maps)
         return theory_vec
