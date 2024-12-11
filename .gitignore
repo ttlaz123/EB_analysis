@@ -9,3 +9,4 @@
 *.locked
 *.cleaned
 *.pyc
+*.csv
