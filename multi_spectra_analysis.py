@@ -347,7 +347,7 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
     param_names, means, mean_std_strs = epd.plot_triangle(outpath, replace_dict)
     eb_like_cls = BK18_multicomp(used_maps=all_cross_spectra, 
                                 signal_params=signal_params)
-    epd.plot_best_fit(eb_like_cls, outpath, all_cross_spectra,  
+    epd.plot_best_crossfit(eb_like_cls, outpath, all_cross_spectra,  
                         param_names, means, mean_std_strs, 
                         signal_params=signal_params)
     return 

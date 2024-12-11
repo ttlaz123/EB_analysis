@@ -76,10 +76,11 @@ def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix'):
                                 rotation=30, ha='right')
         plt.yticks(tick_positions, used_maps)
     plt.colorbar()
+    print("Saving: " + title + '.png')
     plt.savefig(title + '.png')
     #plt.show()
 
-def plot_best_fit(eb_like_cls, outpath, used_maps, param_names, 
+def plot_best_crossfit(eb_like_cls, outpath, used_maps, param_names, 
                         param_bestfit, param_stats, signal_params={}):
     
     used_maps = eb_like_cls.used_maps
@@ -122,6 +123,7 @@ def plot_best_fit(eb_like_cls, outpath, used_maps, param_names,
     plt.colorbar()
     plt.xticks(np.arange(len(used_maps)), used_maps, rotation = 45)
     plt.yticks(np.arange(len(used_maps)), used_maps)
+    print("Saving: " +outpath + '_chisqmap.png')
     plt.savefig(outpath + '_chisqmap.png')
     #plt.show()
     # Initialize lists to store unique maps ending with _E and _B
@@ -191,6 +193,7 @@ def plot_best_fit(eb_like_cls, outpath, used_maps, param_names,
         )
     plt.tight_layout(pad=2)
     plt.savefig(outpath + '_bestfit.png')
+    print("Saving: " +outpath + '_bestfit.png')
     return 
 
 
