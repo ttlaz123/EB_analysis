@@ -1,6 +1,83 @@
 
 import numpy as np
 import re
+from typing import Any
+# Physical constants
+
+h_J_s = 6.62607015e-34
+kB_J_K = 1.380649e-23
+GHZ_KELVIN = h_J_s / kB_J_K * 1e9
+T_CMB_K = 2.7255  # fiducial CMB temperature
+D2R=np.pi/180.0
+FPIVOT_DUST = 353.0
+FPIVOT_SYNC = 23.0
+LPIVOT = 80.0
+TDUST = 19.6
+class Bandpass:
+    pass
+
+def dust_scaling(beta, Tdust, bandpass, nu0, bandcenter_err):
+        """Calculates greybody scaling of dust signal defined at 353 GHz
+        to specified bandpass."""
+        gb_int = np.sum(bandpass.dnu * bandpass.R[:, 1] * bandpass.R[:, 0] ** (3 + beta) /
+                        (np.exp(GHZ_KELVIN * bandpass.R[:, 0] / Tdust) - 1))
+        # Calculate values at pivot frequency.
+        gb0 = nu0 ** (3 + beta) / (np.exp(GHZ_KELVIN * nu0 / Tdust) - 1)
+        #  Add correction for band center error
+        if bandcenter_err != 1:
+            nu_bar = GHZ_KELVIN * bandpass.nu_bar
+            # Conversion factor error due to bandcenter error.
+            th_err = bandcenter_err ** 4 * (np.exp(GHZ_KELVIN * bandpass % nu_bar *
+                                                   (bandcenter_err - 1) / T_CMB_K) *
+                                            (np.exp(nu_bar / T_CMB_K) - 1) ** 2 /
+                                            (np.exp(nu_bar * bandcenter_err
+                                                    / T_CMB_K) - 1) ** 2)
+            # Greybody scaling error due to bandcenter error.
+            gb_err = bandcenter_err ** (3 + beta) * (np.exp(nu_bar / Tdust) - 1) / \
+                     (np.exp(nu_bar * bandcenter_err / Tdust) - 1)
+        else:
+            th_err = 1
+            gb_err = 1
+
+        # Calculate dust scaling.
+        return (gb_int / gb0) / bandpass.th_dust * (gb_err / th_err)
+
+def read_bandpass(fname):
+        bandpass: Any = Bandpass()
+        bandpass.R = np.loadtxt(fname)
+        nu = bandpass.R[:, 0]
+        bandpass.dnu = np.hstack(
+            ((nu[1] - nu[0]), (nu[2:] - nu[:-2]) / 2, (nu[-1] - nu[-2])))
+        # Calculate thermodynamic temperature conversion between this bandpass
+        # and pivot frequencies 353 GHz (used for dust) and 150 GHz (used for sync).
+        th_int = np.sum(bandpass.dnu * bandpass.R[:, 1] * bandpass.R[:, 0] ** 4 *
+                        np.exp(GHZ_KELVIN * bandpass.R[:, 0] / T_CMB_K) /
+                        (np.exp(GHZ_KELVIN * bandpass.R[:, 0] / T_CMB_K) - 1) ** 2)
+        nu0 = FPIVOT_DUST
+        th0 = (nu0 ** 4 * np.exp(GHZ_KELVIN * nu0 / T_CMB_K) /
+               (np.exp(GHZ_KELVIN * nu0 / T_CMB_K) - 1) ** 2)
+        bandpass.th_dust = th_int / th0
+        nu0 = FPIVOT_SYNC
+        th0 = (nu0 ** 4 * np.exp(GHZ_KELVIN * nu0 / T_CMB_K) /
+               (np.exp(GHZ_KELVIN * nu0 / T_CMB_K) - 1) ** 2)
+        bandpass.th_sync = th_int / th0
+        # Calculate bandpass center-of-mass (i.e. mean frequency).
+        bandpass.nu_bar = np.dot(bandpass.dnu,
+            bandpass.R[:, 0] * bandpass.R[:, 1]) / np.dot(
+            bandpass.dnu,
+            bandpass.R[:, 1])
+
+        return bandpass
+
+def add_foregrounds(bandpass, bandcenter_err, data_params, lmax,lmin=0):
+    A_dust = data_params['A_dust']
+    alpha_dust = data_params['A_dust']
+    beta_dust = data_params['A_dust']
+    dust_scale = dust_scaling(beta_dust, TDUST, bandpass, FPIVOT_DUST, bandcenter_err)
+    ratio = np.arange(lmin, lmax+1)/LPIVOT
+    dustpow = A_dust * np.pow(ratio,alpha_dust)
+    dl = dustpow * dust_scale
+    return dl
 
 def filter_matrix(map_reference_header, matrix, used_maps, num_bins=None, zero_offdiag=False):
         """
