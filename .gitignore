@@ -9,3 +9,5 @@
 *.locked
 *.cleaned
 *.pyc
+*.swp
+*.swo
