@@ -6,7 +6,7 @@ import argparse
 import glob
 import shutil
 import re
-
+from concurrent.futures import ProcessPoolExecutor, as_completed
 import pandas as pd
 from scipy.stats import gaussian_kde
 import eb_load_data as ld
@@ -27,10 +27,12 @@ import matplotlib.colors as mcolors
 
 # Global dictionary for file paths
 #DATASETNAME = 'BK18lfnorot'
-DATASETNAME = 'BK18lf_fede01'
-#DATASETNAME = 'BK18lf'
+#DATASETNAME = 'BK18lf_fede01'
+DATASETNAME = 'BK18lf'
 #DATASET_DIRNAME = 'BK18lf_dust_incEE_norot_allbins'
+#DATASET_DIRNAME = 'BK18lf_fede01_sigl'
 DATASET_DIRNAME = DATASETNAME
+#DATASET_DIRNAME = 'BK18lf_sim'
 
 # Define the base directories for the file paths
 CAMB_BASE_PATH = '/n/holylfs04/LABS/kovac_lab/general/input_maps/official_cl/'
@@ -91,7 +93,7 @@ class BK18_multicomp(Likelihood):
     def initialize(self):
         # Load any data or set up anything that needs to happen before likelihood calculation
         self.map_reference_header = None
-        num_bins =16 
+        num_bins =14 
         # BPWF and header check
         self.bpwf, self.map_reference_header = ld.load_bpwf(FILE_PATHS["bpwf"], self.map_reference_header, num_bins = num_bins)
         self.used_maps = self.filter_used_maps(self.used_maps)
@@ -131,7 +133,7 @@ class BK18_multicomp(Likelihood):
                     'alpha_BK18_K95': 0.3,
                     'alpha_BK18_B95e':0.3
         }
-        self.plot_sample_values(test_params)
+        #self.plot_sample_values(test_params)
         
     # plot 
     def plot_sample_values(self, params_values):
@@ -998,7 +1000,33 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
                         signal_params=signal_params)
     return 
 
+def run_simulation(s, output_path, overwrite):
+    outpath = f"{output_path}{s:03d}"
+    if(os.path.exists(outpath + '.1.txt')):
+        return
+    multicomp_mcmc_driver(outpath, overwrite, s)
 
+
+# Parallel execution with cancellation support
+def parallel_simulation(args):
+    sim_indices = range(args.sim_start, args.sim_num)
+    try:
+        with ProcessPoolExecutor() as executor:
+            # Submit all tasks to the executor
+            future_to_sim = {
+                executor.submit(run_simulation, s, args.output_path, args.overwrite): s
+                for s in sim_indices
+            }
+            for future in as_completed(future_to_sim):
+                try:
+                    # Wait for task to complete
+                    future.result()
+                except Exception as e:
+                    print(f"Simulation {future_to_sim[future]} failed with error: {e}")
+    except KeyboardInterrupt:
+        print("Cancelling all simulations...")
+        executor.shutdown(cancel_futures=True)  # Terminates all running tasks
+        raise  # Re-raise the KeyboardInterrupt to exit the program cleanly
 
 def main():
     # Set up argument parsing
@@ -1009,6 +1037,9 @@ def main():
                         help='whether to overwrite current chains')
     parser.add_argument('-n', '--sim_num', default=-1, type=int,
                         help='Simulation num to extract params from, defaults to real data')
+    parser.add_argument('-s', '--sim_start', default=1, type=int,
+                        help='Simulation start')
+
     args = parser.parse_args()
 
     # Check if the overwrite flag is set
@@ -1037,17 +1068,12 @@ def main():
     if(args.sim_num == -1):
         args.sim_num = 'real'
     if(args.sim_num == 500):
-        for s in range(303, args.sim_num):
-            outpath = args.output_path + f"{s:03d}"
-            multicomp_mcmc_driver(outpath, args.overwrite, s)
+        parallel_simulation(args)
 
     else:
         multicomp_mcmc_driver(args.output_path, args.overwrite, args.sim_num)
     
 if __name__ == '__main__':
-    #matlab_covmat = '/n/home08/liuto/GitHub/EB_analysis/bk18covmat.mat'
-    #plot_sim_peaks('chains/simXXX/mpl00c.1.txt', 1, 10)
-    #                single_path='chains/fullcov_real/mpl00b.1.txt')
     main()
 
 
