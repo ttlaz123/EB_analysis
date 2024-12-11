@@ -19,6 +19,40 @@ import matplotlib.colors as mcolors
 import bicep_data_consts as bdc
 MAP_FREQS = bdc.MAP_FREQS
 
+def plot_sample_fit(observed_data, var, mapi, rotated_dict, ebe_dict, tot_dict, params_values):
+    plt.errorbar( 
+                    x = range(len(observed_data)),
+                    y=(observed_data), 
+                    yerr = np.sqrt(var),
+    )
+    ede_cont = ebe_dict[mapi]
+    plt.plot(ede_cont, label='EDE contribution')
+    parts = mapi.split('x')
+    if(parts[0].endswith('_B')):
+        ind = 0
+    else:
+        ind = 1
+    result = parts[ind][:-2] + '_E'
+    result = result + 'x' + result
+    rot_cont = rotated_dict[mapi]
+    plt.plot(rot_cont, label = 'Polarization Rotation')
+    plt.plot(tot_dict[mapi], label='Both')
+    # Convert dictionary to string with a newline after every two keys
+    result_lines = []
+    for i, (key, value) in enumerate(params_values.items(), start=1):
+        result_lines.append(f"{key}: {value}")
+        # Add a newline after every two keys
+        if i % 2 == 0:
+            result_lines.append("\n")  # Blank line for separation
+
+    # Join the lines to form the final string
+    dict_as_string = ", ".join(result_lines)
+    #dict_as_string = "\n".join(f"{key}: {value}" for key, value in params_values.items())
+    plt.title(mapi + '\n ' + str(dict_as_string))
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
 def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix'):
     
     #print(max(mat[(mat<0.99)| (mat > 1.01)] ))

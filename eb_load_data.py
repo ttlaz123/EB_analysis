@@ -13,8 +13,8 @@ import camb
 from camb import model, initialpower, correlations
 print('Using CAMB %s installed at %s'%(camb.__version__,os.path.dirname(camb.__file__)))
 
-
 import bicep_data_consts
+
 def check_file_header(file_path, reference_header):
     with open(file_path, 'r') as f:
         for line in f:
