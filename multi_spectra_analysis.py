@@ -10,20 +10,14 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 import pandas as pd
 from scipy.stats import gaussian_kde
 import eb_load_data as ld
-
+import eb_plot_data as epd
+import matplotlib.pyplot as plt
 print("Loading Cobaya Modules")
 from cobaya.model import get_model
 from cobaya.run import run
 from cobaya.likelihood import Likelihood
 
-print("Loading Plotting  Modules")
-from getdist import plots, MCSamples
-from getdist.mcsamples import loadMCSamples
-import corner
-import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
+
 
 # Global dictionary for file paths
 #DATASETNAME = 'BK18lfnorot'
@@ -61,13 +55,7 @@ FILE_PATHS = {
     "covariance_matrix": BK18_BASE_PATH + DATASETNAME + '_covmat_dust.dat',
     "observed_data": BK18_BASE_PATH + DATASETNAME + '_cl_hat.dat',
     "EDE_spectrum": '/n/home08/liuto/GitHub/EB_analysis/input_data/fEDE0.07_cl.dat',
-    #"Dominic_invcovmat": '/n/home01/dbeck/keckpipe/Cinv_K95K150K220.dat',
-    #"matlab_covmat": '/n/home08/liuto/GitHub/EB_analysis/bk18covmat.mat',
-    #"matlab_invcovmat": '/n/home08/liuto/GitHub/EB_analysis/bk18_invcovmat.mat',
-
-    #"signal_only_covmat": DOMINIC_BASE_PATH + 'BK18lf_dust_incEE_norot/BK18lfnorot_covmat_sigtrimmed_dust.dat',
-    #'noise_only_covmat': DOMINIC_BASE_PATH + 'BK18lf_dust_incEE_norot/BK18lfnorot_covmat_noi_dust.dat',
-}
+ }
 
 class BK18_multicomp(Likelihood):
     params_names = []
@@ -598,302 +586,11 @@ class BK18_multicomp(Likelihood):
                     self.ebe_dict[cross_map] = ede_shift
                     self.tot_dictt[cross_map] = self.rotated_dict[cross_map] + self.ebe_dict[cross_map]
         self.tot_dict = self.apply_bpwf(self.tot_dictt, self.bpwf, self.used_maps,do_cross=True)
-        '''
-        for u in used_maps:
-            plt.plot(self.tot_dictt[u][:600], label='theory')
-            plt.plot(np.array([ 37.5000, 72.5000, 107.5000, 142.5000, 177.5000, 
-              212.5000, 247.5000, 282.5000, 317.5000, 352.5000, 387.5000, 
-              422.5000, 457.5000, 492.5000, 527.5000, 562.5000]), self.tot_dict[u], label='after bpwf')
-            plt.title(u)
-            plt.legend()
-            plt.show()
-        '''
+  
         theory_vec = self.dict_to_vec(self.tot_dict, used_maps)
         return theory_vec
 
-def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix'):
-    
-    #print(max(mat[(mat<0.99)| (mat > 1.01)] ))
-    nonzeros = np.abs(mat[(mat!=0) &( ~np.isnan(mat))])
-    vpercent =max(np.percentile(nonzeros, 99), 1e-25)
-    linthresh = np.percentile(nonzeros, 1)
-    #print(nonzeros)
-    #print(vpercent)
-    cmap = plt.get_cmap('seismic')
-    norm = mcolors.SymLogNorm(linthresh=linthresh, 
-                                vmin=-vpercent, 
-                                vmax=vpercent, base=10)
-    plt.figure()
-    plt.imshow(mat, cmap=cmap, norm=norm)
-    plt.title(title)
-    if(used_maps is not None):
-        num_bins = int(mat.shape[0]/(len(used_maps)))
 
-        tick_positions = np.arange(0, mat.shape[0], num_bins)
-        plt.xticks(tick_positions, used_maps, 
-                                rotation=30, ha='right')
-        plt.yticks(tick_positions, used_maps)
-    plt.colorbar()
-    plt.savefig(title + '.png')
-    #plt.show()
-
-def plot_best_fit(outpath, used_maps, param_names, 
-                        param_bestfit, param_stats, signal_params={}):
-    eb_like_cls = BK18_multicomp(used_maps=used_maps, 
-                                signal_params=signal_params)
-    used_maps = eb_like_cls.used_maps
-    #np.savetxt('150220_invcovar.txt', eb_like_cls.cov_inv, delimiter=',')
-    observed_datas = eb_like_cls.binned_dl_observed_dict
-    theory_spectra = eb_like_cls.dl_theory
-    param_values = {param_names[i]:param_bestfit[i] 
-                            for i in range(len(param_names))}
-    #param_values['alpha_BK18_220'] = 1.2
-    #param_values['alpha_BK18_150'] = -0.5
-    theory_vec=eb_like_cls.theory(param_values, 
-                    theory_spectra, eb_like_cls.used_maps)
-    observed_vec = eb_like_cls.binned_dl_observed_vec
-    res = theory_vec - observed_vec
-    chisq_mat = np.multiply(eb_like_cls.cov_inv, np.outer(res, res))
-    chisq_tot = 'chisq:' + str(np.sum(chisq_mat))
-    #plot_covar_matrix(chisq_mat, used_maps=used_maps, title=chisq_tot )
-
-    rotated_dict = eb_like_cls.tot_dict
-    #print(rotated_dict)
-    keys = list(rotated_dict.keys())
-    #print(keys)
-    # Get block chisqs
-    num_bins = len(rotated_dict[used_maps[0]])
-    chisq_map = np.zeros((len(used_maps), len(used_maps)))
-    print('Num bins:' + str(num_bins))
-    for i, cross_map1 in enumerate(used_maps):
-        for j, cross_map2 in enumerate(used_maps):
-            block = eb_like_cls.cov_inv[i*num_bins:(i+1)*num_bins,
-                                        j*num_bins:(j+1)*num_bins]
-            vector1 = observed_datas[cross_map1] - rotated_dict[cross_map1]
-            vector2 = observed_datas[cross_map2] - rotated_dict[cross_map2]
-            chisq = vector1.T @ block @ vector2
-            chisq_map[i,j] = chisq
-            
-    plt.figure()
-    print('Chisq:' + str(np.sum(chisq_map)))
-    vrange = np.std(chisq_map)
-    plt.imshow(chisq_map, cmap='bwr', vmin=-vrange, vmax=vrange)
-    plt.colorbar()
-    plt.xticks(np.arange(len(used_maps)), used_maps, rotation = 45)
-    plt.yticks(np.arange(len(used_maps)), used_maps)
-    plt.savefig(outpath + '_chisqmap.png')
-    #plt.show()
-    # Initialize lists to store unique maps ending with _E and _B
-    maps_B = set()
-    maps_E = set()
-
-    for key in keys:
-        parts = key.split('x')
-        if parts[0].endswith('_B'):
-            maps_B.add(parts[0])
-        if parts[0].endswith('_E'):
-            maps_E.add(parts[0])
-        if parts[1].endswith('_B'):
-            maps_B.add(parts[1])
-        if parts[1].endswith('_E'):
-            maps_E.add(parts[1])
-    maps_B = sorted(list(maps_B))
-    maps_E = sorted(list(maps_E))
-    param_stats = sorted(param_stats)
-    num_columns = len(maps_B)  # Unique maps for columns
-    num_rows = len(maps_E)      # Unique maps for rows
-    # Create subplots
-    fig, axes = plt.subplots(num_rows, num_columns, 
-                    figsize=(num_columns * 4, num_rows * 4))
-
-    try:
-        axes = axes.flatten()  # Flatten axes array for easy indexing
-    except AttributeError:
-        print("Only one axis!")
-        axes = [axes]
-    # Plot each spectrum
-    for idx, key in enumerate(keys):
-        observed_data = observed_datas[key]
-        best_fit_data = rotated_dict[key]
-        #print(key)
-        #print(observed_data - best_fit_data) 
-        # Split key to find row and column indices
-        parts = key.split('x')
-        row_idx = (maps_E).index(parts[0]) if parts[0].endswith('_E') else (maps_E).index(parts[1])
-        col_idx = (maps_B).index(parts[0]) if parts[0].endswith('_B') else (maps_B).index(parts[1])
-        map_index = eb_like_cls.used_maps.index(key)
-        num_bin = len(observed_data)
-        covar_mat = eb_like_cls.filtered_covmat
-        var = np.diag(covar_mat)[map_index*num_bin:num_bin*(map_index+1)]
-        # Plotting observed data
-        axes_index = row_idx * num_columns + col_idx
-        #print(observed_data)
-        
-        axes[axes_index].errorbar(
-                            x = range(len(observed_data)),
-                            y=(observed_data), 
-                            yerr = np.sqrt(var),
-                            label='Observed', color='blue')
-        # Plotting best fit data
-        axes[axes_index].plot(best_fit_data, label='Best Fit', color='red')
-
-        axes[axes_index].set_title(key)
-        axes[axes_index].legend()
-    for row_idx, map_E in enumerate(maps_E):
-        angle = f"alpha_{map_E}"
-        axes[row_idx].text(
-            0.05, 1.4,  # X and Y position (top-left corner)
-            param_stats[row_idx],  # The parameter stats
-            transform=axes[row_idx].transAxes,  # Use axes coordinates
-            fontsize=10, color='black',
-            verticalalignment='top'
-        )
-    plt.tight_layout(pad=2)
-    plt.savefig(outpath + '_bestfit.png')
-    return 
-
-
-def plot_triangle(root, replace_dict={}):
-    # Load MCMC samples from the specified root
-    samples = loadMCSamples(root)
-    print([name.name for name in samples.getParamNames().names])
-    
-    param_names = [name.name for name in samples.getParamNames().names
-                   if ('chi2' not in name.name and
-                       'weight' not in name.name and
-                       'betadust' not in name.name and
-                       'betasync' not in name.name and
-                       'minuslogprior' not in name.name)]
-    
-    # Get the mean and std of the parameters for titles
-    mean_std_strings = []
-    means = []
-    count = 0
-    for param in param_names:
-        
-        mean = samples.mean(param)
-        if(param in replace_dict):
-            mean = replace_dict[param]
-        chisq = samples.mean('chi2')
-        std = samples.std(param)
-        if(count == 0):
-            mean_std_strings.append(f"{param}: {mean:.2f} ± {std:.2f} chisq={chisq:.2f}")
-            count += 1
-        else:
-            mean_std_strings.append(f"{param}: {mean:.2f} ± {std:.2f}")
-
-        means.append(mean)
-
-    # Create a triangle plot with all variables
-    plt.figure()
-    g = plots.get_subplot_plotter()
-    g.triangle_plot(samples, param_names, filled=True)
-
-    # Add the mean and std to the plot title
-    plt.suptitle("\n".join(mean_std_strings), fontsize=10)
-    plt.tight_layout()
-    # Save the plot
-    plt.savefig(f"{root}_triangle_plot.png")
-    print(f"Triangle plot saved as {root}_triangle_plot.png")
-    #plt.show()
-    return param_names, means, mean_std_strings
-
-def plot_eigenvalues_eigenvectors(matrix):
-    """
-    Plots the eigenvalues and eigenvectors of a given square matrix.
-
-    Parameters:
-    - matrix (np.ndarray): A square matrix for which to compute and plot eigenvalues and eigenvectors.
-    """
-    # Compute eigenvalues and eigenvectors
-    eigenvalues, eigenvectors = np.linalg.eig(matrix)
-
-    # Create subplots
-    plt.figure(figsize=(12, 6))
-
-    # Subplot for eigenvalues
-    plt.subplot(1, 2, 1)
-    plt.bar(range(len(eigenvalues)), np.log(eigenvalues), color='b')
-    plt.title('Eigenvalues')
-    plt.xlabel('Index')
-    plt.ylabel('Ln Eigenvalue')
-
-    # Subplot for eigenvectors
-    plt.subplot(1, 2, 2)
-    plt.imshow(np.log(np.abs(eigenvectors)))
-    plt.colorbar()
-    plt.title('Ln abs Eigenvectors')
-    plt.xlabel('X')
-    plt.ylabel('Y')
-    plt.grid()
-    plt.legend()
-
-    plt.tight_layout()
-    plt.show()
-    return
-
-def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None):
-    modes_dict = {}
-    single_df = None
-    for i in range(1, sim_nums + 1):
-        file_path = chains_path.replace('XXX', f'{i:03d}')
-        print('loading:' + str(file_path))
-        # Read the first line to get the correct header
-        with open(file_path, 'r') as f:
-            first_line = f.readline().strip()  # Read the first line
-            # Remove the '#' and split to get the correct column names
-            corrected_header = first_line.replace('#', '').split()
-        
-        chain_df = pd.read_csv(file_path, delim_whitespace=True, comment='#')
-        chain_df.columns = corrected_header
-        for column in chain_df.columns:
-            if column not in modes_dict:
-                modes_dict[column] = []
-            mode = np.mean(chain_df[column])
-            modes_dict[column].append(mode)
-    # Convert the modes dictionary to a DataFrame
-    modes_df = pd.DataFrame.from_dict(modes_dict)
-    default_cols = ['#', 'weight', 'minuslogpost', 'minuslogprior',
-                   'minuslogprior__0', 'chi2', 'chi2__my_likelihood']
-    param_names = [col for col in modes_df.columns if col not in default_cols]
-    print(param_names)
-    # Create a corner plot of the mean of modes
-    #print(modes_df)
-    #print(modes_df[param_names])
-    
-    
-        
-    colors = ['red', 'blue', 'green', 'orange']
-    for i in range(1,single_sim):
-        fig = corner.corner(modes_df[param_names], 
-                        labels=param_names, 
-                    show_titles=True, 
-                    title_kwargs={"fontsize": 12},
-                    hist_kwargs={'color':'red', 'density':True},
-                    contour_kwargs={'colors':'red'})
-
-        if(single_path is None):
-            file_path = chains_path.replace('XXX', f'{i:03d}')    
-        else:
-            file_path = single_path
-        single_df = pd.read_csv(file_path, delim_whitespace=True, comment='#')
-        single_df.columns = corrected_header
-        corner.corner(single_df[param_names], labels=param_names,
-                    show_titles=False, 
-                    hist_kwargs={'color': 'blue', 'density':True},
-                    contour_kwargs={'colors': 'blue'}, 
-                    fig=fig)
-    
-    
-        # Show the plot
-        supertitle = 'Sim' + str(i) + ' (blue) on top of ' + str(sim_nums) + ' sims (red)'
-        plt.suptitle(supertitle)
-        outpath = chains_path.split('XXX')[0] + str(i) + '_summary.png'
-        plt.savefig(outpath)
-        print('Saved to ' + outpath)
-        plt.show()
-
-    return 
     
 
 # Function to create and run a Cobaya model with the custom likelihood
@@ -994,8 +691,10 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
                                                 signal_params=signal_params)
 
     replace_dict ={}# {"alpha_BK18_220":0.6}
-    param_names, means, mean_std_strs = plot_triangle(outpath, replace_dict)
-    plot_best_fit(outpath, all_cross_spectra,  
+    param_names, means, mean_std_strs = epd.plot_triangle(outpath, replace_dict)
+    eb_like_cls = BK18_multicomp(used_maps=all_cross_spectra, 
+                                signal_params=signal_params)
+    epd.plot_best_fit(eb_like_cls, outpath, all_cross_spectra,  
                         param_names, means, mean_std_strs, 
                         signal_params=signal_params)
     return 
