@@ -354,7 +354,7 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
 
 def run_simulation(s, output_path, overwrite):
     outpath = f"{output_path}{s:03d}"
-    if(os.path.exists(outpath + '.1.txt')):
+    if(os.path.exists(outpath + '.1.txt') and os.path.exists(outpath + '_bestfit.png')):
         return
     multicomp_mcmc_driver(outpath, overwrite, s)
 
