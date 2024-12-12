@@ -1,7 +1,7 @@
 
 import numpy as np
 import re
-from typing import Any
+
 # Physical constants
 
 h_J_s = 6.62607015e-34
@@ -13,66 +13,104 @@ FPIVOT_DUST = 353.0
 FPIVOT_SYNC = 23.0
 LPIVOT = 80.0
 TDUST = 19.6
-class Bandpass:
-    pass
 
-def dust_scaling(beta, Tdust, bandpass, nu0, bandcenter_err):
-        """Calculates greybody scaling of dust signal defined at 353 GHz
-        to specified bandpass."""
-        gb_int = np.sum(bandpass.dnu * bandpass.R[:, 1] * bandpass.R[:, 0] ** (3 + beta) /
-                        (np.exp(GHZ_KELVIN * bandpass.R[:, 0] / Tdust) - 1))
-        # Calculate values at pivot frequency.
-        gb0 = nu0 ** (3 + beta) / (np.exp(GHZ_KELVIN * nu0 / Tdust) - 1)
-        #  Add correction for band center error
-        if bandcenter_err != 1:
-            nu_bar = GHZ_KELVIN * bandpass.nu_bar
-            # Conversion factor error due to bandcenter error.
-            th_err = bandcenter_err ** 4 * (np.exp(GHZ_KELVIN * bandpass % nu_bar *
-                                                   (bandcenter_err - 1) / T_CMB_K) *
-                                            (np.exp(nu_bar / T_CMB_K) - 1) ** 2 /
-                                            (np.exp(nu_bar * bandcenter_err
-                                                    / T_CMB_K) - 1) ** 2)
-            # Greybody scaling error due to bandcenter error.
-            gb_err = bandcenter_err ** (3 + beta) * (np.exp(nu_bar / Tdust) - 1) / \
-                     (np.exp(nu_bar * bandcenter_err / Tdust) - 1)
-        else:
-            th_err = 1
-            gb_err = 1
 
-        # Calculate dust scaling.
-        return (gb_int / gb0) / bandpass.th_dust * (gb_err / th_err)
+def dust_scaling(beta, Tdust, bandpass, nu0, bandcenter_err=1):
+    """
+    Calculates the greybody scaling of a dust signal defined at a pivot frequency (e.g., 353 GHz)
+    to a specified bandpass.
 
-def read_bandpass(fname):
-        bandpass: Any = Bandpass()
-        bandpass.R = np.loadtxt(fname)
-        nu = bandpass.R[:, 0]
-        bandpass.dnu = np.hstack(
-            ((nu[1] - nu[0]), (nu[2:] - nu[:-2]) / 2, (nu[-1] - nu[-2])))
-        # Calculate thermodynamic temperature conversion between this bandpass
-        # and pivot frequencies 353 GHz (used for dust) and 150 GHz (used for sync).
-        th_int = np.sum(bandpass.dnu * bandpass.R[:, 1] * bandpass.R[:, 0] ** 4 *
-                        np.exp(GHZ_KELVIN * bandpass.R[:, 0] / T_CMB_K) /
-                        (np.exp(GHZ_KELVIN * bandpass.R[:, 0] / T_CMB_K) - 1) ** 2)
-        nu0 = FPIVOT_DUST
-        th0 = (nu0 ** 4 * np.exp(GHZ_KELVIN * nu0 / T_CMB_K) /
-               (np.exp(GHZ_KELVIN * nu0 / T_CMB_K) - 1) ** 2)
-        bandpass.th_dust = th_int / th0
-        nu0 = FPIVOT_SYNC
-        th0 = (nu0 ** 4 * np.exp(GHZ_KELVIN * nu0 / T_CMB_K) /
-               (np.exp(GHZ_KELVIN * nu0 / T_CMB_K) - 1) ** 2)
-        bandpass.th_sync = th_int / th0
-        # Calculate bandpass center-of-mass (i.e. mean frequency).
-        bandpass.nu_bar = np.dot(bandpass.dnu,
-            bandpass.R[:, 0] * bandpass.R[:, 1]) / np.dot(
-            bandpass.dnu,
-            bandpass.R[:, 1])
+    Parameters:
+        beta (float): Spectral index for the dust emission.
+        Tdust (float): Temperature of the dust in Kelvin.
+        bandpass (object): Bandpass object containing:
+            - `dnu` (array): Frequency bin widths.
+            - `R` (array): Response matrix where R[:, 0] is frequency and R[:, 1] is the bandpass response.
+            - `nu_bar` (float): Effective band center frequency.
+            - `th_dust` (float): Dust conversion factor for the bandpass.
+        nu0 (float): Pivot frequency in GHz (e.g., 353 GHz).
+        bandcenter_err (float, optional): Error in the band center frequency. Defaults to 1 (no error).
 
-        return bandpass
+    Returns:
+        float: Dust scaling factor accounting for greybody spectrum and bandpass integration.
+    """
+    gb_int = np.sum(bandpass.dnu * bandpass.R[:, 1] * bandpass.R[:, 0] ** (3 + beta) /
+                    (np.exp(GHZ_KELVIN * bandpass.R[:, 0] / Tdust) - 1))
+    # Calculate values at pivot frequency.
+    gb0 = nu0 ** (3 + beta) / (np.exp(GHZ_KELVIN * nu0 / Tdust) - 1)
+    #  Add correction for band center error
+    if bandcenter_err != 1:
+        nu_bar = GHZ_KELVIN * bandpass.nu_bar
+        # Conversion factor error due to bandcenter error.
+        th_err = bandcenter_err ** 4 * (np.exp(GHZ_KELVIN * bandpass % nu_bar *
+                                                (bandcenter_err - 1) / T_CMB_K) *
+                                        (np.exp(nu_bar / T_CMB_K) - 1) ** 2 /
+                                        (np.exp(nu_bar * bandcenter_err
+                                                / T_CMB_K) - 1) ** 2)
+        # Greybody scaling error due to bandcenter error.
+        gb_err = bandcenter_err ** (3 + beta) * (np.exp(nu_bar / Tdust) - 1) / \
+                    (np.exp(nu_bar * bandcenter_err / Tdust) - 1)
+    else:
+        th_err = 1
+        gb_err = 1
 
-def add_foregrounds(bandpass, bandcenter_err, data_params, lmax,lmin=0):
-    A_dust = data_params['A_dust']
-    alpha_dust = data_params['A_dust']
-    beta_dust = data_params['A_dust']
+    # Calculate dust scaling.
+    return (gb_int / gb0) / bandpass.th_dust * (gb_err / th_err)
+
+def add_all_dust_foregrounds(dl_theory_dict, data_params, bandpasses):
+    """
+    Adds dust foregrounds to the theoretical angular power spectrum for each map in the input dictionary.
+
+    Parameters:
+        dl_theory_dict (dict): Dictionary of theoretical angular power spectra with keys
+            in the format `something_Exsomething_B`.
+        data_params (dict): Dictionary containing parameters for dust modeling (e.g., amplitude, slope).
+        bandpasses (dict): Dictionary of bandpass objects indexed by frequency.
+
+    Returns:
+        dict: Updated dictionary with dust foregrounds added to each spectrum.
+    """
+    dust_dict = {}
+    for spec_map in dl_theory_dict:
+        # matches NNNNN_E|BxMMMMM_E|B
+        matches = re.findall(r'([^_]+)_(E|B)x([^_]+)_(E|B)(?:_|$)', spec_map)
+        spec = matches[1] + matches[3]
+        
+        assert(matches[0] == matches[2])
+        freq = matches[0]
+        bandpass = bandpasses[freq]
+        lmax = dl_theory_dict[0].shape[0]
+        dust_foreground = add_foregrounds(bandpass, data_params, spec, lmax)
+        dust_dict[spec_map] = dl_theory_dict[spec_map] + dust_foreground
+    return dust_dict
+
+def add_foregrounds(bandpass, data_params, spectrum, lmax,lmin=0, bandcenter_err=1):
+    """
+    Computes and returns the dust foreground angular power spectrum.
+
+    Parameters:
+        bandpass (object): Bandpass object containing frequency response details.
+        data_params (dict): Dictionary of dust parameters, containing:
+            - `A_dust_<spectrum>`: Amplitude of dust emission.
+            - `alpha_dust_<spectrum>`: Slope of the dust power spectrum.
+            - `beta_dust`: Spectral index of the dust.
+        spectrum (str): Power spectrum type (`EE`, `EB`, or `BB`).
+        lmax (int): Maximum multipole moment (ell).
+        lmin (int, optional): Minimum multipole moment (ell). Defaults to 0.
+        bandcenter_err (float, optional): Error in the band center frequency. Defaults to 1 (no error).
+
+    Returns:
+        ndarray: Array of foreground power spectrum values for each multipole moment.
+    """
+    try:
+        A_dust = data_params['A_dust_' + spectrum]
+        alpha_dust = data_params['alpha_dust_' + spectrum]
+    except KeyError:
+        spectrum = spectrum[1] + spectrum[0]
+        A_dust = data_params['A_dust_' + spectrum]
+        alpha_dust = data_params['alpha_dust_' + spectrum]
+    
+    beta_dust = data_params['beta_dust']
     dust_scale = dust_scaling(beta_dust, TDUST, bandpass, FPIVOT_DUST, bandcenter_err)
     ratio = np.arange(lmin, lmax+1)/LPIVOT
     dustpow = A_dust * np.pow(ratio,alpha_dust)

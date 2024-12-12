@@ -49,6 +49,18 @@ FILE_PATHS = {
         "P353e": CAMB_BASE_PATH + 'dust_270_3p75.fits',
         "P217e": CAMB_BASE_PATH + 'dust_220_3p75.fits',
     },
+    "bandpasses": {
+        "BK18_B95e": BK18_BASE_PATH + 'bandpass_BK18_B95e.txt',
+        "BK18_K95": BK18_BASE_PATH + 'bandpass_BK18_K95.txt',
+        "BK18_150": BK18_BASE_PATH + 'bandpass_BK18_150.txt',
+        "BK18_220": BK18_BASE_PATH + 'bandpass_BK18_220.txt',
+        "P030e": BK18_BASE_PATH + 'bandpass_P030e.txt',
+        "P044e": BK18_BASE_PATH + 'bandpass_P044e.txt',
+        "P143e": BK18_BASE_PATH + 'bandpass_P143e.txt',
+        "P353e": BK18_BASE_PATH + 'bandpass_P353e.txt',
+        "P217e": BK18_BASE_PATH + 'bandpass_P217e.txt',
+        
+    },
     "bpwf": BK18_BASE_PATH + 'windows/' + DATASETNAME + '_bpwf_bin*.txt',
     "covariance_matrix": BK18_BASE_PATH + DATASETNAME + '_covmat_dust.dat',
     "observed_data": BK18_BASE_PATH + DATASETNAME + '_cl_hat.dat',
@@ -61,12 +73,18 @@ class BK18_multicomp(Likelihood):
     include_EDE = True   
     zero_offdiag = False
     signal_params = {}
+    fixed_dust = True
+    num_bins = 14
     def __init__(self,*args,**kwargs):
         if('used_maps' in kwargs):
             self.used_maps = kwargs['used_maps']
             print("New used maps: " + str(self.used_maps))
             if('zero_offdiag' in kwargs):
                 self.zero_offdiag = kwargs['zero_offdiag']
+            if('fixed_dust' in kwargs):
+                self.fixed_dust = kwargs['fixed_dust']
+            if('num_bins' in kwargs):
+                self.num_bins = kwargs['num_bins']
             if('signal_params' in kwargs):
                 self.signal_params = kwargs['signal_params']
                 if('gMpl' in self.signal_params):
@@ -79,14 +97,14 @@ class BK18_multicomp(Likelihood):
     def initialize(self):
         # Load any data or set up anything that needs to happen before likelihood calculation
         self.map_reference_header = None
-        num_bins =14 
+        num_bins = self.num_bins 
         # BPWF and header check
         self.bpwf, self.map_reference_header = ld.load_bpwf(FILE_PATHS["bpwf"], self.map_reference_header, num_bins = num_bins)
         self.used_maps = self.filter_used_maps(self.used_maps)
-
+        self.bandpasses = ld.read_bandpasses(FILE_PATHS['bandpasses'])
         # Theory
         self.dl_theory = ld.load_cmb_spectra(FILE_PATHS['camb_lensing'],
-                                               FILE_PATHS['dust_models'])
+                                               FILE_PATHS['dust_models'], self.fixed_dust)
         print("Include EDE?" + str(self.include_EDE))
         if(self.include_EDE):
             self.dl_theory = ld.include_ede_spectra(FILE_PATHS['EDE_spectrum'],
@@ -224,12 +242,19 @@ class BK18_multicomp(Likelihood):
         self.ebe_dict = {}
         self.tot_dictt = {}
         self.tot_dict = {}
+        dust_dict = {}
+        if(self.fixed_dust):
+            dust_dict = dl_theory_dict
+        else:
+            dust_dict = ec.add_all_dust_foregrounds(dl_theory_dict, params_values, self.bandpasses)
+            
+        
         for cross_map in used_maps:
             self.rotated_dict[cross_map] = ec.rotate_spectrum(cross_map,
-                                            dl_theory_dict, params_values)
+                                            dust_dict, params_values)
             if(self.include_EDE):
                 ede_shift = ec.apply_EDE_shift(cross_map,
-                                                dl_theory_dict, params_values)
+                                                dust_dict, params_values)
                 if self.rotated_dict[cross_map].shape != ede_shift.shape:
                     min_size = min(self.rotated_dict[cross_map].size, 
                                         ede_shift.size)
@@ -249,7 +274,8 @@ class BK18_multicomp(Likelihood):
 # Function to create and run a Cobaya model with the custom likelihood
 def run_bk18_likelihood(params_dict, used_maps, outpath, 
                             include_ede = False, zero_offdiag = False,
-                            rstop = 0.02, max_tries=10000, signal_params = {}):
+                            rstop = 0.02, max_tries=10000, fixed_dust=True,
+                            num_bins=14, signal_params = {}):
 
     # Set up the custom likelihood with provided params
     likelihood_class = BK18_multicomp
@@ -263,6 +289,8 @@ def run_bk18_likelihood(params_dict, used_maps, outpath,
                 "include_EDE": include_ede,
                 "zero_offdiag": zero_offdiag,
                 "signal_params": signal_params,
+                "fixed_dust":  fixed_dust,
+                "num_bins": num_bins,
             }
         },
         "params": params_dict,
@@ -308,6 +336,8 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
                     ]
     do_crosses =True
     include_ede = True
+    num_bins = 14
+    fixed_dust = True
     if(sim_num != 'real'):
         formatted_simnum = str(sim_num).zfill(3)
         simname = BK18_SIM_NAME.replace("XXX", formatted_simnum)
@@ -334,6 +364,24 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
     
     if(include_ede):
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
+ 
+    if(not fixed_dust):
+        A_dust_priors = {"prior":{"min": 0, "max":15}, 
+                            "ref": {"dist":"norm", "loc":3, "scale":0.1},
+                            "proposal":0.1}
+        alpha_dust_priors = {"prior":{"min": -1, "max":0}, 
+                                    "ref": {"dist":"norm", "loc":-0.5, "scale":0.01},
+                                    "proposal":0.01}
+        for spec in ['EE', 'BB', 'EB']:
+
+            params_dict['A_dust_' + spec] = {**A_dust_priors,
+                                        "latex":"A_{"+spec+",\mathrm{dust}}"}
+            params_dict['alpha_dust_' + spec] = {**alpha_dust_priors,
+                                        "latex":"\\alpha_{"+spec+",\mathrm{dust}}"}
+        params_dict['beta_dust'] = {"prior":{"min": 0.8, "max":2.4}, 
+                                    "ref": {"dist":"norm", "loc":1.6, "scale":0.02},
+                                    "proposal":0.02,
+                                    "latex":"\\beta_{\mathrm{dust}}"}
     
    
     if(dorun):
@@ -341,6 +389,8 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
                                                 all_cross_spectra, 
                                                 outpath=outpath,
                                                 include_ede = include_ede,
+                                                fixed_dust=fixed_dust,
+                                                num_bins=num_bins,
                                                 signal_params=signal_params)
 
     replace_dict ={}# {"alpha_BK18_220":0.6}

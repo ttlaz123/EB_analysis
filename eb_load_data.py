@@ -4,16 +4,62 @@ import sys, os
 import pandas as pd
 import re
 import glob
+from typing import Any
 #Assume installed from github using "git clone --recursive https://github.com/cmbant/CAMB.git"
 #This file is then in the docs folders
-camb_path = os.path.realpath(os.path.join(os.getcwd(),'..'))
-sys.path.insert(0,camb_path)
+#camb_path = os.path.realpath(os.path.join(os.getcwd(),'..'))
+#sys.path.insert(0,camb_path)
 
 import camb
 from camb import model, initialpower, correlations
 print('Using CAMB %s installed at %s'%(camb.__version__,os.path.dirname(camb.__file__)))
 
 import bicep_data_consts
+h_J_s = 6.62607015e-34
+kB_J_K = 1.380649e-23
+GHZ_KELVIN = h_J_s / kB_J_K * 1e9
+T_CMB_K = 2.7255  # fiducial CMB temperature
+D2R=np.pi/180.0
+FPIVOT_DUST = 353.0
+FPIVOT_SYNC = 23.0
+LPIVOT = 80.0
+TDUST = 19.6
+K_TO_UK = 1e6
+class Bandpass:
+    pass
+
+def read_bandpasses(file_paths):
+    bandpass_dict = {}
+    for map_freq in file_paths:
+        bandpass_dict[map_freq] = read_bandpass(file_paths[map_freq])
+    return bandpass_dict
+
+def read_bandpass(fname):
+        bandpass: Any = Bandpass()
+        bandpass.R = np.loadtxt(fname)
+        nu = bandpass.R[:, 0]
+        bandpass.dnu = np.hstack(
+            ((nu[1] - nu[0]), (nu[2:] - nu[:-2]) / 2, (nu[-1] - nu[-2])))
+        # Calculate thermodynamic temperature conversion between this bandpass
+        # and pivot frequencies 353 GHz (used for dust) and 150 GHz (used for sync).
+        th_int = np.sum(bandpass.dnu * bandpass.R[:, 1] * bandpass.R[:, 0] ** 4 *
+                        np.exp(GHZ_KELVIN * bandpass.R[:, 0] / T_CMB_K) /
+                        (np.exp(GHZ_KELVIN * bandpass.R[:, 0] / T_CMB_K) - 1) ** 2)
+        nu0 = FPIVOT_DUST
+        th0 = (nu0 ** 4 * np.exp(GHZ_KELVIN * nu0 / T_CMB_K) /
+               (np.exp(GHZ_KELVIN * nu0 / T_CMB_K) - 1) ** 2)
+        bandpass.th_dust = th_int / th0
+        nu0 = FPIVOT_SYNC
+        th0 = (nu0 ** 4 * np.exp(GHZ_KELVIN * nu0 / T_CMB_K) /
+               (np.exp(GHZ_KELVIN * nu0 / T_CMB_K) - 1) ** 2)
+        bandpass.th_sync = th_int / th0
+        # Calculate bandpass center-of-mass (i.e. mean frequency).
+        bandpass.nu_bar = np.dot(bandpass.dnu,
+            bandpass.R[:, 0] * bandpass.R[:, 1]) / np.dot(
+            bandpass.dnu,
+            bandpass.R[:, 1])
+
+        return bandpass
 
 def check_file_header(file_path, reference_header):
     with open(file_path, 'r') as f:
@@ -182,8 +228,7 @@ def load_covariance_matrix(covmat_path, map_reference_header):
     assert shap[0] == shap[1], "Covariance matrix must be square."
     return full_covmat
 
-def load_cmb_spectra(lensing_path, dust_paths):
-    k_to_uk = 1e6
+def load_cmb_spectra(lensing_path, dust_paths, fixed_dust = False):
     theory_dict = {}
     print("Loading: " + str(lensing_path))
     with fits.open(lensing_path) as hdul_lens:
@@ -191,14 +236,18 @@ def load_cmb_spectra(lensing_path, dust_paths):
         BB_lens = hdul_lens[1].data['B-mode C_l']
     for map_freq in dust_paths:
         print("Loading: " + str(dust_paths[map_freq]))
-        with fits.open(dust_paths[map_freq]) as hdul_dust:
-            EE_dust = hdul_dust[1].data['E-mode C_l']
-            BB_dust = hdul_dust[1].data['B-mode C_l']
+        if(fixed_dust):
+            with fits.open(dust_paths[map_freq]) as hdul_dust:
+                EE_dust = hdul_dust[1].data['E-mode C_l']
+                BB_dust = hdul_dust[1].data['B-mode C_l']
+        else:
+            EE_dust = 0
+            BB_dust = 0
         ee_spectrum = EE_lens + EE_dust
         
         bb_spectrum =  BB_lens + BB_dust
-        ee_spectrum *= np.square(k_to_uk)
-        bb_spectrum *= np.square(k_to_uk)
+        ee_spectrum *= np.square(K_TO_UK)
+        bb_spectrum *= np.square(K_TO_UK)
         cl_to_dl = np.array([l*(l+1) for l in range(len(ee_spectrum))])/2/np.pi
         theory_dict[map_freq + '_Ex' + map_freq + '_E'] = ee_spectrum*cl_to_dl            
         theory_dict[map_freq + '_Bx' + map_freq + '_B'] = bb_spectrum*cl_to_dl
@@ -206,13 +255,12 @@ def load_cmb_spectra(lensing_path, dust_paths):
     return theory_dict
 
 def include_ede_spectra(ede_path, theory_dict):
-        k_to_uk = 1e6
-        cmb_temp = 2.726
+        
         data = pd.read_csv(ede_path, delim_whitespace=True, comment='#', header=None)
         data.columns = ['l', 'TT', 'EE', 'TE', 'BB', 'EB', 'TB', 'phiphi', 'TPhi', 'Ephi']
         # Extract 'l' and 'EB' columns
         EB_values = data['EB'].to_numpy()
-        EB_ede_dls = -EB_values * np.square(k_to_uk) * np.square(cmb_temp)
+        EB_ede_dls = -EB_values * np.square(K_TO_UK) * np.square(T_CMB_K)
         theory_dict['EDE_EB'] = EB_ede_dls
         return theory_dict
 
@@ -375,7 +423,7 @@ def load_data(spectrum_type, datafile=None, raw_cls=False):
         GLOBAL_VAR['errs'] = errs
     return GLOBAL_VAR
 
-def load_dust_lensing_model(bin_start=1, bin_end=10, mapname='BK18_B95', 
+def load_dust_lensing_model(bin_start=1, bin_end=15, mapname='BK18_B95', 
                             dust_path='input_data/model_dust.npy', 
                             lensing_path='input_data/model_lens.npy', 
                             bandpowerwindowfunction_path='input_data/bpwf.npy',
@@ -440,7 +488,7 @@ def load_dust_lensing_model(bin_start=1, bin_end=10, mapname='BK18_B95',
     spectrum_dict['EE_binned'] = ee_binned[bin_start:bin_end]
     spectrum_dict['BB_binned'] = bb_binned[bin_start:bin_end]
 
-
+    '''
     if(plot):
         plt.figure()
         plt.title('EE Map: ' + str(mapname))
@@ -458,7 +506,7 @@ def load_dust_lensing_model(bin_start=1, bin_end=10, mapname='BK18_B95',
         plt.xlabel(r'$\ell$')
         plt.legend()
         plt.show()
-
+    '''
 
     
     return bpwf_ls, bpwf_cls[:,:,EE], spectrum_dict
