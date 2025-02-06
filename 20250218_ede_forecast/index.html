@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Early Dark Energy Fisher Forecast</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <!-- Load up MathJax for math notation -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            TeX: { equationNumbers: { autoNumber: "AMS" } }
+        });
+    </script><script type="text/javascript" src="../mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+</head>
+
+<body>
+    <!-- Add my custom pager script -->
+    <script type="text/javascript" src="scripts/pager.js"></script>
+    <link rel="stylesheet" type="text/css" href="scripts/pager.css">
+
+    <header>
+        <h1>Early Dark Energy Fisher Forecast</h1>
+
+        <time datetime="2025 February 18" class="published updated">
+            2025 February 18
+        </time> —
+        Tongtian (Tom) Liu, Dominic Beck
+    </header>
+
+    <hr>
+
+    <section>
+        <h2>Fisher Matrix Analysis and Uncertainty Projections</h2>
+    
+        <p>
+            Fisher matrices are a powerful tool for forecasting the uncertainties in cosmological parameters when experimental conditions, such as sky coverage or observation time, are improved. Below, we present the Fisher matrices used to project uncertainties for the parameters \( g, \alpha_{150}, \alpha_{220}, \alpha_{K95}, \) and \( \alpha_{B95e} \). These matrices encode the expected uncertainties and correlations between parameters under the assumption of Gaussian likelihoods.
+        </p>
+    
+        <h3>Fisher Matrix for Parameter Uncertainties</h3>
+        <p>
+            The Fisher matrix \( F \) is defined as the expectation value of the second derivatives of the log-likelihood with respect to the parameters. The uncertainties \( \sigma_{ii} \) for each parameter are derived from the diagonal elements of the inverse Fisher matrix:
+            \[
+            \sigma_{ii} = \sqrt{(F^{-1})_{ii}}
+            \]
+            Below, we provide the uncertainties for each parameter in both radians and degrees.
+        </p>
+    
+        <h4>Uncertainties in Radians</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Uncertainty (\( \sigma_{ii} \))</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>\( g \)</td>
+                    <td>0.3246</td>
+                </tr>
+                <tr>
+                    <td>\( \alpha_{150} \)</td>
+                    <td>0.002658</td>
+                </tr>
+                <tr>
+                    <td>\( \alpha_{220} \)</td>
+                    <td>0.003777</td>
+                </tr>
+                <tr>
+                    <td>\( \alpha_{K95} \)</td>
+                    <td>0.003547</td>
+                </tr>
+                <tr>
+                    <td>\( \alpha_{B95e} \)</td>
+                    <td>0.002450</td>
+                </tr>
+            </tbody>
+        </table>
+    
+        <h4>Uncertainties in Degrees</h4>
+        <p>
+            To convert the uncertainties from radians to degrees, we use the conversion factor \( 1 \text{ radian} = \frac{180}{\pi} \text{ degrees} \). The results are as follows:
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Uncertainty (\( \sigma_{ii} \))</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>\( \alpha_{150} \)</td>
+                    <td>0.1523°</td>
+                </tr>
+                <tr>
+                    <td>\( \alpha_{220} \)</td>
+                    <td>0.2164°</td>
+                </tr>
+                <tr>
+                    <td>\( \alpha_{K95} \)</td>
+                    <td>0.2032°</td>
+                </tr>
+                <tr>
+                    <td>\( \alpha_{B95e} \)</td>
+                    <td>0.1404°</td>
+                </tr>
+            </tbody>
+        </table>
+    
+        <h3>Fisher Forecasting Framework for CMB Experiments</h3>
+        <p>
+            In the context of CMB experiments, accurately forecasting the science reach of future instruments is a critical challenge. The Bicep/Keck collaboration has developed a robust Fisher forecasting framework that leverages achieved performance metrics from on-sky observations to project the capabilities of future experiments. This framework is particularly valuable for optimizing the design of next-generation CMB experiments, such as Bicep Array and CMB-S4.
+        </p>
+    
+        <h4>Key Features of the Framework</h4>
+        <p>
+            The Fisher forecasting framework is based on the following principles:
+        </p>
+        <ul>
+            <li>
+                <strong>Realistic Inputs:</strong> The framework uses noise spectra and covariance matrices derived from multi-year on-sky maps that have passed jackknife resampling tests. This ensures that the forecasts are grounded in actual experimental performance, accounting for real-world inefficiencies such as imperfect detector yield, non-uniform detector performance, read-out noise, and observing inefficiency.
+            </li>
+            <li>
+                <strong>Flexibility:</strong> The framework allows for rapid iteration over experimental configurations, enabling the optimization of future experiments based on specific science goals. It can incorporate various experimental parameters, including sky coverage, telescope aperture, beam size, detector sensitivity, and atmospheric properties.
+            </li>
+            <li>
+                <strong>Multicomponent Modeling:</strong> The framework includes a detailed multicomponent model of the CMB signal, accounting for contributions from primordial gravitational waves (PGWs), gravitational lensing, and galactic foregrounds (dust and synchrotron). The model incorporates 14 parameters, including the tensor-to-scalar ratio \( r \), dust and synchrotron amplitudes, spectral indices, and frequency decorrelation parameters.
+            </li>
+        </ul>
+    
+        <h4>Applications of the Framework</h4>
+        <p>
+            The Fisher forecasting framework has been applied to two major future CMB experiments:
+        </p>
+        <ul>
+            <li>
+                <strong>Bicep Array:</strong> The framework was used to compute performance-based forecasts for the tensor-to-scalar ratio \( r \) and to determine the optimal frequency coverage and survey design for Bicep Array's nominal five-year operation. These forecasts played a key role in guiding the design and deployment of Bicep Array.
+            </li>
+            <li>
+                <strong>CMB-S4:</strong> The framework was leveraged to explore the effects of various experimental configurations on the constraints for \( r \). This included studying the impact of sky coverage, telescope aperture, beam size, detector sensitivity, and atmospheric properties under different foreground assumptions. The results of these studies contributed to the establishment of the baseline design for CMB-S4 and informed the CMB-S4 Science Book and related reports.
+            </li>
+        </ul>
+    
+        <h4>Validation of the Framework</h4>
+        <p>
+            The forecasts generated by the framework have been validated through suites of map-level simulations that represent experimental configurations with varying degrees of realism and sky models with increasing levels of foreground complexity. This validation ensures that the forecasts are robust and reliable, providing confidence in the projected science reach of future experiments.
+        </p>
+    
+        <h4>Fisher Formalism</h4>
+        <p>
+            At the core of the framework is the Fisher information matrix, which quantifies the curvature of the log-likelihood function around the best-fit model. The Fisher matrix \( F_{ij} \) is given by:
+            \[
+            F_{ij} = \frac{\partial \mu^T}{\partial \theta_i} \Sigma^{-1} \frac{\partial \mu}{\partial \theta_j} + \frac{1}{2} \text{Tr}\left(\Sigma^{-1} \frac{\partial \Sigma}{\partial \theta_i} \Sigma^{-1} \frac{\partial \Sigma}{\partial \theta_j}\right),
+            \]
+            where \( \mu \) represents the expectation values of the data, \( \Sigma \) is the covariance matrix, and \( \theta_i \) are the model parameters. The parameter uncertainties are then derived from the inverse of the Fisher matrix:
+            \[
+            \sigma_{ii} = \sqrt{(F^{-1})_{ii}}.
+            \]
+        </p>
+    
+        <h4>Inputs to the Framework</h4>
+        <p>
+            The framework requires several key inputs, including:
+        </p>
+        <ul>
+            <li>
+                <strong>Achieved Performance:</strong> Noise spectra and covariance matrices derived from Bicep/Keck observations, which include real-world inefficiencies and non-idealities.
+            </li>
+            <li>
+                <strong>Instrument Specifications:</strong> Details such as the number of detectors, beam size, and noise-equivalent temperatures (NETs) for each frequency band.
+            </li>
+            <li>
+                <strong>Signal Fiducial Model:</strong> A multicomponent model of the CMB signal, including contributions from PGWs, lensing, and galactic foregrounds.
+            </li>
+            <li>
+                <strong>Priors:</strong> Prior knowledge of certain parameters, which can be incorporated into the Fisher matrix to improve constraints.
+            </li>
+        </ul>
+    
+        <h4>Conclusion</h4>
+        <p>
+            The Fisher forecasting framework developed by the Bicep/Keck collaboration provides a powerful tool for optimizing the design of future CMB experiments and projecting their science reach. By grounding the forecasts in achieved performance metrics and incorporating realistic experimental inefficiencies, the framework ensures that the projections are both accurate and reliable. This work has been instrumental in guiding the design of Bicep Array and CMB-S4, and it will continue to play a key role in the development of next-generation CMB experiments.
+        </p>
+    </section>
+
+</body>
+
+</html>
