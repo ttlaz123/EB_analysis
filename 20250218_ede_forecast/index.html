@@ -31,20 +31,75 @@
     <hr>
 
     <section>
-        <h2>Fisher Matrix Analysis and Uncertainty Projections</h2>
+        <h2>Introduction</h2>
     
         <p>
-            Fisher matrices are a powerful tool for forecasting the uncertainties in cosmological parameters when experimental conditions, such as sky coverage or observation time, are improved. Below, we present the Fisher matrices used to project uncertainties for the parameters \( g, \alpha_{150}, \alpha_{220}, \alpha_{K95}, \) and \( \alpha_{B95e} \). These matrices encode the expected uncertainties and correlations between parameters under the assumption of Gaussian likelihoods.
+            Fisher matrices are used to forecasting the uncertainties in 
+            cosmological parameters when experimental conditions, such as sky coverage or observation time, 
+            are improved. Below, we present the Fisher matrices used to project uncertainties for the parameters 
+            \( g, \alpha_{150}, \alpha_{220}, \alpha_{K95}, \) and \( \alpha_{B95e} \). These matrices encode the 
+            expected uncertainties and correlations between parameters under the assumption of Gaussian likelihoods.
         </p>
     
-        <h3>Fisher Matrix for Parameter Uncertainties</h3>
-        <p>
-            The Fisher matrix \( F \) is defined as the expectation value of the second derivatives of the log-likelihood with respect to the parameters. The uncertainties \( \sigma_{ii} \) for each parameter are derived from the diagonal elements of the inverse Fisher matrix:
-            \[
-            \sigma_{ii} = \sqrt{(F^{-1})_{ii}}
-            \]
-            Below, we provide the uncertainties for each parameter in both radians and degrees.
-        </p>
+        <h3>Fisher Matrix Calculations</h3>
+        <section>
+            <h3>Mathematical Derivation of the Fisher Matrix</h3>
+        
+            <h4>1. Definition of the Fisher Matrix</h4>
+            <p>
+                The Fisher matrix \( F_{ij} \) quantifies the information content of the data about the parameters \( \theta_i \). For a likelihood function \( \mathcal{L}(\theta; d) \), it is defined as:
+                \[
+                F_{ij} = -\mathbb{E}\left[\frac{\partial^2 \ln \mathcal{L}}{\partial \theta_i \partial \theta_j}\right],
+                \]
+                where \( \mathbb{E}[\cdot] \) denotes the expectation value over the data.
+            </p>
+        
+            <h4>2. Gaussian Likelihood Case</h4>
+            <p>
+                For Gaussian-distributed data with mean \( \mu(\theta) \) and covariance \( \Sigma(\theta) \), the log-likelihood is:
+                \[
+                \ln \mathcal{L}(\theta; d) = -\frac{1}{2} \left( d - \mu(\theta) \right)^T \Sigma(\theta)^{-1} \left( d - \mu(\theta) \right) - \frac{1}{2} \ln \det \Sigma(\theta).
+                \]
+                The Fisher matrix becomes:
+                \[
+                F_{ij} = \frac{\partial \mu^T}{\partial \theta_i} \Sigma^{-1} \frac{\partial \mu}{\partial \theta_j} + \frac{1}{2} \text{Tr}\left( \Sigma^{-1} \frac{\partial \Sigma}{\partial \theta_i} \Sigma^{-1} \frac{\partial \Sigma}{\partial \theta_j} \right).
+                \]
+            </p>
+        
+            <h4>3. Simplified Form for Fixed Covariance</h4>
+            <p>
+                Assuming a fixed covariance matrix (\( \Sigma(\theta) = \Sigma \)), the second term vanishes:
+                \[
+                F_{ij} = \frac{\partial \mu^T}{\partial \theta_i} \Sigma^{-1} \frac{\partial \mu}{\partial \theta_j}.
+                \]
+            </p>
+        
+            <h4>4. Parameter Uncertainties</h4>
+            <p>
+                The Cramér-Rao bound gives the minimum variance for parameter \( \theta_i \):
+                \[
+                \sigma_{ii} = \sqrt{(F^{-1})_{ii}}.
+                \]
+            </p>
+        
+            <h4>5. Practical Implementation Steps</h4>
+            <p>
+                <strong>Inputs:</strong>
+            </p>
+            <ul>
+                <li>Achieved noise spectra \( N_\ell \) and covariance matrices from Bicep/Keck.</li>
+                <li>Instrument specs: detectors, bands, beams.</li>
+                <li>Fiducial model parameters (\( r, A_{\text{dust}}, \beta_{\text{dust}}, \dots \)).</li>
+            </ul>
+        
+            <p>
+                <strong>Workflow:</strong>
+            </p>
+            <ol>
+                <li>Compute partial derivatives \( \frac{\partial \mu}{\partial \theta_i} \).</li>
+                <li>Assemble Fisher matrix \( F_{ij} \).</li>
+                <li>Invert \( F \) to get \( \sigma_{ii} = \sqrt{(F^{-1})_{ii}} \).</li>
+            </ol>
     
         <h4>Uncertainties in Radians</h4>
         <table>
