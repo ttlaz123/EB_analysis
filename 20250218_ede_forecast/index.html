@@ -32,7 +32,7 @@
 
     <section>
         <h2>Introduction</h2>
-    
+        
         <p>
             Fisher matrices are used to forecasting the uncertainties in 
             cosmological parameters when experimental conditions, such as sky coverage or observation time, 
@@ -40,12 +40,15 @@
             \( g, \alpha_{150}, \alpha_{220}, \alpha_{K95}, \) and \( \alpha_{B95e} \). These matrices encode the 
             expected uncertainties and correlations between parameters under the assumption of Gaussian likelihoods.
         </p>
-    
-        <h3>Fisher Matrix Calculations</h3>
+        </section>
         <section>
-            <h3>Mathematical Derivation of the Fisher Matrix</h3>
+        <h2>Fisher Matrix Calculations</h2>
         
-            <h4>1. Definition of the Fisher Matrix</h4>
+            <h3>Mathematical Derivation of the Fisher Matrix</h3>
+            The Fisher forecasting methodology and calculations presented here are adapted from 
+    <a href="https://bicep.rc.fas.harvard.edu/~bicep2/papers/thesi/Keck/VB_PhD_Thesis_Final.pdf">Vargas (2023)</a>, which provides a detailed derivation and validation of the framework 
+    using Bicep/Keck data (see Section 7 of the thesis for the full mathematical treatment).
+       
             <p>
                 The Fisher matrix \( F_{ij} \) quantifies the information content of the data about the parameters \( \theta_i \). For a likelihood function \( \mathcal{L}(\theta; d) \), it is defined as:
                 \[
@@ -54,7 +57,7 @@
                 where \( \mathbb{E}[\cdot] \) denotes the expectation value over the data.
             </p>
         
-            <h4>2. Gaussian Likelihood Case</h4>
+         
             <p>
                 For Gaussian-distributed data with mean \( \mu(\theta) \) and covariance \( \Sigma(\theta) \), the log-likelihood is:
                 \[
@@ -66,7 +69,6 @@
                 \]
             </p>
         
-            <h4>3. Simplified Form for Fixed Covariance</h4>
             <p>
                 Assuming a fixed covariance matrix (\( \Sigma(\theta) = \Sigma \)), the second term vanishes:
                 \[
@@ -74,7 +76,7 @@
                 \]
             </p>
         
-            <h4>4. Parameter Uncertainties</h4>
+     
             <p>
                 The Cramér-Rao bound gives the minimum variance for parameter \( \theta_i \):
                 \[
@@ -82,14 +84,13 @@
                 \]
             </p>
         
-            <h4>5. Practical Implementation Steps</h4>
+            <h4>Practical Implementation Steps</h4>
             <p>
                 <strong>Inputs:</strong>
             </p>
             <ul>
-                <li>Achieved noise spectra \( N_\ell \) and covariance matrices from Bicep/Keck.</li>
-                <li>Instrument specs: detectors, bands, beams.</li>
-                <li>Fiducial model parameters (\( r, A_{\text{dust}}, \beta_{\text{dust}}, \dots \)).</li>
+                <li>Covariance matrices from Bicep/Keck.</li>
+                <li>Fiducial model parameters (\(\theta_i =  g, \alpha_\nu \)).</li>
             </ul>
         
             <p>
@@ -100,8 +101,13 @@
                 <li>Assemble Fisher matrix \( F_{ij} \).</li>
                 <li>Invert \( F \) to get \( \sigma_{ii} = \sqrt{(F^{-1})_{ii}} \).</li>
             </ol>
-    
-        <h4>Uncertainties in Radians</h4>
+            </section><section>
+        <h2>Confirming Forecast Results for Current Data</h2>
+        
+        Following the steps outlined above, we obtain the following uncertainties for Bin num = 15, matching 
+            the emperical peak spread from the simulations in 
+            <a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20241203_multicomp_eb_ede_update/">the previous update</a>.
+
         <table>
             <thead>
                 <tr>
@@ -114,37 +120,6 @@
                     <td>\( g \)</td>
                     <td>0.3246</td>
                 </tr>
-                <tr>
-                    <td>\( \alpha_{150} \)</td>
-                    <td>0.002658</td>
-                </tr>
-                <tr>
-                    <td>\( \alpha_{220} \)</td>
-                    <td>0.003777</td>
-                </tr>
-                <tr>
-                    <td>\( \alpha_{K95} \)</td>
-                    <td>0.003547</td>
-                </tr>
-                <tr>
-                    <td>\( \alpha_{B95e} \)</td>
-                    <td>0.002450</td>
-                </tr>
-            </tbody>
-        </table>
-    
-        <h4>Uncertainties in Degrees</h4>
-        <p>
-            To convert the uncertainties from radians to degrees, we use the conversion factor \( 1 \text{ radian} = \frac{180}{\pi} \text{ degrees} \). The results are as follows:
-        </p>
-        <table>
-            <thead>
-                <tr>
-                    <th>Parameter</th>
-                    <th>Uncertainty (\( \sigma_{ii} \))</th>
-                </tr>
-            </thead>
-            <tbody>
                 <tr>
                     <td>\( \alpha_{150} \)</td>
                     <td>0.1523°</td>
@@ -164,80 +139,52 @@
             </tbody>
         </table>
     
-        <h3>Fisher Forecasting Framework for CMB Experiments</h3>
-        <p>
-            In the context of CMB experiments, accurately forecasting the science reach of future instruments is a critical challenge. The Bicep/Keck collaboration has developed a robust Fisher forecasting framework that leverages achieved performance metrics from on-sky observations to project the capabilities of future experiments. This framework is particularly valuable for optimizing the design of next-generation CMB experiments, such as Bicep Array and CMB-S4.
-        </p>
+    </section><section>
+    <h2>Forecast for Future Observations</h2>
+    <figure>
+        <img alt="Forecast Analysis" id="forecast" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
+        <figcaption>
+            <p>Interactive forecast analysis with two scaling modes:</p>
+            <ul>
+                <li><strong>Forecast Type</strong>:
+                    <ul>
+                        <li>Sky Fraction Scaling: Projections based on increased sky coverage</li>
+                        <li>Sky Fraction + Observation Time: Combined scaling of sky area and integration time</li>
+                    </ul>
+                </li>
+            </ul>
+            <p>This interactive plot shows how parameter uncertainties scale with experimental improvements. 
+               Use the dropdown to switch between different forecast scenarios.</p>
+        </figcaption>
+        <script type="text/javascript">
+            pager.link("#forecast", {
+                'Forecast Type|ftype': [
+                    'Sky Fraction Scaling Only|skyfrac',
+                    'Sky Fraction + Observation Time|skyfrac_tobs'
+                ]
+            },
+            function(params) {
+                let dirpath = dirbase + '/forecast_plots/';
+                let plotname;
+                
+                if(params.ftype === 'skyfrac') {
+                    plotname = 'sky_fraction_scaling.png';
+                } else {
+                    plotname = 'skyfrac_tobs_scaling.png';
+                }
+                
+                return dirpath + plotname;
+            });
     
-        <h4>Key Features of the Framework</h4>
-        <p>
-            The Fisher forecasting framework is based on the following principles:
-        </p>
-        <ul>
-            <li>
-                <strong>Realistic Inputs:</strong> The framework uses noise spectra and covariance matrices derived from multi-year on-sky maps that have passed jackknife resampling tests. This ensures that the forecasts are grounded in actual experimental performance, accounting for real-world inefficiencies such as imperfect detector yield, non-uniform detector performance, read-out noise, and observing inefficiency.
-            </li>
-            <li>
-                <strong>Flexibility:</strong> The framework allows for rapid iteration over experimental configurations, enabling the optimization of future experiments based on specific science goals. It can incorporate various experimental parameters, including sky coverage, telescope aperture, beam size, detector sensitivity, and atmospheric properties.
-            </li>
-            <li>
-                <strong>Multicomponent Modeling:</strong> The framework includes a detailed multicomponent model of the CMB signal, accounting for contributions from primordial gravitational waves (PGWs), gravitational lensing, and galactic foregrounds (dust and synchrotron). The model incorporates 14 parameters, including the tensor-to-scalar ratio \( r \), dust and synchrotron amplitudes, spectral indices, and frequency decorrelation parameters.
-            </li>
-        </ul>
+            pager.setparams({
+                'ftype': 'skyfrac'
+            });
+        </script>
+    </figure>
+    </section>
+    <section>   
+    <h2>Conclusion</h2>
     
-        <h4>Applications of the Framework</h4>
-        <p>
-            The Fisher forecasting framework has been applied to two major future CMB experiments:
-        </p>
-        <ul>
-            <li>
-                <strong>Bicep Array:</strong> The framework was used to compute performance-based forecasts for the tensor-to-scalar ratio \( r \) and to determine the optimal frequency coverage and survey design for Bicep Array's nominal five-year operation. These forecasts played a key role in guiding the design and deployment of Bicep Array.
-            </li>
-            <li>
-                <strong>CMB-S4:</strong> The framework was leveraged to explore the effects of various experimental configurations on the constraints for \( r \). This included studying the impact of sky coverage, telescope aperture, beam size, detector sensitivity, and atmospheric properties under different foreground assumptions. The results of these studies contributed to the establishment of the baseline design for CMB-S4 and informed the CMB-S4 Science Book and related reports.
-            </li>
-        </ul>
-    
-        <h4>Validation of the Framework</h4>
-        <p>
-            The forecasts generated by the framework have been validated through suites of map-level simulations that represent experimental configurations with varying degrees of realism and sky models with increasing levels of foreground complexity. This validation ensures that the forecasts are robust and reliable, providing confidence in the projected science reach of future experiments.
-        </p>
-    
-        <h4>Fisher Formalism</h4>
-        <p>
-            At the core of the framework is the Fisher information matrix, which quantifies the curvature of the log-likelihood function around the best-fit model. The Fisher matrix \( F_{ij} \) is given by:
-            \[
-            F_{ij} = \frac{\partial \mu^T}{\partial \theta_i} \Sigma^{-1} \frac{\partial \mu}{\partial \theta_j} + \frac{1}{2} \text{Tr}\left(\Sigma^{-1} \frac{\partial \Sigma}{\partial \theta_i} \Sigma^{-1} \frac{\partial \Sigma}{\partial \theta_j}\right),
-            \]
-            where \( \mu \) represents the expectation values of the data, \( \Sigma \) is the covariance matrix, and \( \theta_i \) are the model parameters. The parameter uncertainties are then derived from the inverse of the Fisher matrix:
-            \[
-            \sigma_{ii} = \sqrt{(F^{-1})_{ii}}.
-            \]
-        </p>
-    
-        <h4>Inputs to the Framework</h4>
-        <p>
-            The framework requires several key inputs, including:
-        </p>
-        <ul>
-            <li>
-                <strong>Achieved Performance:</strong> Noise spectra and covariance matrices derived from Bicep/Keck observations, which include real-world inefficiencies and non-idealities.
-            </li>
-            <li>
-                <strong>Instrument Specifications:</strong> Details such as the number of detectors, beam size, and noise-equivalent temperatures (NETs) for each frequency band.
-            </li>
-            <li>
-                <strong>Signal Fiducial Model:</strong> A multicomponent model of the CMB signal, including contributions from PGWs, lensing, and galactic foregrounds.
-            </li>
-            <li>
-                <strong>Priors:</strong> Prior knowledge of certain parameters, which can be incorporated into the Fisher matrix to improve constraints.
-            </li>
-        </ul>
-    
-        <h4>Conclusion</h4>
-        <p>
-            The Fisher forecasting framework developed by the Bicep/Keck collaboration provides a powerful tool for optimizing the design of future CMB experiments and projecting their science reach. By grounding the forecasts in achieved performance metrics and incorporating realistic experimental inefficiencies, the framework ensures that the projections are both accurate and reliable. This work has been instrumental in guiding the design of Bicep Array and CMB-S4, and it will continue to play a key role in the development of next-generation CMB experiments.
-        </p>
     </section>
 
 </body>
