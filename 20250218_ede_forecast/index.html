@@ -141,36 +141,49 @@
     
     </section><section>
     <h2>Forecast for Future Observations</h2>
-    <figure>
+    <p>After verifying that the Fisher Forecast parameter uncertainties are consistent with the results of our simulations 
+        in the previous update, we repeated the calculations while varying sky fraction, noise level, and observation time. 
+        At this stage, we assume uniform scaling and do not yet account for the impact of individual receivers or new receivers 
+        on the uncertainties.</p>
+
+       <figure>
         <img alt="Forecast Analysis" id="forecast" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
         <figcaption>
-            <p>Interactive forecast analysis with two scaling modes:</p>
+            
+            <p>The pager shows how g uncertainties scale with experimental improvements for different forecast scenarios:</p>
             <ul>
-                <li><strong>Forecast Type</strong>:
-                    <ul>
-                        <li>Sky Fraction Scaling: Projections based on increased sky coverage</li>
-                        <li>Sky Fraction + Observation Time: Combined scaling of sky area and integration time</li>
-                    </ul>
-                </li>
+                <li><strong>Sky Fraction Scaling Only</strong>: Impact of increased sky coverage and assumes noise level stays the same.</li>
+                <li><strong>Sky Fraction + Noise</strong>: Assumes sky coverage is independent of noise levels.</li>
+                <strong>Sky Fraction + Observation Time</strong>: Combines sky coverage and observation time scaling 
+                                            (assumes noise scales linearly with sky coverage and inversely with observation time).</li>
+                <li><strong>Noise Only</strong>: Assumes current sky coverage.</li>
             </ul>
-            <p>This interactive plot shows how parameter uncertainties scale with experimental improvements. 
-               Use the dropdown to switch between different forecast scenarios.</p>
         </figcaption>
         <script type="text/javascript">
             pager.link("#forecast", {
                 'Forecast Type|ftype': [
+                    
+                    'Sky Fraction + Observation Time|skyfrac_tobs',
+                    'Sky Fraction + Noise|skyfrac_noise',
                     'Sky Fraction Scaling Only|skyfrac',
-                    'Sky Fraction + Observation Time|skyfrac_tobs'
+                    'Noise Only|noise'
                 ]
             },
             function(params) {
+                dirbase = '.'
                 let dirpath = dirbase + '/forecast_plots/';
                 let plotname;
                 
                 if(params.ftype === 'skyfrac') {
-                    plotname = 'sky_fraction_scaling.png';
+                    plotname = 'skyfrac.png';
+                } else if(params.ftype == 'noise'){
+                    plotname = 'noise.png'; 
+                } else if(params.ftype == 'skyfrac_noise'){
+                    plotname = 'skyfrac_noise_2D.png'; 
+                } else if(params.ftype == 'skyfrac_tobs'){
+                    plotname = 'skyfrac_tobs_2D.png';
                 } else {
-                    plotname = 'skyfrac_tobs_scaling.png';
+                    plotname = 'dne.png'
                 }
                 
                 return dirpath + plotname;
@@ -181,10 +194,27 @@
             });
         </script>
     </figure>
+    <p>As expected, we observe that as observation time increases, noise level decreases, and sky fraction increases, 
+        the uncertainty on \( g \) decreases. The magenta line in the <strong>sky fraction + noise</strong> plot represents 
+        the same scenario as the magenta line in the <strong>sky fraction + observation time</strong> plot, which, in turn, 
+        corresponds to the scenario in the <strong>sky fraction scaling only</strong> plot. This consistency arises because, 
+        as sky fraction increases with a constant observation time, the observation time per unit area of the sky decreases, 
+        leading to an overall increase in noise. This effect is evident in the <strong>sky fraction + observation time</strong> 
+        plot: while a larger sky fraction provides more data points and initially reduces the uncertainty on \( g \), 
+        the accompanying rise in noise eventually outweighs the benefits of the increased sky coverage.</p>
+
+        <p>These findings suggest two potential strategies to achieve the literature value of \( \Delta g = \pm 0.15 \):</p>
+        <ul>
+            <li><strong>Maintain the current sky fraction</strong> but increase the observation time by a factor of 10.</li>
+            <li><strong>Expand the observed sky area by a factor of 3</strong> while maintaining the same noise level, 
+                which would require a corresponding threefold increase in observation time.</li>
+        </ul>
     </section>
     <section>   
-    <h2>Conclusion</h2>
-    
+    <h2>Next Steps</h2>
+    <p>To improve the accuracy of our forecast, we should account for the fact that only Bicep 3 is currently operational. 
+        This means we will likely obtain data from a single frequency, requiring us to scale the data under the assumption 
+        that improvements in the multicomponent analysis will rely solely on this single frequency.</p>
     </section>
 
 </body>
