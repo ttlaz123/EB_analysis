@@ -1,7 +1,7 @@
-
+import warnings
 import numpy as np
 import re
-
+import math
 # Physical constants
 
 h_J_s = 6.62607015e-34
@@ -72,19 +72,37 @@ def add_all_dust_foregrounds(dl_theory_dict, data_params, bandpasses):
     """
     dust_dict = {}
     for spec_map in dl_theory_dict:
+        if(spec_map == 'EDE_EB'):
+            dust_dict[spec_map] = dl_theory_dict[spec_map]
+            for freq in bandpasses:
+                for freq2 in bandpasses:
+                    dust_foreground = add_foregrounds(bandpasses[freq], 
+                            data_params, 'EB', 
+                            lmax = dl_theory_dict[spec_map].shape[0],
+                            bandpass2 = bandpasses[freq2])
+                    freq_name = freq+'_Ex'+freq2+'_B_EDE'
+                    freq_name2 = freq+'_Bx'+freq2+'_E_EDE'
+                    dust_dict[freq_name] = dl_theory_dict[spec_map] + dust_foreground
+                    dust_dict[freq_name2] = dust_dict[freq_name]
+            continue
+        freq_map = spec_map.split('x')
+        assert len(freq_map)==2, 'spec map has more than one x:' + spec_map
+        spec0 = freq_map[0][-1]
+        spec1 = freq_map[1][-1]
+        spec = spec0 + spec1
+        freq0 = freq_map[0][:-2]
+        freq1 = freq_map[1][:-2]
+        assert freq0 == freq1, 'freq map not equal:' + freq0 +','+freq1
         # matches NNNNN_E|BxMMMMM_E|B
-        matches = re.findall(r'([^_]+)_(E|B)x([^_]+)_(E|B)(?:_|$)', spec_map)
-        spec = matches[1] + matches[3]
-        
-        assert(matches[0] == matches[2])
-        freq = matches[0]
+
+        freq = freq1
         bandpass = bandpasses[freq]
-        lmax = dl_theory_dict[0].shape[0]
+        lmax = dl_theory_dict[spec_map].shape[0]
         dust_foreground = add_foregrounds(bandpass, data_params, spec, lmax)
-        dust_dict[spec_map] = dl_theory_dict[spec_map] + dust_foreground
+        dust_dict[spec_map] = np.array(dl_theory_dict[spec_map]) + np.array(dust_foreground)
     return dust_dict
 
-def add_foregrounds(bandpass, data_params, spectrum, lmax,lmin=0, bandcenter_err=1):
+def add_foregrounds(bandpass, data_params, spectrum, lmax,lmin=0, bandcenter_err=1, bandpass2=None):
     """
     Computes and returns the dust foreground angular power spectrum.
 
@@ -112,9 +130,18 @@ def add_foregrounds(bandpass, data_params, spectrum, lmax,lmin=0, bandcenter_err
     
     beta_dust = data_params['beta_dust']
     dust_scale = dust_scaling(beta_dust, TDUST, bandpass, FPIVOT_DUST, bandcenter_err)
-    ratio = np.arange(lmin, lmax+1)/LPIVOT
-    dustpow = A_dust * np.pow(ratio,alpha_dust)
-    dl = dustpow * dust_scale
+    if(not bandpass2 is None):
+        dust_scale2 = dust_scaling(beta_dust, TDUST, bandpass2, FPIVOT_DUST, bandcenter_err)
+    else:
+        dust_scale2 = dust_scale
+    ratio = np.arange(lmin, lmax)/LPIVOT
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', category=RuntimeWarning)
+        dustpow = A_dust * np.power(ratio,alpha_dust)
+    # l=0 gives inf, zero it out since shouldn't affect bp
+    if(math.isinf(dustpow[0])):
+        dustpow[0] = 0
+    dl = dustpow * dust_scale * dust_scale2
     return dl
 
 def filter_matrix(map_reference_header, matrix, used_maps, num_bins=None, zero_offdiag=False):
@@ -342,7 +369,7 @@ def assemble_eb_crossmaps(cross_map, binned_dl_theory_dict):
             cross_map2e = maps2[1] + 'x' + maps2[0] + '_EDE'
         return cross_map1, cross_map2e
 
-def apply_EDE_shift(cross_map, dl_theory_dict, params_values):
+def apply_EDE_shift(cross_map, dl_theory_dict, params_values, fixed_dust=True):
         maps = cross_map.split('x')
         map1 = re.sub(r'_{BE}$', '', maps[0])
         map2 = re.sub(r'_{BE}$', '', maps[1])
@@ -356,8 +383,12 @@ def apply_EDE_shift(cross_map, dl_theory_dict, params_values):
 
         #cross_map1, cross_map2 = self.assemble_eb_crossmaps(cross_map,
         #                                   dl_theory_dict)
-        cross_map1 = 'EDE_EB'
-        cross_map2 = 'EDE_EB'
+        if(fixed_dust):
+            cross_map1 = 'EDE_EB'
+            cross_map2 = 'EDE_EB'
+        else:
+            cross_map1 = cross_map + '_EDE'
+            cross_map2 = cross_map + '_EDE'
         #try:
         ede_spec1 = dl_theory_dict[cross_map1]
         ede_spec2 = dl_theory_dict[cross_map2]

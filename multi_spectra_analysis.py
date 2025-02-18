@@ -5,11 +5,11 @@ import argparse
 import glob
 import shutil
 from concurrent.futures import ProcessPoolExecutor, as_completed
-
 print("Loading Local Modules")
 import eb_load_data as ld
 import eb_plot_data as epd
 import eb_calculations as ec
+import fisher_forecast_calc as fc
 
 print("Loading Cobaya Modules")
 from cobaya.run import run
@@ -19,20 +19,19 @@ from cobaya.likelihood import Likelihood
 
 # Global dictionary for file paths
 #DATASETNAME = 'BK18lfnorot'
-#DATASETNAME = 'BK18lf_fede01'
-DATASETNAME = 'BK18lf'
+DATASETNAME = 'BK18lf_fede01'
+#DATASETNAME = 'BK18lf'
 #DATASET_DIRNAME = 'BK18lf_dust_incEE_norot_allbins'
-#DATASET_DIRNAME = 'BK18lf_fede01_sigl'
-DATASET_DIRNAME = DATASETNAME
+DATASET_DIRNAME = 'BK18lf_fede01_sigl'
+#DATASET_DIRNAME = DATASETNAME
 #DATASET_DIRNAME = 'BK18lf_sim'
 
 # Define the base directories for the file paths
 CAMB_BASE_PATH = '/n/holylfs04/LABS/kovac_lab/general/input_maps/official_cl/'
-#BK18_BASE_PATH = '/n/home08/liuto/cosmo_package/data/bicep_keck_2018/BK18_cosmomc/data/BK18lf_dust_incEE_norot_allbins/'
-DOMINIC_BASE_PATH = '/n/home01/dbeck/cobaya/data/bicep_keck_2018/BK18_cosmomc/data/'
+#DOMINIC_BASE_PATH = '/n/home01/dbeck/cobaya/data/bicep_keck_2018/BK18_cosmomc/data/'
 BK18_BASE_PATH = '/n/home08/liuto/cosmo_package/data/bicep_keck_2018/BK18_cosmomc/data/' + DATASET_DIRNAME + '/'
 
-DOMINIC_SIM_PATH = '/n/home01/dbeck/cobaya/data/bicep_keck_2018/BK18_cosmomc/data/' + DATASETNAME +'/'
+#DOMINIC_SIM_PATH = '/n/home01/dbeck/cobaya/data/bicep_keck_2018/BK18_cosmomc/data/' + DATASETNAME +'/'
 BK18_SIM_PATH = BK18_BASE_PATH
 BK18_SIM_NAME = DATASETNAME + '_cl_hat_simXXX.dat'
 # Consolidate file paths into a dictionary
@@ -129,16 +128,10 @@ class BK18_multicomp(Likelihood):
         self.filtered_covmat = ec.filter_matrix(self.map_reference_header, self.full_covmat, self.used_maps, num_bins=num_bins, zero_offdiag = self.zero_offdiag)
         #plot_covar_matrix(self.filtered_covmat, used_maps=self.used_maps)
         self.cov_inv = ec.calc_inverse_covmat(self.filtered_covmat)
+        fc.make_forecast_scaling_plot(self.map_reference_header, self.used_maps,
+                                    self.num_bins, self.dl_theory, self.bpwf)
 
-        test_params = {
-                    'gMpl':1,
-                    'alpha_BK18_150':0.3,
-                    'alpha_BK18_220': 0.3,
-                    'alpha_BK18_K95': 0.3,
-                    'alpha_BK18_B95e':0.3
-        }
-        #self.plot_sample_values(test_params)
-        
+
     # plot 
     def plot_sample_values(self, params_values):
         
@@ -219,6 +212,7 @@ class BK18_multicomp(Likelihood):
         """
        
         # Get the theoretical predictions based on the parameter values
+        #print(params_values)
         theory_prediction = self.theory(params_values, 
                                         self.dl_theory, self.used_maps)
          
@@ -228,7 +222,7 @@ class BK18_multicomp(Likelihood):
         chi_squared = residuals.T @ self.cov_inv @ residuals
         # Calculate the log-likelihood
         log_likelihood = -0.5 * chi_squared
-
+        #print(log_likelihood)
         return log_likelihood
     
     
@@ -247,23 +241,25 @@ class BK18_multicomp(Likelihood):
             dust_dict = dl_theory_dict
         else:
             dust_dict = ec.add_all_dust_foregrounds(dl_theory_dict, params_values, self.bandpasses)
-            
-        
+        #print('done adding dust') 
         for cross_map in used_maps:
             self.rotated_dict[cross_map] = ec.rotate_spectrum(cross_map,
                                             dust_dict, params_values)
+            #print('rotating done' + cross_map)
             if(self.include_EDE):
                 ede_shift = ec.apply_EDE_shift(cross_map,
-                                                dust_dict, params_values)
+                                                dust_dict, params_values, fixed_dust=self.fixed_dust)
                 if self.rotated_dict[cross_map].shape != ede_shift.shape:
                     min_size = min(self.rotated_dict[cross_map].size, 
                                         ede_shift.size)
+                    #print('adding ede')
                     # Truncate both arrays to the minimum size
                     self.rotated_dict[cross_map] = self.rotated_dict[cross_map][:min_size]
                     ede_shift = ede_shift[:min_size]
                     self.ebe_dict[cross_map] = ede_shift
                     self.tot_dictt[cross_map] = self.rotated_dict[cross_map] + self.ebe_dict[cross_map]
         self.tot_dict = ec.apply_bpwf(self.map_reference_header,self.tot_dictt, self.bpwf, self.used_maps,do_cross=True)
+        #print('bpwf applied')
   
         theory_vec = self.dict_to_vec(self.tot_dict, used_maps)
         return theory_vec
@@ -274,7 +270,7 @@ class BK18_multicomp(Likelihood):
 # Function to create and run a Cobaya model with the custom likelihood
 def run_bk18_likelihood(params_dict, used_maps, outpath, 
                             include_ede = False, zero_offdiag = False,
-                            rstop = 0.02, max_tries=10000, fixed_dust=True,
+                            rstop = 0.03, max_tries=10000, fixed_dust=True,
                             num_bins=14, signal_params = {}):
 
     # Set up the custom likelihood with provided params
@@ -332,7 +328,8 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
                     #'P030e', 
                     #'P044e', 
                     #'P143e',
-                    #'P217e'
+                    #'P217e',
+                    #'P353e'
                     ]
     do_crosses =True
     include_ede = True
@@ -394,6 +391,7 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
                                                 signal_params=signal_params)
 
     replace_dict ={}# {"alpha_BK18_220":0.6}
+    print(outpath)
     param_names, means, mean_std_strs = epd.plot_triangle(outpath, replace_dict)
     eb_like_cls = BK18_multicomp(used_maps=all_cross_spectra, 
                                 signal_params=signal_params)
