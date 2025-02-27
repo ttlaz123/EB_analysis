@@ -175,6 +175,8 @@
                                             (assumes noise scales linearly with sky coverage and inversely with observation time).</li>
                 <li><strong>Noise Only</strong>: Assumes current sky coverage.</li>
             </ul>
+
+            We include two different datasets for comparison.
         </figcaption>
         <script type="text/javascript">
             pager.link("#forecast", {
@@ -242,28 +244,33 @@
             <li><strong>Expand the observed sky area by a factor of 3</strong> while maintaining the same noise level, 
                 which would require a corresponding threefold increase in observation time.</li>
         </ul>
+        Unfortunately, both of these strategies require significant resources that are not realistically available.
 
         <p>
-        We also include two scenarios, one with the BK18 dataset that has our usual 
-        frequencies of B95lf, K95, 150, and 220. The B3 + Planck dataset is the 
-        scenario for using only B95lf and the 5 Planck frequencies of 
+        We include another scenario where we only consider the B3 + Planck dataset: using only 
+        B95lf and the 5 Planck frequencies of 
         P30, P44, P143, P217, and P353. This is the Planck data restricted to
-        the BICEP large field, and we see that they do not provide significant
-        constraining power.
+        the BICEP large field, but if we hypothetically increase the skyfraction observed by B3, we 
+        can use existing Planck data to also scale the skyfraction of the Planck maps in the analysis.
+        Accordingly, the noise level of the Planck maps would not change.
         </p>
         <figure>
         <img alt="Forecast Analysis" id="forecast_planck" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
         <figcaption>
             
-            <p>The pager shows how g uncertainties scale with experimental improvements for different forecast scenarios. The units are
-                all in ratio with respect to the current value. For example, total observed time of 2 indicates the case where
-                the data is obtained from twice as much time spent observing as the current available data.</p>
+            <p>The pager is similar to Figure 4.1 using different datasets. However, here we scale the skyfraction 
+                for both B3 and Planck maps, but only scale the noise level of B3.
+                
+            </p>
             <ul>
-                <li><strong>Sky Fraction Scaling Only</strong>: Looks at the impact of increased sky coverage and assumes noise level stays the same. Only signal covariance is scaled.</li>
-                <li><strong>Sky Fraction + Noise</strong>: Assumes noise levels are independent of sky coverage. Both independently scaled.</li>
+                <li><strong>Sky Fraction Scaling Only</strong>: Looks at the impact of increased sky coverage 
+                    and assumes noise level stays the same. Only signal covariance is scaled.</li>
+                <li><strong>Sky Fraction + Noise</strong>: Assumes noise levels are independent of sky coverage. Both independently scaled.
+                Also, Planck noise stays the same.</li>
                 <strong>Sky Fraction + Observation Time</strong>: Combines sky coverage and observation time scaling 
-                                            (assumes noise scales linearly with sky coverage and inversely with observation time).</li>
-                <li><strong>Noise Only</strong>: Assumes current sky coverage.</li>
+                                            (assumes noise scales linearly with sky coverage and inversely with observation time). 
+                                        The observation time ratio is with respect to the B3 observation time</li>
+                <li><strong>Noise Only</strong>: Assumes current sky coverage (Planck noise does not change, only B3).</li>
             </ul>
         </figcaption>
         <script type="text/javascript">
@@ -317,13 +324,20 @@
             });
         </script>
     </figure>
+    <p>We see that by including the Planck data into the analysis, we are able to constrain the uncertainty more than 
+        if we only used B95lf. However, even though the amount is non-negligible, we still require significant 
+        resources to reach literature levels. 
+    </p>
     </section>
     <section>   
     <h2>Next Steps</h2>
-    <p>To improve the accuracy of our forecast, we should account for the fact that we will only be acquiring new data
-      from currently operational receivers. This requires us to scale the covariance matrices with respect to their
-      individual frequency/receiver components rather than assuming each component will scale uniformly.
-      This information can be used to potentially help contribute to determining future observation strategy.
+    <p>We see that significant resources are required to constrain the photon-axion coupling constant \(g\) to literature levels.
+        With new data from the BA receivers, it may be possible to constrain \(g\) with data we already expect to receive, but 
+        as the limiting factor appears to be sky coverage, it is unlikely that new data will contribute significantly.
+        
+        We are currently examining the impact of a finer binning of BICEP data. With a hypothetical larger sky fraction, 
+        we may be able to use finer bins to better constrain the EB curve.
+    </p>
     </section>
 
 </body>
