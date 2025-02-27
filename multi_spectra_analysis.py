@@ -74,6 +74,8 @@ class BK18_multicomp(Likelihood):
     signal_params = {}
     fixed_dust = True
     num_bins = 14
+    forecast_scaling_maps = None
+    forecast_map_names = 'BK18'
     def __init__(self,*args,**kwargs):
         if('used_maps' in kwargs):
             self.used_maps = kwargs['used_maps']
@@ -84,6 +86,11 @@ class BK18_multicomp(Likelihood):
                 self.fixed_dust = kwargs['fixed_dust']
             if('num_bins' in kwargs):
                 self.num_bins = kwargs['num_bins']
+            if('forecast_map_names' in kwargs):
+                self.forecast_map_names = kwargs['forecast_map_names']
+            if('forecast_scaling_maps' in kwargs):
+                self.forecast_scaling_maps = kwargs['forecast_scaling_maps']
+
             if('signal_params' in kwargs):
                 self.signal_params = kwargs['signal_params']
                 if('gMpl' in self.signal_params):
@@ -114,7 +121,7 @@ class BK18_multicomp(Likelihood):
                                     self.used_maps, self.map_reference_header, num_bins=num_bins)
         # inject signal
         print('Inject signal?')
-        if(len(self.signal_params) > 0):
+        if(False):#len(self.signal_params) > 0):
             print('Injecting Signal: ')
             print(self.signal_params)
             self.binned_dl_observed_dict = ec.inject_signal(self.used_maps, self.signal_params, 
@@ -128,8 +135,14 @@ class BK18_multicomp(Likelihood):
         self.filtered_covmat = ec.filter_matrix(self.map_reference_header, self.full_covmat, self.used_maps, num_bins=num_bins, zero_offdiag = self.zero_offdiag)
         #plot_covar_matrix(self.filtered_covmat, used_maps=self.used_maps)
         self.cov_inv = ec.calc_inverse_covmat(self.filtered_covmat)
+        test_params = self.signal_params
+        mapnames = self.forecast_map_names
+        scaled_freqs = self.forecast_scaling_maps
         fc.make_forecast_scaling_plot(self.map_reference_header, self.used_maps,
-                                    self.num_bins, self.dl_theory, self.bpwf)
+                                    self.num_bins, self.dl_theory, self.bpwf, 
+                                    test_params = test_params,
+                                    scaled_freqs = scaled_freqs,
+                                    mapnames = mapnames)
 
 
     # plot 
@@ -271,7 +284,9 @@ class BK18_multicomp(Likelihood):
 def run_bk18_likelihood(params_dict, used_maps, outpath, 
                             include_ede = False, zero_offdiag = False,
                             rstop = 0.03, max_tries=10000, fixed_dust=True,
-                            num_bins=14, signal_params = {}):
+                            num_bins=14, signal_params = {},
+                            forecast_map_names='BK18',
+                            forecast_scaling_maps=None):
 
     # Set up the custom likelihood with provided params
     likelihood_class = BK18_multicomp
@@ -287,6 +302,8 @@ def run_bk18_likelihood(params_dict, used_maps, outpath,
                 "signal_params": signal_params,
                 "fixed_dust":  fixed_dust,
                 "num_bins": num_bins,
+                "forecast_map_names": forecast_map_names,
+                "forecast_scaling_maps": forecast_scaling_maps
             }
         },
         "params": params_dict,
@@ -321,16 +338,23 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
 
     
     calc_spectra = [
-                    'BK18_220', 
-                    'BK18_150', 
-                    'BK18_K95', 
+                    #'BK18_220', 
+                    #'BK18_150', 
+                    #'BK18_K95', 
                     'BK18_B95e',
-                    #'P030e', 
-                    #'P044e', 
-                    #'P143e',
-                    #'P217e',
-                    #'P353e'
-                    ]
+                    'P030e', 
+                    'P044e', 
+                    'P143e',
+                    'P217e',
+                    'P353e'
+                   ] 
+    mapnames = 'B3_planck_real'
+    #mapnames = 'BK18'
+    #mapnames = 'BK18_part'
+    #mapnames = 'B3'
+    #mapnames = 'planck_real'
+
+    scalemaps = 'BK18_B95e'
     do_crosses =True
     include_ede = True
     num_bins = 14
@@ -339,14 +363,9 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
         formatted_simnum = str(sim_num).zfill(3)
         simname = BK18_SIM_NAME.replace("XXX", formatted_simnum)
         FILE_PATHS['observed_data'] = BK18_SIM_PATH + simname
-    signal_params = {#}
-    #                'gMpl':0.0,
-    #                'alpha_BK18_150':-0.5,
-    #                'alpha_BK18_220': 1,
-    #                'alpha_BK18_K95': -0.1,
-    #                'alpha_BK18_B95e':-0.4
-                    }
-    
+    signal_params = {'alpha_' + key : 0 for key in calc_spectra}
+    signal_params['gMpl']=0
+ 
     all_cross_spectra = generate_cross_spectra(calc_spectra, do_crosses=do_crosses)
     angle_priors = {"prior": {"min": -3, "max": 3}, "ref": 0}
     params_dict = {
@@ -388,7 +407,9 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
                                                 include_ede = include_ede,
                                                 fixed_dust=fixed_dust,
                                                 num_bins=num_bins,
-                                                signal_params=signal_params)
+                                                signal_params=signal_params,
+                                                forecast_map_names=mapnames,
+                                                forecast_scaling_maps=scalemaps)
 
     replace_dict ={}# {"alpha_BK18_220":0.6}
     print(outpath)

@@ -53,7 +53,8 @@ def plot_sample_fit(observed_data, var, mapi, rotated_dict, ebe_dict, tot_dict, 
     plt.tight_layout()
     plt.show()
 
-def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix'):
+def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix',
+                        show_plot=False):
     
     #print(max(mat[(mat<0.99)| (mat > 1.01)] ))
     nonzeros = np.abs(mat[(mat!=0) &( ~np.isnan(mat))])
@@ -78,7 +79,8 @@ def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix'):
     plt.colorbar()
     print("Saving: " + title + '.png')
     plt.savefig(title + '.png')
-    #plt.show()
+    if(show_plot):
+        plt.show()
 
 def plot_best_crossfit(eb_like_cls, outpath, used_maps, param_names, 
                         param_bestfit, param_stats, signal_params={}):

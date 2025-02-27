@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import scipy.io
 import copy
 import eb_calculations as ec
+import eb_plot_data as ep
 
 
 
@@ -99,9 +100,9 @@ def fisher_matrix(spectra_dict, params_dict, used_maps,
     fisher_matrix = np.zeros((num_params, num_params))
     i = 0
     j = 0
-    for param1, value1 in params_dict.items():
+    for param1, value1 in sorted(params_dict.items()):
         
-        for param2, value2 in params_dict.items():
+        for param2, value2 in sorted(params_dict.items()):
             dmu_dparam1 = get_fisher_derivatives(spectra_dict, param1, 
                             params_dict, used_maps, map_reference_header, bpwf)
             dmu_dparam2 = get_fisher_derivatives(spectra_dict, param2,
@@ -165,32 +166,32 @@ def get_fisher_derivatives(spectra_dict, deriv_param, params_dict,
     deriv_vec = dict_to_vec(binned_deriv_dict, used_maps, map_reference_header) 
     return deriv_vec
 
-def make_forecast_scaling_plot(map_reference_header, used_maps, num_bins, dl_theory, bpwf):
-    print('Making forecast plot')
-    test_params = {
-                    'gMpl':0,
-                    'alpha_BK18_150':0,
-                    'alpha_BK18_220': -0,
-                    'alpha_BK18_K95': 0,
-                    'alpha_BK18_B95e':-0
-    }
-    bpcm_file = 'bpcm_data.mat'
-    supfac_file = 'rwf2.mat'
-    bpcm_data = scipy.io.loadmat(bpcm_file)
-    supfac_data = scipy.io.loadmat(supfac_file)
-    filtered_bpcm = filter_and_process_bpcm(map_reference_header, used_maps, num_bins,
-                                        bpcm_data, supfac_data)
 
-
+def calc_forecasting_grid(plot_type, filtered_bpcm, scaled_freqs, test_params, 
+                 map_reference_header, bpwf, dl_theory, used_maps, do_planck=False):
     sigma_gs = []
     skyfracs = np.logspace(0, np.log10(10), 10)
-    noise_scales = np.logspace(0, 1, 10)
+    if(plot_type == 't_obs'):
+    
+        noise_scales = np.logspace(0, 1, 10)
+    elif(plot_type == 'noise'):
+        noise_scales = np.logspace(-1,1,10)
+    else:
+        raise ValueError("plot_type not one of expected:" + str(plot_type))
+    if 1 not in noise_scales:
+        noise_scales = np.sort(np.append(noise_scales, 1))
+    if 1 not in skyfracs:
+        skyfracs = np.sort(np.append(skyfracs, 1))
+
     # Create a 2D meshgrid
-    SkyfracGrid, NoiseScaleGrid = np.meshgrid(skyfracs, 1/noise_scales)
+    if(plot_type == 't_obs'):
+        SkyfracGrid, NoiseScaleGrid = np.meshgrid(skyfracs, 1/noise_scales)
+    elif(plot_type == 'noise'):
+        SkyfracGrid, NoiseScaleGrid = np.meshgrid(skyfracs, 1/noise_scales)
 
     # Initialize 2D array for results
     SigmaGrid = np.zeros_like(SkyfracGrid, dtype=np.float64)
-
+    
     # Iterate over (skyfrac, noise_scale) pairs
     for i in range(len(noise_scales)):
         for j in range(len(skyfracs)):
@@ -200,25 +201,54 @@ def make_forecast_scaling_plot(map_reference_header, used_maps, num_bins, dl_the
             print(f'Skyfrac: {skyfrac}, Noise Scale: {noise_scale}')
 
             # Scale covariance with both parameters
-            scaled_cov = scale_covar_mat(filtered_bpcm, skyfrac, noise_scale)
+            if(not do_planck):
+                scaled_cov = scale_covar_mat(filtered_bpcm, skyfrac, noise_scale, 
+                                        plot_type, map_reference_header, 
+                                        scaled_freqs, used_maps)
+            
+            else:
+                scaled_cov = scale_covar_mat_planck(filtered_bpcm, skyfrac, noise_scale, 
+                                        plot_type, map_reference_header, 
+                                        scaled_freqs, used_maps)
+
+
             scaled_covinv = ec.calc_inverse_covmat(scaled_cov)
             fmat = fisher_matrix(dl_theory, test_params, used_maps, scaled_covinv, map_reference_header, bpwf)
 
             # Store sigma_g in the 2D grid
-            sigma_g = np.sqrt(np.linalg.inv(fmat)[0, 0])
+            sigma_g = np.sqrt(np.linalg.inv(fmat)[-1, -1])
             print(sigma_g)
             SigmaGrid[i, j] = sigma_g
-    print(SigmaGrid)
-    # Create a 2D contour plot
-    # Assuming SkyfracGrid, NoiseScaleGrid, and SigmaGrid are defined
-    # skyfracs and noise_scales are the log-spaced values for the x and y axes
+    return SigmaGrid, skyfracs, noise_scales
 
-    plt.figure(figsize=(8, 6))
-    #plt.plot(noise_scales, SigmaGrid[:,0])#, color='magenta')
-    #plt.xlabel('New Noise/Old Noise Level')
-    #plt.ylabel('Sigma g')
-    #plt.title('Sigma g assuming constant skyfrac')
-    #plt.show()
+
+def plot_forecast_grid(skyfracs, noise_scales, SigmaGrid, plot_type, mapnames, scaled_maps,outdir):
+    mapnames = str(mapnames)
+    scaled_maps = str(scaled_maps)
+    if(plot_type == 't_obs'):
+        plt.figure(figsize=(8, 6))
+        sigmas = SigmaGrid[:,0]
+        plt.plot(noise_scales, np.squeeze(sigmas), color='blue')
+        plt.xlabel('Old Noise/New Noise Level')
+        
+        plt.ylabel('Sigma g')
+        plt.title('Sigma g assuming Constant skyfrac')
+        savefile = outdir + '/noise_' + mapnames + '_' + scaled_maps + '.png' 
+    elif(plot_type == 'noise'):
+        plt.figure(figsize=(8,6))
+
+        unit_noise = np.where(noise_scales == 1)[0]
+        sigmas = SigmaGrid[unit_noise,:]
+        plt.plot(skyfracs, np.squeeze(sigmas), color='magenta')
+        plt.xlabel('Skyfrac_new/Skyfrac_old')
+        plt.title('Sigma g assuming Constant Noise Level')
+        savefile = outdir + '/skyfrac_' + mapnames + '_' + scaled_maps + '.png' 
+
+    else:
+        raise ValueError("plot_type not one of expected:" + str(plot_type))
+    plt.savefig(savefile)
+    plt.show()
+
     # Transform the grid values into log space
     skyfracs_log = np.log10(skyfracs)
     noise_scales_log = np.log10(noise_scales)
@@ -227,27 +257,67 @@ def make_forecast_scaling_plot(map_reference_header, used_maps, num_bins, dl_the
     # Use contourf with the log-spaced grid
     contour = plt.contourf(NoiseScaleGrid_log, SkyfracGrid_log,
             SigmaGrid, levels=levels, cmap='RdPu', vmin=0, vmax=0.4)
-    plt.axvline(x=0.0, linestyle='--', color='magenta',
-                linewidth=3, label='Same noise level')
-    #plt.axline((0, 0), slope=1, color='magenta', 
-    #                linestyle='--', linewidth=2, 
-    #                label='Same T_obs per Sky Fraction')
-    plt.legend()
-    # Add a colorbar
     cbar = plt.colorbar(contour)
     cbar.set_label('sigma_g')
 
-    # Set the labels and title
     plt.ylabel('Skyfrac_new/skyfrac_old')
-    plt.xlabel('Overall Noise Ratio')
-    plt.title('Impact of Sky Fraction and Overall Noise on sigma_g')
-
-    # Set the ticks to be the log-spaced values and label them with the original values
     plt.yticks(skyfracs_log, labels=[f'{x:.2f}' for x in skyfracs])
-    plt.xticks(noise_scales_log, labels=[f'{1/y:.2f}' for y in noise_scales])
 
+    if(plot_type == 'noise'):
+        plt.axvline(x=0.0, linestyle='--', color='magenta',
+                linewidth=3, label='Same noise level')
+        plt.xlabel('Overall Noise Ratio')
+        plt.title('Impact of Sky Fraction and Overall Noise on sigma_g')
+        plt.xticks(noise_scales_log, labels=[f'{1/y:.2f}' for y in noise_scales])
+        savefile = outdir + '/skyfrac_noise_2D_' + mapnames + '_' + scaled_maps + '.png' 
+
+    else:
+        plt.axline((0, 0), slope=1, color='magenta',
+                    linestyle='--', linewidth=3,
+                    label='Same T_obs per Sky Fraction')
+        plt.xlabel('Total Observation Time')
+        plt.title('Impact of Sky Fraction and Total Observation Time on sigma_g')
+        plt.xticks(noise_scales_log, labels=[f'{y:.2f}' for y in noise_scales])
+        savefile = outdir + '/skyfrac_tobs_2D_' + mapnames + '_' + scaled_maps + '.png' 
+
+    plt.legend()
+    plt.savefig(savefile)
     plt.show()
 
+
+def make_forecast_scaling_plot(map_reference_header, used_maps, num_bins, dl_theory, bpwf,
+    test_params=None, scaled_freqs = None, mapnames =None):
+    outdir = './20250218_ede_forecast/forecast_plots/'
+    #plot_type = 'noise'
+    plot_type = 't_obs'
+    do_planck=True
+    print('Making forecast plot')
+    if(test_params is None):
+        test_params = {
+                    'gMpl':0,
+                    'alpha_BK18_150':0,
+                    'alpha_BK18_220': -0,
+                    'alpha_BK18_K95': 0,
+                    'alpha_BK18_B95e':-0
+        }
+    print('Fiducial model:')
+    print(test_params)
+    bpcm_file = 'bpcm_data.mat'
+    supfac_file = 'rwf2.mat'
+    bpcm_data = scipy.io.loadmat(bpcm_file)
+    supfac_data = scipy.io.loadmat(supfac_file)
+    filtered_bpcm = filter_and_process_bpcm(map_reference_header, used_maps, num_bins,
+                                        bpcm_data, supfac_data)
+    
+
+    print(filtered_bpcm)
+    
+    # Create a 2D contour plot
+    SigmaGrid, skyfracs, noise_scales = calc_forecasting_grid(plot_type, 
+                    filtered_bpcm, scaled_freqs, test_params,
+                    map_reference_header, bpwf, dl_theory, 
+                    used_maps, do_planck=do_planck)
+    plot_forecast_grid(skyfracs, noise_scales, SigmaGrid, plot_type, mapnames, scaled_freqs, outdir)
     input("paused")
 
 def filter_and_process_bpcm(map_reference_header, used_maps, num_bins, bpcm_file, supfac_file):
@@ -263,7 +333,7 @@ def filter_and_process_bpcm(map_reference_header, used_maps, num_bins, bpcm_file
         'sn4': bpcm_file['bpcm_sn4'],
         'noi': bpcm_file['bpcm_noi']
     }
-
+    print(used_maps)
     # Apply filtering once
     filtered_bpcm = {
         key: ec.filter_matrix(map_reference_header, value / supfac, used_maps, num_bins)
@@ -272,16 +342,280 @@ def filter_and_process_bpcm(map_reference_header, used_maps, num_bins, bpcm_file
 
     return filtered_bpcm
 
-def scale_covar_mat(bpcm_dict, skyfrac, noise_scale): 
+def get_mapscale_freqs(used_maps, map_reference_header, scaled_freqs):
+    order_dict = {element: idx for idx, element in enumerate(map_reference_header)}
+
+    # Sort used_maps based on the order defined in map_reference_header
+    ordered_used_maps = sorted(used_maps, key=lambda x: order_dict[x])
+    part_index = []
+    for s in ordered_used_maps:
+        part1, part2 = s.split('x')
+        if(scaled_freqs is None):
+            part_index.append(0)
+            continue
+        if(scaled_freqs in part1 and scaled_freqs in part2):
+            part_index.append(0)
+        elif(scaled_freqs in part2):
+            part_index.append(2)
+        elif(scaled_freqs in part1):
+            part_index.append(1)
+        else:
+            part_index.append(-1)
+    return np.array(part_index)
+
+def scale_covar_mat_planck(bpcm_dict, skyfrac, noise_scale, plot_type, map_reference_header, scaled_freqs, used_maps, bin_num = 14): 
+    print('Doing planck scaling')
     scaled_bpcm = copy.deepcopy(bpcm_dict)
+    #for key in scaled_bpcm:
+    #    ep.plot_covar_matrix(bpcm_dict[key], 
+    #                            used_maps=used_maps,
+    #                            title='base_' + key, show_plot=True)
+
     # do some processing here
+    if(plot_type == 't_obs'):
+        do_t = True
+    elif(plot_type == 'noise'):
+        do_t = False 
+    else:
+        ValueError('plot type not correct')
+
+    # sig (SxS, SxS)
+    # sn1 (SxN, SxN)
+    # sn2 (SxN, NxS)
+    # sn3 (NxS, SxN)
+    # sn4 (NxS, NxS)
+    
+    map_indices = get_mapscale_freqs(used_maps, map_reference_header, scaled_freqs)
+    if(do_t):
+        noise_scale = skyfrac * noise_scale
+    skyfrac = np.sqrt(skyfrac)
+    noise_scale = np.sqrt(noise_scale)
+    for i in range(len(map_indices)):
+        ind_low = i*bin_num
+        ind_high = (i+1)*bin_num
+        #both B3
+        if(map_indices[i] == 0):
+            
+            scaled_bpcm['sig'][ind_low:ind_high,:] /= skyfrac **2
+            scaled_bpcm['sn1'][ind_low:ind_high,:] *= noise_scale/skyfrac
+            scaled_bpcm['sn2'][ind_low:ind_high,:] *= noise_scale/skyfrac
+
+            scaled_bpcm['sn3'][ind_low:ind_high,:] *= noise_scale/skyfrac
+            scaled_bpcm['sn4'][ind_low:ind_high,:] *= noise_scale/skyfrac
+            scaled_bpcm['noi'][ind_low:ind_high,:] *= noise_scale **2
+            
+            scaled_bpcm['sig'][:,ind_low:ind_high] /= skyfrac **2
+            scaled_bpcm['sn1'][:,ind_low:ind_high]*= noise_scale/skyfrac
+            scaled_bpcm['sn2'][:,ind_low:ind_high]*= noise_scale/skyfrac
+            scaled_bpcm['sn3'][:,ind_low:ind_high]*= noise_scale/skyfrac
+            scaled_bpcm['sn4'][:,ind_low:ind_high]*= noise_scale/skyfrac
+            scaled_bpcm['noi'][:,ind_low:ind_high] *= noise_scale **2
+   
+        #both planck, scale only skyfrac
+        if(map_indices[i] == -1):
+            scaled_bpcm['sig'][ind_low:ind_high,:] /= skyfrac **2
+            scaled_bpcm['sn1'][ind_low:ind_high,:] *= skyfrac
+            scaled_bpcm['sn2'][ind_low:ind_high,:] *= skyfrac
+
+            scaled_bpcm['sn3'][ind_low:ind_high,:] *= skyfrac
+            scaled_bpcm['sn4'][ind_low:ind_high,:] *= skyfrac
+            #scaled_bpcm['noi'][ind_low:ind_high,:] *= noise_scale **2
+            
+            scaled_bpcm['sig'][:,ind_low:ind_high] /= skyfrac **2
+            scaled_bpcm['sn1'][:,ind_low:ind_high]*= skyfrac
+            scaled_bpcm['sn2'][:,ind_low:ind_high]*= skyfrac
+            scaled_bpcm['sn3'][:,ind_low:ind_high]*= skyfrac
+            scaled_bpcm['sn4'][:,ind_low:ind_high]*= skyfrac
+            #scaled_bpcm['noi'][:,ind_low:ind_high] *= noise_scale **2
+
+            
+        #first is B3, second is planck
+        if(map_indices[i] == 1):
+            scaled_bpcm['sig'][ind_low:ind_high,:] /= skyfrac**2
+            scaled_bpcm['sn1'][ind_low:ind_high,:] /= skyfrac
+            scaled_bpcm['sn2'][ind_low:ind_high,:] /= skyfrac
+
+            scaled_bpcm['sn3'][ind_low:ind_high,:] *= noise_scale/skyfrac
+            scaled_bpcm['sn4'][ind_low:ind_high,:] *= noise_scale/skyfrac
+            scaled_bpcm['noi'][ind_low:ind_high,:] *= noise_scale
+            
+            scaled_bpcm['sig'][:,ind_low:ind_high] /= skyfrac**2
+            scaled_bpcm['sn1'][:,ind_low:ind_high] /= skyfrac
+            scaled_bpcm['sn2'][:,ind_low:ind_high] *= noise_scale/skyfrac
+            scaled_bpcm['sn3'][:,ind_low:ind_high] /= skyfrac
+            scaled_bpcm['sn4'][:,ind_low:ind_high] *= noise_scale/skyfrac
+            scaled_bpcm['noi'][:,ind_low:ind_high] *= noise_scale
+
+        #first is planck, second is B3
+        if(map_indices[i] == 2):
+            scaled_bpcm['sig'][ind_low:ind_high,:] /= skyfrac**2
+            scaled_bpcm['sn4'][ind_low:ind_high,:] /= skyfrac
+            scaled_bpcm['sn3'][ind_low:ind_high,:] /= skyfrac
+
+            scaled_bpcm['sn2'][ind_low:ind_high,:] *= noise_scale/skyfrac
+            scaled_bpcm['sn1'][ind_low:ind_high,:] *= noise_scale/skyfrac
+            scaled_bpcm['noi'][ind_low:ind_high,:] *= noise_scale
+            
+            scaled_bpcm['sig'][:,ind_low:ind_high] /= skyfrac**2
+            scaled_bpcm['sn4'][:,ind_low:ind_high] /= skyfrac
+            scaled_bpcm['sn3'][:,ind_low:ind_high] *= noise_scale/skyfrac
+            scaled_bpcm['sn2'][:,ind_low:ind_high] /= skyfrac
+            scaled_bpcm['sn1'][:,ind_low:ind_high] *= noise_scale/skyfrac
+            scaled_bpcm['noi'][:,ind_low:ind_high] *= noise_scale
+
+
+
+
+
+
+
+    '''
     scaled_bpcm['sig'] /= skyfrac**2
     for key in ['sn1', 'sn2', 'sn3', 'sn4']:
-        scaled_bpcm[key] *= noise_scale/skyfrac
-    scaled_bpcm['noi'] *= (noise_scale**2)#*skyfrac**2)
+        if(do_t):
+            scaled_bpcm[key] *= noise_scale
+        else:
+            scaled_bpcm[key] *= noise_scale/skyfrac
+    if(do_t):
+        scaled_bpcm['noi'] *= (noise_scale**2*skyfrac**2)
+    else:
+        scaled_bpcm['noi'] *= noise_scale**2
+    '''
+    '''
+    for key in scaled_bpcm:
+        ep.plot_covar_matrix(scaled_bpcm[key], 
+                                used_maps=used_maps,
+                                title=key, show_plot=True)
 
+        ep.plot_covar_matrix(scaled_bpcm[key]/bpcm_dict[key], 
+                                used_maps=used_maps,
+                                title=key, show_plot=True)
+    '''
     bpcm = sum(scaled_bpcm.values())
     bpcm = (bpcm+bpcm.T)/2
+    #ep.plot_covar_matrix(bpcm/sum(bpcm_dict.values()), 
+    #                            used_maps=used_maps,
+    #                            title='overall scaled bpcm', show_plot=True)
+
+    return bpcm
+ 
+
+def scale_covar_mat(bpcm_dict, skyfrac, noise_scale, plot_type, 
+                map_reference_header, scaled_freqs, used_maps, bin_num = 14): 
+    print('Doing all scaling')
+    scaled_bpcm = copy.deepcopy(bpcm_dict)
+    #for key in scaled_bpcm:
+    #    ep.plot_covar_matrix(bpcm_dict[key], 
+    #                            used_maps=used_maps,
+    #                            title='base_' + key, show_plot=True)
+
+    # do some processing here
+    if(plot_type == 't_obs'):
+        do_t = True
+    elif(plot_type == 'noise'):
+        do_t = False 
+    else:
+        ValueError('plot type not correct')
+
+    # sig (SxS, SxS)
+    # sn1 (SxN, SxN)
+    # sn2 (SxN, NxS)
+    # sn3 (NxS, SxN)
+    # sn4 (NxS, NxS)
+    
+    map_indices = get_mapscale_freqs(used_maps, map_reference_header, scaled_freqs)
+    if(do_t):
+        noise_scale = skyfrac * noise_scale
+    skyfrac = np.sqrt(skyfrac)
+    noise_scale = np.sqrt(noise_scale)
+    for i in range(len(map_indices)):
+        ind_low = i*bin_num
+        ind_high = (i+1)*bin_num
+            
+        if(map_indices[i] == 0 and False):
+            
+            scaled_bpcm['sig'][ind_low:ind_high,:] /= skyfrac **2
+            scaled_bpcm['sn1'][ind_low:ind_high,:] *= noise_scale/skyfrac
+            scaled_bpcm['sn2'][ind_low:ind_high,:] *= noise_scale/skyfrac
+
+            scaled_bpcm['sn3'][ind_low:ind_high,:] *= noise_scale/skyfrac
+            scaled_bpcm['sn4'][ind_low:ind_high,:] *= noise_scale/skyfrac
+            scaled_bpcm['noi'][ind_low:ind_high,:] *= noise_scale **2
+            
+            scaled_bpcm['sig'][:,ind_low:ind_high] /= skyfrac **2
+            scaled_bpcm['sn1'][:,ind_low:ind_high]*= noise_scale/skyfrac
+            scaled_bpcm['sn2'][:,ind_low:ind_high]*= noise_scale/skyfrac
+            scaled_bpcm['sn3'][:,ind_low:ind_high]*= noise_scale/skyfrac
+            scaled_bpcm['sn4'][:,ind_low:ind_high]*= noise_scale/skyfrac
+            scaled_bpcm['noi'][:,ind_low:ind_high] *= noise_scale **2
+
+        if(map_indices[i] == 1 or map_indices[i] == 0):
+            scaled_bpcm['sig'][ind_low:ind_high,:] /= skyfrac
+            scaled_bpcm['sn1'][ind_low:ind_high,:] /= skyfrac
+            scaled_bpcm['sn2'][ind_low:ind_high,:] /= skyfrac
+
+            scaled_bpcm['sn3'][ind_low:ind_high,:] *= noise_scale
+            scaled_bpcm['sn4'][ind_low:ind_high,:] *= noise_scale
+            scaled_bpcm['noi'][ind_low:ind_high,:] *= noise_scale
+            
+            scaled_bpcm['sig'][:,ind_low:ind_high] /= skyfrac
+            scaled_bpcm['sn1'][:,ind_low:ind_high] /=skyfrac
+            scaled_bpcm['sn2'][:,ind_low:ind_high] *= noise_scale
+            scaled_bpcm['sn3'][:,ind_low:ind_high] /=skyfrac
+            scaled_bpcm['sn4'][:,ind_low:ind_high] *= noise_scale
+            scaled_bpcm['noi'][:,ind_low:ind_high] *= noise_scale
+
+        if(map_indices[i] == 2 or map_indices[i] == 0):
+            scaled_bpcm['sig'][ind_low:ind_high,:] /= skyfrac
+            scaled_bpcm['sn4'][ind_low:ind_high,:] /= skyfrac
+            scaled_bpcm['sn3'][ind_low:ind_high,:] /= skyfrac
+
+            scaled_bpcm['sn2'][ind_low:ind_high,:] *= noise_scale
+            scaled_bpcm['sn1'][ind_low:ind_high,:] *= noise_scale
+            scaled_bpcm['noi'][ind_low:ind_high,:] *= noise_scale
+            
+            scaled_bpcm['sig'][:,ind_low:ind_high] /= skyfrac
+            scaled_bpcm['sn4'][:,ind_low:ind_high] /=skyfrac
+            scaled_bpcm['sn3'][:,ind_low:ind_high] *= noise_scale
+            scaled_bpcm['sn2'][:,ind_low:ind_high] /=skyfrac
+            scaled_bpcm['sn1'][:,ind_low:ind_high] *= noise_scale
+            scaled_bpcm['noi'][:,ind_low:ind_high] *= noise_scale
+
+
+
+
+
+
+
+    '''
+    scaled_bpcm['sig'] /= skyfrac**2
+    for key in ['sn1', 'sn2', 'sn3', 'sn4']:
+        if(do_t):
+            scaled_bpcm[key] *= noise_scale
+        else:
+            scaled_bpcm[key] *= noise_scale/skyfrac
+    if(do_t):
+        scaled_bpcm['noi'] *= (noise_scale**2*skyfrac**2)
+    else:
+        scaled_bpcm['noi'] *= noise_scale**2
+    '''
+    '''
+    for key in scaled_bpcm:
+        ep.plot_covar_matrix(scaled_bpcm[key], 
+                                used_maps=used_maps,
+                                title=key, show_plot=True)
+
+        ep.plot_covar_matrix(scaled_bpcm[key]/bpcm_dict[key], 
+                                used_maps=used_maps,
+                                title=key, show_plot=True)
+    '''
+    bpcm = sum(scaled_bpcm.values())
+    bpcm = (bpcm+bpcm.T)/2
+    #ep.plot_covar_matrix(bpcm/sum(bpcm_dict.values()), 
+    #                            used_maps=used_maps,
+    #                            title='overall scaled bpcm', show_plot=True)
+
+
     return bpcm
 
 

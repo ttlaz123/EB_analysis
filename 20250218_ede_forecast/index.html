@@ -34,10 +34,10 @@
         <h2>Introduction</h2>
         
         <p>
-            Fisher matrices are used to forecasting the uncertainties in 
+            Fisher matrices are used to forecast the uncertainties in 
             cosmological parameters when experimental conditions, such as sky coverage or observation time, 
             are improved. Below, we present the Fisher matrices used to project uncertainties for the parameters 
-            \( g, \alpha_{150}, \alpha_{220}, \alpha_{K95}, \) and \( \alpha_{B95e} \). These matrices encode the 
+            \( g, \alpha_{150}, \alpha_{220}, \alpha_{K95}, \) and \( \alpha_{B95lf} \)  (previously refered to as B95e). These matrices encode the 
             expected uncertainties and correlations between parameters under the assumption of Gaussian likelihoods.
         </p>
         </section>
@@ -46,7 +46,7 @@
         
             <h3>Mathematical Derivation of the Fisher Matrix</h3>
             The Fisher forecasting methodology and calculations presented here are adapted from 
-    <a href="https://bicep.rc.fas.harvard.edu/~bicep2/papers/thesi/Keck/VB_PhD_Thesis_Final.pdf">Vargas (2023)</a>, which provides a detailed derivation and validation of the framework 
+    <a href="https://bicep.rc.fas.harvard.edu/~bicep2/papers/thesi/Keck/VB_PhD_Thesis_Final.pdf">Victor Buza's thesis</a>, which provides a detailed derivation and validation of the framework 
     using Bicep/Keck data (see Section 7 of the thesis for the full mathematical treatment).
        
             <p>
@@ -67,6 +67,9 @@
                 \[
                 F_{ij} = \frac{\partial \mu^T}{\partial \theta_i} \Sigma^{-1} \frac{\partial \mu}{\partial \theta_j} + \frac{1}{2} \text{Tr}\left( \Sigma^{-1} \frac{\partial \Sigma}{\partial \theta_i} \Sigma^{-1} \frac{\partial \Sigma}{\partial \theta_j} \right).
                 \]
+                In our case, the \(\theta\)s are the photon-axion coupling constant \(g\) and the polarization rotation angles \(\alpha_\nu\) where each \(\nu\) represents the different receiver frequencies.
+                For our fiducial model, we assume \(\mu(\theta)\) is zero for both \(g\) and each of the polarization rotation angles. A quick check verifies that using different values for 
+                our parameters in our fiducial model has negligible effect on the Fisher forecast as long as the values are small.
             </p>
         
             <p>
@@ -89,8 +92,12 @@
                 <strong>Inputs:</strong>
             </p>
             <ul>
-                <li>Covariance matrices from Bicep/Keck.</li>
-                <li>Fiducial model parameters (\(\theta_i =  g, \alpha_\nu \)).</li>
+                <li>
+    <strong>Covariance Matrices from BICEP/Keck:</strong>  
+    The covariance matrices are generated using the BK18 simulation pipeline,  
+    constructed with <code>scale_bpcm.m</code> in <code>make_cosmomc_dataset.m</code>.
+</li>
+                <li>Fiducial model parameters (\(\theta_i =  g, \alpha_\nu \) which are all \(\mu(\theta_i)=0\) in our case).</li>
             </ul>
         
             <p>
@@ -105,68 +112,65 @@
         <h2>Confirming Forecast Results for Current Data</h2>
         
         Following the steps outlined above, we obtain the following uncertainties for Bin num = 15, matching 
-            the emperical peak spread from the simulations in 
+            the empirical peak spread from the simulations in 
             <a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20241203_multicomp_eb_ede_update/">the previous update</a>.
 
             <table>
                 <thead>
                     <tr>
                         <th>Parameter</th>
-                        <th>Uncertainty from Fisher Forecast(\( \sigma_{ii} \))</th>
-                        <th>Uncertainty from Simulations (Upper)</th>
-                        <th>Uncertainty from Simulations (Lower)</th>
+                        <th>Uncertainty from Fisher Forecast (\( \sigma_{ii} \))</th>
+                        <th>Uncertainty from Simulations (avg)</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>\( g \)</td>
                         <td>0.3246</td>
-                        <td>+0.35°</td>
-                        <td>-0.37°</td>
+                        <td>0.36</td>
                     </tr>
                     <tr>
                         <td>\( \alpha_{150} \)</td>
                         <td>0.1523°</td>
-                        <td>+0.19°</td>
-                        <td>-0.17°</td>
+                        <td>0.18°</td>
                     </tr>
                     <tr>
                         <td>\( \alpha_{220} \)</td>
                         <td>0.2164°</td>
-                        <td>+0.24°</td>
-                        <td>-0.22°</td>
+                        <td>0.23°</td>
                     </tr>
                     <tr>
                         <td>\( \alpha_{K95} \)</td>
                         <td>0.2032°</td>
-                        <td>+0.22°</td>
-                        <td>-0.20°</td>
+                        <td>0.21°</td>
                     </tr>
                     <tr>
-                        <td>\( \alpha_{B95e} \)</td>
+                        <td>\( \alpha_{B95lf} \)</td>
                         <td>0.1404°</td>
-                        <td>+0.17°</td>
-                        <td>-0.16°</td>
+                        <td>0.17°</td>
                     </tr>
                 </tbody>
             </table>
-            The simulation uncertainties are slightly larger than the uncertainties from the Fisher Forecast because the 
-            calculations are for the minimum bound, which is not necessarily true for any particular realization.
+            The simulation uncertainties are slightly larger than the uncertainties from the Fisher Forecast because it calculates
+             the minimum bound, which is not necessarily true for any particular realization.
     </section><section>
     <h2>Forecast for Future Observations</h2>
     <p>After verifying that the Fisher Forecast parameter uncertainties are consistent with the results of our simulations 
         in the previous update, we repeated the calculations while varying sky fraction, noise level, and observation time. 
         At this stage, we assume uniform scaling and do not yet account for the impact of individual receivers or new receivers 
-        on the uncertainties.</p>
+        on the uncertainties. Uniform scaling means we apply the noise and sky fraction scaling factors equally to all
+        frequency bands and receivers. </p>
 
        <figure>
         <img alt="Forecast Analysis" id="forecast" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
         <figcaption>
             
-            <p>The pager shows how g uncertainties scale with experimental improvements for different forecast scenarios:</p>
+            <p>The pager shows how g uncertainties scale with experimental improvements for different forecast scenarios. The units are
+                all in ratio with respect to the current value. For example, total observed time of 2 indicates the case where
+                the data is obtained from twice as much time spent observing as the current available data.</p>
             <ul>
-                <li><strong>Sky Fraction Scaling Only</strong>: Impact of increased sky coverage and assumes noise level stays the same.</li>
-                <li><strong>Sky Fraction + Noise</strong>: Assumes noise levels are independent of sky coverage.</li>
+                <li><strong>Sky Fraction Scaling Only</strong>: Looks at the impact of increased sky coverage and assumes noise level stays the same. Only signal covariance is scaled.</li>
+                <li><strong>Sky Fraction + Noise</strong>: Assumes noise levels are independent of sky coverage. Both independently scaled.</li>
                 <strong>Sky Fraction + Observation Time</strong>: Combines sky coverage and observation time scaling 
                                             (assumes noise scales linearly with sky coverage and inversely with observation time).</li>
                 <li><strong>Noise Only</strong>: Assumes current sky coverage.</li>
@@ -180,7 +184,20 @@
                     'Sky Fraction + Noise|skyfrac_noise',
                     'Sky Fraction Scaling Only|skyfrac',
                     'Noise Only|noise'
-                ]
+                ],
+                'Dataset|data':[
+                    'BK18|_BK18',
+                    //'B3 + Planck|_B3_planck',
+                    'B95lf Only|_B3',
+                    //'B95 + 150|_BK18_part'
+                ],
+                //'Scaling|scalar':[
+                //    'All|None',
+                    //'B3 only|BK18_B95e',
+                    //'BK150 only|BK18_150',
+                    //'BK220 only|BK18_220',
+                    //'K95 only|BK18_K95',
+                //],
             },
             function(params) {
                 dirbase = '.'
@@ -188,22 +205,25 @@
                 let plotname;
                 
                 if(params.ftype === 'skyfrac') {
-                    plotname = 'skyfrac.png';
+                    plotname = 'skyfrac';
                 } else if(params.ftype == 'noise'){
-                    plotname = 'noise.png'; 
+                    plotname = 'noise'; 
                 } else if(params.ftype == 'skyfrac_noise'){
-                    plotname = 'skyfrac_noise_2D.png'; 
+                    plotname = 'skyfrac_noise_2D'; 
                 } else if(params.ftype == 'skyfrac_tobs'){
-                    plotname = 'skyfrac_tobs_2D.png';
+                    plotname = 'skyfrac_tobs_2D';
                 } else {
                     plotname = 'dne.png'
+                    return dirpath + plotname;
                 }
-                
+                plotname = plotname + params.data + '_'+ params.scalar + '.png'
                 return dirpath + plotname;
             });
     
             pager.setparams({
-                'ftype': 'skyfrac'
+                'ftype': 'skyfrac',
+                'data': '_BK18',
+                'scalar': 'None',
             });
         </script>
     </figure>
@@ -222,12 +242,88 @@
             <li><strong>Expand the observed sky area by a factor of 3</strong> while maintaining the same noise level, 
                 which would require a corresponding threefold increase in observation time.</li>
         </ul>
+
+        <p>
+        We also include two scenarios, one with the BK18 dataset that has our usual 
+        frequencies of B95lf, K95, 150, and 220. The B3 + Planck dataset is the 
+        scenario for using only B95lf and the 5 Planck frequencies of 
+        P30, P44, P143, P217, and P353. This is the Planck data restricted to
+        the BICEP large field, and we see that they do not provide significant
+        constraining power.
+        </p>
+        <figure>
+        <img alt="Forecast Analysis" id="forecast_planck" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
+        <figcaption>
+            
+            <p>The pager shows how g uncertainties scale with experimental improvements for different forecast scenarios. The units are
+                all in ratio with respect to the current value. For example, total observed time of 2 indicates the case where
+                the data is obtained from twice as much time spent observing as the current available data.</p>
+            <ul>
+                <li><strong>Sky Fraction Scaling Only</strong>: Looks at the impact of increased sky coverage and assumes noise level stays the same. Only signal covariance is scaled.</li>
+                <li><strong>Sky Fraction + Noise</strong>: Assumes noise levels are independent of sky coverage. Both independently scaled.</li>
+                <strong>Sky Fraction + Observation Time</strong>: Combines sky coverage and observation time scaling 
+                                            (assumes noise scales linearly with sky coverage and inversely with observation time).</li>
+                <li><strong>Noise Only</strong>: Assumes current sky coverage.</li>
+            </ul>
+        </figcaption>
+        <script type="text/javascript">
+            pager.link("#forecast_planck", {
+                'Forecast Type|ftype': [
+                    
+                    'Sky Fraction + Observation Time|skyfrac_tobs',
+                    'Sky Fraction + Noise|skyfrac_noise',
+                    'Sky Fraction Scaling Only|skyfrac',
+                    'Noise Only|noise'
+                ],
+                'Dataset|data_planck':[
+                    //'BK18|_BK18',
+                    'B3 + Planck|_B3_planck_real',
+                    'B95lf Only|_B3',
+                    //'B95 + 150|_BK18_part'
+                ],
+                //'Scaling|scalar':[
+                //    'All|None',
+                    //'B3 only|BK18_B95e',
+                    //'BK150 only|BK18_150',
+                    //'BK220 only|BK18_220',
+                    //'K95 only|BK18_K95',
+                //],
+            },
+            function(params) {
+                dirbase = '.'
+                let dirpath = dirbase + '/forecast_plots/';
+                let plotname;
+                
+                if(params.ftype === 'skyfrac') {
+                    plotname = 'skyfrac';
+                } else if(params.ftype == 'noise'){
+                    plotname = 'noise'; 
+                } else if(params.ftype == 'skyfrac_noise'){
+                    plotname = 'skyfrac_noise_2D'; 
+                } else if(params.ftype == 'skyfrac_tobs'){
+                    plotname = 'skyfrac_tobs_2D';
+                } else {
+                    plotname = 'dne.png'
+                    return dirpath + plotname;
+                }
+                plotname = plotname + params.data_planck + '_'+ params.scalar_planck + '.png'
+                return dirpath + plotname;
+            });
+    
+            pager.setparams({
+                'ftype': 'skyfrac',
+                'data_planck': '_B3_planck_real',
+                'scalar_planck': 'BK18_B95e',
+            });
+        </script>
+    </figure>
     </section>
     <section>   
     <h2>Next Steps</h2>
-    <p>To improve the accuracy of our forecast, we should account for the fact that only Bicep 3 is currently operational. 
-        This means we will likely obtain data from a single frequency, requiring us to scale the data under the assumption 
-        that improvements in the multicomponent analysis will rely solely on this single frequency.</p>
+    <p>To improve the accuracy of our forecast, we should account for the fact that we will only be acquiring new data
+      from currently operational receivers. This requires us to scale the covariance matrices with respect to their
+      individual frequency/receiver components rather than assuming each component will scale uniformly.
+      This information can be used to potentially help contribute to determining future observation strategy.
     </section>
 
 </body>
