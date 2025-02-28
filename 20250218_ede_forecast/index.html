@@ -213,12 +213,15 @@
     <p>
         Similarly, we assume that noise decreases with increased observation time. However, if observation time remains 
         constant while sky fraction increases, noise increases because less time is spent on each part of the sky. 
-        To account for this, we present two different cases:
+        Assuming constant sky fraction, we scale down each \(N\) by the square root of the observation time ratio. 
+        With this, we define "Noise Level" to be equal to Sky Fraction Ratio/Observation Time Ratio. Similarly, each 
+        \(N\) scales with the square root of this "Noise Level".
+        We present two different cases:
     </p>
     
     <ul>
-        <li>A scenario where noise remains independent of sky fraction.</li>
-        <li>A scenario where observation time remains independent, allowing noise to increase with sky fraction.</li>
+        <li>Noise level is the independent variable.</li>
+        <li>Observation time remains independent, allowing noise to increase with sky fraction.</li>
     </ul>
     
        <figure>
