@@ -167,13 +167,13 @@
     <p>To scale the covariance matrix, we decompose it into six components:</p>
     
     \[
-        \text{Cov} = \sigma + \text{sn}_1 + \text{sn}_2 + \text{sn}_3 + \text{sn}_4 + \text{noi}
+        \text{Cov} = \text{sig} + \text{sn}_1 + \text{sn}_2 + \text{sn}_3 + \text{sn}_4 + \text{noi}
     \]
     
     <p>where</p>
     
     \[
-    \sig = (S \times S, S \times S)
+    \text{sig} = (S \times S, S \times S)
     \]
     
     \[
@@ -199,7 +199,7 @@
     <p>
         The signal components (\(S\)) scale with sky fraction, while the noise components (\(N\)) scale with noise. 
         Our base assumption is that each \(S\) scales with the square root of the sky fraction ratio. 
-        For example, doubling the sky fraction would scale \(sig\) by:
+        For example, doubling the sky fraction would scale \(\text{sig}\) by:
     </p>
     
     \[
@@ -207,7 +207,7 @@
     \]
     
     <p>
-        since there are four \(S\)'s in \(\sigma\). This reflects how increasing sky coverage reduces signal variance.
+        since there are four \(S\)'s in \(\text{sig}\). This reflects how increasing sky coverage reduces signal variance.
     </p>
     
     <p>
