@@ -338,23 +338,24 @@ def multicomp_mcmc_driver(outpath, dorun, sim_num='real'):
 
     
     calc_spectra = [
-                    #'BK18_220', 
-                    #'BK18_150', 
-                    #'BK18_K95', 
+                    'BK18_220', 
+                    'BK18_150', 
+                    'BK18_K95', 
                     'BK18_B95e',
-                    'P030e', 
-                    'P044e', 
-                    'P143e',
-                    'P217e',
-                    'P353e'
+                    #'P030e', 
+                    #'P044e', 
+                    #'P143e',
+                    #'P217e',
+                    #'P353e'
                    ] 
-    mapnames = 'B3_planck_real'
-    #mapnames = 'BK18'
+    #mapnames = 'B3_planck_real'
+    mapnames = 'BK18'
     #mapnames = 'BK18_part'
     #mapnames = 'B3'
     #mapnames = 'planck_real'
 
-    scalemaps = 'BK18_B95e'
+    scalemaps = None
+    #scalemaps = 'BK18_B95e'
     do_crosses =True
     include_ede = True
     num_bins = 14

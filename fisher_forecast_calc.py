@@ -290,7 +290,7 @@ def make_forecast_scaling_plot(map_reference_header, used_maps, num_bins, dl_the
     outdir = './20250218_ede_forecast/forecast_plots/'
     #plot_type = 'noise'
     plot_type = 't_obs'
-    do_planck=True
+    do_planck=False
     print('Making forecast plot')
     if(test_params is None):
         test_params = {
@@ -388,7 +388,7 @@ def scale_covar_mat_planck(bpcm_dict, skyfrac, noise_scale, plot_type, map_refer
     map_indices = get_mapscale_freqs(used_maps, map_reference_header, scaled_freqs)
     if(do_t):
         noise_scale = skyfrac * noise_scale
-    skyfrac = np.sqrt(skyfrac)
+    skyfrac = np.sqrt(np.sqrt(skyfrac))
     noise_scale = np.sqrt(noise_scale)
     for i in range(len(map_indices)):
         ind_low = i*bin_num
@@ -526,7 +526,7 @@ def scale_covar_mat(bpcm_dict, skyfrac, noise_scale, plot_type,
     map_indices = get_mapscale_freqs(used_maps, map_reference_header, scaled_freqs)
     if(do_t):
         noise_scale = skyfrac * noise_scale
-    skyfrac = np.sqrt(skyfrac)
+    skyfrac = np.sqrt(np.sqrt(skyfrac))
     noise_scale = np.sqrt(noise_scale)
     for i in range(len(map_indices)):
         ind_low = i*bin_num
