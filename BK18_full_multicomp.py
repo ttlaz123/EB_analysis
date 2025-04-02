@@ -3,9 +3,15 @@ from cobaya.likelihood import Likelihood
 
 class BK18_full_multicomp(Likelihood):
     # define variables
+    map_set=None
+    dataset= None
+    forecast=False 
+    bin_num=14 
+    theory_comps='all' 
+    spectra_type='all'
     def __init__(self, *args, **kwargs):
     
-    
+        
         #define variables
         pass
     def initialize():
