@@ -18,7 +18,7 @@ def load_shared_data(args):
     covmat_name = 'covariance_matrix'
     FILE_PATHS = fp.set_file_paths(args.dataset)
     SHARED_DATA_DICT['covmat'] = ld.load_covariance_matrix(FILE_PATHS[covmat_name])
-    SHARED_DATA_DICT['bpwf'] = ld.load_bpwf(FILE_PATHS['bpwf'], 
+    SHARED_DATA_DICT['bpwf'], map_reference_header = ld.load_bpwf(FILE_PATHS['bpwf'], 
                                             map_reference_header, 
                                             num_bins=args.bin_num)
     SHARED_DATA_DICT['theory_spectra'] = ld.load_cmb_spectra(FILE_PATHS['camb_lensing'],
@@ -27,7 +27,7 @@ def load_shared_data(args):
     SHARED_DATA_DICT['theory_spectra'] = ld.include_ede_spectra(FILE_PATHS['EDE_spectrum'],
                                                                 args.theory_comps)
     SHARED_DATA_DICT['bandpasses'] = ld.read_bandpasses(FILE_PATHS['bandpasses'])
-    
+    SHARED_DATA_DICT['map_reference_header'] = map_reference_header
     
 
 def run_bk18_likelihood(params_dict, used_maps, outpath, observation_file_path,
