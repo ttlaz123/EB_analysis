@@ -1,5 +1,6 @@
 from cobaya.likelihood import Likelihood
-
+import eb_load_data as ld
+import eb_calculations as ec
 
 class BK18_full_multicomp(Likelihood):
     # define variables
@@ -33,17 +34,19 @@ class BK18_full_multicomp(Likelihood):
         else:
             super().__init__(*args, **kwargs)
 
-    def initialize():
+    def initialize(self):
         self.map_reference_header = self.sim_common_data['map_reference_header']
         self.used_maps = self.filter_used_maps(self.used_maps)
         self.bandpasses = self.sim_common_data['bandpasses']
+        self.bpwf = self.sim_common_data['bpwf']
         self.dl_theory = self.sim_common_data['theory_spectra']
         self.cov_inv = self.sim_common_data['inv_covmat']
         self.binned_dl_observed_dict, self.map_reference_header = ld.load_observed_spectra(
-                                                            observe_filepath,
+                                                            self.observe_filepath,
                                                             self.used_maps,
                                                             self.map_reference_header,
                                                             num_bins = self.bin_num)
+        self.initial_theory_dict = ec.apply_initial_conditions(self.dl_theory, self.map_set, self.spectra_type)
     def logp(self, **params_values):
         """
         Calculate the log-likelihood based on the current parameter values.
@@ -51,8 +54,7 @@ class BK18_full_multicomp(Likelihood):
 
         # Get the theoretical predictions based on the parameter values
         #print(params_values)
-        theory_prediction = self.theory(params_values,
-                                        self.dl_theory, self.used_maps)
+        theory_prediction = self.theory(params_values)
 
         # Calculate the residuals
         residuals = self.binned_dl_observed_vec - theory_prediction
@@ -64,25 +66,33 @@ class BK18_full_multicomp(Likelihood):
         return log_likelihood
 
 
-    def theory():
+    def theory(self, params_values):
         # define relevant dictionaries
         if(self.theory_comps in ['all', 'fixed_dust']):
             # do ede shift
-
-                    
+            post_inflation_dict = ec.apply_EDE_shift(params_values)
+        else:
+            post_inflation_dict = self.initial_theory_dict
         if(self.theory_comps in ['all', 'no_ede']):
-            # do dust
+            
             # do cmb rotation
-
-        if(self.theory_comps in ['all', 'det_polrot', 'fixed_dust', 'no_ede'):
+            post_travel_dict = ec.apply_cmb_rotation(post_inflation_dict, params_values)
+            # do dust
+            post_travel_dict = ec.apply_dust(post_travel_dict)
+            
+        else: 
+            post_travel_dict = post_inflation_dict
+        if(self.theory_comps in ['all', 'det_polrot', 'fixed_dust', 'no_ede']):
             # do detector rotation
+            post_detection_dict = ec.apply_det_rotation(post_travel_dict, params_values)
+            
 
 
         # apply bpwf
-        self.tot_dict = ec.apply_bpwf(self.map_reference_header,
-                                      self.theory_dict,
+        self.final_detection_dict = ec.apply_bpwf(self.map_reference_header,
+                                      post_detection_dict,
                                       self.bpwf,
                                       self.used_maps,
                                       do_cross=True)
-        theory_vec = self.dict_to_vec(self.tot_dict, self.used_maps)
+        theory_vec = self.dict_to_vec(self.final_detection_dict, self.used_maps)
         return theory_vec
