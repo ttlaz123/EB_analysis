@@ -8,6 +8,7 @@ from cobaya.run import run
 
 import eb_load_data as ld
 import eb_file_paths as fp
+import eb_calculations as ec
 import eb_plot_data as epd
 import BK18_full_multicomp
 
@@ -131,44 +132,6 @@ def define_priors(calc_spectra, theory_comps, angle_degree=3):
     
     return params_dict
 
-def determine_map_freqs(mapset):
-    if(mapset == 'BK18'):
-        calc_spectra = [
-                    'BK18_220', 
-                    'BK18_150', 
-                    'BK18_K95', 
-                    'BK18_B95e']
-        
-
-    elif(mapset == 'BK18_planck'):
-        calc_spectra = [
-                    'BK18_220', 
-                    'BK18_150', 
-                    'BK18_K95', 
-                    'BK18_B95e',
-                    'P030e', 
-                    'P044e', 
-                    'P143e',
-                    'P217e',
-                    'P353e'
-                   ]
-    elif(mapset == 'planck'):
-        calc_spectra = [
-                    'P030e', 
-                    'P044e', 
-                    'P143e',
-                    'P217e',
-                    'P353e'
-                   ]
-    elif(mapset == 'BK_good'):
-        calc_spectra = ['BK18_150',
-                        'BK18_B95e'] 
-    elif(mapset == 'BK_bad'):
-        calc_spectra = ['BK18_220',
-                        'BK18_K95'] 
-    else:
-        calc_spectra = [mapset]
-    return calc_spectra
 
 def generate_cross_spectra(calc_spectra, do_crosses, spectra_type):
     cross_spectra = []
@@ -205,7 +168,7 @@ def multicomp_mcmc_driver(outpath, overwrite=True,
                           spectra_type='all'):
     # full multicomp driver
     # define maps based on mapopts
-    calc_spectra = determine_map_freqs(map_set)
+    calc_spectra = ec.determine_map_freqs(map_set)
     do_crosses = True
     used_maps = generate_cross_spectra(calc_spectra, do_crosses=do_crosses, spectra_type=spectra_type)
     # define dust params based on dustopts

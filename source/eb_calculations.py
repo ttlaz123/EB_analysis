@@ -15,6 +15,121 @@ LPIVOT = 80.0
 TDUST = 19.6
 
 
+
+def determine_map_freqs(mapset):
+    if(mapset == 'BK18'):
+        calc_spectra = [
+                    'BK18_220', 
+                    'BK18_150', 
+                    'BK18_K95', 
+                    'BK18_B95e']
+        
+
+    elif(mapset == 'BK18_planck'):
+        calc_spectra = [
+                    'BK18_220', 
+                    'BK18_150', 
+                    'BK18_K95', 
+                    'BK18_B95e',
+                    'P030e', 
+                    'P044e', 
+                    'P143e',
+                    'P217e',
+                    'P353e'
+                   ]
+    elif(mapset == 'planck'):
+        calc_spectra = [
+                    'P030e', 
+                    'P044e', 
+                    'P143e',
+                    'P217e',
+                    'P353e'
+                   ]
+    elif(mapset == 'BK_good'):
+        calc_spectra = ['BK18_150',
+                        'BK18_B95e'] 
+    elif(mapset == 'BK_bad'):
+        calc_spectra = ['BK18_220',
+                        'BK18_K95']  
+    else:
+        calc_spectra = [mapset]
+    return calc_spectra
+
+def determine_spectrum_type(spectrum_name):
+    """
+    Determines the polarization spectrum type (EE, BB, EB, or BE) 
+    from a string formatted like 'something_Exsomething_B'.
+
+    Args:
+        spectrum_name (str): The input string containing '_E' or '_B' before and after an 'x'.
+
+    Returns:
+        str: A 2-letter string indicating the spectrum type, e.g., 'EB', 'BE', 'EE', or 'BB'.
+
+    Raises:
+        AssertionError: If the input format is not as expected.
+    """
+    spectra = spectrum_name.split('x')
+    assert len(spectra) == 2, "spectrum name isn't properly formatted: " + str(spectrum_name)
+    
+    spec1 = spectra[0][-2:]
+    spec2 = spectra[1][-2:]
+    
+    assert spec1 in ['_E', '_B'], "spectrum name isn't properly formatted: " + str(spectrum_name)
+    assert spec2 in ['_E', '_B'], "spectrum name isn't properly formatted: " + str(spectrum_name)
+
+    spec_type = spec1[-1] + spec2[-1]
+    return spec_type
+
+def apply_initial_conditions(dl_theory_dict, used_maps):
+    initial_conditions_dict = {}
+    for used_map in used_maps:
+        spec_type = determine_spectrum_type(used_map)
+        initial_conditions_dict[used_map] = dl_theory_dict[spec_type]
+    return initial_conditions_dict
+
+def apply_EDE_shift(cross_map, dl_theory_dict, params_values, fixed_dust=True):
+        maps = cross_map.split('x')
+        map1 = re.sub(r'_{BE}$', '', maps[0])
+        map2 = re.sub(r'_{BE}$', '', maps[1])
+        angle1_name = 'alpha_' + maps[0]
+        angle2_name = 'alpha_' + maps[1]
+        # Use regex to remove _B, _E, or any other suffix ending with _ followed by letters
+        angle1_name = re.sub(r'_[BE]$', '', angle1_name)
+        angle2_name = re.sub(r'_[BE]$', '', angle2_name)
+        angle1 = params_values[angle1_name]
+        angle2 = params_values[angle2_name]
+
+        #cross_map1, cross_map2 = self.assemble_eb_crossmaps(cross_map,
+        #                                   dl_theory_dict)
+        if(fixed_dust):
+            cross_map1 = 'EDE_EB'
+            cross_map2 = 'EDE_EB'
+        else:
+            cross_map1 = cross_map + '_EDE'
+            cross_map2 = cross_map + '_EDE'
+        #try:
+        ede_spec1 = dl_theory_dict[cross_map1]
+        ede_spec2 = dl_theory_dict[cross_map2]
+        #except KeyError as e:
+        #    msg = f"Key '{e.args[0]}' not found. Additional info: {cross_map} not in dict. Available keys: {list(dl_theory_dict.keys())}"
+        #    raise KeyError(msg) from e
+        gMpl = params_values['gMpl']
+        D_e1b2 = (ede_spec1 * np.cos(2*np.deg2rad(angle1)) * 
+                                    np.cos(2*np.deg2rad(angle2)))
+        D_b1e2 = (ede_spec2 * np.sin(2*np.deg2rad(angle1)) * 
+                                    np.sin(2*np.deg2rad(angle2)))
+
+        ede_shift = (D_e1b2 - D_b1e2)
+        return ede_shift * gMpl
+
+
+
+
+###########################################################
+# DEPRECATED FUNCTIONS BELOW
+#
+###########################################################
 def dust_scaling(beta, Tdust, bandpass, nu0, bandcenter_err=1):
     """
     Calculates the greybody scaling of a dust signal defined at a pivot frequency (e.g., 353 GHz)

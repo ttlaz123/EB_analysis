@@ -46,7 +46,7 @@ class BK18_full_multicomp(Likelihood):
                                                             self.used_maps,
                                                             self.map_reference_header,
                                                             num_bins = self.bin_num)
-        self.initial_theory_dict = ec.apply_initial_conditions(self.dl_theory, self.map_set, self.spectra_type)
+        self.initial_theory_dict = ec.apply_initial_conditions(self.dl_theory, self.used_maps, self.spectra_type)
     def logp(self, **params_values):
         """
         Calculate the log-likelihood based on the current parameter values.
