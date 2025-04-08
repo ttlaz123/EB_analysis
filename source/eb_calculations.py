@@ -2,6 +2,7 @@ import warnings
 import numpy as np
 import re
 import math
+from functools import lru_cache
 # Physical constants
 
 h_J_s = 6.62607015e-34
@@ -85,9 +86,181 @@ def apply_initial_conditions(dl_theory_dict, used_maps):
     initial_conditions_dict = {}
     for used_map in used_maps:
         spec_type = determine_spectrum_type(used_map)
+        if(spec_type in ['EB', 'BE']):
+            continue
         initial_conditions_dict[used_map] = dl_theory_dict[spec_type]
     return initial_conditions_dict
 
+def get_map_freqs(used_map):
+    maps = used_map.spilt('x')
+    map1 = maps[0]
+    map2 = maps[1]
+    return map1[:-2], map2[:-2]
+
+def determine_angle_names(used_map):
+    maps = used_map.split('x')
+    angle1_name = 'alpha_' + maps[0]
+    angle2_name = 'alpha_' + maps[1]
+    angle1_name = re.sub(r'_[BE]$', '', angle1_name)
+    angle2_name = re.sub(r'_[BE]$', '', angle2_name)
+    return angle1_name, angle2_name
+
+def get_other_spec_map(used_map, all_maps):
+    maps = used_map.split('x')
+    map1 = maps[0]
+    map2 = maps[1]
+    ee_map = map1[:-2] + '_Ex' + map2[:-2] + '_E'
+    bb_map = map1[:-2] + '_Bx' + map2[:-2] + '_B'
+    eb_map = map1[:-2] + '_Ex' + map2[:-2] + '_B'
+    be_map = map1[:-2] + '_Bx' + map2[:-2] + '_E'
+    if(eb_map in all_maps):
+        return ee_map, bb_map, eb_map
+    elif(be_map in all_maps):
+        return ee_map, bb_map, be_map
+    else:
+        raise ValueError('Map does not have all three spec types: ' + str(used_map))
+
+# Caching angle lookup
+@lru_cache(maxsize=None)
+def determine_angle_names_cached(map_name):
+    return determine_angle_names(map_name)
+
+def apply_EDE(initial_theory_dict, params_values, dl_theory_dict, used_maps):
+    """
+    Applies Early Dark Energy (EDE) replacement to EB/BE spectra in a copy of the theory dict.
+
+    Parameters:
+        initial_theory_dict (dict): Theory Cls to be copied and modified.
+        params_values (dict): Parameters, must include 'gMpl'.
+        dl_theory_dict (dict): Must include 'EB_EDE' key with EDE spectrum.
+        used_maps (list): List of map names like 'foo_Exbar_B'.
+
+    Returns:
+        dict: New theory dictionary with EDE EB/BE spectra replaced.
+    """
+    ede = dl_theory_dict['EB_EDE']
+    g = params_values['gMpl']
+    post_dict = {k: v.copy() for k, v in initial_theory_dict.items()}
+
+    for m in used_maps:
+        spec = determine_spectrum_type(m)
+        if spec in ['EB', 'BE']:
+            if m in post_dict:
+                post_dict[m] = ede * g
+            else:
+                print(f"Warning: map {m} not found in theory dict, skipping.")
+
+    return post_dict
+
+
+def apply_cmb_rotation(post_inflation_dict, params_values, dl_theory_dict, used_maps):
+    """
+    Applies rotation of CMB polarization spectra due to a global angle alpha_CMB.
+
+    Parameters:
+        post_inflation_dict (dict): Theory Cls after inflation but before CMB rotation.
+        params_values (dict): Parameters, must include 'alpha_CMB' in degrees.
+        dl_theory_dict (dict): (Unused here, kept for compatibility).
+        used_maps (list): List of map names like 'foo_Exbar_B'.
+
+    Returns:
+        dict: New theory dictionary with rotated spectra.
+    """
+    angle = np.deg2rad(params_values['alpha_CMB'])
+
+    # Precompute trigonometric terms
+    sin2 = np.sin(2 * angle)
+    cos2 = np.cos(2 * angle)
+    sin4 = np.sin(4 * angle)
+    cos4 = np.cos(4 * angle)
+    sin2_sq = sin2 ** 2
+    cos2_sq = cos2 ** 2
+
+    # Deep copy the theory dict
+    post_travel_dict = {k: v.copy() for k, v in post_inflation_dict.items()}
+
+    for m in used_maps:
+        spec = determine_spectrum_type(m)
+        ee_map, bb_map, eb_map = get_other_spec_map(m, used_maps)
+
+        # Pre-fetch values to avoid repeated dict access
+        Cl_EE = post_inflation_dict[ee_map]
+        Cl_BB = post_inflation_dict[bb_map]
+        Cl_EB = post_inflation_dict[eb_map]
+
+        if spec == 'BB':
+            post_travel_dict[m] = Cl_EE * sin2_sq + Cl_BB * cos2_sq + Cl_EB * sin4
+
+        elif spec == 'EE':
+            post_travel_dict[m] = Cl_EE * cos2_sq + Cl_BB * sin2_sq - Cl_EB * sin4
+
+        elif spec in ['EB', 'BE']:
+            post_travel_dict[m] = 0.5 * (Cl_EE - Cl_BB) * sin4 + Cl_EB / cos4
+
+    return post_travel_dict
+
+def apply_dust(post_travel_dict, bandpasses, params_values):
+    """
+    Applies dust contamination model to post-CMB-rotation Cls.
+
+    Parameters:
+        post_travel_dict (dict): Theory Cls after rotation.
+        bandpasses (dict): Dict of bandpass arrays keyed by map names.
+        params_values (dict): Must include dust amplitude, tilt, and beta_dust.
+
+    Returns:
+        dict: Updated Cls with dust power added.
+    """
+    beta_dust = params_values['beta_dust']
+    dust_cache = {}
+    
+    for used_map, dls in post_travel_dict.items():
+        lmax = dls.shape[0]
+        ratio = np.arange(lmax) / LPIVOT
+
+        spec_type = determine_spectrum_type(used_map)
+        freq1, freq2 = get_map_freqs(used_map)
+
+        # Use cached dust scaling if available
+        if freq1 not in dust_cache:
+            dust_cache[freq1] = dust_scaling(beta_dust, TDUST, bandpasses[freq1], FPIVOT_DUST, bandcenter_err=1)
+        if freq2 not in dust_cache:
+            dust_cache[freq2] = dust_scaling(beta_dust, TDUST, bandpasses[freq2], FPIVOT_DUST, bandcenter_err=1)
+
+        dust_scale1 = dust_cache[freq1]
+        dust_scale2 = dust_cache[freq2]
+
+        if spec_type in ['EB', 'BE']:
+            A_key = f'A_dust_EB'
+            alpha_key = f'alpha_dust_EB'
+        else:
+            A_key = f'A_dust_{spec_type}'
+            alpha_key = f'alpha_dust_{spec_type}'
+
+        A_dust = params_values[A_key]
+        alpha_dust = params_values[alpha_key]
+
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', category=RuntimeWarning)
+            dustpow = A_dust * np.power(ratio, alpha_dust)
+
+        if np.isinf(dustpow[0]):
+            dustpow[0] = 0
+
+        dls += dustpow * dust_scale1 * dust_scale2
+
+    return post_travel_dict
+
+def apply_det_rotation(post_travel_dict, params_values):
+    post_detection_dict = {k: v.copy() for k, v in post_travel_dict.items()}
+    for used_map in post_travel_dict.keys():
+        ## TODO: finish this
+        post_detection_dict[used_map] = 0
+    return post_detection_dict
+###########################################################
+# DEPRECATED FUNCTIONS BELOW
+#
+###########################################################
 def apply_EDE_shift(cross_map, dl_theory_dict, params_values, fixed_dust=True):
         maps = cross_map.split('x')
         map1 = re.sub(r'_{BE}$', '', maps[0])
@@ -126,10 +299,6 @@ def apply_EDE_shift(cross_map, dl_theory_dict, params_values, fixed_dust=True):
 
 
 
-###########################################################
-# DEPRECATED FUNCTIONS BELOW
-#
-###########################################################
 def dust_scaling(beta, Tdust, bandpass, nu0, bandcenter_err=1):
     """
     Calculates the greybody scaling of a dust signal defined at a pivot frequency (e.g., 353 GHz)

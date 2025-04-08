@@ -70,15 +70,21 @@ class BK18_full_multicomp(Likelihood):
         # define relevant dictionaries
         if(self.theory_comps in ['all', 'fixed_dust']):
             # do ede shift
-            post_inflation_dict = ec.apply_EDE_shift(params_values)
+            post_inflation_dict = ec.apply_EDE(self.initial_theory_dict, 
+                                               params_values,
+                                               self.dl_theory,
+                                               self.used_maps)
         else:
             post_inflation_dict = self.initial_theory_dict
         if(self.theory_comps in ['all', 'no_ede']):
             
             # do cmb rotation
-            post_travel_dict = ec.apply_cmb_rotation(post_inflation_dict, params_values)
+            post_travel_dict = ec.apply_cmb_rotation(post_inflation_dict,
+                                                    params_values,
+                                                    self.dl_theory,
+                                                    self.used_maps)
             # do dust
-            post_travel_dict = ec.apply_dust(post_travel_dict)
+            post_travel_dict = ec.apply_dust(post_travel_dict, params_values)
             
         else: 
             post_travel_dict = post_inflation_dict
