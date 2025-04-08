@@ -105,6 +105,7 @@ def determine_angle_names(used_map):
     angle2_name = re.sub(r'_[BE]$', '', angle2_name)
     return angle1_name, angle2_name
 
+## TODO: something is off with this
 def get_other_spec_map(used_map, all_maps):
     maps = used_map.split('x')
     map1 = maps[0]
