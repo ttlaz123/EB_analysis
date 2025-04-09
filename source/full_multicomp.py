@@ -321,9 +321,11 @@ def main():
         description="Run multicomponent EB MCMC analysis using BICEP/Keck data."
     )
 
-    parser.add_argument('--mapset', type=str, default='BK18_planck',
+    parser.add_argument('--mapset', type=str, default='BK18',
     help="""
             Frequency combination to use for computing spectra. Determines which spectra to include in the likelihood calculation.
+
+            Default: BK18
 
             Available options:
             - BK18: BK18-only maps [220, 150, K95, B95e]
@@ -336,9 +338,11 @@ def main():
             Used to determine which `dust_model` and `bandpass` files are included for each frequency channel.
             """)
 
-    parser.add_argument('--dataset', type=str, default='BK18lf_dust_incEE',
+    parser.add_argument('--dataset', type=str, default='BK18lf_fede01',
     help="""
             Name of the dataset directory to use. This sets the data directory and file naming scheme.
+
+            Default: BK18lf_fede01
 
             Available options include:
             - BK18lf: BICEP/Keck 2018 likelihood baseline dataset.
@@ -355,12 +359,22 @@ def main():
 
     parser.add_argument(
         "--sim_num",
+        type=int,
+        default="1",
+        help=(
+            "Number of simulations to use. "
+            "Set to 500 to run over a batch of simulations in parallel. Default: 1."
+        ),
+    )
+
+    parser.add_argument(
+        "--sim_start",
         type=lambda x: int(x) if x.isdigit() else x,
         default="real",
         help=(
             "Simulation number to use. Set to 'real' to use real observed data, "
             "or an integer (e.g., 0, 1, ...) to use a specific simulation. "
-            "Set to 500 to run over a batch of simulations. Default: 'real'."
+            "Default: 'real'."
         ),
     )
 
