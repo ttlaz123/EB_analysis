@@ -5,6 +5,7 @@ import eb_calculations as ec
 
 class BK18_full_multicomp(Likelihood):
     # define variables
+    params_names = [] 
     map_set=None
     dataset= None
     forecast=False 
