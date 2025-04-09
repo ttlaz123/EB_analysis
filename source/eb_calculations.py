@@ -56,6 +56,22 @@ def determine_map_freqs(mapset):
         calc_spectra = [mapset]
     return calc_spectra
 
+def filter_used_maps(map_reference_header, used_maps):
+        """
+        Remove elements from used_maps that are not in reference_maps.
+
+        Parameters:
+        - used_maps: List of maps to filter.
+        - reference_maps: List of valid reference maps.
+
+        Returns:
+        - A filtered list containing only elements from used_maps that are present in reference_maps.
+        """
+        maps = [map_ for map_ in map_reference_header if map_ in used_maps]
+        print(" ~~~~~~~~~~ Using the following maps in analysis: ~~~~~~~~~~")
+        print(maps)
+        return maps
+
 def determine_spectrum_type(spectrum_name):
     """
     Determines the polarization spectrum type (EE, BB, EB, or BE) 

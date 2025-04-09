@@ -2,7 +2,7 @@ import argparse
 import os
 import glob
 import shutil
-
+import copy
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from cobaya.run import run
 
@@ -14,31 +14,64 @@ import BK18_full_multicomp
 
 SHARED_DATA_DICT = {}
 FILE_PATHS = {}
-def load_shared_data(args):
+def load_shared_data(input_args):
+    """
+    Loads and initializes shared data structures including bandpasses, theory spectra,
+    covariance matrices, and used map configurations. The result is stored in global
+    dictionaries SHARED_DATA_DICT and FILE_PATHS.
+
+    Args:
+        input_args: Parsed arguments from argparse specifying dataset, bin number, etc.
+
+    Modifies:
+        SHARED_DATA_DICT (dict): Shared data for use across likelihoods and simulations.
+        FILE_PATHS (dict): Dictionary of file paths to required datasets.
+    """
+    global SHARED_DATA_DICT, FILE_PATHS
     map_reference_header = None
-    covmat_name = 'covariance_matrix'
-    FILE_PATHS = fp.set_file_paths(args.dataset)
-    SHARED_DATA_DICT['covmat'] = ld.load_covariance_matrix(FILE_PATHS[covmat_name])
+    FILE_PATHS = fp.set_file_paths(input_args.dataset)
+    
     SHARED_DATA_DICT['bpwf'], map_reference_header = ld.load_bpwf(FILE_PATHS['bpwf'], 
                                             map_reference_header, 
-                                            num_bins=args.bin_num)
+                                            num_bins=input_args.bin_num)
     SHARED_DATA_DICT['theory_spectra'] = ld.load_cmb_spectra(FILE_PATHS['camb_lensing'],
                                                              FILE_PATHS['dust_models'],
-                                                             args.theory_comps)
+                                                             input_args.theory_comps)
     SHARED_DATA_DICT['theory_spectra'] = ld.include_ede_spectra(FILE_PATHS['EDE_spectrum'],
-                                                                args.theory_comps)
+                                                                input_args.theory_comps)
     SHARED_DATA_DICT['bandpasses'] = ld.read_bandpasses(FILE_PATHS['bandpasses'])
     SHARED_DATA_DICT['map_reference_header'] = map_reference_header
     
+    covmat_name = 'covariance_matrix'
+    calc_spectra = ec.determine_map_freqs(input_args.map_set)
+    do_crosses = True
+    used_maps = generate_cross_spectra(calc_spectra, 
+                                       do_crosses=do_crosses, 
+                                       spectra_type=input_args.spectra_type)
+    SHARED_DATA_DICT['used_maps'] = ec.filter_used_maps(map_reference_header, used_maps)
+    full_covmat = ld.load_covariance_matrix(FILE_PATHS[covmat_name])
+    filtered_covmat = ec.filter_matrix(map_reference_header, 
+                                       full_covmat, 
+                                       SHARED_DATA_DICT['used_maps'], 
+                                       num_bins=input_args.bin_num)
+    #plot_covar_matrix(self.filtered_covmat, used_maps=self.used_maps)
+    SHARED_DATA_DICT['inv_covmat'] = ec.calc_inverse_covmat(filtered_covmat)
 
-def run_bk18_likelihood(params_dict, used_maps, outpath, observation_file_path,
-                        rstop = 0.03, max_tries=10000,
-                        map_set='BK18', 
-                        dataset='BK18lf_fede01', 
-                        forecast=False, 
-                        bin_num=14, 
-                        theory_comps='all', 
-                        spectra_type='all'):
+def run_bk18_likelihood(params_dict, observation_file_path, input_args, 
+                        rstop = 0.03, max_tries=10000):
+    """
+    Runs the Cobaya MCMC likelihood using BK18_full_multicomp likelihood class.
+
+    Args:
+        params_dict (dict): Dictionary of parameter priors for the MCMC.
+        observation_file_path (str): Path to observed or simulated map data.
+        input_args (Namespace): Input arguments including map set, dataset, etc.
+        rstop (float): R-1 convergence threshold for stopping.
+        max_tries (int): Maximum number of samples to try.
+
+    Returns:
+        Tuple: (updated_info, sampler) from the Cobaya run.
+    """
     likelihood_class = BK18_full_multicomp
     likelihood_class.params_names = list(params_dict.keys())
 
@@ -47,13 +80,13 @@ def run_bk18_likelihood(params_dict, used_maps, outpath, observation_file_path,
         "likelihood": {
             "my_likelihood": {
                 "external": likelihood_class,
-                "used_maps": used_maps,
-                "map_set": map_set,
-                "dataset": dataset,
-                "forecast": forecast,
-                "bin_num":  bin_num,
-                "theory_comps": theory_comps,
-                "spectra_type": spectra_type,
+                "used_maps": SHARED_DATA_DICT['used_maps'],
+                "map_set": input_args.map_set,
+                "dataset": input_args.dataset,
+                "forecast": input_args.forecast,
+                "bin_num":  input_args.bin_num,
+                "theory_comps": input_args.theory_comps,
+                "spectra_type": input_args.spectra_type,
                 "sim_common_data":SHARED_DATA_DICT,
                 "single_observe_data":observation_file_path
             }
@@ -65,7 +98,7 @@ def run_bk18_likelihood(params_dict, used_maps, outpath, observation_file_path,
                 "max_tries": max_tries,
             }
         },
-        "output": outpath,
+        "output": input_args.output_path,
         "resume": True
     }
 
@@ -74,6 +107,17 @@ def run_bk18_likelihood(params_dict, used_maps, outpath, observation_file_path,
     return updated_info, sampler
 
 def define_priors(calc_spectra, theory_comps, angle_degree=3):
+    """
+    Defines prior distributions for angle parameters, dust parameters, and EDE params.
+
+    Args:
+        calc_spectra (list): List of spectrum types (e.g., ['BK18_95', ...]).
+        theory_comps (str): Which theoretical components to include ('all', 'fixed_dust', etc.).
+        angle_degree (float): Range of prior on alpha rotation parameters.
+
+    Returns:
+        dict: Dictionary defining Cobaya-compatible priors for parameters.
+    """
     # define angles based on mapopts
     angle_priors = {"prior": {"min": -angle_degree, "max": angle_degree}, "ref": 0}
     params_dict = {
@@ -134,6 +178,17 @@ def define_priors(calc_spectra, theory_comps, angle_degree=3):
 
 
 def generate_cross_spectra(calc_spectra, do_crosses, spectra_type):
+    """
+    Generates a list of cross-spectra combinations for E/B modes between maps.
+
+    Args:
+        calc_spectra (list): List of maps to use (e.g., ['BK18_95']).
+        do_crosses (bool): Whether to include cross-spectra between different maps.
+        spectra_type (str): 'all' or 'eb', determines which spectra to include.
+
+    Returns:
+        list: List of strings representing spectra types.
+    """
     cross_spectra = []
     for spec1 in calc_spectra:
         for spec2 in calc_spectra:
@@ -158,74 +213,96 @@ def generate_cross_spectra(calc_spectra, do_crosses, spectra_type):
     return  cross_spectra 
 
 
-def multicomp_mcmc_driver(outpath, overwrite=True, 
-                          sim_num='real', 
-                          map_set='BK18', 
-                          dataset='BK18lf_fede01', 
-                          forecast=False, 
-                          bin_num=14, 
-                          theory_comps='all', 
-                          spectra_type='all'):
+def multicomp_mcmc_driver(input_args):
+    """
+    Top-level function for managing a full Cobaya MCMC run or batch of simulations.
+
+    Args:
+        input_args (Namespace): Parsed command-line arguments defining the run.
+    """
     # full multicomp driver
     # define maps based on mapopts
-    calc_spectra = ec.determine_map_freqs(map_set)
-    do_crosses = True
-    used_maps = generate_cross_spectra(calc_spectra, do_crosses=do_crosses, spectra_type=spectra_type)
+    load_shared_data(input_args)
+    calc_spectra = ec.determine_map_freqs(input_args.map_set)
     # define dust params based on dustopts
-    params_dict = define_priors(calc_spectra, theory_comps)
+    params_dict = define_priors(calc_spectra, input_args.theory_comps)
+    if(input_args.sim_num == 500):
+        parallel_simulation(input_args, params_dict)
+    else:
+        # define relevant files based on opts
+        if(input_args.sim_num == 'real'):
+            observation_file_path = FILE_PATHS['observed_data']
+        elif(isinstance(input_args.sim_num, int) and input_args.sim_num >= 0):
+            formatted_simnum = str(input_args.sim_num).zfill(3)
+            observation_file_path = FILE_PATHS['sim_path'].replace('XXX', formatted_simnum)
     
-    # define relevant files based on opts
-    if(sim_num == 'real'):
-        observation_file_path = FILE_PATHS['observed_data']
-    elif(isinstance(sim_num, int) and sim_num >= 0):
-        formatted_simnum = str(sim_num).zfill(3)
-        observation_file_path = FILE_PATHS['sim_path'].replace('XXX', formatted_simnum)
-    # run mcmc
-    if(overwrite):
-        updated_info, sampler = run_bk18_likelihood(
-                        params_dict, 
-                        used_maps, 
-                        outpath, 
-                        observation_file_path,
-                        rstop = 0.03, 
-                        max_tries=10000,
-                        map_set=map_set, 
-                        dataset=dataset, 
-                        forecast=forecast, 
-                        bin_num=bin_num, 
-                        theory_comps=theory_comps, 
-                        spectra_type=spectra_type)
+        
+   
+        if(input_args.overwrite):
+            updated_info, sampler = run_bk18_likelihood(params_dict, 
+                                                        observation_file_path, 
+                                                        input_args)
     # plot mcmc results
     replace_dict ={}# {"alpha_BK18_220":0.6}
-    print(outpath)
-    param_names, means, mean_std_strs = epd.plot_triangle(outpath, replace_dict)
-    eb_like_cls = BK18_full_multicomp(used_maps=used_maps)
+    print(input_args.output_path)
+    param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path, replace_dict)
+    eb_like_cls = BK18_full_multicomp(used_maps=SHARED_DATA_DICT['used_maps'],
+                                      sim_common_dat = SHARED_DATA_DICT)
     epd.plot_best_crossfit(eb_like_cls, 
-                           outpath, 
-                           used_maps,  
+                           input_args.output_path, 
+                           SHARED_DATA_DICT['used_maps'],  
                            param_names, 
                            means, 
                            mean_std_strs)
     return 
 
-def run_simulation(s, output_path, overwrite):
-    outpath = f"{output_path}{s:03d}"
+def run_simulation(sim_num, params_dict,input_args):
+    """
+    Runs a single simulation for a given simulation number.
+
+    Args:
+        sim_num (int or str): Simulation index or 'real' for real data.
+        params_dict (dict): Priors and parameter definitions.
+        input_args (Namespace): Parsed command-line args.
+    """ 
+    outpath = f"{input_args.output_path}{sim_num:03d}"
     # skip chains that already exist
     if(os.path.exists(outpath + '.1.txt') and os.path.exists(outpath + '_bestfit.png')):
+        print(f"Skipping existing simulation {sim_num}")
         return
-    multicomp_mcmc_driver(outpath, overwrite, s)
+    if(sim_num == 'real'):
+            observation_file_path = FILE_PATHS['observed_data']
+    elif(isinstance(sim_num, int) and sim_num >= 0):
+        formatted_simnum = str(sim_num).zfill(3)
+        observation_file_path = FILE_PATHS['sim_path'].replace('XXX', formatted_simnum)
+
+    params_copy = copy.deepcopy(params_dict)
+    updated_info, sampler = run_bk18_likelihood(params_copy, 
+                                            observation_file_path, 
+                                            input_args)
 
 
 
 # Parallel execution with cancellation support
-def parallel_simulation(args):
-    sim_indices = range(args.sim_start, args.sim_num)
-    load_shared_data(args)
+def parallel_simulation(input_args, params_dict):
+    """
+    Runs multiple simulations in parallel using ProcessPoolExecutor.
+
+    Args:
+        input_args (Namespace): Command-line arguments specifying simulation range.
+        params_dict (dict): Parameter prior definitions.
+
+    Raises:
+        KeyboardInterrupt: If user interrupts execution (gracefully shuts down workers).
+    """
+    sim_indices = range(input_args.sim_start, input_args.sim_num)
     try:
         with ProcessPoolExecutor() as executor:
             # Submit all tasks to the executor
             future_to_sim = {
-                executor.submit(run_simulation, s, args.output_path, args.overwrite): s
+                executor.submit(run_simulation, s,
+                                params_dict, 
+                                input_args): s
                 for s in sim_indices
             }
             for future in as_completed(future_to_sim):
@@ -288,8 +365,5 @@ def main():
             print(f"No existing chains to overwrite at: {args.output_path}")
     if(args.sim_num == -1):
         args.sim_num = 'real'
-    if(args.sim_num == 500):
-        parallel_simulation(args)
-    else:
-        multicomp_mcmc_driver(args)
+    multicomp_mcmc_driver(args)
     

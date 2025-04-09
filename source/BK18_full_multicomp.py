@@ -1,4 +1,5 @@
 from cobaya.likelihood import Likelihood
+import numpy as np
 import eb_load_data as ld
 import eb_calculations as ec
 
@@ -36,7 +37,7 @@ class BK18_full_multicomp(Likelihood):
 
     def initialize(self):
         self.map_reference_header = self.sim_common_data['map_reference_header']
-        self.used_maps = self.filter_used_maps(self.used_maps)
+        self.used_maps = self.sim_common_data['used_maps']
         self.bandpasses = self.sim_common_data['bandpasses']
         self.bpwf = self.sim_common_data['bpwf']
         self.dl_theory = self.sim_common_data['theory_spectra']
@@ -46,7 +47,13 @@ class BK18_full_multicomp(Likelihood):
                                                             self.used_maps,
                                                             self.map_reference_header,
                                                             num_bins = self.bin_num)
+        
         self.initial_theory_dict = ec.apply_initial_conditions(self.dl_theory, self.used_maps, self.spectra_type)
+        self.binned_dl_observed_vec = self.dict_to_vec(self.binned_dl_observed_dict, 
+                                                    self.used_maps)
+         
+    
+    
     def logp(self, **params_values):
         """
         Calculate the log-likelihood based on the current parameter values.
@@ -65,6 +72,30 @@ class BK18_full_multicomp(Likelihood):
         #print(log_likelihood)
         return log_likelihood
 
+    def dict_to_vec(self, spectra_dict, used_maps):
+        """
+        Concatenates spectra from a dictionary into one large vector, following the order in `map_reference_header`.
+
+        Args:
+            spectra_dict (dict): A dictionary where keys are map names and values are corresponding spectra (numpy arrays).
+
+
+        Returns:
+            ndarray: A concatenated 1D array containing all the spectra in the given order, 
+                    only including maps that exist in `spectra_dict`.
+        """
+        big_vector = []
+
+        for map_name in self.map_reference_header:
+            if map_name in used_maps:
+                spec = spectra_dict[map_name].copy()
+                #spec[7:9] = 0
+                big_vector.append(spec)
+
+        # Concatenate all spectra arrays into a single 1D array
+        concat_vec =  np.concatenate(big_vector, axis=0)
+
+        return concat_vec   
 
     def theory(self, params_values):
         # define relevant dictionaries
