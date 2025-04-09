@@ -321,7 +321,7 @@ def main():
         description="Run multicomponent EB MCMC analysis using BICEP/Keck data."
     )
 
-    parser.add_argument('--mapset', type=str, default='BK18',
+    parser.add_argument('-m', '--mapset', type=str, default='BK18',
     help="""
             Frequency combination to use for computing spectra. Determines which spectra to include in the likelihood calculation.
 
@@ -338,7 +338,7 @@ def main():
             Used to determine which `dust_model` and `bandpass` files are included for each frequency channel.
             """)
 
-    parser.add_argument('--dataset', type=str, default='BK18lf_fede01',
+    parser.add_argument('d', '--dataset', type=str, default='BK18lf_fede01',
     help="""
             Name of the dataset directory to use. This sets the data directory and file naming scheme.
 
@@ -358,7 +358,7 @@ def main():
             """)
 
     parser.add_argument(
-        "--sim_num",
+        '-n', "--sim_num",
         type=int,
         default="1",
         help=(
@@ -368,7 +368,7 @@ def main():
     )
 
     parser.add_argument(
-        "--sim_start",
+        's', "--sim_start",
         type=lambda x: int(x) if x.isdigit() else x,
         default="real",
         help=(
@@ -379,26 +379,26 @@ def main():
     )
 
     parser.add_argument(
-        "--bin_num",
+        '-b', "--bin_num",
         type=int,
         default=14,
         help="Number of bandpower bins. Default: 14.",
     )
 
     parser.add_argument(
-        "--forecast",
+        '-f', "--forecast",
         action="store_true",
         help="Flag to indicate forecast mode. Default: False (off).",
     )
 
     parser.add_argument(
-        "--overwrite",
+        '-o', "--overwrite",
         action="store_true",
         help="Overwrite existing MCMC results. Default: False (off).",
     )
 
     parser.add_argument(
-        "--spectra_type",
+        '-t', "--spectra_type",
         type=str,
         choices=["all", "eb"],
         default="eb",
@@ -409,7 +409,7 @@ def main():
     )
 
     parser.add_argument(
-        "--theory_comps",
+        '-c', "--theory_comps",
         type=str,
         choices=["all", "fixed_dust", "det_polrot", "no_ede"],
         default="all",
@@ -424,7 +424,7 @@ def main():
     )
 
     parser.add_argument(
-        "--output_path",
+        'p', "--output_path",
         type=str,
         default='chains/default',
         help="Path to directory for storing Cobaya MCMC outputs. Default: chains/default",
