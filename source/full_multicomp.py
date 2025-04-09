@@ -366,4 +366,7 @@ def main():
     if(args.sim_num == -1):
         args.sim_num = 'real'
     multicomp_mcmc_driver(args)
-    
+
+
+if __name__ == '__main__':
+    main()
