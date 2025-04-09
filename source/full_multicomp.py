@@ -317,28 +317,104 @@ def parallel_simulation(input_args, params_dict):
         raise  # Re-raise the KeyboardInterrupt to exit the program cleanly
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--output_path', default='chains/default',
-                        help='directory to save the mcmc chains and plots')
-    parser.add_argument('-o', '--overwrite', action='store_true',
-                        help='whether to overwrite current chains')
-    parser.add_argument('-n', '--sim_num', default=-1, type=int,
-                        help='Number of simulations to extract params from')
-    parser.add_argument('-s', '--sim_start', default=1, type=int,
-                        help='Simulation number start')
-    parser.add_argument('-m', '--map_set', default='BK18',
-                        help='set of maps to be used for the analysis')
-    parser.add_argument('-d', '--dataset', default='BK18lf_fede01',
-                        help='dataset to be used for the analysis')
-    parser.add_argument('-f', '--forecast', action='store_true',
-                        help='whether to do forecast instead of running mcmc chains')
-    parser.add_argument('-b', '--bin_num', default=14,
-                        help='Number of ell bins used in the analysis')
-    parser.add_argument('-u', '--theory_comps', default='all',
-                        help='which theory components to include in the analysis')
-    parser.add_argument('-t', '--spectra_type', default='eb',
-                        help='which spectra type to use in analysis')
-    
+    parser = argparse.ArgumentParser(
+        description="Run multicomponent EB MCMC analysis using BICEP/Keck data."
+    )
+
+    parser.add_argument('--mapset', type=str, default='BK18_planck',
+    help="""
+            Frequency combination to use for computing spectra. Determines which spectra to include in the likelihood calculation.
+
+            Available options:
+            - BK18: BK18-only maps [220, 150, K95, B95e]
+            - BK18_planck: Combines BK18 with Planck maps [includes P030e, P044e, P143e, P217e, P353e]
+            - planck: Planck-only maps
+            - BK_good: Subset of cleaner BK18 frequencies [150, B95e]
+            - BK_bad: Potentially contaminated BK18 maps [220, K95]
+            - <custom>: Specify a single map directly (e.g., BK18_150)
+
+            Used to determine which `dust_model` and `bandpass` files are included for each frequency channel.
+            """)
+
+    parser.add_argument('--dataset', type=str, default='BK18lf_dust_incEE',
+    help="""
+            Name of the dataset directory to use. This sets the data directory and file naming scheme.
+
+            Available options include:
+            - BK18lf: BICEP/Keck 2018 likelihood baseline dataset.
+            - BK18lf_dust: Includes dust modeling.
+            - BK18lf_dust_incEE: Includes EE spectra in the analysis.
+            - BK18lf_norot: Rotation turned off, excludes EB rotation terms.
+            - BK18lf_norot_allbins: Like BK18lf_norot, but includes all bins.
+            - BK18lf_fede01: Simulations with injected fEDE=0.01 signal.
+            - BK18lf_fede01_sigl: fEDE=0.01 signal including sig_l scaling.
+            - BK18lf_sim: Baseline BK18lf simulations for null testing.
+
+            This choice determines the observed data path, covariance matrix, simulation path, and bandpass files.
+            """)
+
+    parser.add_argument(
+        "--sim_num",
+        type=lambda x: int(x) if x.isdigit() else x,
+        default="real",
+        help=(
+            "Simulation number to use. Set to 'real' to use real observed data, "
+            "or an integer (e.g., 0, 1, ...) to use a specific simulation. "
+            "Set to 500 to run over a batch of simulations. Default: 'real'."
+        ),
+    )
+
+    parser.add_argument(
+        "--bin_num",
+        type=int,
+        default=14,
+        help="Number of bandpower bins. Default: 14.",
+    )
+
+    parser.add_argument(
+        "--forecast",
+        action="store_true",
+        help="Flag to indicate forecast mode. Default: False (off).",
+    )
+
+    parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Overwrite existing MCMC results. Default: False (off).",
+    )
+
+    parser.add_argument(
+        "--spectra_type",
+        type=str,
+        choices=["all", "eb"],
+        default="eb",
+        help=(
+            "Which spectra to include. 'all' includes EE, BB, EB, etc., while 'eb' only includes EB-related spectra. "
+            "Default: 'eb'."
+        ),
+    )
+
+    parser.add_argument(
+        "--theory_comps",
+        type=str,
+        choices=["all", "fixed_dust", "det_polrot", "no_ede"],
+        default="all",
+        help=(
+            "Controls which theoretical components are included in the likelihood. "
+            "'all': Fit for dust, CMB angle, and EDE (gMpl). "
+            "'fixed_dust': Fix dust and CMB angle, fit only gMpl. "
+            "'det_polrot': Detectable polarization rotation only. "
+            "'no_ede': Only include dust and alpha_CMB, exclude gMpl. "
+            "Default: 'all'."
+        ),
+    )
+
+    parser.add_argument(
+        "--output_path",
+        type=str,
+        required=True,
+        help="Path to directory for storing Cobaya MCMC outputs.",
+    )
     args = parser.parse_args()
     # Check if the overwrite flag is set
     if args.overwrite:
