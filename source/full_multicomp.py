@@ -426,7 +426,7 @@ def main():
     parser.add_argument(
         "--output_path",
         type=str,
-        default='chains/default'
+        default='chains/default',
         help="Path to directory for storing Cobaya MCMC outputs. Default: chains/default",
     )
     args = parser.parse_args()
