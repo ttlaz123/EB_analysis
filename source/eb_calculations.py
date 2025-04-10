@@ -237,7 +237,13 @@ def apply_cmb_rotation(post_inflation_dict, params_values, dl_theory_dict, used_
         Cl_BB = post_inflation_dict[bb_map]
         Cl_EB = post_inflation_dict[eb_map]
         Cl_BE = post_inflation_dict[be_map]
-
+        # Trim all arrays to the minimum length to avoid shape mismatch
+        min_len = min(map(len, [Cl_EE, Cl_BB, Cl_EB, Cl_BE]))
+        Cl_EE = Cl_EE[:min_len]
+        Cl_BB = Cl_BB[:min_len]
+        Cl_EB = Cl_EB[:min_len]
+        Cl_BE = Cl_BE[:min_len]
+        
         if spec == 'BB':
             post_travel_dict[m] = Cl_EE * sin2_sq + Cl_BB * cos2_sq + Cl_EB * sin4
         elif spec == 'EE':
