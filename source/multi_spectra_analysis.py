@@ -67,6 +67,7 @@ FILE_PATHS = {
  }
 
 class BK18_multicomp(Likelihood):
+    print('Defining class')
     params_names = []
     used_maps = []
     include_EDE = True   
@@ -77,6 +78,7 @@ class BK18_multicomp(Likelihood):
     forecast_scaling_maps = None
     forecast_map_names = 'BK18'
     def __init__(self,*args,**kwargs):
+        print('init')
         if('used_maps' in kwargs):
             self.used_maps = kwargs['used_maps']
             print("New used maps: " + str(self.used_maps))
@@ -101,6 +103,7 @@ class BK18_multicomp(Likelihood):
         
         # Initialize your likelihood class
     def initialize(self):
+        print('initialize')
         # Load any data or set up anything that needs to happen before likelihood calculation
         self.map_reference_header = None
         num_bins = self.num_bins 

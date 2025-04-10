@@ -19,17 +19,19 @@ SHARED_DATA_DICT = {}
 FILE_PATHS = {}
 class BK18_full_multicomp(Likelihood):
     # define variables
+    print('class')
     params_names = [] 
     map_set=None
     dataset= None
     forecast=False 
     bin_num=14 
+    used_maps = []
     theory_comps='all' 
     spectra_type='all'
     sim_common_data = {}
     observe_filepath = None
     def __init__(self, *args, **kwargs):
-    
+        print('init') 
         if('used_maps' in kwargs):
             self.used_maps = kwargs['used_maps']
             if('zero_offdiag' in kwargs):
@@ -44,13 +46,14 @@ class BK18_full_multicomp(Likelihood):
                 self.spectra_type = kwargs['spectra_type']
             if('sim_common_data' in kwargs):
                 self.sim_common_data = kwargs['sim_common_data']
-            if('single_observe_data' in kwargs):
-                self.observe_filepath = kwargs['single_observe_data']
+            if('observe_filepath' in kwargs):
+                self.observe_filepath = kwargs['observe_filepath']
             self.initialize()
         else:
             super().__init__(*args, **kwargs)
 
     def initialize(self):
+        print('initializing')
         self.map_reference_header = self.sim_common_data['map_reference_header']
         self.used_maps = self.sim_common_data['used_maps']
         self.bandpasses = self.sim_common_data['bandpasses']
@@ -113,6 +116,7 @@ class BK18_full_multicomp(Likelihood):
         return concat_vec   
 
     def theory(self, params_values):
+        print('In theory')
         # define relevant dictionaries
         if(self.theory_comps in ['all', 'fixed_dust']):
             # do ede shift
@@ -224,7 +228,7 @@ def run_bk18_likelihood(params_dict, observation_file_path, input_args,
                 "theory_comps": input_args.theory_comps,
                 "spectra_type": input_args.spectra_type,
                 "sim_common_data":SHARED_DATA_DICT,
-                "single_observe_data":observation_file_path
+                "observe_filepath":observation_file_path
             }
         },
         "params": params_dict,
@@ -239,7 +243,8 @@ def run_bk18_likelihood(params_dict, observation_file_path, input_args,
     }
 
     # Run Cobaya
-    updated_info, sampler = run(info)
+    print('Running cobaya')
+    updated_info, sampler = run(info, debug=True)
     return updated_info, sampler
 
 def define_priors(calc_spectra, theory_comps, angle_degree=3):
@@ -537,10 +542,10 @@ def main():
         '-t', "--spectra_type",
         type=str,
         choices=["all", "eb"],
-        default="eb",
+        default="all",
         help=(
             "Which spectra to include. 'all' includes EE, BB, EB, etc., while 'eb' only includes EB-related spectra. "
-            "Default: 'eb'."
+            "Default: 'all'."
         ),
     )
 
