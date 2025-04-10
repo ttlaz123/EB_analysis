@@ -228,6 +228,19 @@ def load_covariance_matrix(covmat_path, map_reference_header):
     assert shap[0] == shap[1], "Covariance matrix must be square."
     return full_covmat
 
+def load_cmb_theory(lensing_path):
+    theory_dict = {}
+    print("Loading: " + str(lensing_path))
+    with fits.open(lensing_path) as hdul_lens:
+        EE_lens = hdul_lens[1].data['E-mode C_l']
+        BB_lens = hdul_lens[1].data['B-mode C_l']
+    ee_spectrum = EE_lens* np.square(K_TO_UK)
+    bb_spectrum = BB_lens* np.square(K_TO_UK)
+    cl_to_dl = np.array([l*(l+1) for l in range(len(ee_spectrum))])/2/np.pi
+    theory_dict['EE'] = ee_spectrum*cl_to_dl            
+    theory_dict['BB'] = bb_spectrum*cl_to_dl
+    return theory_dict
+
 def load_cmb_spectra(lensing_path, dust_paths, fixed_dust = False):
     theory_dict = {}
     print("Loading: " + str(lensing_path))

@@ -175,9 +175,9 @@ def load_shared_data(input_args):
     SHARED_DATA_DICT['bpwf'], map_reference_header = ld.load_bpwf(FILE_PATHS['bpwf'], 
                                             map_reference_header, 
                                             num_bins=input_args.bin_num)
-    SHARED_DATA_DICT['theory_spectra'] = ld.load_cmb_spectra(FILE_PATHS['camb_lensing'],
-                                                             FILE_PATHS['dust_models'],
-                                                             input_args.theory_comps)
+    SHARED_DATA_DICT['theory_spectra'] = ld.load_cmb_theory(FILE_PATHS['camb_lensing'])
+                                                             #FILE_PATHS['dust_models'],
+                                                             #input_args.theory_comps)
     SHARED_DATA_DICT['theory_spectra'] = ld.include_ede_spectra(FILE_PATHS['EDE_spectrum'], SHARED_DATA_DICT['theory_spectra'])
     SHARED_DATA_DICT['bandpasses'] = ld.read_bandpasses(FILE_PATHS['bandpasses'])
     SHARED_DATA_DICT['map_reference_header'] = map_reference_header
