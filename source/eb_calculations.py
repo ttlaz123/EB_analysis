@@ -103,8 +103,11 @@ def apply_initial_conditions(dl_theory_dict, used_maps):
     for used_map in used_maps:
         spec_type = determine_spectrum_type(used_map)
         if(spec_type in ['EB', 'BE']):
-            continue
-        initial_conditions_dict[used_map] = dl_theory_dict[spec_type]
+            initial_conditions_dict[used_map] = 0
+        elif(spec_type in ['EE', 'BB']):
+            initial_conditions_dict[used_map] = dl_theory_dict[spec_type]
+        else:
+            raise ValueError('Not proper spectype: ' + str(used_map))
     return initial_conditions_dict
 
 @lru_cache(maxsize=None)
