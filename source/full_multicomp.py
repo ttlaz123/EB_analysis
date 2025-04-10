@@ -44,8 +44,8 @@ class BK18_full_multicomp(Likelihood):
                 self.theory_comps = kwargs['theory_comps']
             if('spectra_type' in kwargs):
                 self.spectra_type = kwargs['spectra_type']
-            if('sim_common_data' in kwargs):
-                self.sim_common_data = kwargs['sim_common_data']
+            #if('sim_common_data' in kwargs):
+            #    self.sim_common_data = kwargs['sim_common_data']
             if('observe_filepath' in kwargs):
                 self.observe_filepath = kwargs['observe_filepath']
             self.initialize()
@@ -54,6 +54,7 @@ class BK18_full_multicomp(Likelihood):
 
     def initialize(self):
         print('initializing')
+        self.sim_common_data = SHARED_DATA_DICT
         self.map_reference_header = self.sim_common_data['map_reference_header']
         self.used_maps = self.sim_common_data['used_maps']
         self.bandpasses = self.sim_common_data['bandpasses']
@@ -227,7 +228,7 @@ def run_bk18_likelihood(params_dict, observation_file_path, input_args,
                 "bin_num":  input_args.bin_num,
                 "theory_comps": input_args.theory_comps,
                 "spectra_type": input_args.spectra_type,
-                "sim_common_data":SHARED_DATA_DICT,
+                #"sim_common_data":SHARED_DATA_DICT,
                 "observe_filepath":observation_file_path
             }
         },
