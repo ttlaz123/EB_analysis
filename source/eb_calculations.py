@@ -190,7 +190,8 @@ def apply_EDE(initial_theory_dict, params_values, dl_theory_dict, used_maps):
     """
     ede = dl_theory_dict['EB_EDE']
     g = params_values['gMpl']
-    post_dict = {k: v.copy() for k, v in initial_theory_dict.items()}
+    post_dict = {k: v.copy() if hasattr(v, 'copy') else v for k, v in initial_theory_dict.items()}
+
 
     for m in used_maps:
         spec = determine_spectrum_type(m)
