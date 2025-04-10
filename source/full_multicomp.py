@@ -144,7 +144,7 @@ class BK18_full_multicomp(Likelihood):
                                                     self.dl_theory,
                                                     self.used_maps)
             # do dust
-            post_travel_dict = ec.apply_dust(post_travel_dict, params_values)
+            post_travel_dict = ec.apply_dust(post_travel_dict, self.bandpasses, params_values)
             
         else: 
             post_travel_dict = post_inflation_dict
