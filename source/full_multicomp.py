@@ -67,7 +67,7 @@ class BK18_full_multicomp(Likelihood):
                                                             self.map_reference_header,
                                                             num_bins = self.bin_num)
         
-        self.initial_theory_dict = ec.apply_initial_conditions(self.dl_theory, self.used_maps, self.spectra_type)
+        self.initial_theory_dict = ec.apply_initial_conditions(self.dl_theory, self.used_maps)
         self.binned_dl_observed_vec = self.dict_to_vec(self.binned_dl_observed_dict, 
                                                     self.used_maps)
          
