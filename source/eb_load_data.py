@@ -267,6 +267,16 @@ def load_cmb_spectra(lensing_path, dust_paths, fixed_dust = False):
     #plt.plot(theory_dict[map_freq + '_Ex' + map_freq + '_E'])
     return theory_dict
 
+def load_ede_spectra(ede_path, theory_dict):
+        
+        data = pd.read_csv(ede_path, delim_whitespace=True, comment='#', header=None)
+        data.columns = ['l', 'TT', 'EE', 'TE', 'BB', 'EB', 'TB', 'phiphi', 'TPhi', 'Ephi']
+        # Extract 'l' and 'EB' columns
+        EB_values = data['EB'].to_numpy()
+        EB_ede_dls = -EB_values * np.square(K_TO_UK) * np.square(T_CMB_K)
+        theory_dict['EB_EDE'] = EB_ede_dls
+        return theory_dict
+
 def include_ede_spectra(ede_path, theory_dict):
         
         data = pd.read_csv(ede_path, delim_whitespace=True, comment='#', header=None)
