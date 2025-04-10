@@ -126,7 +126,6 @@ class BK18_full_multicomp(Likelihood):
         return concat_vec   
 
     def theory(self, params_values):
-        print('In theory')
         # define relevant dictionaries
         if(self.theory_comps in ['all', 'fixed_dust']):
             # do ede shift
