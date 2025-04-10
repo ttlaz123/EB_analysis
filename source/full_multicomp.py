@@ -254,7 +254,7 @@ def run_bk18_likelihood(params_dict, observation_file_path, input_args,
 
     # Run Cobaya
     print('Running cobaya')
-    updated_info, sampler = run(info, debug=True)
+    updated_info, sampler = run(info, debug=True, stop_at_error=True)
     return updated_info, sampler
 
 def define_priors(calc_spectra, theory_comps, angle_degree=3):
