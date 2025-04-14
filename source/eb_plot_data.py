@@ -291,11 +291,14 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None):
         file_path = chains_path.replace('XXX', f'{i:03d}')
         print('loading:' + str(file_path))
         # Read the first line to get the correct header
-        with open(file_path, 'r') as f:
-            first_line = f.readline().strip()  # Read the first line
-            # Remove the '#' and split to get the correct column names
-            corrected_header = first_line.replace('#', '').split()
-        
+        try:
+            with open(file_path, 'r') as f:
+                first_line = f.readline().strip()  # Read the first line
+                # Remove the '#' and split to get the correct column names
+                corrected_header = first_line.replace('#', '').split()
+        except FileNotFoundError:
+            print("Skipping " + file_path)
+            continue
         chain_df = pd.read_csv(file_path, delim_whitespace=True, comment='#')
         chain_df.columns = corrected_header
         for column in chain_df.columns:
@@ -316,7 +319,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None):
     
         
     colors = ['red', 'blue', 'green', 'orange']
-    for i in range(1,single_sim):
+    for i in range(1,single_sim+1):
         fig = corner.corner(modes_df[param_names], 
                         labels=param_names, 
                     show_titles=True, 

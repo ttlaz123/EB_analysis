@@ -290,7 +290,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=3):
                                 "proposal":0.01}
 
     if(theory_comps == 'all'):
-        params_dict['alpha_CMB'] = angle_priors
+        params_dict['alpha_CMB'] = 0# angle_priors
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
         for spec in ['EE', 'BB', 'EB']:
 
@@ -395,6 +395,7 @@ def multicomp_mcmc_driver(input_args):
     # plot mcmc results
     replace_dict ={}# {"alpha_BK18_220":0.6}
     print(input_args.output_path)
+    '''
     param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path, replace_dict)
     eb_like_cls = BK18_full_multicomp(used_maps=SHARED_DATA_DICT['used_maps'],
                                       sim_common_dat = SHARED_DATA_DICT)
@@ -404,6 +405,7 @@ def multicomp_mcmc_driver(input_args):
                            param_names, 
                            means, 
                            mean_std_strs)
+    '''
     return 
 
 def run_simulation(sim_num, params_dict,input_args):
@@ -417,7 +419,7 @@ def run_simulation(sim_num, params_dict,input_args):
     """ 
     outpath = f"{input_args.output_path}{sim_num:03d}"
     # skip chains that already exist
-    if(os.path.exists(outpath + '.1.txt') and os.path.exists(outpath + '_bestfit.png')):
+    if(os.path.exists(outpath + '.1.txt')):# and os.path.exists(outpath + '_bestfit.png')):
         print(f"Skipping existing simulation {sim_num}")
         return
     if(sim_num == 'real'):
@@ -427,6 +429,7 @@ def run_simulation(sim_num, params_dict,input_args):
         observation_file_path = FILE_PATHS['sim_path'].replace('XXX', formatted_simnum)
 
     params_copy = copy.deepcopy(params_dict)
+    input_args.output_path = outpath
     updated_info, sampler = run_bk18_likelihood(params_copy, 
                                             observation_file_path, 
                                             input_args)
@@ -466,6 +469,11 @@ def parallel_simulation(input_args, params_dict):
         executor.shutdown(cancel_futures=True)  # Terminates all running tasks
         raise  # Re-raise the KeyboardInterrupt to exit the program cleanly
 
+def do_plotting(input_args):
+    chains_path = input_args.output_path + "XXX.1.txt"
+    epd.plot_sim_peaks(chains_path, input_args.sim_start, input_args.sim_num)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Run multicomponent EB MCMC analysis using BICEP/Keck data."
@@ -495,11 +503,13 @@ def main():
             Default: BK18lf_fede01
 
             Available options include:
+            ~~~~ real only ~~~~
             - BK18lf: BICEP/Keck 2018 likelihood baseline dataset.
             - BK18lf_dust: Includes dust modeling.
             - BK18lf_dust_incEE: Includes EE spectra in the analysis.
             - BK18lf_norot: Rotation turned off, excludes EB rotation terms.
             - BK18lf_norot_allbins: Like BK18lf_norot, but includes all bins.
+            ~~~~~ sims below ~~~~~~
             - BK18lf_fede01: Simulations with injected fEDE=0.01 signal.
             - BK18lf_fede01_sigl: fEDE=0.01 signal including sig_l scaling.
             - BK18lf_sim: Baseline BK18lf simulations for null testing.
@@ -546,6 +556,11 @@ def main():
         action="store_true",
         help="Overwrite existing MCMC results. Default: False (off).",
     )
+    parser.add_argument(
+        '-q', "--plot_peaks",
+        action="store_true",
+        help="Plot the MCMC sim peaks. Default: False (off).",
+    )
 
     parser.add_argument(
         '-t', "--spectra_type",
@@ -581,6 +596,10 @@ def main():
     )
     args = parser.parse_args()
     # Check if the overwrite flag is set
+    
+    if args.plot_peaks:
+        do_plotting(args)
+        return
     if args.overwrite:
         # Check if the output path exists
         # Construct the glob pattern to match all files and directories with the specified prefix
@@ -603,6 +622,8 @@ def main():
                 print("Deletion cancelled. Existing chains will be kept.")
         else:
             print(f"No existing chains to overwrite at: {args.output_path}")
+    
+        
     if(args.sim_num == -1):
         args.sim_num = 'real'
     multicomp_mcmc_driver(args)
