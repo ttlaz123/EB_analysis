@@ -470,6 +470,9 @@ def parallel_simulation(input_args, params_dict):
         raise  # Re-raise the KeyboardInterrupt to exit the program cleanly
 
 def do_plotting(input_args):
+    for sim in range(input_args.sim_start, input_args.sim_start+input_args.sim_num):
+        outpath = f"{input_args.output_path}{sim:03d}"
+        epd.plot_triangle(outpath)
     chains_path = input_args.output_path + "XXX.1.txt"
     epd.plot_sim_peaks(chains_path, input_args.sim_start, input_args.sim_num)
 
@@ -596,7 +599,7 @@ def main():
     )
     args = parser.parse_args()
     # Check if the overwrite flag is set
-    
+
     if args.plot_peaks:
         do_plotting(args)
         return
@@ -622,7 +625,7 @@ def main():
                 print("Deletion cancelled. Existing chains will be kept.")
         else:
             print(f"No existing chains to overwrite at: {args.output_path}")
-    
+
         
     if(args.sim_num == -1):
         args.sim_num = 'real'
