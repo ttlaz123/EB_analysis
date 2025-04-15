@@ -482,7 +482,7 @@ def do_plotting(input_args):
         outpath = f"{input_args.output_path}{sim:03d}"
         try:
             epd.plot_triangle(outpath)
-        except FileNotFoundError:
+        except OSError:
             print('File note found, skipping: ' + str(outpath))
             continue
     chains_path = input_args.output_path + "XXX.1.txt"
