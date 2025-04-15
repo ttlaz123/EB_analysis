@@ -283,10 +283,10 @@ def define_priors(calc_spectra, theory_comps, angle_degree=3):
 
     # dust priors
     A_dust_priors = {"prior":{"min": 0, "max":15}, 
-                            "ref": {"dist":"norm", "loc":3, "scale":0.1},
+                            "ref": {"dist":"norm", "loc":6, "scale":1},
                             "proposal":0.1}
-    alpha_dust_priors = {"prior":{"min": -1, "max":0}, 
-                                "ref": {"dist":"norm", "loc":-0.5, "scale":0.01},
+    alpha_dust_priors = {"prior":{"min": -1, "max":1}, 
+                                "ref": {"dist":"norm", "loc":-0, "scale":0.01},
                                 "proposal":0.01}
 
     if(theory_comps == 'all'):
