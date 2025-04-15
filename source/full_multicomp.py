@@ -310,10 +310,18 @@ def define_priors(calc_spectra, theory_comps, angle_degree=3):
 
     elif(theory_comps == 'no_ede'):
         params_dict['alpha_CMB'] = angle_priors
-        for spec in ['EE', 'BB', 'EB']:
+        for spec in ['EE', 'BB']:#, 'EB']:
 
             params_dict['A_dust_' + spec] = {**A_dust_priors,
                                         "latex":"A_{"+spec+",\mathrm{dust}}"}
+            params_dict['alpha_dust_' + spec] = {**alpha_dust_priors,
+                                        "latex":"\\alpha_{"+spec+",\mathrm{dust}}"}
+        for spec in ['EB']:
+
+            params_dict['A_dust_' + spec] = {"prior":{"min": -3, "max":3}, 
+                                            "ref": {"dist":"norm", "loc":0, "scale":0.1},
+                                            "proposal":0.1,
+                                            "latex":"A_{"+spec+",\mathrm{dust}}"}
             params_dict['alpha_dust_' + spec] = {**alpha_dust_priors,
                                         "latex":"\\alpha_{"+spec+",\mathrm{dust}}"}
         params_dict['beta_dust'] = {"prior":{"min": 0.8, "max":2.4}, 
@@ -376,7 +384,7 @@ def multicomp_mcmc_driver(input_args):
     calc_spectra = ec.determine_map_freqs(input_args.map_set)
     # define dust params based on dustopts
     params_dict = define_priors(calc_spectra, input_args.theory_comps)
-    if(input_args.sim_num == 500):
+    if(input_args.sim_num > 2):
         parallel_simulation(input_args, params_dict)
     else:
         # define relevant files based on opts
@@ -448,7 +456,7 @@ def parallel_simulation(input_args, params_dict):
     Raises:
         KeyboardInterrupt: If user interrupts execution (gracefully shuts down workers).
     """
-    sim_indices = range(input_args.sim_start, input_args.sim_num)
+    sim_indices = range(input_args.sim_start, input_args.sim_start + input_args.sim_num)
     try:
         with ProcessPoolExecutor() as executor:
             # Submit all tasks to the executor
