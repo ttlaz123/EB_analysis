@@ -292,10 +292,18 @@ def define_priors(calc_spectra, theory_comps, angle_degree=3):
     if(theory_comps == 'all'):
         params_dict['alpha_CMB'] = 0# angle_priors
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
-        for spec in ['EE', 'BB', 'EB']:
+        for spec in ['EE', 'BB']:#, 'EB']:
 
             params_dict['A_dust_' + spec] = {**A_dust_priors,
                                         "latex":"A_{"+spec+",\mathrm{dust}}"}
+            params_dict['alpha_dust_' + spec] = {**alpha_dust_priors,
+                                        "latex":"\\alpha_{"+spec+",\mathrm{dust}}"}
+        for spec in ['EB']:
+
+            params_dict['A_dust_' + spec] = {"prior":{"min": -3, "max":3}, 
+                                            "ref": {"dist":"norm", "loc":0, "scale":0.1},
+                                            "proposal":0.1,
+                                            "latex":"A_{"+spec+",\mathrm{dust}}"}
             params_dict['alpha_dust_' + spec] = {**alpha_dust_priors,
                                         "latex":"\\alpha_{"+spec+",\mathrm{dust}}"}
         params_dict['beta_dust'] = {"prior":{"min": 0.8, "max":2.4}, 
