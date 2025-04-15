@@ -480,7 +480,11 @@ def parallel_simulation(input_args, params_dict):
 def do_plotting(input_args):
     for sim in range(input_args.sim_start, input_args.sim_start+input_args.sim_num):
         outpath = f"{input_args.output_path}{sim:03d}"
-        epd.plot_triangle(outpath)
+        try:
+            epd.plot_triangle(outpath)
+        except FileNotFoundError:
+            print('File note found, skipping: ' + str(outpath))
+            continue
     chains_path = input_args.output_path + "XXX.1.txt"
     epd.plot_sim_peaks(chains_path, input_args.sim_start, input_args.sim_num)
 
