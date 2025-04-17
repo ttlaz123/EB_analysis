@@ -57,6 +57,7 @@ class BK18_full_multicomp(Likelihood):
         self.bandpasses = self.sim_common_data['bandpasses']
         self.bpwf = self.sim_common_data['bpwf']
         self.dl_theory = self.sim_common_data['theory_spectra']
+        self.filtered_covmat = self.sim_common_data['covmat']
         self.cov_inv = self.sim_common_data['inv_covmat']
         self.binned_dl_observed_dict, self.map_reference_header = ld.load_observed_spectra(
                                                             self.observe_filepath,
@@ -205,6 +206,7 @@ def load_shared_data(input_args):
                                        num_bins=input_args.bin_num)
     #plot_covar_matrix(self.filtered_covmat, used_maps=self.used_maps)
     SHARED_DATA_DICT['inv_covmat'] = ec.calc_inverse_covmat(filtered_covmat)
+    SHARED_DATA_DICT['covmat'] = filtered_covmat
 
 def run_bk18_likelihood(params_dict, observation_file_path, input_args, 
                         rstop = 0.03, max_tries=10000):
