@@ -231,12 +231,18 @@ def apply_cmb_rotation(post_inflation_dict, params_values, dl_theory_dict, used_
 
     for m in used_maps:
         spec = determine_spectrum_type(m)
+        
         ee_map, bb_map, eb_map, be_map = get_other_spec_map(m, used_maps)
+        if(ee_map in used_maps and bb_map in used_maps):
+            Cl_EE = post_inflation_dict[ee_map]
+            Cl_BB = post_inflation_dict[bb_map]
+        else:
+            CL_EE = dl_theory_dict['EE']
+            CL_BB = dl_theory_dict['BB']
 
-        Cl_EE = post_inflation_dict[ee_map]
-        Cl_BB = post_inflation_dict[bb_map]
         Cl_EB = post_inflation_dict[eb_map]
         Cl_BE = post_inflation_dict[be_map]
+        
         # Trim all arrays to the minimum length to avoid shape mismatch
         min_len = min(map(len, [Cl_EE, Cl_BB, Cl_EB, Cl_BE]))
         Cl_EE = Cl_EE[:min_len]
@@ -309,7 +315,7 @@ def apply_dust(post_travel_dict, bandpasses, params_values):
     return post_travel_dict
 
 
-def apply_det_rotation(post_travel_dict, params_values):
+def apply_det_rotation(post_travel_dict, params_values, dl_theory_dict):
     """
     Applies detector angle rotation to theory spectra using cached trig calculations.
 
@@ -338,9 +344,13 @@ def apply_det_rotation(post_travel_dict, params_values):
 
         c1, s1 = get_trigs(angle1_name)
         c2, s2 = get_trigs(angle2_name)
+        if(ee_map in used_maps and bb_map in used_maps):
+            EE = post_travel_dict[ee_map]
+            BB = post_travel_dict[bb_map]
+        else:
+            EE = dl_theory_dict['EE']
+            EE = dl_theory_dict['BB']
 
-        EE = post_travel_dict[ee_map]
-        BB = post_travel_dict[bb_map]
         EB = post_travel_dict[eb_map]
         BE = post_travel_dict[be_map]
         min_len = min(map(len, [EE, BB, EB, BE]))

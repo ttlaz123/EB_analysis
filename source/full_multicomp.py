@@ -150,7 +150,7 @@ class BK18_full_multicomp(Likelihood):
             post_travel_dict = post_inflation_dict
         if(self.theory_comps in ['all', 'det_polrot', 'fixed_dust', 'no_ede']):
             # do detector rotation
-            post_detection_dict = ec.apply_det_rotation(post_travel_dict, params_values)
+            post_detection_dict = ec.apply_det_rotation(post_travel_dict, params_values, self.dl_theory)
             
 
 
