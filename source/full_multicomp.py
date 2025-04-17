@@ -460,8 +460,23 @@ def run_simulation(sim_num, params_dict,input_args):
     updated_info, sampler = run_bk18_likelihood(params_copy, 
                                             observation_file_path, 
                                             input_args)
-    param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path)
-
+    param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path)#, replace_dict)
+    multicomp_class = BK18_full_multicomp(
+                    used_maps=SHARED_DATA_DICT['used_maps'],
+                    map_set= input_args.map_set,
+                    dataset= input_args.dataset,
+                    forecast= input_args.forecast,
+                    bin_num= input_args.bin_num,
+                    theory_comps= input_args.theory_comps,
+                    spectra_type= input_args.spectra_type,
+                    #"sim_common_data":SHARED_DATA_DICT,
+                    observe_filepath= observation_file_path,
+                    sim_common_dat = SHARED_DATA_DICT)
+    epd.plot_eebbeb(multicomp_class, 
+                    input_args.output_path, 
+                    param_names, 
+                    means, 
+                    mean_std_strs)
 
 # Parallel execution with cancellation support
 def parallel_simulation(input_args, params_dict):
