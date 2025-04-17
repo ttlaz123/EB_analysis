@@ -343,6 +343,11 @@ def apply_det_rotation(post_travel_dict, params_values):
         BB = post_travel_dict[bb_map]
         EB = post_travel_dict[eb_map]
         BE = post_travel_dict[be_map]
+        min_len = min(map(len, [EE, BB, EB, BE]))
+        EE = EE[:min_len]
+        BB = BB[:min_len]
+        EB = EB[:min_len]
+        BE = BE[:min_len]
 
         if spec == 'EE':
             dls = EE * c1 * c2 + BB * s1 * s2 - EB * c1 * s2 - BE * s1 * c2
