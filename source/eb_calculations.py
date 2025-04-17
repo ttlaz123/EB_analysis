@@ -326,7 +326,8 @@ def apply_det_rotation(post_travel_dict, params_values, dl_theory_dict):
     Returns:
         dict: Updated theory Cls with detector rotation applied.
     """
-    post_detection_dict = {k: v.copy() for k, v in post_travel_dict.items()}
+    post_detection_dict = {k: v.copy() if hasattr(v, 'copy') else v for k, v in post_travel_dict.items()}
+
     used_maps = list(post_travel_dict.keys())
 
     # Cache trig values: sin(2θ), cos(2θ)
