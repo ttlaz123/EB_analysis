@@ -409,19 +409,29 @@ def multicomp_mcmc_driver(input_args):
                                                         observation_file_path, 
                                                         input_args)
             param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path)#, replace_dict)
+            multicomp_class = BK18_full_multicomp(
+                            used_maps=SHARED_DATA_DICT['used_maps'],
+                            map_set= input_args.map_set,
+                            dataset= input_args.dataset,
+                            forecast= input_args.forecast,
+                            bin_num= input_args.bin_num,
+                            theory_comps= input_args.theory_comps,
+                            spectra_type= input_args.spectra_type,
+                            #"sim_common_data":SHARED_DATA_DICT,
+                            observe_filepath= observation_file_path
+                            sim_common_dat = SHARED_DATA_DICT)
+            epd.plot_eebbeb(multicomp_class, 
+                           input_args.output_path, 
+                           param_names, 
+                           means, 
+                           mean_std_strs)
     # plot mcmc results
     replace_dict ={}# {"alpha_BK18_220":0.6}
     print(input_args.output_path)
     '''
     
-    eb_like_cls = BK18_full_multicomp(used_maps=SHARED_DATA_DICT['used_maps'],
-                                      sim_common_dat = SHARED_DATA_DICT)
-    epd.plot_best_crossfit(eb_like_cls, 
-                           input_args.output_path, 
-                           SHARED_DATA_DICT['used_maps'],  
-                           param_names, 
-                           means, 
-                           mean_std_strs)
+    
+    
     '''
     return 
 
