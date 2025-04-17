@@ -82,6 +82,136 @@ def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix',
     if(show_plot):
         plt.show()
 
+def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class, observed_datas,
+                      outpath, param_stats):
+    num_columns = len(maps_B)  # Unique maps for columns
+    num_rows = len(maps_E)      # Unique maps for rows
+    # Create subplots
+    fig, axes = plt.subplots(num_rows, num_columns, 
+                    figsize=(num_columns * 4, num_rows * 4))
+
+    try:
+        axes = axes.flatten()  # Flatten axes array for easy indexing
+    except AttributeError:
+        print("Only one axis!")
+        axes = [axes]
+    keys = list(theory_dict.keys())
+    # Plot each spectrum
+    for idx, key in enumerate(keys):
+        observed_data = observed_datas[key]
+        best_fit_data = theory_dict[key]
+        #print(key)
+        #print(observed_data - best_fit_data) 
+        # Split key to find row and column indices
+        spec_type = determine_spectrum_type(key)
+        parts = key.split('x')
+        if(spectra_type in ['EB', 'BE']):
+            if(spec_type in ['EE', 'BB']):
+                continue
+            row_idx = (maps_E).index(parts[0]) if parts[0].endswith('_E') else (maps_E).index(parts[1])
+            col_idx = (maps_B).index(parts[0]) if parts[0].endswith('_B') else (maps_B).index(parts[1])
+        elif(spectra_type in ['EE', 'BB']):
+            if(not spec_type == spectra_type ):
+                continue
+            row_idx = (maps_E).index(parts[0]) if parts[0].endswith('_E') else (maps_B).index(parts[0])
+            col_idx = (maps_E).index(parts[1]) if parts[1].endswith('_E') else (maps_B).index(parts[1])
+       
+        else: 
+            pass
+        
+        
+        map_index = multicomp_class.used_maps.index(key)
+        num_bin = len(observed_data)
+        covar_mat = multicomp_class.filtered_covmat
+        var = np.diag(covar_mat)[map_index*num_bin:num_bin*(map_index+1)]
+        # Plotting observed data
+        axes_index = row_idx * num_columns + col_idx
+        #print(observed_data)
+        
+        axes[axes_index].errorbar(
+                            x = range(len(observed_data)),
+                            y=(observed_data), 
+                            yerr = np.sqrt(var),
+                            label='Observed', color='blue')
+        # Plotting best fit data
+        axes[axes_index].plot(best_fit_data, label='Best Fit', color='red')
+
+        axes[axes_index].set_title(key)
+        axes[axes_index].legend()
+    for row_idx, map_E in enumerate(maps_E):
+        angle = f"alpha_{map_E}"
+        axes[row_idx].text(
+            0.05, 1.4,  # X and Y position (top-left corner)
+            param_stats[row_idx],  # The parameter stats
+            transform=axes[row_idx].transAxes,  # Use axes coordinates
+            fontsize=10, color='black',
+            verticalalignment='top'
+        )
+    plt.tight_layout(pad=2)
+    plt.savefig(outpath + '_bestfit' + spectra_type + '.png')
+    print("Saving: " +outpath + '_bestfit'+ spectra_type +'.png')
+    return 
+
+def determine_spectrum_type(spectrum_name):
+    """
+    Determines the polarization spectrum type (EE, BB, EB, or BE) 
+    from a string formatted like 'something_Exsomething_B'.
+
+    Args:
+        spectrum_name (str): The input string containing '_E' or '_B' before and after an 'x'.
+
+    Returns:
+        str: A 2-letter string indicating the spectrum type, e.g., 'EB', 'BE', 'EE', or 'BB'.
+
+    Raises:
+        AssertionError: If the input format is not as expected.
+    """
+    spectra = spectrum_name.split('x')
+    assert len(spectra) == 2, "spectrum name isn't properly formatted: " + str(spectrum_name)
+    
+    spec1 = spectra[0][-2:]
+    spec2 = spectra[1][-2:]
+    
+    assert spec1 in ['_E', '_B'], "spectrum name isn't properly formatted: " + str(spectrum_name)
+    assert spec2 in ['_E', '_B'], "spectrum name isn't properly formatted: " + str(spectrum_name)
+
+    spec_type = spec1[-1] + spec2[-1]
+    return spec_type
+
+def plot_eebbeb(multicomp_class, outpath, param_names, param_bestfit, param_stats):
+    used_maps = multicomp_class.used_maps
+    observed_datas = multicomp_class.binned_dl_observed_dict
+    param_values = {param_names[i]:param_bestfit[i] 
+                            for i in range(len(param_names))}
+    theory_vec=multicomp_class.theory(param_values)
+    theory_dict = multicomp_class.final_detection_dict
+
+    maps_B = set()
+    maps_E = set()
+    keys = list(theory_dict.keys())
+    for key in keys:
+        parts = key.split('x')
+        if parts[0].endswith('_B'):
+            maps_B.add(parts[0])
+        if parts[0].endswith('_E'):
+            maps_E.add(parts[0])
+        if parts[1].endswith('_B'):
+            maps_B.add(parts[1])
+        if parts[1].endswith('_E'):
+            maps_E.add(parts[1])
+    maps_B = sorted(list(maps_B))
+    maps_E = sorted(list(maps_E))
+    param_stats = sorted(param_stats)
+    for spectra_type in ['EE', 'EB', 'BB']:
+        plot_spectra_type(spectra_type, 
+                      maps_E, 
+                      maps_B, 
+                      theory_dict, multicomp_class, observed_datas,
+                      outpath, param_stats)
+    
+
+    return 
+
 def plot_best_crossfit(eb_like_cls, outpath, used_maps, param_names, 
                         param_bestfit, param_stats, signal_params={}):
     
