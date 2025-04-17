@@ -400,7 +400,7 @@ def multicomp_mcmc_driver(input_args):
         parallel_simulation(input_args, params_dict)
     else:
         # define relevant files based on opts
-        if(input_args.sim_num == 'real'):
+        if(input_args.sim_num == -1):
             observation_file_path = FILE_PATHS['observed_data']
         elif(isinstance(input_args.sim_num, int) and input_args.sim_num >= 0):
             formatted_simnum = str(input_args.sim_num).zfill(3)
@@ -676,9 +676,7 @@ def main():
         else:
             print(f"No existing chains to overwrite at: {args.output_path}")
 
-        
-    if(args.sim_num == -1):
-        args.sim_num = 'real'
+       
     multicomp_mcmc_driver(args)
 
 
