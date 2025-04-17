@@ -408,11 +408,12 @@ def multicomp_mcmc_driver(input_args):
             updated_info, sampler = run_bk18_likelihood(params_dict, 
                                                         observation_file_path, 
                                                         input_args)
+            param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path)#, replace_dict)
     # plot mcmc results
     replace_dict ={}# {"alpha_BK18_220":0.6}
     print(input_args.output_path)
     '''
-    param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path, replace_dict)
+    
     eb_like_cls = BK18_full_multicomp(used_maps=SHARED_DATA_DICT['used_maps'],
                                       sim_common_dat = SHARED_DATA_DICT)
     epd.plot_best_crossfit(eb_like_cls, 
@@ -449,7 +450,7 @@ def run_simulation(sim_num, params_dict,input_args):
     updated_info, sampler = run_bk18_likelihood(params_copy, 
                                             observation_file_path, 
                                             input_args)
-
+    param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path)
 
 
 # Parallel execution with cancellation support
