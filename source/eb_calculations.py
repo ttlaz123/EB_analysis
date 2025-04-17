@@ -349,7 +349,7 @@ def apply_det_rotation(post_travel_dict, params_values, dl_theory_dict):
             BB = post_travel_dict[bb_map]
         else:
             EE = dl_theory_dict['EE']
-            EE = dl_theory_dict['BB']
+            BB = dl_theory_dict['BB']
 
         EB = post_travel_dict[eb_map]
         BE = post_travel_dict[be_map]
