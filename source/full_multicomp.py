@@ -418,7 +418,7 @@ def multicomp_mcmc_driver(input_args):
                             theory_comps= input_args.theory_comps,
                             spectra_type= input_args.spectra_type,
                             #"sim_common_data":SHARED_DATA_DICT,
-                            observe_filepath= observation_file_path
+                            observe_filepath= observation_file_path,
                             sim_common_dat = SHARED_DATA_DICT)
             epd.plot_eebbeb(multicomp_class, 
                            input_args.output_path, 
