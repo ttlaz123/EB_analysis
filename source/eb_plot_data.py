@@ -122,8 +122,9 @@ def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class
         
         map_index = multicomp_class.used_maps.index(key)
         num_bin = len(observed_data)
-        covar_mat = multicomp_class.filtered_covmat
-        var = np.diag(covar_mat)[map_index*num_bin:num_bin*(map_index+1)]
+        covar_inv = multicomp_class.cov_inv
+        inv_var = np.diag(covar_inv)[map_index*num_bin:num_bin*(map_index+1)]
+        var = 1/inv_var
         # Plotting observed data
         axes_index = row_idx * num_columns + col_idx
         #print(observed_data)
