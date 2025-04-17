@@ -354,11 +354,19 @@ def apply_det_rotation(post_travel_dict, params_values, dl_theory_dict):
 
         EB = post_travel_dict[eb_map]
         BE = post_travel_dict[be_map]
-        min_len = min(map(len, [EE, BB, EB, BE]))
-        EE = EE[:min_len]
-        BB = BB[:min_len]
-        EB = EB[:min_len]
-        BE = BE[:min_len]
+        # Identify which ones are array-like
+        arrays = [x for x in [EE, BB, EB, BE] if isinstance(x, np.ndarray)]
+        if arrays:
+            min_len = min(len(x) for x in arrays)
+
+            if isinstance(EE, np.ndarray):
+                EE = EE[:min_len]
+            if isinstance(BB, np.ndarray):
+                BB = BB[:min_len]
+            if isinstance(EB, np.ndarray):
+                EB = EB[:min_len]
+            if isinstance(BE, np.ndarray):
+                BE = BE[:min_len]
 
         if spec == 'EE':
             dls = EE * c1 * c2 + BB * s1 * s2 - EB * c1 * s2 - BE * s1 * c2
