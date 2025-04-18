@@ -116,11 +116,12 @@ class BK18_full_multicomp(Likelihood):
         big_vector = []
 
         for map_name in self.map_reference_header:
-            spec = ec.determine_spectrum_type(map_name)
-            # TODO remove this later
-            if(spec == 'BB'):
-                continue
+            
             if map_name in used_maps:
+                spectype = ec.determine_spectrum_type(map_name)
+                # TODO remove this later
+                if(spectype == 'BB'):
+                    continue
                 spec = spectra_dict[map_name].copy()
                 #spec[7:9] = 0
                 big_vector.append(spec)
