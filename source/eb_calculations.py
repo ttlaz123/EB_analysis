@@ -175,7 +175,7 @@ def get_other_spec_map(used_map, all_maps):
 def determine_angle_names_cached(map_name):
     return determine_angle_names(map_name)
 
-def apply_EDE(params_values, dl_theory_dict, used_maps):
+def apply_EDE(initial_theory_dict, params_values, dl_theory_dict, used_maps):
     """
     Applies Early Dark Energy (EDE) replacement to EB/BE spectra in a copy of the theory dict.
 
@@ -190,13 +190,16 @@ def apply_EDE(params_values, dl_theory_dict, used_maps):
     """
     ede = dl_theory_dict['EB_EDE']
     g = params_values['gMpl']
-    post_dict = {}
+    post_dict = {k: v.copy() if hasattr(v, 'copy') else v for k, v in initial_theory_dict.items()}
 
 
     for m in used_maps:
         spec = determine_spectrum_type(m)
         if spec in ['EB', 'BE']:
-            post_dict[m] = ede * g
+            if m in post_dict:
+                post_dict[m] = ede * g
+            else:
+                print(f"Warning: map {m} not found in theory dict, skipping.")
 
     return post_dict
 
