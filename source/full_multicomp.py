@@ -119,9 +119,7 @@ class BK18_full_multicomp(Likelihood):
             
             if map_name in used_maps:
                 spectype = ec.determine_spectrum_type(map_name)
-                # TODO remove this later
-                if(spectype == 'BB'):
-                    continue
+
                 spec = spectra_dict[map_name].copy()
                 #spec[7:9] = 0
                 big_vector.append(spec)
@@ -206,19 +204,11 @@ def load_shared_data(input_args):
                                        spectra_type=input_args.spectra_type)
     
     SHARED_DATA_DICT['used_maps'] = ec.filter_used_maps(map_reference_header, used_maps)
-    nobb_used_maps = [] 
-    for m in SHARED_DATA_DICT['used_maps']:
-        spec = ec.determine_spectrum_type(m)
-        if(not spec == 'BB'):
-            nobb_used_maps.append(m)
-    print('Maps without BB:')
-    print(nobb_used_maps)
     full_covmat = ld.load_covariance_matrix(FILE_PATHS[covmat_name],
                                             map_reference_header)
     filtered_covmat = ec.filter_matrix(map_reference_header, 
                                        full_covmat, 
-                                       nobb_used_maps,
-                                       #SHARED_DATA_DICT['used_maps'], 
+                                       SHARED_DATA_DICT['used_maps'], 
                                        num_bins=input_args.bin_num)
     #plot_covar_matrix(self.filtered_covmat, used_maps=self.used_maps)
     SHARED_DATA_DICT['inv_covmat'] = ec.calc_inverse_covmat(filtered_covmat)
@@ -388,7 +378,13 @@ def generate_cross_spectra(calc_spectra, do_crosses, spectra_type):
                 cross_spectra.append(cross_spectrum)
                 cross_spectrum = f"{spec1}_Bx{spec2}_B"
                 cross_spectra.append(cross_spectrum)
-
+            elif(spectra_type == 'nob'):
+                cross_spectrum = f"{spec1}_Ex{spec2}_B"
+                cross_spectra.append(cross_spectrum)
+                cross_spectrum = f"{spec1}_Bx{spec2}_E"
+                cross_spectra.append(cross_spectrum)
+                cross_spectrum = f"{spec1}_Ex{spec2}_E"
+                cross_spectra.append(cross_spectrum)
             elif(spectra_type == 'eb'):
                 cross_spectrum = f"{spec1}_Ex{spec2}_B"
                 cross_spectra.append(cross_spectrum)

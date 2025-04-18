@@ -233,11 +233,14 @@ def apply_cmb_rotation(post_inflation_dict, params_values, dl_theory_dict, used_
         spec = determine_spectrum_type(m)
         
         ee_map, bb_map, eb_map, be_map = get_other_spec_map(m, used_maps)
-        if(ee_map in used_maps and bb_map in used_maps):
+        if(ee_map in used_maps): 
             Cl_EE = post_inflation_dict[ee_map]
+        else:
+            CL_EE = dl_theory_dict['EE']   
+
+        if(bb_map in used_maps):
             Cl_BB = post_inflation_dict[bb_map]
         else:
-            CL_EE = dl_theory_dict['EE']
             CL_BB = dl_theory_dict['BB']
 
         Cl_EB = post_inflation_dict[eb_map]
@@ -345,11 +348,14 @@ def apply_det_rotation(post_travel_dict, params_values, dl_theory_dict):
 
         c1, s1 = get_trigs(angle1_name)
         c2, s2 = get_trigs(angle2_name)
-        if(ee_map in used_maps and bb_map in used_maps):
+        if(ee_map in used_maps):
             EE = post_travel_dict[ee_map]
-            BB = post_travel_dict[bb_map]
         else:
             EE = dl_theory_dict['EE']
+
+        if(bb_map in used_maps):
+            BB = post_travel_dict[bb_map]
+        else:
             BB = dl_theory_dict['BB']
 
         EB = post_travel_dict[eb_map]
