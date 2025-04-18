@@ -631,7 +631,7 @@ def main():
     parser.add_argument(
         '-t', "--spectra_type",
         type=str,
-        choices=["all", "eb"],
+        choices=["all", "eb", "nob"],
         default="all",
         help=(
             "Which spectra to include. 'all' includes EE, BB, EB, etc., while 'eb' only includes EB-related spectra. "
