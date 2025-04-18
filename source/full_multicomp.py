@@ -116,6 +116,10 @@ class BK18_full_multicomp(Likelihood):
         big_vector = []
 
         for map_name in self.map_reference_header:
+            spec = ec.determine_spectrum_type(map_name)
+            # TODO remove this later
+            if(spec == 'BB'):
+                continue
             if map_name in used_maps:
                 spec = spectra_dict[map_name].copy()
                 #spec[7:9] = 0
@@ -130,8 +134,7 @@ class BK18_full_multicomp(Likelihood):
         # define relevant dictionaries
         if(self.theory_comps in ['all', 'fixed_dust']):
             # do ede shift
-            post_inflation_dict = ec.apply_EDE(self.initial_theory_dict, 
-                                               params_values,
+            post_inflation_dict = ec.apply_EDE(params_values,
                                                self.dl_theory,
                                                self.used_maps)
         else:
