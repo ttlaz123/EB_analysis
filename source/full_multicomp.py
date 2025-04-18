@@ -210,7 +210,7 @@ def load_shared_data(input_args):
     for m in SHARED_DATA_DICT['used_maps']:
         spec = ec.determine_spectrum_type(m)
         if(not spec == 'BB'):
-            nobb_used_maps.append(spec)
+            nobb_used_maps.append(m)
     print('Maps without BB:')
     print(nobb_used_maps)
     full_covmat = ld.load_covariance_matrix(FILE_PATHS[covmat_name],
