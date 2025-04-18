@@ -175,7 +175,7 @@ def get_other_spec_map(used_map, all_maps):
 def determine_angle_names_cached(map_name):
     return determine_angle_names(map_name)
 
-def apply_EDE(initial_theory_dict, params_values, dl_theory_dict, used_maps):
+def apply_EDE(params_values, dl_theory_dict, used_maps):
     """
     Applies Early Dark Energy (EDE) replacement to EB/BE spectra in a copy of the theory dict.
 
@@ -190,7 +190,7 @@ def apply_EDE(initial_theory_dict, params_values, dl_theory_dict, used_maps):
     """
     ede = dl_theory_dict['EB_EDE']
     g = params_values['gMpl']
-    post_dict = {k: v.copy() if hasattr(v, 'copy') else v for k, v in initial_theory_dict.items()}
+    post_dict = {}
 
 
     for m in used_maps:
@@ -227,7 +227,7 @@ def apply_cmb_rotation(post_inflation_dict, params_values, dl_theory_dict, used_
     sin2_sq = sin2 ** 2
     cos2_sq = cos2 ** 2
 
-    post_travel_dict = {k: v.copy() for k, v in post_inflation_dict.items()}
+    post_travel_dict = {}
 
     for m in used_maps:
         spec = determine_spectrum_type(m)
@@ -326,7 +326,7 @@ def apply_det_rotation(post_travel_dict, params_values, dl_theory_dict):
     Returns:
         dict: Updated theory Cls with detector rotation applied.
     """
-    post_detection_dict = {k: v.copy() if hasattr(v, 'copy') else v for k, v in post_travel_dict.items()}
+    post_detection_dict = {}
 
     used_maps = list(post_travel_dict.keys())
 
@@ -370,7 +370,7 @@ def apply_det_rotation(post_travel_dict, params_values, dl_theory_dict):
 
         if spec == 'EE':
             dls = EE * c1 * c2 + BB * s1 * s2 - EB * c1 * s2 - BE * s1 * c2
-        elif spec == 'BB':
+        elif spec == 'BB':       
             dls = EE * s1 * s2 + BB * c1 * c2 + EB * s1 * c2 + BE * c1 * s2
         elif spec == 'EB':
             dls = EE * c1 * s2 - BB * s1 * c2 + EB * c1 * c2 - BE * s1 * s2
@@ -378,7 +378,7 @@ def apply_det_rotation(post_travel_dict, params_values, dl_theory_dict):
             dls = EE * s1 * c2 - BB * c1 * s2 - EB * s1 * s2 + BE * c1 * c2
         else:
             continue
-
+        
         post_detection_dict[used_map] = dls
 
     return post_detection_dict
