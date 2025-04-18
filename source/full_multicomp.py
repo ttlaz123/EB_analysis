@@ -496,7 +496,7 @@ def parallel_simulation(input_args, params_dict):
     """
     sim_indices = range(input_args.sim_start, input_args.sim_start + input_args.sim_num)
     try:
-        maxworkers = os.cpu_count()-1
+        maxworkers = 1
         with ProcessPoolExecutor(max_workers=maxworkers) as executor:
             # Submit all tasks to the executor
             future_to_sim = {
@@ -517,6 +517,7 @@ def parallel_simulation(input_args, params_dict):
         raise  # Re-raise the KeyboardInterrupt to exit the program cleanly
 
 def do_plotting(input_args):
+    '''
     for sim in range(input_args.sim_start, input_args.sim_start+input_args.sim_num):
         outpath = f"{input_args.output_path}{sim:03d}"
         try:
@@ -524,6 +525,7 @@ def do_plotting(input_args):
         except OSError:
             print('File note found, skipping: ' + str(outpath))
             continue
+    '''
     chains_path = input_args.output_path + "XXX.1.txt"
     epd.plot_sim_peaks(chains_path, input_args.sim_start, input_args.sim_num)
 
