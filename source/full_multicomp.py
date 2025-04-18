@@ -204,7 +204,12 @@ def load_shared_data(input_args):
     used_maps = generate_cross_spectra(calc_spectra, 
                                        do_crosses=do_crosses, 
                                        spectra_type=input_args.spectra_type)
-    SHARED_DATA_DICT['used_maps'] = ec.filter_used_maps(map_reference_header, used_maps)
+    nobb_used_maps = [] 
+    for m in used_maps:
+        spec = ec.determine_spectrum_type(m)
+        if(not spec == 'BB'):
+            nobb_used_maps.append(spec)
+    SHARED_DATA_DICT['used_maps'] = ec.filter_used_maps(map_reference_header, nobb_used_maps)
     full_covmat = ld.load_covariance_matrix(FILE_PATHS[covmat_name],
                                             map_reference_header)
     filtered_covmat = ec.filter_matrix(map_reference_header, 
