@@ -196,10 +196,7 @@ def apply_EDE(params_values, dl_theory_dict, used_maps):
     for m in used_maps:
         spec = determine_spectrum_type(m)
         if spec in ['EB', 'BE']:
-            if m in post_dict:
-                post_dict[m] = ede * g
-            else:
-                print(f"Warning: map {m} not found in theory dict, skipping.")
+            post_dict[m] = ede * g
 
     return post_dict
 
