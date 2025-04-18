@@ -217,7 +217,8 @@ def load_shared_data(input_args):
                                             map_reference_header)
     filtered_covmat = ec.filter_matrix(map_reference_header, 
                                        full_covmat, 
-                                       SHARED_DATA_DICT['used_maps'], 
+                                       nobb_used_maps,
+                                       #SHARED_DATA_DICT['used_maps'], 
                                        num_bins=input_args.bin_num)
     #plot_covar_matrix(self.filtered_covmat, used_maps=self.used_maps)
     SHARED_DATA_DICT['inv_covmat'] = ec.calc_inverse_covmat(filtered_covmat)
