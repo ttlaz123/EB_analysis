@@ -143,12 +143,14 @@ class BK18_full_multicomp(Likelihood):
         if(self.theory_comps in ['all', 'no_ede']):
             
             # do cmb rotation
+            '''
             post_travel_dict = ec.apply_cmb_rotation(post_inflation_dict,
                                                     params_values,
                                                     self.dl_theory,
                                                     self.used_maps)
+            '''
             # do dust
-            post_travel_dict = ec.apply_dust(post_travel_dict, self.bandpasses, params_values)
+            post_travel_dict = ec.apply_dust(post_inflation_dict, self.bandpasses, params_values)
             
         else: 
             post_travel_dict = post_inflation_dict
