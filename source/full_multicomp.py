@@ -157,7 +157,6 @@ class BK18_full_multicomp(Likelihood):
                                                         params_values, 
                                                         self.dl_theory,
                                                         override_maps=override_maps)
-            
 
 
         # apply bpwf

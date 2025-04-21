@@ -341,7 +341,6 @@ def apply_det_rotation(post_travel_dict, params_values, dl_theory_dict, override
             angle_rad = np.deg2rad(params_values[angle_name])
             trig_cache[angle_name] = (np.cos(2 * angle_rad), np.sin(2 * angle_rad))
         return trig_cache[angle_name]
-
     for used_map in used_maps:
         spec = determine_spectrum_type(used_map)
         ee_map, bb_map, eb_map, be_map = get_other_spec_map(used_map, used_maps)
@@ -349,12 +348,12 @@ def apply_det_rotation(post_travel_dict, params_values, dl_theory_dict, override
 
         c1, s1 = get_trigs(angle1_name)
         c2, s2 = get_trigs(angle2_name)
-        if(ee_map in used_maps):
+        if(ee_map in dl_theory_dict):
             EE = post_travel_dict[ee_map]
         else:
             EE = dl_theory_dict['EE']
 
-        if(bb_map in used_maps):
+        if(bb_map in dl_theory_dict):
             BB = post_travel_dict[bb_map]
         else:
             BB = dl_theory_dict['BB']
@@ -696,7 +695,7 @@ def apply_bpwf(map_reference_header, theory_dict, bpwf_mat, used_maps, do_cross=
         - The result is a new dictionary where the theoretical power spectra have been binned according to the BPWF.
         """
         binned_theory_dict = {}
-        for cross_map in used_maps:
+        for cross_map in theory_dict.keys():
             maps = cross_map.split('x')
             for freq_map in maps:
                 if(do_cross):
