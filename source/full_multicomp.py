@@ -129,7 +129,7 @@ class BK18_full_multicomp(Likelihood):
 
         return concat_vec   
 
-    def theory(self, params_values):
+    def theory(self, params_values, override_maps=None):
         # define relevant dictionaries
         if(self.theory_comps in ['all', 'fixed_dust']):
             # do ede shift
@@ -155,7 +155,8 @@ class BK18_full_multicomp(Likelihood):
             # do detector rotation
             post_detection_dict = ec.apply_det_rotation(post_travel_dict, 
                                                         params_values, 
-                                                        self.dl_theory)
+                                                        self.dl_theory,
+                                                        override_maps=override_maps)
             
 
 
@@ -475,6 +476,11 @@ def run_simulation(sim_num, params_dict,input_args):
                                             observation_file_path, 
                                             input_args)
     param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path)#, replace_dict)
+    calc_spectra = ec.determine_map_freqs(input_args.map_set)
+    do_crosses = True
+    used_maps = generate_cross_spectra(calc_spectra, 
+                                       do_crosses=do_crosses, 
+                                       spectra_type='all')
     multicomp_class = BK18_full_multicomp(
                     used_maps=SHARED_DATA_DICT['used_maps'],
                     map_set= input_args.map_set,
@@ -490,7 +496,8 @@ def run_simulation(sim_num, params_dict,input_args):
                     input_args.output_path, 
                     param_names, 
                     means, 
-                    mean_std_strs)
+                    mean_std_strs,
+                    override_maps = used_maps)
 
 # Parallel execution with cancellation support
 def parallel_simulation(input_args, params_dict):

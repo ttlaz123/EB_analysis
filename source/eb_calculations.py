@@ -318,7 +318,7 @@ def apply_dust(post_travel_dict, bandpasses, params_values):
     return post_travel_dict
 
 
-def apply_det_rotation(post_travel_dict, params_values, dl_theory_dict):
+def apply_det_rotation(post_travel_dict, params_values, dl_theory_dict, override_maps=None):
     """
     Applies detector angle rotation to theory spectra using cached trig calculations.
 
@@ -330,9 +330,10 @@ def apply_det_rotation(post_travel_dict, params_values, dl_theory_dict):
         dict: Updated theory Cls with detector rotation applied.
     """
     post_detection_dict = {}
-
-    used_maps = list(post_travel_dict.keys())
-
+    if(override_maps is None):
+        used_maps = list(post_travel_dict.keys())
+    else:
+        used_maps = override_maps
     # Cache trig values: sin(2θ), cos(2θ)
     trig_cache = {}
     def get_trigs(angle_name):

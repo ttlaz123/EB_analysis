@@ -178,12 +178,12 @@ def determine_spectrum_type(spectrum_name):
     spec_type = spec1[-1] + spec2[-1]
     return spec_type
 
-def plot_eebbeb(multicomp_class, outpath, param_names, param_bestfit, param_stats):
-    used_maps = multicomp_class.used_maps
+def plot_eebbeb(multicomp_class, outpath, param_names, param_bestfit, param_stats, override_maps=None):
+    #used_maps = multicomp_class.used_maps
     observed_datas = multicomp_class.binned_dl_observed_dict
     param_values = {param_names[i]:param_bestfit[i] 
                             for i in range(len(param_names))}
-    theory_vec=multicomp_class.theory(param_values)
+    theory_vec=multicomp_class.theory(param_values, override_maps=override_maps)
     theory_dict = multicomp_class.final_detection_dict
 
     maps_B = set()
