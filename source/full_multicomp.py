@@ -498,9 +498,7 @@ def run_simulation(sim_num, params_dict,input_args):
                     means, 
                     mean_std_strs,
                     override_maps = used_maps)
-    plt.close('all')  # Close all open figures
     del updated_info, sampler, param_names, means, mean_std_strs, multicomp_class
-    gc.collect()      # Force garbage collection
 
 # Parallel execution with cancellation support
 def parallel_simulation(input_args, params_dict):

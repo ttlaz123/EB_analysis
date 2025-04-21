@@ -148,8 +148,10 @@ def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class
             verticalalignment='top'
         )
     plt.tight_layout(pad=2)
-    plt.savefig(outpath + '_bestfit' + spectra_type + '.png')
     print("Saving: " +outpath + '_bestfit'+ spectra_type +'.png')
+    plt.savefig(outpath + '_bestfit' + spectra_type + '.png')
+    
+    plt.close(fig)
     return 
 
 def determine_spectrum_type(spectrum_name):
@@ -362,7 +364,7 @@ def plot_triangle(root, replace_dict={}):
         means.append(mean)
 
     # Create a triangle plot with all variables
-    plt.figure()
+    fig = plt.figure()
     g = plots.get_subplot_plotter()
     g.triangle_plot(samples, param_names, filled=True)
 
@@ -373,6 +375,7 @@ def plot_triangle(root, replace_dict={}):
     plt.savefig(f"{root}_triangle_plot.png")
     print(f"Triangle plot saved as {root}_triangle_plot.png")
     #plt.show()
+    plt.close(fig)
     return param_names, means, mean_std_strings
 
 
