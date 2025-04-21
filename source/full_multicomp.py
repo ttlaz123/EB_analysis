@@ -435,11 +435,17 @@ def multicomp_mcmc_driver(input_args):
                             #"sim_common_data":SHARED_DATA_DICT,
                             observe_filepath= observation_file_path,
                             sim_common_dat = SHARED_DATA_DICT)
+            calc_spectra = ec.determine_map_freqs(input_args.map_set)
+            do_crosses = True
+            used_maps = generate_cross_spectra(calc_spectra, 
+                                            do_crosses=do_crosses, 
+                                            spectra_type='all')
             epd.plot_eebbeb(multicomp_class, 
                            input_args.output_path, 
                            param_names, 
                            means, 
-                           mean_std_strs)
+                           mean_std_strs,
+                           override_maps = used_maps)
     # plot mcmc results
     replace_dict ={}# {"alpha_BK18_220":0.6}
     print(input_args.output_path)
