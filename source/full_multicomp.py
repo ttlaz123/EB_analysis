@@ -460,7 +460,7 @@ def run_simulation(sim_num, params_dict,input_args):
     """ 
     outpath = f"{input_args.output_path}{sim_num:03d}"
     # skip chains that already exist
-    if(os.path.exists(outpath + '.1.txt') and os.path.exists(outpath + '_bestfit.png')):
+    if(os.path.exists(outpath + '.1.txt') and os.path.exists(outpath + '_bestfitEB.png')):
         print(f"Skipping existing simulation {sim_num}")
         return
     if(sim_num == 'real'):
@@ -491,6 +491,9 @@ def run_simulation(sim_num, params_dict,input_args):
                     param_names, 
                     means, 
                     mean_std_strs)
+    plt.close('all')  # Close all open figures
+    del updated_info, sampler, param_names, means, mean_std_strs, multicomp_class
+    gc.collect()      # Force garbage collection
 
 # Parallel execution with cancellation support
 def parallel_simulation(input_args, params_dict):
@@ -506,7 +509,7 @@ def parallel_simulation(input_args, params_dict):
     """
     sim_indices = range(input_args.sim_start, input_args.sim_start + input_args.sim_num)
     try:
-        maxworkers = 10 
+        maxworkers = 10
         with ProcessPoolExecutor(max_workers=maxworkers) as executor:
             # Submit all tasks to the executor
             future_to_sim = {

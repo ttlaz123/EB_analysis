@@ -417,6 +417,7 @@ def plot_eigenvalues_eigenvectors(matrix):
 def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None):
     modes_dict = {}
     single_df = None
+    simcount = 0
     for i in range(1, sim_nums + 1):
         file_path = chains_path.replace('XXX', f'{i:03d}')
         print('loading:' + str(file_path))
@@ -436,6 +437,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None):
                 modes_dict[column] = []
             mode = np.mean(chain_df[column])
             modes_dict[column].append(mode)
+        simcount += 1
     # Convert the modes dictionary to a DataFrame
     modes_df = pd.DataFrame.from_dict(modes_dict)
     default_cols = ['#', 'weight', 'minuslogpost', 'minuslogprior',
@@ -471,7 +473,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None):
     
     
         # Show the plot
-        supertitle = 'Sim' + str(i) + ' (blue) on top of ' + str(sim_nums) + ' sims (red)'
+        supertitle = 'Sim' + str(i) + ' (blue) on top of ' + str(simcount) + ' sims (red)'
         plt.suptitle(supertitle)
         outpath = chains_path.split('XXX')[0] + str(i) + '_summary.png'
         plt.savefig(outpath)
