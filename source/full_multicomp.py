@@ -423,8 +423,14 @@ def multicomp_mcmc_driver(input_args):
                                                         observation_file_path, 
                                                         input_args)
             param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path)#, replace_dict)
+            calc_spectra = ec.determine_map_freqs(input_args.map_set)
+            do_crosses = True
+            used_maps = generate_cross_spectra(calc_spectra, 
+                                            do_crosses=do_crosses, 
+                                            spectra_type='all')
+            used_maps = ec.filter_used_maps(SHARED_DATA_DICT["map_reference_header"], used_maps)
             multicomp_class = BK18_full_multicomp(
-                            used_maps=SHARED_DATA_DICT['used_maps'],
+                            used_maps=used_maps,
                             map_set= input_args.map_set,
                             dataset= input_args.dataset,
                             forecast= input_args.forecast,
@@ -434,12 +440,7 @@ def multicomp_mcmc_driver(input_args):
                             #"sim_common_data":SHARED_DATA_DICT,
                             observe_filepath= observation_file_path,
                             sim_common_dat = SHARED_DATA_DICT)
-            calc_spectra = ec.determine_map_freqs(input_args.map_set)
-            do_crosses = True
-            used_maps = generate_cross_spectra(calc_spectra, 
-                                            do_crosses=do_crosses, 
-                                            spectra_type='all')
-            used_maps = ec.filter_used_maps(SHARED_DATA_DICT["map_reference_header"], used_maps)
+            
             epd.plot_eebbeb(multicomp_class, 
                            input_args.output_path, 
                            param_names, 
@@ -489,7 +490,7 @@ def run_simulation(sim_num, params_dict,input_args):
                                        spectra_type='all')
     used_maps = ec.filter_used_maps(SHARED_DATA_DICT["map_reference_header"], used_maps)
     multicomp_class = BK18_full_multicomp(
-                    used_maps=SHARED_DATA_DICT['used_maps'],
+                    used_maps=used_maps,
                     map_set= input_args.map_set,
                     dataset= input_args.dataset,
                     forecast= input_args.forecast,
