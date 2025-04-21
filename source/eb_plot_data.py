@@ -187,7 +187,6 @@ def plot_eebbeb(multicomp_class, outpath, param_names, param_bestfit, param_stat
                             for i in range(len(param_names))}
     theory_vec=multicomp_class.theory(param_values, override_maps=override_maps)
     theory_dict = multicomp_class.final_detection_dict
-
     maps_B = set()
     maps_E = set()
     keys = list(theory_dict.keys())
