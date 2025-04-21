@@ -440,6 +440,7 @@ def multicomp_mcmc_driver(input_args):
             used_maps = generate_cross_spectra(calc_spectra, 
                                             do_crosses=do_crosses, 
                                             spectra_type='all')
+            used_maps = ec.filter_used_maps(SHARED_DATA_DICT["map_reference_header"], used_maps)
             epd.plot_eebbeb(multicomp_class, 
                            input_args.output_path, 
                            param_names, 
@@ -487,6 +488,7 @@ def run_simulation(sim_num, params_dict,input_args):
     used_maps = generate_cross_spectra(calc_spectra, 
                                        do_crosses=do_crosses, 
                                        spectra_type='all')
+    used_maps = ec.filter_used_maps(SHARED_DATA_DICT["map_reference_header"], used_maps)
     multicomp_class = BK18_full_multicomp(
                     used_maps=SHARED_DATA_DICT['used_maps'],
                     map_set= input_args.map_set,
