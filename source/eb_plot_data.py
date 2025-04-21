@@ -122,7 +122,7 @@ def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class
         
         map_index = multicomp_class.used_maps.index(key)
         num_bin = len(observed_data)
-        covar_mat = multicomp_class.filtered_covmat
+        covar_mat = multicomp_class.full_covmat
         var = np.diag(covar_mat)[map_index*num_bin:num_bin*(map_index+1)]
         # Plotting observed data
         axes_index = row_idx * num_columns + col_idx
@@ -185,7 +185,6 @@ def plot_eebbeb(multicomp_class, outpath, param_names, param_bestfit, param_stat
     observed_datas = multicomp_class.binned_dl_observed_dict
     param_values = {param_names[i]:param_bestfit[i] 
                             for i in range(len(param_names))}
-    
     theory_vec=multicomp_class.theory(param_values, override_maps=override_maps)
     theory_dict = multicomp_class.final_detection_dict
     maps_B = set()

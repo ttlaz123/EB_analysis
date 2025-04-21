@@ -53,18 +53,19 @@ class BK18_full_multicomp(Likelihood):
     def initialize(self):
         self.sim_common_data = SHARED_DATA_DICT
         self.map_reference_header = self.sim_common_data['map_reference_header']
-        self.used_maps = self.sim_common_data['used_maps']
+        if(len(self.used_maps) == 0):
+            self.used_maps = self.sim_common_data['used_maps']
         self.bandpasses = self.sim_common_data['bandpasses']
         self.bpwf = self.sim_common_data['bpwf']
         self.dl_theory = self.sim_common_data['theory_spectra']
         self.filtered_covmat = self.sim_common_data['covmat']
+        self.full_covmat = self.sim_common_data['full_covmat']
         self.cov_inv = self.sim_common_data['inv_covmat']
         self.binned_dl_observed_dict, self.map_reference_header = ld.load_observed_spectra(
                                                             self.observe_filepath,
                                                             self.used_maps,
                                                             self.map_reference_header,
                                                             num_bins = self.bin_num)
-        
         self.initial_theory_dict = ec.apply_initial_conditions(self.dl_theory, self.used_maps)
         self.binned_dl_observed_vec = self.dict_to_vec(self.binned_dl_observed_dict, 
                                                     self.used_maps)
@@ -204,6 +205,11 @@ def load_shared_data(input_args):
                                        spectra_type=input_args.spectra_type)
     
     SHARED_DATA_DICT['used_maps'] = ec.filter_used_maps(map_reference_header, used_maps)
+    all_maps = generate_cross_spectra(calc_spectra, 
+                                       do_crosses=do_crosses, 
+                                       spectra_type='all')
+    all_maps = ec.filter_used_maps(map_reference_header, all_maps)                          
+
     full_covmat = ld.load_covariance_matrix(FILE_PATHS[covmat_name],
                                             map_reference_header)
     filtered_covmat = ec.filter_matrix(map_reference_header, 
@@ -213,6 +219,12 @@ def load_shared_data(input_args):
     #plot_covar_matrix(self.filtered_covmat, used_maps=self.used_maps)
     SHARED_DATA_DICT['inv_covmat'] = ec.calc_inverse_covmat(filtered_covmat)
     SHARED_DATA_DICT['covmat'] = filtered_covmat
+    SHARED_DATA_DICT['all_maps'] = all_maps
+    SHARED_DATA_DICT['full_covmat'] = ec.filter_matrix(map_reference_header, 
+                                       full_covmat, 
+                                       all_maps, 
+                                       num_bins=input_args.bin_num)
+
 
 def run_bk18_likelihood(params_dict, observation_file_path, input_args, 
                         rstop = 0.03, max_tries=10000):
@@ -423,12 +435,7 @@ def multicomp_mcmc_driver(input_args):
                                                         observation_file_path, 
                                                         input_args)
             param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path)#, replace_dict)
-            calc_spectra = ec.determine_map_freqs(input_args.map_set)
-            do_crosses = True
-            used_maps = generate_cross_spectra(calc_spectra, 
-                                            do_crosses=do_crosses, 
-                                            spectra_type='all')
-            used_maps = ec.filter_used_maps(SHARED_DATA_DICT["map_reference_header"], used_maps)
+            used_maps = SHARED_DATA_DICT["all_maps"]
             multicomp_class = BK18_full_multicomp(
                             used_maps=used_maps,
                             map_set= input_args.map_set,
@@ -483,12 +490,7 @@ def run_simulation(sim_num, params_dict,input_args):
                                             observation_file_path, 
                                             input_args)
     param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path)#, replace_dict)
-    calc_spectra = ec.determine_map_freqs(input_args.map_set)
-    do_crosses = True
-    used_maps = generate_cross_spectra(calc_spectra, 
-                                       do_crosses=do_crosses, 
-                                       spectra_type='all')
-    used_maps = ec.filter_used_maps(SHARED_DATA_DICT["map_reference_header"], used_maps)
+    used_maps = SHARED_DATA_DICT["all_maps"]
     multicomp_class = BK18_full_multicomp(
                     used_maps=used_maps,
                     map_set= input_args.map_set,
