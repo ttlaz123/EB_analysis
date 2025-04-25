@@ -280,7 +280,7 @@ def apply_dust(post_travel_dict, bandpasses, params_values):
     """
     beta_dust = params_values['beta_dust']
     dust_cache = {}
-
+    
     for used_map, dls in post_travel_dict.items():
         lmax = dls.shape[0]
         ratio = np.arange(lmax) / LPIVOT
@@ -314,6 +314,11 @@ def apply_dust(post_travel_dict, bandpasses, params_values):
         dustpow[0] = 0 if np.isinf(dustpow[0]) else dustpow[0]
 
         dls += dustpow * dust_scale1 * dust_scale2
+        post_travel_dict[used_map] = dls
+        #print(f"Map: {used_map}, Spec: {spec_type}")
+        #print(f"A_dust: {A_dust}, alpha_dust: {alpha_dust}")
+        #print(f"Max dustpow: {np.max(dustpow)}, Max scaling: {np.max(dust_scale1 * dust_scale2)}")
+        #print(f"Delta Dls: {np.max(dustpow * dust_scale1 * dust_scale2)}")
 
     return post_travel_dict
 
@@ -348,12 +353,12 @@ def apply_det_rotation(post_travel_dict, params_values, dl_theory_dict, override
 
         c1, s1 = get_trigs(angle1_name)
         c2, s2 = get_trigs(angle2_name)
-        if(ee_map in dl_theory_dict):
+        if(ee_map in post_travel_dict):
             EE = post_travel_dict[ee_map]
         else:
             EE = dl_theory_dict['EE']
 
-        if(bb_map in dl_theory_dict):
+        if(bb_map in post_travel_dict):
             BB = post_travel_dict[bb_map]
         else:
             BB = dl_theory_dict['BB']

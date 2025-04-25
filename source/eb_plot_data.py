@@ -453,7 +453,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None):
     
         
     colors = ['red', 'blue', 'green', 'orange']
-    for i in range(1,single_sim+1):
+    for i in range(single_sim,single_sim+1):
         fig = corner.corner(modes_df[param_names], 
                         labels=param_names, 
                     show_titles=True, 

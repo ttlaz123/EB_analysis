@@ -419,7 +419,7 @@ def multicomp_mcmc_driver(input_args):
     load_shared_data(input_args)
     calc_spectra = ec.determine_map_freqs(input_args.map_set)
     # define dust params based on dustopts
-    params_dict = define_priors(calc_spectra, input_args.theory_comps)
+    params_dict = define_priors(calc_spectra, input_args.theory_comps, angle_degree=3)
     if(input_args.sim_num > 2):
         parallel_simulation(input_args, params_dict)
     else:
@@ -526,7 +526,7 @@ def parallel_simulation(input_args, params_dict):
     """
     sim_indices = range(input_args.sim_start, input_args.sim_start + input_args.sim_num)
     try:
-        maxworkers = 10
+        maxworkers = 5
         with ProcessPoolExecutor(max_workers=maxworkers) as executor:
             # Submit all tasks to the executor
             future_to_sim = {
