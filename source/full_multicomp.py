@@ -526,7 +526,7 @@ def parallel_simulation(input_args, params_dict):
     """
     sim_indices = range(input_args.sim_start, input_args.sim_start + input_args.sim_num)
     try:
-        maxworkers = 5
+        maxworkers = 10 
         with ProcessPoolExecutor(max_workers=maxworkers) as executor:
             # Submit all tasks to the executor
             future_to_sim = {
