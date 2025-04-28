@@ -691,8 +691,10 @@ def load_eskilt_data(data_path = 'input_data/HFI_f_sky_092_EB_o.npy'):
     n_bins = len(ell)
     ee_binned, bin_starts = bin_spectrum(n_bins, delta_ell, ell_min, spectrum_dict['EE'])
     bb_binned, bin_starts = bin_spectrum(n_bins, delta_ell, ell_min, spectrum_dict['BB'])
+    eb_binned, bin_starts = bin_spectrum(n_bins, delta_ell, ell_min, read_ede_data())
     spectrum_dict['EE_binned'] = ee_binned
     spectrum_dict['BB_binned'] = bb_binned
+    spectrum_dict['EB_EDE'] = eb_binned
     return bin_starts, raw_cl, spectrum_dict   
 
 

@@ -97,6 +97,8 @@ class BK18_full_multicomp(Likelihood):
         residuals = self.binned_dl_observed_vec - theory_prediction
         # Calculate the Mahalanobis distance using the inverse covariance matrix
         chi_squared = residuals.T @ self.cov_inv @ residuals
+        if(self.theory_comps == 'eskilt'):
+            chi_squared += self.theory_eskilt(params_values)
         # Calculate the log-likelihood
         log_likelihood = -0.5 * chi_squared
         #print(log_likelihood)
@@ -129,10 +131,40 @@ class BK18_full_multicomp(Likelihood):
         concat_vec =  np.concatenate(big_vector, axis=0)
 
         return concat_vec   
+    
+    def theory_eskilt(self, params_values):
+        """
+        Compute chi-squared for Eskilt model fit to EB data.
+
+        Parameters:
+        -----------
+        params_values : dict
+            Dictionary containing 'angle_CMB' (degrees) and 'gMpl' parameters.
+
+        Returns:
+        --------
+        chisq : float
+            Chi-squared value.
+        """
+        angle_deg = params_values['angle_CMB']
+        g = params_values['gMpl']
+
+        observed = self.sim_common_data['eskilt']['EB_observed']
+        var = self.sim_common_data['eskilt']['EB_var']
+        ee = self.sim_common_data['eskilt']['EE_binned']
+        bb = self.sim_common_data['eskilt']['BB_binned']
+        eb = self.sim_common_data['eskilt']['EB_EDE']
+        sin4theta = np.sin(np.deg2rad(4 * angle_deg))/2
+        cos4theta = np.cos(np.deg2rad(4 * angle_deg))
+        expected = sin4theta * (ee - bb) + eb * cos4theta * g
+        residual = observed - expected
+
+        chisq = np.sum(residual**2 / (var))
+        return chisq
 
     def theory(self, params_values, override_maps=None):
         # define relevant dictionaries
-        if(self.theory_comps in ['all', 'fixed_dust']):
+        if(self.theory_comps in ['all', 'fixed_dust', 'eskilt']):
             # do ede shift
             post_inflation_dict = ec.apply_EDE(self.initial_theory_dict,
                                                params_values,
@@ -154,7 +186,7 @@ class BK18_full_multicomp(Likelihood):
             
         else: 
             post_travel_dict = post_inflation_dict
-        if(self.theory_comps in ['all', 'det_polrot', 'fixed_dust', 'no_ede']):
+        if(self.theory_comps in ['all', 'det_polrot', 'fixed_dust', 'no_ede', 'eskilt']):
             # do detector rotation
             post_detection_dict = ec.apply_det_rotation(post_travel_dict, 
                                                         params_values, 
@@ -226,7 +258,8 @@ def load_shared_data(input_args):
                                        full_covmat, 
                                        all_maps, 
                                        num_bins=input_args.bin_num)
-
+    
+    bin_starts, raw_cl, SHARED_DATA_DICT['eskilt'] = ld.load_eskilt_data()
 
 def run_bk18_likelihood(params_dict, observation_file_path, input_args, 
                         rstop = 0.03, max_tries=10000):
@@ -278,7 +311,7 @@ def run_bk18_likelihood(params_dict, observation_file_path, input_args,
     updated_info, sampler = run(info, stop_at_error=True)
     return updated_info, sampler
 
-def define_priors(calc_spectra, theory_comps, angle_degree=3):
+def define_priors(calc_spectra, theory_comps, angle_degree=5):
     """
     Defines prior distributions for angle parameters, dust parameters, and EDE params.
 
@@ -312,7 +345,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=3):
                                 "proposal":0.01}
 
     if(theory_comps == 'all'):
-        params_dict['alpha_CMB'] = 0# angle_priors
+        params_dict['alpha_CMB'] = angle_priors
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
         for spec in ['EE', 'BB']:#, 'EB']:
 
@@ -332,6 +365,9 @@ def define_priors(calc_spectra, theory_comps, angle_degree=3):
                                     "ref": {"dist":"norm", "loc":1.6, "scale":0.02},
                                     "proposal":0.02,
                                     "latex":"\\beta_{\mathrm{dust}}"}
+    elif(theory_comps == 'eskilt'):
+        params_dict['alpha_CMB'] = angle_priors
+        params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
     elif(theory_comps == 'det_polrot'):
         pass
 
@@ -419,7 +455,7 @@ def multicomp_mcmc_driver(input_args):
     load_shared_data(input_args)
     calc_spectra = ec.determine_map_freqs(input_args.map_set)
     # define dust params based on dustopts
-    params_dict = define_priors(calc_spectra, input_args.theory_comps, angle_degree=3)
+    params_dict = define_priors(calc_spectra, input_args.theory_comps)
     if(input_args.sim_num > 2):
         parallel_simulation(input_args, params_dict)
     else:
