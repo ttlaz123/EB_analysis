@@ -139,14 +139,14 @@ class BK18_full_multicomp(Likelihood):
         Parameters:
         -----------
         params_values : dict
-            Dictionary containing 'angle_CMB' (degrees) and 'gMpl' parameters.
+            Dictionary containing 'alpha_CMB' (degrees) and 'gMpl' parameters.
 
         Returns:
         --------
         chisq : float
             Chi-squared value.
         """
-        angle_deg = params_values['angle_CMB']
+        angle_deg = params_values['alpha_CMB']
         g = params_values['gMpl']
 
         observed = self.sim_common_data['eskilt']['EB_observed']
