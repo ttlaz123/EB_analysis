@@ -698,7 +698,7 @@ def main():
     parser.add_argument(
         '-c', "--theory_comps",
         type=str,
-        choices=["all", "fixed_dust", "det_polrot", "no_ede"],
+        choices=["all", "fixed_dust", "det_polrot", "no_ede", "eskilt"],
         default="all",
         help=(
             "Controls which theoretical components are included in the likelihood. "
