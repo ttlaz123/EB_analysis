@@ -3,6 +3,15 @@ import numpy as np
 import pandas as pd
 import corner
 
+import matplotlib
+import os
+if "SLURM_JOB_ID" in os.environ:
+    matplotlib.use('Agg')  # headless mode
+else:
+    matplotlib.use('TkAgg')  # if running with GUI (e.g., locally)
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+
 from getdist.mcsamples import MCSamplesFromCobaya
 from getdist.mcsamples import loadMCSamples
 import getdist.plots as gdplt
@@ -10,17 +19,8 @@ from matplotlib.gridspec import GridSpec
 print("Loading Plotting  Modules")
 from getdist import plots, MCSamples
 from getdist.mcsamples import loadMCSamples
-import corner
-import matplotlib
-import os
-display_var = os.environ.get('DISPLAY','')
-print('Display Var:' + str(display_var))
-if  display_var == '':
-    matplotlib.use('Agg')  # headless mode
-else:
-    matplotlib.use('TkAgg')  # if running with GUI (e.g., locally)
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
+
+
 
 import bicep_data_consts as bdc
 MAP_FREQS = bdc.MAP_FREQS
