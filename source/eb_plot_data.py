@@ -12,7 +12,12 @@ from getdist import plots, MCSamples
 from getdist.mcsamples import loadMCSamples
 import corner
 import matplotlib
-matplotlib.use('TkAgg')
+import os
+
+if os.environ.get('DISPLAY','') == '':
+    matplotlib.use('Agg')  # headless mode
+else:
+    matplotlib.use('TkAgg')  # if running with GUI (e.g., locally)
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
