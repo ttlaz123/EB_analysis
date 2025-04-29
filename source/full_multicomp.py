@@ -344,12 +344,12 @@ def define_priors(calc_spectra, theory_comps, angle_degree=5):
     
 
     # dust priors
-    A_dust_priors = {"prior":{"min": 0, "max":15}, 
+    A_dust_priors = {"prior":{"min": -50, "max":150}, 
                             "ref": {"dist":"norm", "loc":6, "scale":1},
-                            "proposal":0.1}
+                            "proposal":1}
     alpha_dust_priors = {"prior":{"min": -1, "max":1}, 
                                 "ref": {"dist":"norm", "loc":-0, "scale":0.01},
-                                "proposal":0.01}
+                                "proposal":0.1}
 
     if(theory_comps == 'all'):
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
