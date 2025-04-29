@@ -642,6 +642,15 @@ def main():
             - BK18lf_fede01: Simulations with injected fEDE=0.01 signal.
             - BK18lf_fede01_sigl: fEDE=0.01 signal including sig_l scaling.
             - BK18lf_sim: Baseline BK18lf simulations for null testing.
+            - BK18lf_mhd    
+            - BK18lf_mkd    
+            - BK18lf_vansyngel
+            - BK18lf_gampmod      
+            - BK18lf_pysm1
+            - BK18lf_gaussdust    
+            - BK18lf_pysm2
+            - BK18lf_gdecorr      
+            - BK18lf_pysm3
 
             This choice determines the observed data path, covariance matrix, simulation path, and bandpass files.
             """)

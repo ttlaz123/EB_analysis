@@ -32,6 +32,13 @@ def set_file_paths(dataset):
     elif(dataset == 'BK18lf_sim'):
         DATASETNAME = 'BK18lf'
         DATASET_DIRNAME = 'BK18lf_sim'
+    elif(dataset in ['BK18lf_mhd', 'BK18lf_mkd', 'BK18lf_vansyngel',
+                     'BK18lf_gampmod', 'BK18lf_gaussdust','BK18lf_gdecorr',
+                     'BK18lf_pysm1', 'BK18lf_pysm2','BK18lf_pysm3',
+        ]):
+        DATASETNAME = 'BK18lf'
+        DATASET_DIRNAME = dataset
+
     else:
         raise ValueError(dataset + ' not one of the dataset options')
     
