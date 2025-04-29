@@ -352,7 +352,6 @@ def define_priors(calc_spectra, theory_comps, angle_degree=5):
                                 "proposal":0.01}
 
     if(theory_comps == 'all'):
-        params_dict['alpha_CMB'] = angle_priors
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
         for spec in ['EE', 'BB']:#, 'EB']:
 
