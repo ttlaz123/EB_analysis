@@ -4,7 +4,7 @@ import glob
 import shutil
 import copy
 import numpy as np
-
+import matplotlib.pyplot as plt
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from cobaya.run import run
 from cobaya.likelihood import Likelihood
@@ -154,11 +154,18 @@ class BK18_full_multicomp(Likelihood):
         ee = self.sim_common_data['eskilt']['EE_binned']
         bb = self.sim_common_data['eskilt']['BB_binned']
         eb = self.sim_common_data['eskilt']['EB_EDE']
+    
         sin4theta = np.sin(np.deg2rad(4 * angle_deg))/2
         cos4theta = np.cos(np.deg2rad(4 * angle_deg))
         expected = sin4theta * (ee - bb) + eb * cos4theta * g
         residual = observed - expected
-
+        #plt.figure()
+        #plt.plot(expected, label = 'alpha*ee+g*eb')
+        #plt.plot(observed, label='obs')
+        #plt.plot(ee * 0.01, label='0.01*ee')
+        #plt.plot(eb * 0.1, label='0.1*eb')
+        #plt.legend()
+        #plt.show()
         chisq = np.sum(residual**2 / (var))
         return chisq
 
