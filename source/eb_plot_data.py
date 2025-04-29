@@ -13,8 +13,9 @@ from getdist.mcsamples import loadMCSamples
 import corner
 import matplotlib
 import os
-
-if os.environ.get('DISPLAY','') == '':
+display_var = os.environ.get('DISPLAY','')
+print('Display Var:' + str(display_var))
+if  display_var == '':
     matplotlib.use('Agg')  # headless mode
 else:
     matplotlib.use('TkAgg')  # if running with GUI (e.g., locally)
