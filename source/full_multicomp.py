@@ -4,7 +4,8 @@ import glob
 import shutil
 import copy
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
+
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from cobaya.run import run
 from cobaya.likelihood import Likelihood
@@ -27,6 +28,7 @@ class BK18_full_multicomp(Likelihood):
     used_maps = []
     theory_comps='all' 
     spectra_type='all'
+    injected_signal = {}
     sim_common_data = {}
     observe_filepath = None
     def __init__(self, *args, **kwargs):
@@ -42,6 +44,9 @@ class BK18_full_multicomp(Likelihood):
                 self.theory_comps = kwargs['theory_comps']
             if('spectra_type' in kwargs):
                 self.spectra_type = kwargs['spectra_type']
+            if('injected_signal' in kwargs):
+                self.injected_signal = kwargs['injected_signal']
+            # Passing in the dict slows down the process by a lot
             #if('sim_common_data' in kwargs):
             #    self.sim_common_data = kwargs['sim_common_data']
             if('observe_filepath' in kwargs):
@@ -66,10 +71,23 @@ class BK18_full_multicomp(Likelihood):
                                                             self.used_maps,
                                                             self.map_reference_header,
                                                             num_bins = self.bin_num)
+        if(len(self.injected_signal) > 1):
+            self.binned_dl_observed_dict = ec.inject_signal_prebin(self.used_maps,
+                                                        self.injected_signal, 
+                                                        self.dl_theory,
+                                                        self.binned_dl_observed_dict,
+                                                        self.bpwf,
+                                                        self.map_reference_header)
         self.initial_theory_dict = ec.apply_initial_conditions(self.dl_theory, self.used_maps)
         self.binned_dl_observed_vec = self.dict_to_vec(self.binned_dl_observed_dict, 
                                                     self.used_maps)
-         
+        #print('Showing figs')
+        #plt.figure()
+        #plt.plot(self.dl_theory['EE']/100, label='EE/100')
+        #plt.plot(self.dl_theory['EB_EDE'], label = 'EB EDE')
+        #plt.legend()
+        #plt.show()
+
     def get_requirements(self):
         """
         Specify what is needed from other components, such as theory predictions.
@@ -98,6 +116,7 @@ class BK18_full_multicomp(Likelihood):
         # Calculate the Mahalanobis distance using the inverse covariance matrix
         chi_squared = residuals.T @ self.cov_inv @ residuals
         if(self.theory_comps == 'eskilt'):
+            #chi_squared = 0
             chi_squared += self.theory_eskilt(params_values)
         # Calculate the log-likelihood
         log_likelihood = -0.5 * chi_squared
@@ -226,7 +245,7 @@ def load_shared_data(input_args):
     """
     global SHARED_DATA_DICT, FILE_PATHS
     map_reference_header = None
-    FILE_PATHS = fp.set_file_paths(input_args.dataset)
+    FILE_PATHS = fp.set_file_paths(input_args.dataset, input_args.fede)
     
     SHARED_DATA_DICT['bpwf'], map_reference_header = ld.load_bpwf(FILE_PATHS['bpwf'], 
                                             map_reference_header, 
@@ -298,6 +317,7 @@ def run_bk18_likelihood(params_dict, observation_file_path, input_args,
                 "bin_num":  input_args.bin_num,
                 "theory_comps": input_args.theory_comps,
                 "spectra_type": input_args.spectra_type,
+                "injected_signal":input_args.injected_signal,
                 #"sim_common_data":SHARED_DATA_DICT,
                 "observe_filepath":observation_file_path
             }
@@ -448,6 +468,25 @@ def generate_cross_spectra(calc_spectra, do_crosses, spectra_type):
                 cross_spectra.append(cross_spectrum)
     return  cross_spectra 
 
+def get_injected_signal(calc_spectra, signal_type):
+    injected_signal = {}
+    num_spectra = len(calc_spectra)
+    count = 0
+    for spec in calc_spectra:
+        if(signal_type == 'pos'):
+            sig = count / num_spectra
+        elif(signal_type == 'neg'):
+            sig = -count / num_spectra
+        elif(signal_type == 'bal'):
+            sig = count / num_spectra * 2 - 1
+
+        else:
+            print('No signal injected')
+            return {} 
+        count += 1
+        injected_signal['alpha_' + spec] = sig
+    print('Injected signal: ' + str(injected_signal))
+    return injected_signal
 
 def multicomp_mcmc_driver(input_args):
     """
@@ -462,6 +501,9 @@ def multicomp_mcmc_driver(input_args):
     calc_spectra = ec.determine_map_freqs(input_args.map_set)
     # define dust params based on dustopts
     params_dict = define_priors(calc_spectra, input_args.theory_comps)
+    input_args.injected_signal = get_injected_signal(calc_spectra, 
+                                            signal_type=input_args.injected_signal)
+
     if(input_args.sim_num > 2):
         parallel_simulation(input_args, params_dict)
     else:
@@ -488,6 +530,7 @@ def multicomp_mcmc_driver(input_args):
                             bin_num= input_args.bin_num,
                             theory_comps= input_args.theory_comps,
                             spectra_type= input_args.spectra_type,
+                            injected_signal = input_args.injected_signal,
                             #"sim_common_data":SHARED_DATA_DICT,
                             observe_filepath= observation_file_path,
                             sim_common_dat = SHARED_DATA_DICT)
@@ -543,6 +586,7 @@ def run_simulation(sim_num, params_dict,input_args):
                     bin_num= input_args.bin_num,
                     theory_comps= input_args.theory_comps,
                     spectra_type= input_args.spectra_type,
+                    injected_signal = input_args.injected_signal,
                     #"sim_common_data":SHARED_DATA_DICT,
                     observe_filepath= observation_file_path,
                     sim_common_dat = SHARED_DATA_DICT)
@@ -698,7 +742,16 @@ def main():
         action="store_true",
         help="Plot the MCMC sim peaks. Default: False (off).",
     )
-
+    parser.add_argument(
+        '-i', "--injected_signal",
+        type=str,
+        choices=['none', 'pos', 'neg', 'bal'],
+        default="none",
+        help=(
+            "What kind of signal to inject (none, positive, negative, balanced)"
+            "Default: 'all'."
+        ),
+    )
     parser.add_argument(
         '-t', "--spectra_type",
         type=str,
@@ -707,6 +760,15 @@ def main():
         help=(
             "Which spectra to include. 'all' includes EE, BB, EB, etc., while 'eb' only includes EB-related spectra. "
             "Default: 'all'."
+        ),
+    )
+    parser.add_argument(
+        "--fede",
+        type=float,
+        default="0.07",
+        help=(
+            "F_ede curve to use for fitting. Set the f_ede parameter"
+            "Default: 0.07"
         ),
     )
 

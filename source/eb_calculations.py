@@ -824,6 +824,26 @@ def apply_EDE_shift(cross_map, dl_theory_dict, params_values, fixed_dust=True):
 
         ede_shift = (D_e1b2 - D_b1e2)
         return ede_shift * gMpl
+def inject_signal_prebin(used_maps, injected_signal, theory_dict, observed_dict, 
+                            bpwf, map_reference_header):
+    inject_dict = {}
+    for m in used_maps:
+        spec_type = determine_spectrum_type(m)
+        if(spec_type in ['EE', 'BB']):
+            inject_dict[m] = theory_dict[spec_type]
+        elif(spec_type in ['EB', 'BE']):
+            inject_dict[m] = 0
+    inject_dict = apply_det_rotation(inject_dict, injected_signal, theory_dict)
+    for m in used_maps:
+        spec_type = determine_spectrum_type(m)
+        if(spec_type in ['EE', 'BB']):
+            inject_dict[m] -= theory_dict[spec_type]
+
+    binned_inject_dict = apply_bpwf(map_reference_header, inject_dict, 
+                                    bpwf, used_maps, do_cross=True)
+    for m in used_maps:
+        observed_dict[m] += binned_inject_dict[m]
+    return observed_dict
 
 def inject_signal(used_maps, signal_params, 
                     binned_dl_theory_dict, binned_dl_observed_dict):

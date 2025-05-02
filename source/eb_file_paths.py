@@ -7,7 +7,7 @@ DATA_BASE_PATH = '/n/home08/liuto/cosmo_package/data/bicep_keck_2018/BK18_cosmom
 
 
 
-def set_file_paths(dataset):
+def set_file_paths(dataset, fede=0.07):
     if(dataset == 'BK18lf'):
         DATASETNAME = 'BK18lf'
         DATASET_DIRNAME = 'BK18lf'
@@ -72,7 +72,7 @@ def set_file_paths(dataset):
         "bpwf": BK18_BASE_PATH + 'windows/' + DATASETNAME + '_bpwf_bin*.txt',
         "covariance_matrix": BK18_BASE_PATH + DATASETNAME + '_covmat_dust.dat',
         "observed_data": BK18_BASE_PATH + DATASETNAME + '_cl_hat.dat',
-        "EDE_spectrum": '/n/home08/liuto/GitHub/EB_analysis/input_data/fEDE0.07_cl.dat',
+        "EDE_spectrum": '/n/home08/liuto/GitHub/EB_analysis/input_data/fEDE' + str(fede) + '_cl.dat',
         "sim_path": BK18_BASE_PATH + DATASETNAME + '_cl_hat_simXXX.dat'
     }
     return FILE_PATHS
