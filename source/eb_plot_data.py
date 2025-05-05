@@ -422,10 +422,12 @@ def plot_eigenvalues_eigenvectors(matrix):
     plt.show()
     return
 
-def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None):
+def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None, 
+                   use_median=True, percentile_clip=(0.5, 99.5)):
     modes_dict = {}
     single_df = None
     simcount = 0
+
     for i in range(1, sim_nums + 1):
         file_path = chains_path.replace('XXX', f'{i:03d}')
         print('loading:' + str(file_path))
@@ -438,57 +440,56 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None):
         except FileNotFoundError:
             print("Skipping " + file_path)
             continue
+
         chain_df = pd.read_csv(file_path, delim_whitespace=True, comment='#')
         chain_df.columns = corrected_header
+
         for column in chain_df.columns:
             if column not in modes_dict:
                 modes_dict[column] = []
-            mode = np.mean(chain_df[column])
-            modes_dict[column].append(mode)
+            value = np.median(chain_df[column]) if use_median else np.mean(chain_df[column])
+            modes_dict[column].append(value)
+
         simcount += 1
-    # Convert the modes dictionary to a DataFrame
+
     modes_df = pd.DataFrame.from_dict(modes_dict)
     default_cols = ['#', 'weight', 'minuslogpost', 'minuslogprior',
-                   'minuslogprior__0', 'chi2', 'chi2__my_likelihood']
+                    'minuslogprior__0', 'chi2', 'chi2__my_likelihood']
     param_names = [col for col in modes_df.columns if col not in default_cols]
-    print(param_names)
-    # Create a corner plot of the mean of modes
-    #print(modes_df)
-    #print(modes_df[param_names])
-    
-    
-        
-    colors = ['red', 'blue', 'green', 'orange']
-    for i in range(single_sim,single_sim+1):
-        fig = corner.corner(modes_df[param_names], 
-                        labels=param_names, 
-                    show_titles=True, 
-                    title_kwargs={"fontsize": 12},
-                    hist_kwargs={'color':'red', 'density':True},
-                    contour_kwargs={'colors':'red'})
+    print("Parameter names for plotting:", param_names)
 
-        if(single_path is None):
-            file_path = chains_path.replace('XXX', f'{i:03d}')    
-        else:
-            file_path = single_path
+    # Compute ranges for corner plot from red summary (modes_df)
+    ranges = []
+    for param in param_names:
+        low, high = np.percentile(modes_df[param], percentile_clip)
+        ranges.append((low, high))
+
+    for i in range(single_sim, single_sim + 1):
+        fig = corner.corner(modes_df[param_names],
+                            labels=param_names,
+                            show_titles=True,
+                            title_kwargs={"fontsize": 12},
+                            hist_kwargs={'color': 'red', 'density': True},
+                            contour_kwargs={'colors': 'red'},
+                            range=ranges)
+
+        file_path = single_path if single_path is not None else chains_path.replace('XXX', f'{i:03d}')
         single_df = pd.read_csv(file_path, delim_whitespace=True, comment='#')
         single_df.columns = corrected_header
-        corner.corner(single_df[param_names], labels=param_names,
-                    show_titles=False, 
-                    hist_kwargs={'color': 'blue', 'density':True},
-                    contour_kwargs={'colors': 'blue'}, 
-                    fig=fig)
-    
-    
-        # Show the plot
-        supertitle = 'Sim' + str(i) + ' (blue) on top of ' + str(simcount) + ' sims (red)'
+
+        corner.corner(single_df[param_names],
+                      labels=param_names,
+                      show_titles=False,
+                      hist_kwargs={'color': 'blue', 'density': True},
+                      contour_kwargs={'colors': 'blue'},
+                      fig=fig)
+
+        supertitle = f'Sim {i} (blue) on top of {simcount} sims (red)'
         plt.suptitle(supertitle)
-        outpath = chains_path.split('XXX')[0] + str(i) + '_summary.png'
+        outpath = chains_path.split('XXX')[0] + f'{i}_summary.png'
         plt.savefig(outpath)
         print('Saved to ' + outpath)
         plt.show()
-
-    return 
 
 def read_sampler(filepath):
     """
