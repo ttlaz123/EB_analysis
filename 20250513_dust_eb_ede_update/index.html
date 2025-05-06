@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Early Dark Energy EB Spectrum Dust Simulation Update</title>
+    <title>Early Dark Energy Dust and Polarization Miscalibration Simulation Update</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <!-- Load up MathJax for math notation -->
     <script type="text/x-mathjax-config">
@@ -29,7 +29,44 @@
     </header>
 
     <hr>
-
+    <section>
+        <h2>Introduction</h2>
+        <p>This posting is an update to the previous postings:</p>
+        <ul>
+        <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20240924_preliminary_eb_ede_results/">2024-09-24 Preliminary EB EDE Results</a></li>
+        <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20241203_multicomp_eb_ede_update/">2024-12-03 Multicomp EB EDE Update</a></li>
+        <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20250218_ede_forecast/">2025-02-18 EDE Forecast</a></li>
+        </ul>
+        <p>
+            We further demonstrate the robustness of the method for fitting to early dark energy parameters.
+            We first refactor our EDE fitting pipeline to also include the data from the EE and BB spectra. 
+            While the sensitivity to rotation angle and EDE parameters for EE and BB are much suppressed compared 
+            to EB, their presence helps calibrate nuisance parameters like dust, which in turn improves constraints 
+            on rotation angles determined by EB.
+            
+          </p>
+          <p>
+            We inject miscalibration rotation angles into our data to see their effect on the pipeline.
+            We run MCMC chains using EB only, then with EE and EB (excluding BB), and finally with all EE, EB, and BB.
+            This progression lets us isolate the influence of each spectrum type on the inferred parameters when signals are injected.
+          </p>
+          <p>
+            The injected miscalibration angles (in degrees) for BK18_220, BK18_150, BK18_K95, and BK18_B95e (B95lf) are:
+            <ul>
+              <li>Positive: 0, 0.25, 0.5, 0.75</li>
+              <li>Negative: 0, -0.25, -0.5, -0.75</li>
+              <li>Balanced: -1, -0.5, 0, 0.5</li>
+            </ul>
+            We apply these to two datasets: BK18lf (no EDE injection) and BK18lf_fede01 (with EDE injected at fede=0.07, g=1).
+            This tests whether polarization rotation miscalibration could falsely enhance the EDE signal.
+          </p>
+           
+        <p>
+            We also run the fitting over the dust models presented in 
+            <a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20210122_BK18mm_final_altdust/">J. Willmert's posting</a>.
+            This is to show that different dust models would not impact our evaluation of g.
+        </p>
+    </section>
     <section>
    <h2>Bias checks</h2>
    <figure>
