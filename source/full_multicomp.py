@@ -143,7 +143,6 @@ class BK18_full_multicomp(Likelihood):
                 spectype = ec.determine_spectrum_type(map_name)
 
                 spec = spectra_dict[map_name].copy()
-                #spec[7:9] = 0
                 big_vector.append(spec)
 
         # Concatenate all spectra arrays into a single 1D array

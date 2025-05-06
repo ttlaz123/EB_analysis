@@ -123,8 +123,8 @@
             ]
         },
         function (params) {
-            let dirbase = '/liuto/home/GitHub/EB_analysis/'
-            let dirpath = dirbase + '/chains/';
+            let dirbase = '/liuto'
+            let dirpath = dirbase + '/ede_chains/';
             let mcmc_folder = params.ede + params.bin_num15 + params.theory_comp + params.spectra + '/';
             let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
             let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
@@ -148,103 +148,7 @@
     </script>
 </figure>
     </section>
-   <section>
-   <h2>Trying different dust models</h2>
-<figure>
-    <img alt="Fitting to different dust models" id="dustmodels" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
-    <figcaption>
-        <p>Interactive plot pager for multicomponent analysis of the Early Dark Energy (EDE) spectrum.
-            Visualizes the fits and triangle plots for 499 simulations.</p>
-        <ul>
-            <li><strong>Map Type</strong>: Choose the type of plot to visualize:
-                <ul>
-                    <li>Best Fit EE: Displays best fit to the EE spectrum.</li>
-                    <li>Best Fit EB: Displays best fit to the EB spectrum.</li>
-                    <li>Best Fit BB: Displays best fit to the BB spectrum.</li>
-                    <li>Triangle Plot: Shows parameter correlation contours.</li>
-                    <li>Summary plot: shows the peaks of all the triangle plot sims.</li>
-                </ul>
-            </li>
-            <li><strong>Bins Used</strong>: Choose the binning scheme applied to spectra:
-                <ul>
-                    <li>2–15: Uses bins 2 through 15.</li>
-                </ul>
-            </li>
-            <li><strong>Dust model</strong>: Select the theoretical dust model used for comparison:
-                <ul>
-                Dust models acquired from <a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20210122_BK18mm_final_altdust/">J. Willmert's posting</a>
-                </ul>
-            </li>
-            </li>
-            <li><strong>Map Sim num</strong>: Choose the simulation number (three digits) to view results for a particular realization.</li>
-        </ul>
-        <p>This interactive plot allows detailed exploration of multicomponent analysis by adjusting map types, binning, theoretical assumptions, spectra selections, EDE signal injections, and simulation numbers.</p>
-    </figcaption>
-
-    <script type="text/javascript">
-
-        pager.link("#dustmodels", {
-            'Map Sim Num Digit1|digit1': simnums,
-            'Digit2|digit2': simnums,
-            'Digit3|digit3': simnums,
-
-            'Map Type|m_map_type': [
-                'Best Fit EE|_bestfitEE',
-                'Best Fit EB|_bestfitEB',
-                'Best Fit BB|_bestfitBB',
-                'Triangle Plot|_triangle_plot',
-                'Summary Plot (Peaks histogram)|sim1_summary'
-            ],
-            'Bins Used|bin_num15': [
-                '2-15|_bin15',
-            ],
-            'Dust model|dust_model':[
-                'No Dust|_nodust',
-                'Gaussian Dust|_gdust',
-                'pysm1|_pysm1',
-                'pysm2|_pysm2',
-                'pysm3|_pysm3',
-                'mhd|_mhd',
-                'mkd|_mkd',
-                'gdecorr|_gdecorr',
-                'gampmod|_gampmod',
-                'vansyngel|_vansyngel',
-
-            ],
-            'Spectra|spectrad':[
-                'All|_all',
-            ],
-            'Injected EDE Signal|eded': [
-                'g = 0|zeroeb'
-            ]
-        },
-        function (params) {
-            let dirbase2 = '/liuto'
-            let dirpath = dirbase2 + '/ede_chains/';
-            let mcmc_folder = params.eded + params.bin_num15 + params.dust_model + params.spectrad + '/';
-            let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
-            let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
-            if(params.m_map_type == 'sim1_summary'){
-                name = dirpath + mcmc_folder + params.m_map_type + '.png'
-            }
-            console.log(name);
-            return name;
-        });
-
-        pager.setparams({
-            'digit1':'0',
-            'digit2': '0',
-            'digit3': '1',
-            'm_map_type': '_bestfitEB',
-            'bin_num15': '_bin15',
-            'eded': 'zeroeb',
-            'spectrad':'_all',
-            'dust_model':'_pysm1',
-        });
-    </script>
-</figure>
-</section>
-
+ 
 <section>
 
 <h2>Injecting detector rotation miscalibration</h2>
@@ -342,6 +246,104 @@
 </figure>
 </section>
 
+<section>
+    <h2>Trying different dust models</h2>
+ <figure>
+     <img alt="Fitting to different dust models" id="dustmodels" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
+     <figcaption>
+         <p>Interactive plot pager for multicomponent analysis of the Early Dark Energy (EDE) spectrum.
+             Visualizes the fits and triangle plots for 499 simulations.</p>
+         <ul>
+             <li><strong>Map Type</strong>: Choose the type of plot to visualize:
+                 <ul>
+                     <li>Best Fit EE: Displays best fit to the EE spectrum.</li>
+                     <li>Best Fit EB: Displays best fit to the EB spectrum.</li>
+                     <li>Best Fit BB: Displays best fit to the BB spectrum.</li>
+                     <li>Triangle Plot: Shows parameter correlation contours.</li>
+                     <li>Summary plot: shows the peaks of all the triangle plot sims.</li>
+                 </ul>
+             </li>
+             <li><strong>Bins Used</strong>: Choose the binning scheme applied to spectra:
+                 <ul>
+                     <li>2–15: Uses bins 2 through 15.</li>
+                 </ul>
+             </li>
+             <li><strong>Dust model</strong>: Select the theoretical dust model used for comparison:
+                 <ul>
+                 Dust models acquired from <a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20210122_BK18mm_final_altdust/">J. Willmert's posting</a>
+                 </ul>
+             </li>
+             </li>
+             <li><strong>Map Sim num</strong>: Choose the simulation number (three digits) to view results for a particular realization.</li>
+         </ul>
+         <p>This interactive plot allows detailed exploration of multicomponent analysis by adjusting map types, binning, theoretical assumptions, spectra selections, EDE signal injections, and simulation numbers.</p>
+     </figcaption>
+ 
+     <script type="text/javascript">
+ 
+         pager.link("#dustmodels", {
+             'Map Sim Num Digit1|digit1': simnums,
+             'Digit2|digit2': simnums,
+             'Digit3|digit3': simnums,
+ 
+             'Map Type|m_map_type': [
+                 'Best Fit EE|_bestfitEE',
+                 'Best Fit EB|_bestfitEB',
+                 'Best Fit BB|_bestfitBB',
+                 'Triangle Plot|_triangle_plot',
+                 'Summary Plot (Peaks histogram)|sim1_summary'
+             ],
+             'Bins Used|bin_num15': [
+                 '2-15|_bin15',
+             ],
+             'Dust model|dust_model':[
+                 'No Dust|_nodust',
+                 'Gaussian Dust|_gdust',
+                 'pysm1|_pysm1',
+                 'pysm2|_pysm2',
+                 'pysm3|_pysm3',
+                 'mhd|_mhd',
+                 'mkd|_mkd',
+                 'gdecorr|_gdecorr',
+                 'gampmod|_gampmod',
+                 'vansyngel|_vansyngel',
+ 
+             ],
+             'Spectra|spectrad':[
+                 'All|_all',
+             ],
+             'Injected EDE Signal|eded': [
+                 'g = 0|zeroeb'
+             ]
+         },
+         function (params) {
+             let dirbase2 = '/liuto'
+             let dirpath = dirbase2 + '/ede_chains/';
+             let mcmc_folder = params.eded + params.bin_num15 + params.dust_model + params.spectrad + '/';
+             let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
+             let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
+             if(params.m_map_type == 'sim1_summary'){
+                 name = dirpath + mcmc_folder + params.m_map_type + '.png'
+             }
+             console.log(name);
+             return name;
+         });
+ 
+         pager.setparams({
+             'digit1':'0',
+             'digit2': '0',
+             'digit3': '1',
+             'm_map_type': '_bestfitEB',
+             'bin_num15': '_bin15',
+             'eded': 'zeroeb',
+             'spectrad':'_all',
+             'dust_model':'_pysm1',
+         });
+     </script>
+ </figure>
+ </section>
+
+ 
 </body>
 
 </html>
