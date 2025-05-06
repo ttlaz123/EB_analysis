@@ -20,7 +20,7 @@
     <link rel="stylesheet" type="text/css" href="scripts/pager.css">
 
     <header>
-        <h1>Early Dark Energy EB Spectrum Dust Analysis Simulation Update</h1>
+        <h1>Early Dark Energy Dust and Polarization Miscalibration Simulation Update</h1>
 
         <time datetime="2025 May 13" class="published updated">
             2025 May 13
@@ -32,43 +32,96 @@
     <section>
         <h2>Introduction</h2>
         <p>This posting is an update to the previous postings:</p>
-        <ul>
-        <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20240924_preliminary_eb_ede_results/">2024-09-24 Preliminary EB EDE Results</a></li>
-        <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20241203_multicomp_eb_ede_update/">2024-12-03 Multicomp EB EDE Update</a></li>
-        <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20250218_ede_forecast/">2025-02-18 EDE Forecast</a></li>
-        </ul>
-        <p>
-            We further demonstrate the robustness of the method for fitting to early dark energy parameters.
-            We first refactor our EDE fitting pipeline to also include the data from the EE and BB spectra. 
-            While the sensitivity to rotation angle and EDE parameters for EE and BB are much suppressed compared 
-            to EB, their presence helps calibrate nuisance parameters like dust, which in turn improves constraints 
-            on rotation angles determined by EB.
-            
-          </p>
-          <p>
-            We inject miscalibration rotation angles into our data to see their effect on the pipeline.
-            We run MCMC chains using EB only, then with EE and EB (excluding BB), and finally with all EE, EB, and BB.
-            This progression lets us isolate the influence of each spectrum type on the inferred parameters when signals are injected.
-          </p>
-          <p>
-            The injected miscalibration angles (in degrees) for BK18_220, BK18_150, BK18_K95, and BK18_B95e (B95lf) are:
-            <ul>
-              <li>Positive: 0, 0.25, 0.5, 0.75</li>
-              <li>Negative: 0, -0.25, -0.5, -0.75</li>
-              <li>Balanced: -1, -0.5, 0, 0.5</li>
-            </ul>
-            We apply these to two datasets: BK18lf (no EDE injection) and BK18lf_fede01 (with EDE injected at fede=0.07, g=1).
-            This tests whether polarization rotation miscalibration could falsely enhance the EDE signal.
-          </p>
+        <p>This posting builds upon previous updates:</p>
+  <ul>
+    <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20240924_preliminary_eb_ede_results/">
+        2024-09-24: Preliminary EB EDE Results</a></li>
+    <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20241203_multicomp_eb_ede_update/">
+        2024-12-03: Multicomponent EB EDE Update</a></li>
+    <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20250218_ede_forecast/">
+        2025-02-18: EDE Forecast</a></li>
+  </ul>
+  <p>
+    Here, we further demonstrate the robustness of our method for fitting early dark energy (EDE)
+    parameters by expanding the pipeline to also include EE and BB spectra alongside EB. While
+    EE and BB are far less sensitive to polarization rotation or EDE parameters than EB,
+    their inclusion helps calibrate nuisance parameters like dust, ultimately tightening
+    constraints on the EB-inferred rotation angle.
+</p>
+<p>
+    To test the impact of miscalibration, we inject artificial rotation angles into the maps
+    and fit the parameters using three combinations of spectra: EB only, EE + EB (excluding BB),
+    and the full EE + EB + BB set. This progression allows us to isolate the influence of each
+    spectrum type on the parameter recovery in the presence of injected signals.
+</p>
+
+<p>
+    The injected rotation angles (in degrees) for BK18_220, BK18_150, BK18_K95, and BK18_B95e
+    (B95lf) are grouped as follows:
+</p>
+
+<ul>
+    <li><strong>Positive:</strong> 0, 0.25, 0.5, 0.75</li>
+    <li><strong>Negative:</strong> 0, -0.25, -0.5, -0.75</li>
+    <li><strong>Balanced:</strong> -1, -0.5, 0, 0.5</li>
+</ul>
+
+<p>
+    These are applied to two datasets: <strong>BK18lf</strong> (no EDE injection) and
+    <strong>BK18lf_fede01</strong> (EDE injected with
+    \( f_{\mathrm{EDE}} = 0.07 \), \( g = 1 \)). This tests whether miscalibration-induced
+    polarization rotation could artificially enhance an EDE signal.
+</p>
            
-        <p>
-            We also run the fitting over the dust models presented in 
-            <a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20210122_BK18mm_final_altdust/">J. Willmert's posting</a>.
-            This is to show that different dust models would not impact our evaluation of g.
-        </p>
+<p>
+    Finally, we assess the robustness of our constraints against different dust models by
+    fitting over the dust scenarios presented in
+    <a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20210122_BK18mm_final_altdust/">
+        J. Willmert’s posting
+    </a>. This helps determine whether the inferred coupling \( g \) is sensitive to dust modeling.
+</p>
     </section>
     <section>
-   <h2>Bias checks</h2>
+   <h2>Initial Bias checks</h2>
+   <p>
+    We begin by running MCMC chains on the two datasets: <strong>BK18lf</strong> (no EDE injection)
+    and <strong>BK18lf_fede01</strong> (with EDE injected). Both datasets are based on the
+    standard BK18 large-field map combination (3553×1459×5260×5261). The only difference is that
+    <strong>BK18lf_fede01</strong> includes a nonzero EB spectrum corresponding to best-fit EDE
+    parameters from
+    <a href="https://arxiv.org/pdf/2209.07804">Murai (2022)</a>,
+    specifically the case with \( f_{\mathrm{EDE}} = 0.07 \).
+</p>
+
+<p>
+    This choice differs from
+    <a href="https://arxiv.org/pdf/2303.15369">Eskilt (2023)</a>,
+    who considers other values such as \( f_{\mathrm{EDE}} = 0.0872 \) and
+    \( f_{\mathrm{EDE}} = 0.1271 \). For our final fits of the coupling \( g \),
+    we plan to explore a grid of \( f_{\mathrm{EDE}} \) values based on multiple best-fit spectra.
+</p>
+<p>
+    For each dataset, we fit to three spectrum combinations: EB only, EE + EB, and full EE + EB + BB.
+    We also evaluate two dust models:
+</p>
+
+<ol>
+    <li>
+        <strong>No dust:</strong> We set dust to zero and use base EE and BB theory curves
+        (with lensing) along with an EB theory curve derived from the EDE model.
+    </li>
+    <li>
+        <strong>Nominal dust:</strong> Following the assumptions in
+        <a href="https://bicep.rc.fas.harvard.edu/dbeck/20230202_cmbbirefringence/">
+            Dominic’s posting
+        </a>, we set \( P_{\text{cal}} = 1 \) and ignore synchrotron emission.
+        We fit for rotation angle \( \alpha \) and dust amplitude \( A_{\text{dust}} \),
+        using separate \( A_{\text{dust}} \) parameters for EE, BB, and EB.
+        The dust spectral index \( \beta \) is shared across all spectra.
+    </li>
+</ol>
+
+
    <figure>
     <img alt="Multicomponent Analysis EB Spectrum" id="dustfigs" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
     <figcaption>
@@ -143,6 +196,108 @@
             'Bins Used|bin_num15': [
                 '2-15|_bin15',
             ],
+            'Dust Model|theory_comp':[
+                'Fixed dust = zero|_fixeddust',
+                'Gaussian dust|_gdust',
+            ],
+            'Spectra|spectra':[
+                'All|_all',
+                'No BB|_nob',
+                'EB only|_eb',
+            ],
+            'Injected EDE Signal|ede': [
+                'Fede = 0.07, g = 1|fede01',
+                'g = 0|zeroeb'
+            ]
+        },
+        function (params) {
+            let dirbase = '/liuto'
+            let dirpath = dirbase + '/ede_chains/';
+            let mcmc_folder = params.ede + params.bin_num15 + params.theory_comp + params.spectra + '/';
+            let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
+            let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
+            if(params.m_map_type == 'sim1_summary'){
+                name = dirpath + mcmc_folder + params.m_map_type + '.png'
+            }
+            console.log(name);
+            return name;
+        });
+
+        pager.setparams({
+            'digit1':'0',
+            'digit2': '0',
+            'digit3': '1',
+            'm_map_type': '_bestfitEB',
+            'bin_num15': '_bin15',
+            'ede': 'zeroeb',
+            'spectra':'_all',
+            'theory_comp':'_fixeddust',
+        });
+    </script>
+</figure>
+
+<figure>
+    <img alt="Multicomponent Analysis EB Spectrum" id="sigl" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
+    <figcaption>
+        <p>Interactive plot pager for multicomponent analysis of the Early Dark Energy (EDE) spectrum.
+            Visualizes the fits and triangle plots for 499 simulations.</p>
+        <ul>
+            <li><strong>Map Type</strong>: Choose the type of plot to visualize:
+                <ul>
+                    <li>Best Fit EE: Displays best fit to the EE spectrum.</li>
+                    <li>Best Fit EB: Displays best fit to the EB spectrum.</li>
+                    <li>Best Fit BB: Displays best fit to the BB spectrum.</li>
+                    <li>Triangle Plot: Shows parameter correlation contours.</li>
+                </ul>
+            </li>
+            <li><strong>Bins Used</strong>: Choose the binning scheme applied to spectra:
+                <ul>
+                    <li>2–15: Uses bins 2 through 15.</li>
+                </ul>
+            </li>
+            <li><strong>Theory comp</strong>: Select the theoretical model used for comparison:
+                <ul>
+                    <li>Fixed dust fit: Dust parameters fixed to zero.</li>
+                    <li>With Dust fit: Dust parameters are floated in the fit.</li>
+                    <li>Signal Only: Only the injected signal is fit, no dust model or noise.</li>
+                    <li>Fixed angle signal only: Signal-only fit with angle fixed to 0.</li>
+                </ul>
+            </li>
+            <li><strong>Spectra</strong>: Choose which spectra to include in the fit:
+                <ul>
+                    <li>All: Includes EE, EB, and BB.</li>
+                    <li>No BB: Includes EE and EB only.</li>
+                    <li>EB only: Only EB spectrum is used.</li>
+                </ul>
+            </li>
+            <li><strong>Injected EDE Signal</strong>: Select which Early Dark Energy (EDE) signal was injected:
+                <ul>
+                    <li>Fede = 0.07, g = 1: Injected signal with EDE.</li>
+                    <li>g = 0: No rotation, null birefringence.</li>
+                </ul>
+            </li>
+            <li><strong>Map Sim num</strong>: Choose the simulation number (three digits) to view results for a particular realization.</li>
+        </ul>
+        <p>This interactive plot allows detailed exploration of multicomponent analysis by adjusting map types, binning, theoretical assumptions, spectra selections, EDE signal injections, and simulation numbers.</p>
+    </figcaption>
+
+    <script type="text/javascript">
+
+        pager.link("#sigl", {
+            'Map Sim Num Digit1|digit1': simnums,
+            'Digit2|digit2': simnums,
+            'Digit3|digit3': simnums,
+
+            'Map Type|m_map_type': [
+                'Best Fit EE|_bestfitEE',
+                'Best Fit EB|_bestfitEB',
+                'Best Fit BB|_bestfitBB',
+                'Triangle Plot|_triangle_plot',
+                'Summary Plot (Peaks histogram)|sim1_summary'
+            ],
+            'Bins Used|bin_num15': [
+                '2-15|_bin15',
+            ],
             'Theory comp|theory_comp':[
                 'Fixed dust fit|_fixeddust',
                 'With Dust fit|_gdust',
@@ -156,7 +311,6 @@
             ],
             'Injected EDE Signal|ede': [
                 'Fede = 0.07, g = 1|fede01',
-                'g = 0|zeroeb'
             ]
         },
         function (params) {
