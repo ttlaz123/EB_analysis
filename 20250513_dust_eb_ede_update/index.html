@@ -235,7 +235,16 @@
         });
     </script>
 </figure>
-Below is a summary of the results over the peaks of the simulations.
+<p>
+    We notice that for the best-fit BB plots, when BB is not included in the fit,  
+    the model deviates significantly from the data.  
+    This mismatch is not driven by polarization rotation or <em>g</em>,  
+    but rather by the fact that BB dust becomes unconstrained when excluded from the fit.  
+    This effect is further supported by the behavior seen in the signal-only (sigl) plots.
+  </p>
+  <p>
+    Below is a summary of the results over the peaks of the simulations.
+  </p>
 <p>
     MCMC fit results for <em>g</em> = 0 (no dust model). We see that while there  
     is a slight positive bias for <em>g</em> and a slight negative bias for  
@@ -243,7 +252,7 @@ Below is a summary of the results over the peaks of the simulations.
     the overall posterior spread.
   </p>
 <table>
-   
+    <caption>MCMC fit results for <em>g</em> = 0 (no dust model)</caption>
     <thead>
       <tr>
         <th>Spectra</th>
@@ -291,7 +300,7 @@ Below is a summary of the results over the peaks of the simulations.
     that the BB data drive the apparent bias in the full-spectrum analysis.
   </p>
   <table>
-  
+    MCMC fit results for <em>g</em> = 1 (no dust model)
     <thead>
       <tr>
         <th>Spectra</th>
@@ -351,7 +360,7 @@ Below is a summary of the results over the peaks of the simulations.
   </p>
   
   <table>
-
+    <caption>MCMC fit results for <em>g</em> = 0 (with dust model)</caption>
     <thead>
       <tr>
         <th>Spectra</th>
@@ -417,9 +426,98 @@ Below is a summary of the results over the peaks of the simulations.
       </tr>
     </tbody>
   </table>
-  
-
-
+  <p>
+    MCMC fit results for <em>g</em> = 1 (with dust model).  
+    Fitting all three spectra again yields suppression of the recovered coupling,  
+    compensated by shifts in the rotation angles, reflecting a degeneracy between  
+    the injected EDE signal and polarization miscalibration.  
+    Omitting BB or using EB‑only restores the coupling to the expected value,  
+    with only modest increases in uncertainty—consistent with the no‑dust  
+    <em>g</em> = 1 case.  
+    Similar to the <em>g</em> = 0 results, the EE and BB dust amplitudes and spectral index  
+    remain well constrained in the full‑spectrum fit, while the EB dust amplitude stays  
+    unconstrained.  
+    Removing BB or EE leaves the corresponding dust parameters driven by the priors.  
+    Across all configurations, the recovered coupling and rotation angles remain stable,  
+    demonstrating the pipeline’s robustness.  
+    Our dust constraints agree with  
+    <a href="https://bicep.rc.fas.harvard.edu/dbeck/20230202_cmbbirefringence/">
+      Dominic’s posting
+    </a>, aside from expected differences due to dataset choice.
+  </p>
+  <table>
+    <caption>MCMC fit results for <em>g</em> = 1 (with dust model)</caption>
+    <thead>
+      <tr>
+        <th>Spectra</th>
+        <th>g</th>
+        <th>α<sub>220</sub> (°)</th>
+        <th>α<sub>150</sub> (°)</th>
+        <th>α<sub>K95</sub> (°)</th>
+        <th>α<sub>B95lf</sub> (°)</th>
+        <th>A<sub>dust</sub><sup>EE</sup></th>
+        <th>α<sub>dust</sub><sup>EE</sup> (°)</th>
+        <th>A<sub>dust</sub><sup>BB</sup></th>
+        <th>α<sub>dust</sub><sup>BB</sup> (°)</th>
+        <th>A<sub>dust</sub><sup>EB</sup></th>
+        <th>α<sub>dust</sub><sup>EB</sup> (°)</th>
+        <th>β</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>All</th>
+        <td>0.73 ± 0.30</td>
+        <td>0.10 ± 0.25</td>
+        <td>0.13 ± 0.16</td>
+        <td>0.12 ± 0.22</td>
+        <td>0.13 ± 0.17</td>
+        <td>7.65 ± 1.47</td>
+        <td>-0.40 ± 0.22</td>
+        <td>3.54 ± 0.74</td>
+        <td>-0.31 ± 0.20</td>
+        <td>-0.03 ± 0.33</td>
+        <td>—</td>
+        <td>1.60 ± 0.14</td>
+      </tr>
+      <tr>
+        <th>No BB</th>
+        <td>0.98 ± 0.42</td>
+        <td>-0.02 ± 0.25</td>
+        <td>0.00 ± 0.20</td>
+        <td>-0.01 ± 0.25</td>
+        <td>-0.02 ± 0.18</td>
+        <td>8.24 ± 1.66</td>
+        <td>-0.39 ± 0.21</td>
+        <td>—</td>
+        <td>—</td>
+        <td>0.02 ± 0.36</td>
+        <td>—</td>
+        <td>1.76 ± 0.26</td>
+      </tr>
+      <tr>
+        <th>EB only</th>
+        <td>1.00 ± 0.42</td>
+        <td>-0.03 ± 0.25</td>
+        <td>-0.01 ± 0.20</td>
+        <td>-0.03 ± 0.27</td>
+        <td>-0.02 ± 0.19</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+        <td>0.02 ± 0.38</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>
+    We initially found it concerning that the recovered coupling <em>g</em> was heavily suppressed  
+    when including the BB spectrum.  
+    To investigate this further, we performed MCMC fits on a “signal‑only” <em>g</em> = 1 dataset  
+    with no dust or noise, comparing chains with and without BB to isolate its impact.
+  </p>
 <figure>
     <img alt="Multicomponent Analysis EB Spectrum" id="sigl" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
     <figcaption>
@@ -522,6 +620,55 @@ Below is a summary of the results over the peaks of the simulations.
         });
     </script>
 </figure>
+<p>
+    For the signal‑only dataset with <em>g</em> = 1, fitting all three spectra again recovers a slightly  
+    suppressed value of the coupling with small, consistent positive shifts in the rotation angles.  
+    Similarly, removing BB or using EB only restores the coupling to its true injected value,  
+    while all rotation angles shift back to near zero.  
+    These results clearly demonstrate that BB is the primary spectrum causing suppression of 
+    recovering the early dark energy signal, while EB is responsible for breaking the degeneracy  
+    with polarization angle miscalibration.
+  </p>
+
+  <table>
+    <caption>MCMC fit results for <em>g</em> = 1 (signal‑only “sigl” dataset)</caption>
+    <thead>
+      <tr>
+        <th>Spectra</th>
+        <th><em>g</em></th>
+        <th>α<sub>220</sub> (°)</th>
+        <th>α<sub>150</sub> (°)</th>
+        <th>α<sub>K95</sub> (°)</th>
+        <th>α<sub>B95lf</sub> (°)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>All</th>
+        <td>0.69 ± 0.17</td>
+        <td>0.12 ± 0.08</td>
+        <td>0.12 ± 0.09</td>
+        <td>0.12 ± 0.10</td>
+        <td>0.12 ± 0.08</td>
+      </tr>
+      <tr>
+        <th>No BB</th>
+        <td>0.97 ± 0.25</td>
+        <td>-0.01 ± 0.12</td>
+        <td>0.00 ± 0.12</td>
+        <td>-0.01 ± 0.13</td>
+        <td>0.00 ± 0.12</td>
+      </tr>
+      <tr>
+        <th>EB Only</th>
+        <td>0.97 ± 0.25</td>
+        <td>-0.01 ± 0.12</td>
+        <td>-0.01 ± 0.12</td>
+        <td>-0.01 ± 0.13</td>
+        <td>-0.01 ± 0.12</td>
+      </tr>
+    </tbody>
+  </table>
     </section>
  
 <section>
