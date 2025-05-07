@@ -47,7 +47,7 @@
     <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20250218_ede_forecast/">
         2025-02-18: EDE Forecast</a></li>
   </ul>
-  <p></p>
+  <p>
     Here, we further demonstrate the robustness of our method for fitting early dark energy (EDE)
     parameters by expanding the pipeline to also include EE and BB spectra alongside EB. While
     EE and BB are far less sensitive to polarization rotation or EDE parameters than EB,
@@ -179,8 +179,8 @@
   <p>
     For each spectrum type (e.g., EB), we stack the bandpowers across all multipole bins 
     and frequency pairs (\( \nu_1 \times \nu_2 \)) into a single data vector. 
-    The corresponding theoretical prediction is obtained by forward-modeling the 
-    effect of birefringence and miscalibration on the CMB and foreground signals.
+    The corresponding theoretical prediction is obtained by modeling the 
+    effect of miscalibration on the CMB and early dark energy signals.
   </p>
   <p>
     The likelihood is defined as:
@@ -188,7 +188,7 @@
   
   <p>
     \[
-    -2\ln \mathcal{L} = \sum_{\ell,\,\nu_1 \times \nu_2} 
+    -2\ln \mathcal{L} = 
     \left( \bar{D}_\ell^{\rm theory} - D_\ell^{\rm data} \right)^T 
     \Sigma^{-1} 
     \left( \bar{D}_\ell^{\rm theory} - D_\ell^{\rm data} \right)
@@ -198,6 +198,9 @@
     where \( D_\ell^{\rm data} \) are the measured bandpowers, 
     \( \bar{D}_\ell^{\rm theory} \) are the model predictions, and
      \( \Sigma \) is the covariance matrix derived from simulations. 
+     The theory and data vectors stack each cross-spectrum from every pair 
+     of frequencies that we wish to include, whether that is EB, EE, BB, 
+     or some combination of the three spectra types. 
      The covariance accounts for both statistical uncertainties and systematics 
      such as instrumental noise and foreground residuals.
   </p>
@@ -209,8 +212,7 @@
   
   <p>
     \[
-    \theta = \left\{ \alpha_{\rm cmb}, \{\alpha^\nu\}, \text{foreground amplitudes}, 
-    \text{spectral indices}, \ldots \right\}
+    \theta = \left\{ \alpha_{\rm cmb}, \{\alpha^\nu\}, \text{dust parameters}, \ldots \right\}
     \]
   </p>
   
@@ -221,32 +223,17 @@
   <p>
     The posterior distribution \( P(\theta | D_{\ell}^{\rm data}) \propto \mathcal{L}(D|\theta)\,
     P(\theta) \) is explored using Markov Chain Monte Carlo (MCMC) via <code>Cobaya</code>. 
-    Chains are run until convergence, assessed by the Gelman-Rubin criterion \( R-1 < 0.01 \),
+    Chains are run until convergence, assessed by the Gelman-Rubin criterion \( R-1 < 0.03 \),
      and constraints are quoted from marginalized posteriors.
   </p>
 <h3>Further tests</h3>
 <p>
-    To test the impact of miscalibration, we inject artificial rotation angles into the maps
+    To test the impact of detector miscalibration on the best fit parameters, 
+    we inject artificial rotation angles into the maps
     and fit the parameters using three combinations of spectra: EB only, EE + EB (excluding BB),
     and the full EE + EB + BB set. This progression allows us to isolate the influence of each
     spectrum type on the parameter recovery in the presence of injected signals.
 </p>
-
-
-
-<p>
-    These are applied to two datasets: <strong>BK18lf</strong> (no EDE injection) and
-    <strong>BK18lf_fede01</strong> (EDE injected with
-    \( f_{\mathrm{EDE}} = 0.07 \), \( g = 1 \)). This tests whether miscalibration-induced
-    polarization rotation could artificially enhance or suppress an EDE signal.
-</p>
-    <p>
-    We use ( f{\mathrm{EDE}} = 0.07 ), corresponding to the best-fit EB spectrum
-    available from <a href="https://arxiv.org/pdf/2209.07804">Murai (2022)</a>. While this
-    differs from values considered by <a href="https://arxiv.org/pdf/2303.15369">Eskilt (2023)</a>,
-    such as ( f{\mathrm{EDE}} = 0.0872 ) and ( 0.1271 ), our final analysis will include
-    a grid of ( f_{\mathrm{EDE}} ) values to evaluate sensitivity across multiple scenarios.
-</p>       
 <p>
     Finally, we assess the robustness of our constraints against different dust models by
     fitting over the dust scenarios presented in
@@ -255,65 +242,57 @@
     </a>. This helps determine whether the inferred coupling \( g \) is sensitive to dust modeling.
 </p>
     </section>
-    <section>
-   <h2>Initial Bias Checks</h2>
-   <p>
-    We begin by running MCMC chains on the two datasets: <strong>BK18lf</strong> (no EDE injection)
-    and <strong>BK18lf_fede01</strong> (with EDE injected). Both datasets are based on the
-    standard BK18 large-field map combination (3553×1459×5260×5261). The only difference is that
-    <strong>BK18lf_fede01</strong> includes a nonzero EB spectrum corresponding to best-fit EDE
-    parameters from
-    <a href="https://arxiv.org/pdf/2209.07804">Murai (2022)</a>,
-    specifically the case with \( f_{\mathrm{EDE}} = 0.07 \).
-</p>
 
-<p>
-    This choice differs from
-    <a href="https://arxiv.org/pdf/2303.15369">Eskilt (2023)</a>,
-    who considers other values such as \( f_{\mathrm{EDE}} = 0.0872 \) and
-    \( f_{\mathrm{EDE}} = 0.1271 \). For our final fits of the coupling \( g \),
-    we plan to explore a grid of \( f_{\mathrm{EDE}} \) values based on multiple best-fit spectra.
-</p>
-<p>
-    We inject the EDE signal exclusively into the EB spectrum, consistent with the expectation
-    that EE and BB modifications from EDE are negligible in the absence of polarization rotation.
-    Since the simulations assume zero rotation angle, there are no mechanisms by which EB could
-    leak into BB or EE. Our MCMC pipeline similarly assumes that the injected signal affects only EB,
-    with no EDE contributions modeled for EE or BB.
-</p>
-<p>
-    For each dataset, we fit to three spectrum combinations: EB only, EE + EB, and full EE + EB + BB.
-    We also evaluate two dust models:
-</p>
 
-<ol>
+
+<section>
+<h2>Initial Bias Checks</h2>
+<p>
+    The primary goal is to constrain to degeneracy between miscalibration-induced 
+    polarization rotation and the EDE signal. Specifically, we evaluate the impact of the EDE signal injected exclusively 
+    into the EB spectrum, as EE and BB modifications from EDE are expected to be negligible in 
+    the absence of polarization rotation. Our MCMC pipeline assumes no EDE contributions to EE or BB.
+  </p>
+<p>
+    We begin by running MCMC chains on two datasets: <strong>BK18lf</strong> (no EDE injection) 
+    and <strong>BK18lf_fede01</strong> (EDE injected with \( f_{\mathrm{EDE}} = 0.07 \), \( g = 1 \)). 
+    These datasets are based on the standard BK18 large-field map combination (3553×1459×5260×5261). 
+    The only difference is that <strong>BK18lf_fede01</strong> includes a nonzero EB spectrum 
+    corresponding to the best-fit EDE parameters from 
+    <a href="https://arxiv.org/pdf/2209.07804">Murai (2022)</a>. Both datasets model gaussian dust.
+</p> 
+<p>
+    We will also explore a grid of \( f_{\mathrm{EDE}} \) values for our final analysis to assess 
+    the sensitivity across different EDE scenarios. While we begin with \( f_{\mathrm{EDE}} = 0.07 \) 
+    (from <a href="https://arxiv.org/pdf/2209.07804">Murai 2022</a>), we will also consider values like 
+    \( f_{\mathrm{EDE}} = 0.0872 \) and \( f_{\mathrm{EDE}} = 0.1271 \) as explored by 
+    <a href="https://arxiv.org/pdf/2303.15369">Eskilt (2023)</a>.
+  </p>  
+  <p>
+    For each dataset, we fit three spectrum combinations: EB only, EE + EB, and full EE + EB + BB. 
+    Additionally, we evaluate two dust models for our likelihood function:
+  </p>
+
+
+  <ol>
     <li>
-        <strong>No dust:</strong> We set dust to zero and use base EE and BB theory curves
-        (with lensing) along with an EB theory curve derived from the EDE model.
+      <strong>Fixed dust:</strong> We set dust amplitude to zero, using base EE and BB theory curves (with lensing) 
+      and an EB theory curve derived from the EDE model.
     </li>
     <li>
-        <strong>Nominal dust:</strong> Following the assumptions in
-        <a href="https://bicep.rc.fas.harvard.edu/dbeck/20230202_cmbbirefringence/">
-            Dominic’s posting
-        </a>, we set \( P_{\text{cal}} = 1 \) and ignore synchrotron emission.
-        In addition to fitting for rotation angle \( \alpha_\nu \) for each frequency \(\nu\), 
-        we now additionally fit to 
-        dust amplitude \( A_{\text{dust}} \) and exponent \( \alpha_{\text{dust}} \) ,
-        using separate \( A_{\text{dust}} \) and \( \alpha_{\text{dust}} \) parameters for EE, BB, and EB.
-        The dust spectral index \( \beta \) is shared across all spectra.
+      <strong>Nominal dust:</strong> Here, we additionally fit for dust amplitude \( A_{\text{dust}} \) and 
+      exponent \( \alpha_{\text{dust}} \), with separate parameters for each spectrum (EE, BB, EB). 
+      The dust spectral index \( \beta \) is shared across all spectra.
     </li>
-</ol>
-<p>
-    The goal of these MCMC chains is to recover the injected signals and demonstrate that 
-    our pipeline does not bias the EDE coupling parameter \(g\).
-    We also show that fitting dust parameters alongside \(g\) introduces no additional bias. 
-    Rather than fixing dust to a single “best‐fit” value, 
-    we simultaneously fit dust parameters alongside the EDE coupling. 
-    This approach properly propagates dust uncertainties into our final errors, 
-    and potentially breaks degeneracies between foreground EB and true polarization rotation, 
-    Jointly fitting dust with EE and BB also leverages those spectra to self‑calibrate the
-    polarization amplitude, ensuring a more robust, bias‑resistant measurement of 
-    any cosmological birefringence or early dark energy signal. </p>
+  </ol>
+  <p>
+    The goal of these initial checks is to recover the injected signals and demonstrate that our pipeline 
+    does not introduce bias in the EDE coupling parameter \( g \). By simultaneously fitting dust parameters 
+    with \( g \), we properly propagate dust uncertainties into the final errors, while potentially breaking 
+    degeneracies between foreground EB and true polarization rotation. Jointly fitting dust with EE and BB 
+    spectra also helps calibrate the polarization amplitude, leading to a more robust and bias-resistant 
+    measurement of any cosmological birefringence or early dark energy signal.
+  </p>
 
    <figure>
     <img alt="Multicomponent Analysis EB Spectrum" id="dustfigs" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
@@ -338,7 +317,7 @@
             <li><strong>Theory comp</strong>: Select the theoretical model used for comparison:
                 <ul>
                     <li>Fixed dust fit: Dust parameters fixed to zero.</li>
-                    <li>With Dust fit: Dust parameters are floated in the fit.</li>
+                    <li>Nominal Dust fit: Dust parameters are floated in the fit.</li>
                 </ul>
             </li>
             <li><strong>Spectra</strong>: Choose which spectra to include in the fit:
@@ -390,7 +369,7 @@
             ],
             'Dust Model|theory_comp':[
                 'Fixed dust = zero|_fixeddust',
-                'Gaussian dust|_gdust',
+                'Nominal dust|_gdust',
             ],
             'Spectra|spectra':[
                 'All|_all',
@@ -438,7 +417,7 @@
   <p>
     Below is a summary of the results over the peaks of the simulations.
   </p>
-  <h4>MCMC fit results for <em>g</em> = 0 (no dust model).</h4>
+  <h4>ML search results for <em>g</em> = 0 (fixed dust model).</h4>
 <p>
      We see that while there  
     is a slight positive bias for <em>g</em> and a slight negative bias for  
@@ -446,7 +425,7 @@
     the overall posterior spread.
   </p>
 <table>
-    <caption>MCMC fit results for <em>g</em> = 0 (no dust model)</caption>
+    <caption>ML search results for <em>g</em> = 0 (fixed dust model)</caption>
     <thead>
       <tr>
         <th>Spectra</th>
@@ -484,18 +463,18 @@
       </tr>
     </tbody>
   </table>
-  <h4>MCMC fit results for <em>g</em> = 1 (no dust model).</h4>
+  <h4>ML search results for <em>g</em> = 1 (fixed dust model).</h4>
   <p>
     For <em>g</em> = 1, fitting to all three spectra yields a pronounced  
     suppression of the recovered coupling, offset by large positive shifts in each  
     rotation angle. This behaviour reflects a degeneracy between the injected EDE signal  
     and polarization miscalibration.  
-    Omitting the BB spectrum from the MCMC fit restores the recovered coupling distribution  
+    Omitting the BB spectrum from the ML search restores the recovered coupling distribution  
     to match the <em>g</em> = 0 case, albeit with a slightly broader posterior, demonstrating  
     that the BB data drive the apparent bias in the full-spectrum analysis.
   </p>
   <table>
-    MCMC fit results for <em>g</em> = 1 (no dust model)
+    ML search results for <em>g</em> = 1 (fixed dust model)
     <thead>
       <tr>
         <th>Spectra</th>
@@ -533,7 +512,7 @@
       </tr>
     </tbody>
   </table>
-  <h4>MCMC fit results for <em>g</em> = 0 (with dust model)</h4>
+  <h4>ML search results for <em>g</em> = 0 (nominal dust model)</h4>
   <p>
      We see similar results to  
     the <em>g</em> = 0 case without dust, albeit with slightly broader posteriors.  
@@ -556,7 +535,7 @@
   </p>
   
   <table>
-    <caption>MCMC fit results for <em>g</em> = 0 (with dust model)</caption>
+    <caption>ML search results for <em>g</em> = 0 (nominal dust model)</caption>
     <thead>
       <tr>
         <th>Spectra</th>
@@ -622,13 +601,13 @@
       </tr>
     </tbody>
   </table>
-  <h4>MCMC fit results for <em>g</em> = 1 (with dust model)</h4>
+  <h4>ML search results for <em>g</em> = 1 (nominal dust model)</h4>
   <p>
     Fitting all three spectra again yields suppression of the recovered coupling,  
     compensated by shifts in the rotation angles, reflecting a degeneracy between  
     the injected EDE signal and polarization miscalibration.  
     Omitting BB or using EB‑only restores the coupling to the expected value,  
-    with only modest increases in uncertainty—consistent with the no‑dust  
+    with only modest increases in uncertainty—consistent with the fixed dust  
     <em>g</em> = 1 case.  
     Similar to the <em>g</em> = 0 results, the EE and BB dust amplitudes and spectral index  
     remain well constrained in the full‑spectrum fit, while the EB dust amplitude stays  
@@ -642,7 +621,7 @@
     </a>, aside from expected differences due to dataset choice.
   </p>
   <table>
-    <caption>MCMC fit results for <em>g</em> = 1 (with dust model)</caption>
+    <caption>ML search results for <em>g</em> = 1 (nominal dust model)</caption>
     <thead>
       <tr>
         <th>Spectra</th>
@@ -712,7 +691,7 @@
   <p>
     We initially found it concerning that the recovered coupling <em>g</em> was heavily suppressed  
     when including the BB spectrum.  
-    To investigate this further, we performed MCMC fits on a “signal‑only” <em>g</em> = 1 dataset  
+    To investigate this further, we performed ML searchs on a “signal‑only” <em>g</em> = 1 dataset  
     with no dust or noise, comparing chains with and without BB to isolate its impact.
   </p>
 <figure>
@@ -738,8 +717,8 @@
             <li><strong>Theory comp</strong>: Select the theoretical model used for comparison:
                 <ul>
                     <li>Fixed dust fit: Dust parameters fixed to zero.</li>
-                    <li>With Dust fit: Dust parameters are floated in the fit.</li>
-                    <li>Signal Only: Only the injected signal is fit, no dust model or noise.</li>
+                    <li>Nominal Dust fit: Dust parameters are floated in the fit.</li>
+                    <li>Signal Only: Only the injected signal is fit, no dust model or noise in data.</li>
                     <li>Fixed angle signal only: Signal-only fit with angle fixed to 0.</li>
                 </ul>
             </li>
@@ -829,7 +808,7 @@
   </p>
 
   <table>
-    <caption>MCMC fit results for <em>g</em> = 1 (signal‑only “sigl” dataset)</caption>
+    <caption>ML search results for <em>g</em> = 1 (signal‑only “sigl” dataset)</caption>
     <thead>
       <tr>
         <th>Spectra</th>
@@ -1060,7 +1039,7 @@
     <strong>Table: Recovered <em>g</em> Values for Different Miscalibration Scenarios</strong>
   </p>
   
-  <p><strong>g = 0 (No Dust Model)</strong></p>
+  <p><strong>g = 0 (Fixed Dust Model)</strong></p>
   <table border="1">
     <tr>
       <th>Spectra</th>
@@ -1088,7 +1067,7 @@
     </tr>
   </table>
   
-  <p><strong>g = 1 (With Dust Model)</strong></p>
+  <p><strong>g = 1 (Nominal Dust Model)</strong></p>
   <table border="1">
     <tr>
       <th>Spectra</th>
@@ -1117,7 +1096,7 @@
   </table>
   
   <p>
-    For <em>g = 0</em> (no dust model), the recovered values of <em>g</em> 
+    For <em>g = 0</em> (fixed dust model), the recovered values of <em>g</em> 
     are consistent across all miscalibration cases. 
     The values are all close to zero, indicating that the model is not biased 
     by the polarization rotation or other factors under these conditions.
@@ -1125,7 +1104,7 @@
      between the different miscalibration types.
     </p>
     <p>
-    For <em>g = 1</em> (with dust model), the recovered <em>g</em> values 
+    For <em>g = 1</em> (nominal dust model), the recovered <em>g</em> values 
     exhibit more variation, especially in the <strong>All spectra</strong> case. 
     This suggests that the inclusion of BB spectra, with its sensitivity to dust, 
     affects the recovered coupling constant <em>g</em> The values for <em>g</em> in the 
