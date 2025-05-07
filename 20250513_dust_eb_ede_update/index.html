@@ -40,12 +40,31 @@
     <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20250218_ede_forecast/">
         2025-02-18: EDE Forecast</a></li>
   </ul>
+  <p><strong>Summary:</strong> EB-only and full-spectrum fits both recover <em>g ≈ 0</em> with minor bias;
+rotation angles remain near zero, supporting the robustness of the pipeline.</p>
+<p><strong>Summary:</strong> Including BB suppresses <em>g</em> to ~0.62 due to compensatory shifts
+in rotation angles. Removing BB restores expected recovery near <em>g = 1</em>.</p>
   <p>
     Here, we further demonstrate the robustness of our method for fitting early dark energy (EDE)
     parameters by expanding the pipeline to also include EE and BB spectra alongside EB. While
     EE and BB are far less sensitive to polarization rotation or EDE parameters than EB,
     their inclusion helps calibrate nuisance parameters like dust, ultimately tightening
-    constraints on the EB-inferred rotation angle.
+    constraints on the EB-inferred rotation angle. 
+</p>
+<p>
+    We inject the EDE signal exclusively into the EB spectrum, consistent with the expectation
+    that EE and BB modifications from EDE are negligible in the absence of polarization rotation.
+    Since the simulations assume zero rotation angle, there are no mechanisms by which EB could
+    leak into BB or EE. Our MCMC pipeline similarly assumes that the injected signal affects only EB,
+    with no EDE contributions modeled for EE or BB.
+</p>
+<p>
+    We jointly fit dust and EDE parameters to ensure that uncertainties in the dust model
+    are properly propagated into our estimates of ( g ) and the rotation angles.
+    Across all configurations tested, we find no significant degeneracy between
+    the foreground dust parameters and the EDE coupling. EB remains the primary
+    spectrum constraining ( g ), with EE and BB helping calibrate polarization amplitude
+    and dust components.
 </p>
 <p>
     To test the impact of miscalibration, we inject artificial rotation angles into the maps
@@ -60,9 +79,15 @@
     These are applied to two datasets: <strong>BK18lf</strong> (no EDE injection) and
     <strong>BK18lf_fede01</strong> (EDE injected with
     \( f_{\mathrm{EDE}} = 0.07 \), \( g = 1 \)). This tests whether miscalibration-induced
-    polarization rotation could artificially enhance an EDE signal.
+    polarization rotation could artificially enhance or suppress an EDE signal.
 </p>
-           
+    <p>
+    We use ( f{\mathrm{EDE}} = 0.07 ), corresponding to the best-fit EB spectrum
+    available from <a href="https://arxiv.org/pdf/2209.07804">Murai (2022)</a>. While this
+    differs from values considered by <a href="https://arxiv.org/pdf/2303.15369">Eskilt (2023)</a>,
+    such as ( f{\mathrm{EDE}} = 0.0872 ) and ( 0.1271 ), our final analysis will include
+    a grid of ( f_{\mathrm{EDE}} ) values to evaluate sensitivity across multiple scenarios.
+</p>       
 <p>
     Finally, we assess the robustness of our constraints against different dust models by
     fitting over the dust scenarios presented in
@@ -70,6 +95,9 @@
         J. Willmert’s posting
     </a>. This helps determine whether the inferred coupling \( g \) is sensitive to dust modeling.
 </p>
+<figure>
+    <img src="visual_summary.png" width="750" height="500">
+</figure>
     </section>
     <section>
    <h2>Initial Bias Checks</h2>
@@ -748,6 +776,13 @@
 <section>
 
 <h2>Injecting detector rotation miscalibration</h2>
+
+<h3>Pipeline Validation Checks</h3>
+<ul>
+  <li>Injected rotation angles are recovered accurately with no artificial inflation of ( g ).</li>
+  <li>EB-only results align with All-spectra fits when BB is downweighted.</li>
+  <li>Signal-only tests confirm that BB residuals influence parameter recovery even in the absence of dust or noise.</li>
+</ul>
 <p>
     We perform an additional check to ensure that we can break the degeneracy between polarization rotation and the EDE signal.  
     In this test, we inject different rotation angles directly into the spectra after they have been generated through the BK18 pipeline.  
