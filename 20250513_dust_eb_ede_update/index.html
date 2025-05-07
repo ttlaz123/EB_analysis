@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Early Dark Energy Dust and Polarization Miscalibration Simulation Update</title>
+    <title>Early Dark Energy Simulation Dust and Polarization Miscalibration Update</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <!-- Load up MathJax for math notation -->
     <script type="text/x-mathjax-config">
@@ -20,7 +20,7 @@
     <link rel="stylesheet" type="text/css" href="scripts/pager.css">
 
     <header>
-        <h1>Early Dark Energy Dust and Polarization Miscalibration Simulation Update</h1>
+        <h1>Early Dark Energy Simulation Dust and Polarization Miscalibration Update</h1>
 
         <time datetime="2025 May 13" class="published updated">
             2025 May 13
@@ -31,7 +31,6 @@
     <hr>
     <section>
         <h2>Introduction</h2>
-        <p>This posting is an update to the previous postings:</p>
         <p>This posting builds upon previous updates:</p>
   <ul>
     <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20240924_preliminary_eb_ede_results/">
@@ -55,16 +54,7 @@
     spectrum type on the parameter recovery in the presence of injected signals.
 </p>
 
-<p>
-    The injected rotation angles (in degrees) for BK18_220, BK18_150, BK18_K95, and BK18_B95e
-    (B95lf) are grouped as follows:
-</p>
 
-<ul>
-    <li><strong>Positive:</strong> 0, 0.25, 0.5, 0.75</li>
-    <li><strong>Negative:</strong> 0, -0.25, -0.5, -0.75</li>
-    <li><strong>Balanced:</strong> -1, -0.5, 0, 0.5</li>
-</ul>
 
 <p>
     These are applied to two datasets: <strong>BK18lf</strong> (no EDE injection) and
@@ -82,7 +72,7 @@
 </p>
     </section>
     <section>
-   <h2>Initial Bias checks</h2>
+   <h2>Initial Bias Checks</h2>
    <p>
     We begin by running MCMC chains on the two datasets: <strong>BK18lf</strong> (no EDE injection)
     and <strong>BK18lf_fede01</strong> (with EDE injected). Both datasets are based on the
@@ -115,12 +105,24 @@
         <a href="https://bicep.rc.fas.harvard.edu/dbeck/20230202_cmbbirefringence/">
             Dominic’s posting
         </a>, we set \( P_{\text{cal}} = 1 \) and ignore synchrotron emission.
-        We fit for rotation angle \( \alpha \) and dust amplitude \( A_{\text{dust}} \),
-        using separate \( A_{\text{dust}} \) parameters for EE, BB, and EB.
+        In addition to fitting for rotation angle \( \alpha_\nu \) for each frequency \(\nu\), 
+        we now additionally fit to 
+        dust amplitude \( A_{\text{dust}} \) and exponent \( \alpha_{\text{dust}} \) ,
+        using separate \( A_{\text{dust}} \) and \( \alpha_{\text{dust}} \) parameters for EE, BB, and EB.
         The dust spectral index \( \beta \) is shared across all spectra.
     </li>
 </ol>
-
+<p>
+    The goal of these MCMC chains is to recover the injected signals and demonstrate that 
+    our pipeline does not bias the EDE coupling parameter \(g\).
+    We also show that fitting dust parameters alongside \(g\) introduces no additional bias. 
+    Rather than fixing dust to a single “best‐fit” value, 
+    we simultaneously fit dust parameters alongside the EDE coupling. 
+    This approach properly propagates dust uncertainties into our final errors, 
+    and potentially breaks degeneracies between foreground EB and true polarization rotation, 
+    Jointly fitting dust with EE and BB also leverages those spectra to self‑calibrate the
+    polarization amplitude, ensuring a more robust, bias‑resistant measurement of 
+    any cosmological birefringence or early dark energy signal. </p>
 
    <figure>
     <img alt="Multicomponent Analysis EB Spectrum" id="dustfigs" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
@@ -145,8 +147,6 @@
                 <ul>
                     <li>Fixed dust fit: Dust parameters fixed to zero.</li>
                     <li>With Dust fit: Dust parameters are floated in the fit.</li>
-                    <li>Signal Only: Only the injected signal is fit, no dust model or noise.</li>
-                    <li>Fixed angle signal only: Signal-only fit with angle fixed to 0.</li>
                 </ul>
             </li>
             <li><strong>Spectra</strong>: Choose which spectra to include in the fit:
@@ -235,6 +235,156 @@
         });
     </script>
 </figure>
+Below is a summary of the results over the peaks of the simulations.
+<table>
+    <caption>MCMC fit results for <em>g</em> = 0 (no dust model)</caption>
+    <thead>
+      <tr>
+        <th>Spectra</th>
+        <th>g</th>
+        <th>α<sub>220</sub> (°)</th>
+        <th>α<sub>150</sub> (°)</th>
+        <th>α<sub>K95</sub> (°)</th>
+        <th>α<sub>B95lf</sub> (°)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>All</th>
+        <td>0.03 ± 0.27</td>
+        <td>–0.01 ± 0.22</td>
+        <td>–0.01 ± 0.14</td>
+        <td>–0.01 ± 0.23</td>
+        <td>–0.02 ± 0.13</td>
+      </tr>
+      <tr>
+        <th>No BB</th>
+        <td>0.05 ± 0.37</td>
+        <td>–0.03 ± 0.24</td>
+        <td>–0.03 ± 0.19</td>
+        <td>–0.02 ± 0.26</td>
+        <td>–0.03 ± 0.18</td>
+      </tr>
+      <tr>
+        <th>EB only</th>
+        <td>0.03 ± 0.37</td>
+        <td>–0.02 ± 0.24</td>
+        <td>–0.02 ± 0.19</td>
+        <td>–0.02 ± 0.26</td>
+        <td>–0.02 ± 0.18</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <table>
+    <caption>MCMC fit results for <em>g</em> = 1 (no dust model)</caption>
+    <thead>
+      <tr>
+        <th>Spectra</th>
+        <th>g</th>
+        <th>α<sub>220</sub> (°)</th>
+        <th>α<sub>150</sub> (°)</th>
+        <th>α<sub>K95</sub> (°)</th>
+        <th>α<sub>B95lf</sub> (°)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>All</th>
+        <td>0.62 ± 0.27</td>
+        <td>0.20 ± 0.24</td>
+        <td>0.18 ± 0.15</td>
+        <td>0.15 ± 0.24</td>
+        <td>0.16 ± 0.14</td>
+      </tr>
+      <tr>
+        <th>No BB</th>
+        <td>1.02 ± 0.44</td>
+        <td>–0.04 ± 0.25</td>
+        <td>–0.02 ± 0.21</td>
+        <td>–0.03 ± 0.26</td>
+        <td>–0.03 ± 0.19</td>
+      </tr>
+      <tr>
+        <th>EB only</th>
+        <td>1.00 ± 0.42</td>
+        <td>–0.03 ± 0.25</td>
+        <td>–0.01 ± 0.20</td>
+        <td>–0.02 ± 0.23</td>
+        <td>–0.02 ± 0.19</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <table>
+    <caption>MCMC fit results for <em>g</em> = 0 (with dust model)</caption>
+    <thead>
+      <tr>
+        <th>Spectra</th>
+        <th>g</th>
+        <th>α<sub>220</sub> (°)</th>
+        <th>α<sub>150</sub> (°)</th>
+        <th>α<sub>K95</sub> (°)</th>
+        <th>α<sub>B95lf</sub> (°)</th>
+        <th>A<sub>dust</sub><sup>EE</sup></th>
+        <th>α<sub>dust</sub><sup>EE</sup></th>
+        <th>A<sub>dust</sub><sup>BB</sup></th>
+        <th>α<sub>dust</sub><sup>BB</sup></th>
+        <th>A<sub>dust</sub><sup>EB</sup></th>
+        <th>α<sub>dust</sub><sup>EB</sup></th>
+        <th>β</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>All</th>
+        <td>0.03 ± 0.31</td>
+        <td>0.01 ± 0.22</td>
+        <td>–0.02 ± 0.17</td>
+        <td>0.02 ± 0.27</td>
+        <td>–0.02 ± 0.15</td>
+        <td>7.7 ± 1.3</td>
+        <td>–0.33 ± 0.18</td>
+        <td>3.86 ± 0.8</td>
+        <td>–0.31 ± 0.18</td>
+        <td>0.00 ± 0.40</td>
+        <td>—</td>
+        <td>1.68 ± 0.15</td>
+      </tr>
+      <tr>
+        <th>No BB</th>
+        <td>0.04 ± 0.38</td>
+        <td>–0.01 ± 0.26</td>
+        <td>–0.04 ± 0.21</td>
+        <td>0.01 ± 0.29</td>
+        <td>–0.03 ± 0.18</td>
+        <td>8.36 ± 1.46</td>
+        <td>–0.33 ± 0.18</td>
+        <td>—</td>
+        <td>—</td>
+        <td>–0.07 ± 0.45</td>
+        <td>—</td>
+        <td>1.79 ± 0.26</td>
+      </tr>
+      <tr>
+        <th>EB only</th>
+        <td>0.03 ± 0.38</td>
+        <td>0.00 ± 0.25</td>
+        <td>–0.03 ± 0.21</td>
+        <td>0.02 ± 0.28</td>
+        <td>–0.02 ± 0.18</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+        <td>–0.03 ± 0.45</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+    </tbody>
+  </table>
+  
+
 
 <figure>
     <img alt="Multicomponent Analysis EB Spectrum" id="sigl" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
@@ -343,6 +493,16 @@
 <section>
 
 <h2>Injecting detector rotation miscalibration</h2>
+<p>
+    The injected rotation angles (in degrees) for BK18_220, BK18_150, BK18_K95, and BK18_B95e
+    (B95lf) are grouped as follows:
+</p>
+
+<ul>
+    <li><strong>Positive:</strong> 0, 0.25, 0.5, 0.75</li>
+    <li><strong>Negative:</strong> 0, -0.25, -0.5, -0.75</li>
+    <li><strong>Balanced:</strong> -1, -0.5, 0, 0.5</li>
+</ul>
 <figure>
     <img alt="Fitting to injected miscalibration" id="polrot" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
     <figcaption>
