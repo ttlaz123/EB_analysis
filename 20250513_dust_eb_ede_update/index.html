@@ -243,11 +243,13 @@
     but rather by the fact that BB dust becomes unconstrained when excluded from the fit.  
     This effect is further supported by the behavior seen in the signal-only (sigl) plots.
   </p>
+  <h3>Bias Check Results</h3>
   <p>
     Below is a summary of the results over the peaks of the simulations.
   </p>
+  <h4>MCMC fit results for <em>g</em> = 0 (no dust model).</h4>
 <p>
-    MCMC fit results for <em>g</em> = 0 (no dust model). We see that while there  
+     We see that while there  
     is a slight positive bias for <em>g</em> and a slight negative bias for  
     the polarization rotation angles, those biases remain small compared to  
     the overall posterior spread.
@@ -291,8 +293,9 @@
       </tr>
     </tbody>
   </table>
+  <h4>MCMC fit results for <em>g</em> = 1 (no dust model).</h4>
   <p>
-    For <em>g</em> = 1 (no dust model), fitting to all three spectra yields a pronounced  
+    For <em>g</em> = 1, fitting to all three spectra yields a pronounced  
     suppression of the recovered coupling, offset by large positive shifts in each  
     rotation angle. This behaviour reflects a degeneracy between the injected EDE signal  
     and polarization miscalibration.  
@@ -339,8 +342,9 @@
       </tr>
     </tbody>
   </table>
+  <h4>MCMC fit results for <em>g</em> = 0 (with dust model)</h4>
   <p>
-    MCMC fit results for <em>g</em> = 0 (with dust model). We see similar results to  
+     We see similar results to  
     the <em>g</em> = 0 case without dust, albeit with slightly broader posteriors.  
     Allowing dust parameters to float propagates their uncertainty into other  
     parameters such as <em>g</em> and the rotation angles.  
@@ -427,8 +431,8 @@
       </tr>
     </tbody>
   </table>
+  <h4>MCMC fit results for <em>g</em> = 1 (with dust model)</h4>
   <p>
-    MCMC fit results for <em>g</em> = 1 (with dust model).  
     Fitting all three spectra again yields suppression of the recovered coupling,  
     compensated by shifts in the rotation angles, reflecting a degeneracy between  
     the injected EDE signal and polarization miscalibration.  
@@ -513,6 +517,7 @@
       </tr>
     </tbody>
   </table>
+  <h3>Examining BB Signal Only</h3>
   <p>
     We initially found it concerning that the recovered coupling <em>g</em> was heavily suppressed  
     when including the BB spectrum.  
@@ -690,6 +695,7 @@
     to satisfy the fit. Even though these changes are visually tiny, they show that the 
     BB spectrum is influencing the <em>g</em> estimation more than expected.
   </p>
+  <h4>BB g suppression explanations</h4>
   <p>
     There are a few possible explanations for this behavior.  
     The first is that while generating the <code>fede01</code>, <em>g</em> = 1 simulations,  
@@ -1088,7 +1094,54 @@
     </tbody>
   </table>
  </section>
+ <section>
+    <h2>Future Directions</h2>
 
+<p>
+    In this work, we've demonstrated that there is no significant bias affecting the 
+    recovered parameters when excluding BB from the analysis, 
+    particularly the coupling parameter \( g \), and that the results 
+    are consistent across different dust models. 
+    This is an important step as it suggests that we may proceed with 
+    analyzing the real data from BK18. 
+    However, there are still a few important aspects to further explore in order to 
+    ensure the robustness and consistency of our analysis.
+</p>
+<p>
+    One crucial next step is to test our results on different EB curves generated from 
+    various Fede parameters. By running MCMC chains using these alternate EB curves, 
+    we can verify that our results are consistent regardless of the specific choice of 
+    EB spectra. The choice of EB spectrum may have subtle 
+    effects on the recovered parameters, and ensuring that our analysis is insensitive 
+    to these choices strengthens the overall reliability of our conclusions. 
+    Eskilt's previous work demonstrated the consistency of results across different EB curves, 
+    and we aim to replicate these findings in our analysis to ensure that our conclusions hold 
+    across a range of possible EB spectra.
+</p>
+<p>
+    Additionally, although our analysis has shown that BB spectra are not significantly 
+    affecting the \( g \) parameter and rotation angles when \(g\) is small, 
+    there are still indications that the BB spectra may be introducing some 
+    discrepancies into the fits. To address this, we can continue to investigate the 
+    role of the BB spectra in the fitting process, 
+    particularly focusing on how it affects the MCMC chains. 
+    Specifically, we need to explore why the inclusion of BB seems to cause the 
+    \( g \) parameter to shift, and whether this is related to the way the BB spectra 
+    are being used to constrain the dust models. 
+    Understanding and resolving these issues will be important, 
+    particularly if further refinements to the analysis pipeline are needed to 
+    improve the precision of the parameter estimates.
+</p>
+
+<p>
+    Overall, while we've shown that the current approach is robust, 
+    further validation and refinement are key to ensuring that the results are as 
+    precise and reliable as possible. By continuing to explore different EB spectra, 
+    further scrutinizing the role of BB spectra, 
+    and keeping a close eye on potential systematic uncertainties, 
+    we can move towards a final analysis using real data.
+</p>
+</section>
  <section>
     <h2>Appendix</h2>
     <p>All chains and plots can be found in 
