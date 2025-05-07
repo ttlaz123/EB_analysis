@@ -88,16 +88,18 @@
 
   <p>
     \[
-    \begin{aligned}
-      C_{\ell}^{EE,\mathrm{rot}} &= \cos^2(2\alpha_{\mathrm{cmb}}) \, C_{\ell}^{EE,\mathrm{CMB}} \\
-                                 &\quad + \sin^2(2\alpha_{\mathrm{cmb}}) \, C_{\ell}^{BB,\mathrm{CMB}} \\
-                                 &\quad + \sin(4\alpha_{\mathrm{cmb}}) \, C_{\ell}^{EB,\mathrm{CMB}}, \\
-      C_{\ell}^{BB,\mathrm{rot}} &= \sin^2(2\alpha_{\mathrm{cmb}}) \, C_{\ell}^{EE,\mathrm{CMB}} \\
-                                 &\quad + \cos^2(2\alpha_{\mathrm{cmb}}) \, C_{\ell}^{BB,\mathrm{CMB}} \\
-                                 &\quad - \sin(4\alpha_{\mathrm{cmb}}) \, C_{\ell}^{EB,\mathrm{CMB}}, \\
-      C_{\ell}^{EB,\mathrm{rot}} &= \frac{1}{2} \sin(4\alpha_{\mathrm{cmb}})(C_{\ell}^{EE,\mathrm{CMB}} - C_{\ell}^{BB,\mathrm{CMB}}) \\
-                                 &\quad + \cos(4\alpha_{\mathrm{cmb}}) \, C_{\ell}^{EB,\mathrm{CMB}}.
-    \end{aligned}
+    \tilde{D}_{\ell}^{EE,\,{\rm CMB}} = D_{\ell}^{EE,\,{\rm CMB}} \cos^2(2\alpha_{\rm cmb}) 
+    + D_{\ell}^{BB,\,{\rm CMB}} \sin^2(2\alpha_{\rm cmb}) 
+    - D_{\ell}^{EB,\,{\rm CMB}} \sin(4\alpha_{\rm cmb})
+    \]
+    \[
+    \tilde{D}_{\ell}^{BB,\,{\rm CMB}} = D_{\ell}^{EE,\,{\rm CMB}} \sin^2(2\alpha_{\rm cmb}) 
+    + D_{\ell}^{BB,\,{\rm CMB}} \cos^2(2\alpha_{\rm cmb}) 
+    + D_{\ell}^{EB,\,{\rm CMB}} \sin(4\alpha_{\rm cmb})
+    \]
+    \[
+    \tilde{D}_{\ell}^{EB,\,{\rm CMB}} = \frac{1}{2} (D_{\ell}^{EE,\,{\rm CMB}} - D_{\ell}^{BB,\,{\rm CMB}}) \sin(4\alpha_{\rm cmb}) 
+    + \frac{D_{\ell}^{EB,\,{\rm CMB}}}{\cos(4\alpha_{\rm cmb})}
     \]
   </p>
   <p>
@@ -112,8 +114,16 @@
 
   <p>
     \[
-    D_{\ell}^{XY,\mathrm{dust},\nu_i \times \nu_j}
-    = A_d^{XY} \left( \frac{\ell}{80} \right)^{\alpha_d^{XY}} f_d^{\nu_i} f_d^{\nu_j},
+    \hat{D}_\ell^{EE,\,\nu_1 \times \nu_2} =  
+    \tilde{D}_\ell^{EE,\,{\rm CMB}} + f_d^{\nu_1}(\beta_d) f_d^{\nu_2}(\beta_d) A_d^{EE} \left(\frac{\ell}{80}\right)^{\alpha_d^{EE}} 
+    \]
+    \[
+    \hat{D}_\ell^{BB,\,\nu_1 \times \nu_2} = 
+    \tilde{D}_\ell^{BB,\,{\rm CMB}} + f_d^{\nu_1}(\beta_d) f_d^{\nu_2}(\beta_d) A_d^{BB} \left(\frac{\ell}{80}\right)^{\alpha_d^{BB}} 
+    \]
+    \[
+    \hat{D}_\ell^{EB,\,\nu_1 \times \nu_2} = 
+    \tilde{D}_\ell^{EB,\,{\rm CMB}} + f_d^{\nu_1}(\beta_d) f_d^{\nu_2}(\beta_d) A_d^{EB} \left(\frac{\ell}{80}\right)^{\alpha_d^{EB}} 
     \]
   </p>
   <p>
