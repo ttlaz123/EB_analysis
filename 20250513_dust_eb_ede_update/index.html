@@ -145,6 +145,63 @@ in rotation angles. Removing BB restores expected recovery near <em>g = 1</em>.<
         This conceptual map frames the simulation and MCMC results presented in the posting, which demonstrate that despite these complexities, the EB signal remains robust to dust model variations and BB contamination.
     </figcaption>
 </figure>
+<h3>MCMC Likelihood Framework</h3>
+
+<p>
+  To infer the birefringence and miscalibration parameters, we construct a likelihood function
+  comparing the observed EB power spectra to the forward-modeled spectra described above.
+  We stack the EB spectra across all frequency combinations (\( \nu_1 \times \nu_2 \)) and 
+  across all \( \ell \)-bins, which are then used to calculate the chi-squared statistic with the inverse covariance matrix.
+</p>
+
+<p>
+  The likelihood function is defined as:
+</p>
+
+<p>
+  \[
+  -2\ln \mathcal{L} = \sum_{\ell,\,\nu_1 \times \nu_2} 
+  \left( \bar{D}_\ell^{EB,\,\nu_1 \times \nu_2} - D_\ell^{\rm data} \right)^T 
+  \Sigma^{-1} 
+  \left( \bar{D}_\ell^{EB,\,\nu_1 \times \nu_2} - D_\ell^{\rm data} \right)
+  \]
+</p>
+
+<p>
+  where \( D_\ell^{\rm data} \) are the measured EB bandpowers and \( \Sigma \) is the covariance matrix,
+  computed from simulations. This matrix captures both the statistical and systematic uncertainties 
+  in the data, including instrumental and foreground contamination.
+</p>
+
+<p>
+  The stacked EB spectra for each frequency pair \( \nu_1 \times \nu_2 \) are used to form a single
+  data vector, and the inverse of the covariance matrix \( \Sigma^{-1} \) is applied to calculate the chi-squared:
+</p>
+
+<p>
+  \[
+  \chi^2 = \sum_{\ell,\,\nu_1 \times \nu_2} \left( \bar{D}_\ell^{EB,\,\nu_1 \times \nu_2} - D_\ell^{\rm data} \right)^T \Sigma^{-1} \left( \bar{D}_\ell^{EB,\,\nu_1 \times \nu_2} - D_\ell^{\rm data} \right)
+  \]
+</p>
+
+<p>
+  The parameters of interest include:
+  \[
+  \theta = \left\{ \alpha_{\rm cmb}, \{\alpha^\nu\}, \text{foreground amplitudes}, \text{spectral indices}, \ldots \right\}
+  \]
+  We apply uniform priors on all angles and log-uniform or Gaussian priors on foreground parameters, following BICEP conventions.
+</p>
+
+<p>
+  We explore the posterior distribution \( P(\theta | D_{\ell}^{\rm data}) \propto \mathcal{L}(D|\theta)\,P(\theta) \)
+  using Markov Chain Monte Carlo (MCMC) sampling via <code>Cobaya</code>.
+</p>
+
+<p>
+  Chains are run until convergence using the Gelman-Rubin statistic \( R-1 < 0.01 \), and
+  parameter constraints are reported as marginalized posteriors.
+</p>
+<h3>Further tests</h3>
 <p>
     To test the impact of miscalibration, we inject artificial rotation angles into the maps
     and fit the parameters using three combinations of spectra: EB only, EE + EB (excluding BB),
