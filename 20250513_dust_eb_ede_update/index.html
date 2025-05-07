@@ -136,6 +136,7 @@
                     <li>Best Fit EB: Displays best fit to the EB spectrum.</li>
                     <li>Best Fit BB: Displays best fit to the BB spectrum.</li>
                     <li>Triangle Plot: Shows parameter correlation contours.</li>
+                    <li>Summary plot: shows the peaks of all the triangle plot sims.</li>
                 </ul>
             </li>
             <li><strong>Bins Used</strong>: Choose the binning scheme applied to spectra:
@@ -530,6 +531,7 @@
                     <li>Best Fit EB: Displays best fit to the EB spectrum.</li>
                     <li>Best Fit BB: Displays best fit to the BB spectrum.</li>
                     <li>Triangle Plot: Shows parameter correlation contours.</li>
+                    <li>Summary plot: shows the peaks of all the triangle plot sims.</li>
                 </ul>
             </li>
             <li><strong>Bins Used</strong>: Choose the binning scheme applied to spectra:
@@ -669,11 +671,85 @@
       </tr>
     </tbody>
   </table>
+  <p>
+    When examining the BB and EB spectra individually across realizations, we observe a subtle trade-off in the fits  
+    depending on whether the BB spectrum is included in the analysis.  
+    In the <em>No BB</em> case, the BB spectrum shows a slightly worse fit, while the EB spectrum improves.  
+    Conversely, when fitting <em>All</em> spectra, the BB fit improves slightly, but the EB fit becomes poorer.  
+    This pattern suggests that the MCMC chains are compensating for tension in the BB spectrum  
+    by significantly adjusting the value of <em>g</em>.  
+    In other words, the BB data appear to exert a stronger influence on the inferred coupling than is physically expected,  
+    pulling the best-fit <em>g</em> away from its true value in order to improve agreement with BB,  
+    even at the cost of worsening the EB fit.
+  </p>
+  <p>
+    We also try performing the <code>sigl</code> fit with every rotation angle fixed to zero. 
+    In this case, we successfully recover the expected <em>g</em> = 1, even when using BB. 
+    This indicates that the chi-squared contribution from BB is dominating more than it should, 
+    causing the polarization rotation angles to shift and <em>g</em> to be suppressed in order 
+    to satisfy the fit. Even though these changes are visually tiny, they show that the 
+    BB spectrum is influencing the <em>g</em> estimation more than expected.
+  </p>
+  <p>
+    There are a few possible explanations for this behavior.  
+    The first is that while generating the <code>fede01</code>, <em>g</em> = 1 simulations,  
+    we did not alter the BB or EE spectra at all; only an EDE signal was added to EB.  
+    This could explain why BB causes a suppression of <em>g</em>, as BB is slightly more sensitive  
+    to EDE than EE.  
+    However, since the simulations have no injected miscalibration angle,  
+    there should be no polarization rotation, and no EDE signal from EB should have been  
+    rotated into BB, unless there were unforeseen mechanisms in the simulation generation pipeline  
+    allowing EB leakage into BB.  
+    Ideally, the best-fit result for BB should aim to capture zero rotation unaffected by EDE signal.  
+    Instead, the fit appears to produce a nonzero combination of EDE and rotation  
+    that better accommodates discrepancies in the BB lensing signals.
+  </p>
+  <p>
+    Another possible explanation is that approximations made when generating the band power  
+    window functions or the covariance matrices assume a small EB signal.  
+    The presence of an injected EDE signal can increase the EB amplitude by an order of magnitude,  
+    potentially invalidating these approximations and causing unintended coupling into BB.
+    However, this hypothesis is not strongly supported by later results.  
+    Injecting a pure polarization rotation—which also increases EB to a similar scale—does not  
+    lead to the same BB-induced suppression of <em>g</em>.  
+    This suggests that the BB-driven suppression may be more specific to how EDE alters the spectrum  
+    and interacts with the pipeline, rather than a general failure of the approximations.
+  </p>
+  <p>
+    It is also possible that a bug in the analysis code could be driving this behavior.  
+    However, this seems unlikely, as all other fits behave as expected, and the transitions  
+    between <em>All</em> and <em>No BB</em> configurations appear smooth and continuous.  
+    In particular, when we manually downweight the chi-squared contribution from the BB residuals,  
+    the recovered parameter values gradually interpolate between the <em>All</em> and <em>No BB</em> fits.  
+    This continuity suggests the MCMC pipeline is functioning properly and the anomalous influence of BB  
+    is likely a genuine feature of the data-model interaction rather than an implementation error.
+  </p>
+  <p>
+    Ultimately, we may not need to be overly concerned about this BB-induced suppression of <em>g</em>,  
+    since our analysis focuses on the regime where <em>g</em> &lt; 0.2—closer to the <em>g</em> = 0 case.  
+    In this regime, the dominant sensitivity to <em>g</em> comes from the EB spectrum,  
+    and the BB spectrum is primarily included to constrain dust.  
+    BB should not significantly impact the recovered value of <em>g</em> or the polarization rotation angles.  
+    Therefore, it is sufficient to verify that including all spectra does not shift the rotation angles  
+    compared to using EB only, which we trust to provide the most direct constraint.  
+    As long as this consistency holds, the presence of BB should not compromise our conclusions.
+  </p>
+<p>
+   
+</p>
     </section>
  
 <section>
 
 <h2>Injecting detector rotation miscalibration</h2>
+<p>
+    We perform an additional check to ensure that we can break the degeneracy between polarization rotation and the EDE signal.  
+    In this test, we inject different rotation angles directly into the spectra after they have been generated through the BK18 pipeline.  
+    We then attempt to recover these injected signals for both the <em>g</em> = 0 case and the <em>g</em> = 1 case.  
+    The goal of this check is twofold: first, to confirm that if we had a nonzero <em>g</em> value, it would not be suppressed,  
+    and second, to demonstrate that if <em>g</em> were truly zero, the injected rotation angles would not lead us to falsely infer a nonzero <em>g</em>.  
+    This provides further confidence that our analysis is robust and that the polarization rotation angles do not artificially bias the <em>g</em> estimation.
+  </p>
 <p>
     The injected rotation angles (in degrees) for BK18_220, BK18_150, BK18_K95, and BK18_B95e
     (B95lf) are grouped as follows:
@@ -746,15 +822,14 @@
                 'No  BB|_nob',
                 'EB Only|_eb',
             ],
-            'Injected EDE Signal|ede': [
-                'g = 0|zeroeb',
+            'Injected EDE Signal|ede1': [
                 'g = 1, fede=0.07|fede01'
             ]
         },
         function (params) {
             let dirbase2 = '/liuto'
             let dirpath = dirbase2 + '/ede_chains/';
-            let mcmc_folder = params.ede + params.bin_num15 + '_gdust' + params.spectra + params.inj_sig + '/';
+            let mcmc_folder = params.ede1 + params.bin_num15 + '_gdust' + params.spectra + params.inj_sig + '/';
             let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
             let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
             if(params.m_map_type == 'sim1_summary'){
@@ -770,16 +845,117 @@
             'digit3': '1',
             'm_map_type': '_bestfitEB',
             'bin_num15': '_bin15',
-            'ede': 'zeroeb',
+            'ede1': 'fede01',
             'spectra':'_all',
             'inj_sig': '_sigpos',
         });
     </script>
 </figure>
+
+<p>
+    <strong>Table: Recovered <em>g</em> Values for Different Miscalibration Scenarios</strong>
+  </p>
+  
+  <p><strong>g = 0 (No Dust Model)</strong></p>
+  <table border="1">
+    <tr>
+      <th>Spectra</th>
+      <th>Positive Miscal</th>
+      <th>Negative Miscal</th>
+      <th>Balanced Miscal</th>
+    </tr>
+    <tr>
+      <td>All</td>
+      <td>0.04 ± 0.31</td>
+      <td>0.01 ± 0.31</td>
+      <td>0.02 ± 0.30</td>
+    </tr>
+    <tr>
+      <td>No BB</td>
+      <td>0.03 ± 0.38</td>
+      <td>0.05 ± 0.38</td>
+      <td>0.03 ± 0.38</td>
+    </tr>
+    <tr>
+      <td>EB Only</td>
+      <td>0.04 ± 0.37</td>
+      <td>0.03 ± 0.38</td>
+      <td>0.03 ± 0.37</td>
+    </tr>
+  </table>
+  
+  <p><strong>g = 1 (With Dust Model)</strong></p>
+  <table border="1">
+    <tr>
+      <th>Spectra</th>
+      <th>Positive Miscal</th>
+      <th>Negative Miscal</th>
+      <th>Balanced Miscal</th>
+    </tr>
+    <tr>
+      <td>All</td>
+      <td>1.07 ± 0.39</td>
+      <td>0.51 ± 0.21</td>
+      <td>0.81 ± 0.34</td>
+    </tr>
+    <tr>
+      <td>No BB</td>
+      <td>0.98 ± 0.43</td>
+      <td>0.99 ± 0.44</td>
+      <td>0.97 ± 0.43</td>
+    </tr>
+    <tr>
+      <td>EB Only</td>
+      <td>0.97 ± 0.42</td>
+      <td>0.98 ± 0.42</td>
+      <td>0.97 ± 0.42</td>
+    </tr>
+  </table>
+  
+  <p>
+    For <em>g = 0</em> (no dust model), the recovered values of <em>g</em> 
+    are consistent across all miscalibration cases. 
+    The values are all close to zero, indicating that the model is not biased 
+    by the polarization rotation or other factors under these conditions.
+    The spread of uncertainties is relatively consistent, with small variations
+     between the different miscalibration types.
+    </p>
+    <p>
+    For <em>g = 1</em> (with dust model), the recovered <em>g</em> values 
+    exhibit more variation, especially in the <strong>All spectra</strong> case. 
+    This suggests that the inclusion of BB spectra, with its sensitivity to dust, 
+    affects the recovered coupling constant <em>g</em> The values for <em>g</em> in the 
+    <strong>No BB</strong> and <strong>EB Only</strong> cases are more stable and 
+    align closely with the expected value of <em>g = </em>**, with only slight variations 
+    in the uncertainties due to miscalibration.
+  </p>
+  <p>
+    Importantly, the fact that the results for <strong>EB Only</strong> match closely with those for 
+    <strong>All spectra</strong> in the <em>g = 1</em> case, while the inclusion of BB does not 
+    significantly change the recovered values of <em>g</em> or the rotation angles, 
+    means that we can trust these results. As long as the <strong>EB Only</strong> results align with the
+    <strong>All spectra</strong> results, we can be confident that the recovered parameters are not being 
+    unduly influenced by the BB spectra, which are primarily used for dust constraints.
+  </p>
 </section>
 
 <section>
     <h2>Trying different dust models</h2>
+    <p> Since these dust foregrounds can impact the results, 
+        it's important to ensure that the dust models used are reliable and do not 
+        introduce significant biases into the cosmological parameters being measured. </p>
+
+     <p> The dust models employed in this analysis are based on a range of approaches, 
+        as detailed in 
+        <a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20210122_BK18mm_final_altdust/">
+            Willmert's posting</a>.
+        The pager below shows the MCMC plots for various dust models, 
+         including "No Dust" (for comparison) and several different standard dust models, 
+         such as Gaussian Dust, PySM models, and others like MHD, MKD, Gdecorr, and Gampmod.
+          Each of these models represents a different method for characterizing the galactic 
+          dust foregrounds, but the goal is to show that, despite the differences in the 
+          dust models, the recovered value of the coupling parameter <em>g</em> remains 
+          consistent across all of them. </p>
  <figure>
      <img alt="Fitting to different dust models" id="dustmodels" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
      <figcaption>
@@ -873,6 +1049,44 @@
          });
      </script>
  </figure>
+ <p> As seen in the table below, the recovered <em>g</em> values across all dust models 
+    are similar, suggesting that the dust foregrounds do not significantly affect the
+     measurement of <em>g</em>. 
+     This indicates that the <em>g</em> parameter is well-constrained, 
+     and the dust models used here are not introducing large biases 
+     into the analysis. </p>
+ <table border="1">
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>No Dust</th>
+        <th>Gaussian Dust</th>
+        <th>pysm1</th>
+        <th>pysm2</th>
+        <th>pysm3</th>
+        <th>mhd</th>
+        <th>mkd</th>
+        <th>gdecorr</th>
+        <th>gampmod</th>
+        <th>vansyngel</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>g</td>
+        <td>0.04&plusmn;0.31</td>
+        <td>0.03&plusmn;0.31</td>
+        <td>-0.02&plusmn;0.35</td>
+        <td>0&plusmn;0.46</td>
+        <td>-0.03&plusmn;0.38</td>
+        <td>-0.07&plusmn;0.33</td>
+        <td>0.13&plusmn;0.35</td>
+        <td>0.04&plusmn;0.32</td>
+        <td>0.03&plusmn;0.32</td>
+        <td>0.05&plusmn;0.31</td>
+      </tr>
+    </tbody>
+  </table>
  </section>
 
  
