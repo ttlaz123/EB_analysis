@@ -236,8 +236,14 @@
     </script>
 </figure>
 Below is a summary of the results over the peaks of the simulations.
+<p>
+    MCMC fit results for <em>g</em> = 0 (no dust model). We see that while there  
+    is a slight positive bias for <em>g</em> and a slight negative bias for  
+    the polarization rotation angles, those biases remain small compared to  
+    the overall posterior spread.
+  </p>
 <table>
-    <caption>MCMC fit results for <em>g</em> = 0 (no dust model)</caption>
+   
     <thead>
       <tr>
         <th>Spectra</th>
@@ -252,32 +258,40 @@ Below is a summary of the results over the peaks of the simulations.
       <tr>
         <th>All</th>
         <td>0.03 ± 0.27</td>
-        <td>–0.01 ± 0.22</td>
-        <td>–0.01 ± 0.14</td>
-        <td>–0.01 ± 0.23</td>
-        <td>–0.02 ± 0.13</td>
+        <td>-0.01 ± 0.22</td>
+        <td>-0.01 ± 0.14</td>
+        <td>-0.01 ± 0.23</td>
+        <td>-0.02 ± 0.13</td>
       </tr>
       <tr>
         <th>No BB</th>
         <td>0.05 ± 0.37</td>
-        <td>–0.03 ± 0.24</td>
-        <td>–0.03 ± 0.19</td>
-        <td>–0.02 ± 0.26</td>
-        <td>–0.03 ± 0.18</td>
+        <td>-0.03 ± 0.24</td>
+        <td>-0.03 ± 0.19</td>
+        <td>-0.02 ± 0.26</td>
+        <td>-0.03 ± 0.18</td>
       </tr>
       <tr>
         <th>EB only</th>
         <td>0.03 ± 0.37</td>
-        <td>–0.02 ± 0.24</td>
-        <td>–0.02 ± 0.19</td>
-        <td>–0.02 ± 0.26</td>
-        <td>–0.02 ± 0.18</td>
+        <td>-0.02 ± 0.24</td>
+        <td>-0.02 ± 0.19</td>
+        <td>-0.02 ± 0.26</td>
+        <td>-0.02 ± 0.18</td>
       </tr>
     </tbody>
   </table>
-  
+  <p>
+    For <em>g</em> = 1 (no dust model), fitting to all three spectra yields a pronounced  
+    suppression of the recovered coupling, offset by large positive shifts in each  
+    rotation angle. This behaviour reflects a degeneracy between the injected EDE signal  
+    and polarization miscalibration.  
+    Omitting the BB spectrum from the MCMC fit restores the recovered coupling distribution  
+    to match the <em>g</em> = 0 case, albeit with a slightly broader posterior, demonstrating  
+    that the BB data drive the apparent bias in the full-spectrum analysis.
+  </p>
   <table>
-    <caption>MCMC fit results for <em>g</em> = 1 (no dust model)</caption>
+  
     <thead>
       <tr>
         <th>Spectra</th>
@@ -300,24 +314,44 @@ Below is a summary of the results over the peaks of the simulations.
       <tr>
         <th>No BB</th>
         <td>1.02 ± 0.44</td>
-        <td>–0.04 ± 0.25</td>
-        <td>–0.02 ± 0.21</td>
-        <td>–0.03 ± 0.26</td>
-        <td>–0.03 ± 0.19</td>
+        <td>-0.04 ± 0.25</td>
+        <td>-0.02 ± 0.21</td>
+        <td>-0.03 ± 0.26</td>
+        <td>-0.03 ± 0.19</td>
       </tr>
       <tr>
         <th>EB only</th>
         <td>1.00 ± 0.42</td>
-        <td>–0.03 ± 0.25</td>
-        <td>–0.01 ± 0.20</td>
-        <td>–0.02 ± 0.23</td>
-        <td>–0.02 ± 0.19</td>
+        <td>-0.03 ± 0.25</td>
+        <td>-0.01 ± 0.20</td>
+        <td>-0.02 ± 0.23</td>
+        <td>-0.02 ± 0.19</td>
       </tr>
     </tbody>
   </table>
+  <p>
+    MCMC fit results for <em>g</em> = 0 (with dust model). We see similar results to  
+    the <em>g</em> = 0 case without dust, albeit with slightly broader posteriors.  
+    Allowing dust parameters to float propagates their uncertainty into other  
+    parameters such as <em>g</em> and the rotation angles.  
+    When fitting all three spectra, the EE and BB dust parameters are well constrained.  
+    The EB dust amplitude, however, peaks at zero, leaving  
+    \( \alpha_{\text{dust}} \) poorly determined. This is evident from the fact that  
+    the summary‐level spread is much smaller than the spread seen in individual  
+    simulations, reflecting the influence of the prior constraint.  
+    Excluding BB from the fit causes the BB dust parameters to become unconstrained,  
+    allowing individual‐simulation spreads to reach the prior bounds while the  
+    summary distribution remains narrow. The same effect occurs when excluding EE,  
+    in which case the dust spectral index \( \beta \) also becomes poorly constrained.  
+    In all scenarios, the recovered rotation angles and <em>g</em> remain consistent,  
+    differing only by modest increases in their posterior widths.  
+    Our recovered dust parameters are roughly consistent with  
+    <a href="https://bicep.rc.fas.harvard.edu/dbeck/20230202_cmbbirefringence/">Dominic’s posting</a>,  
+    with any minor discrepancies attributable to our use of different datasets.
+  </p>
   
   <table>
-    <caption>MCMC fit results for <em>g</em> = 0 (with dust model)</caption>
+
     <thead>
       <tr>
         <th>Spectra</th>
@@ -340,13 +374,13 @@ Below is a summary of the results over the peaks of the simulations.
         <th>All</th>
         <td>0.03 ± 0.31</td>
         <td>0.01 ± 0.22</td>
-        <td>–0.02 ± 0.17</td>
+        <td>-0.02 ± 0.17</td>
         <td>0.02 ± 0.27</td>
-        <td>–0.02 ± 0.15</td>
+        <td>-0.02 ± 0.15</td>
         <td>7.7 ± 1.3</td>
-        <td>–0.33 ± 0.18</td>
+        <td>-0.33 ± 0.18</td>
         <td>3.86 ± 0.8</td>
-        <td>–0.31 ± 0.18</td>
+        <td>-0.31 ± 0.18</td>
         <td>0.00 ± 0.40</td>
         <td>—</td>
         <td>1.68 ± 0.15</td>
@@ -354,15 +388,15 @@ Below is a summary of the results over the peaks of the simulations.
       <tr>
         <th>No BB</th>
         <td>0.04 ± 0.38</td>
-        <td>–0.01 ± 0.26</td>
-        <td>–0.04 ± 0.21</td>
+        <td>-0.01 ± 0.26</td>
+        <td>-0.04 ± 0.21</td>
         <td>0.01 ± 0.29</td>
-        <td>–0.03 ± 0.18</td>
+        <td>-0.03 ± 0.18</td>
         <td>8.36 ± 1.46</td>
-        <td>–0.33 ± 0.18</td>
+        <td>-0.33 ± 0.18</td>
         <td>—</td>
         <td>—</td>
-        <td>–0.07 ± 0.45</td>
+        <td>-0.07 ± 0.45</td>
         <td>—</td>
         <td>1.79 ± 0.26</td>
       </tr>
@@ -370,14 +404,14 @@ Below is a summary of the results over the peaks of the simulations.
         <th>EB only</th>
         <td>0.03 ± 0.38</td>
         <td>0.00 ± 0.25</td>
-        <td>–0.03 ± 0.21</td>
+        <td>-0.03 ± 0.21</td>
         <td>0.02 ± 0.28</td>
-        <td>–0.02 ± 0.18</td>
+        <td>-0.02 ± 0.18</td>
         <td>—</td>
         <td>—</td>
         <td>—</td>
         <td>—</td>
-        <td>–0.03 ± 0.45</td>
+        <td>-0.03 ± 0.45</td>
         <td>—</td>
         <td>—</td>
       </tr>
