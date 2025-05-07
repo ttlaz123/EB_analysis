@@ -31,6 +31,13 @@
     <hr>
     <section>
         <h2>Introduction</h2>
+        <p><strong>Summary:</strong> EB-only and full-spectrum fits both recover <em>g ≈ 0</em> with minor bias;
+            rotation angles remain near zero, supporting the robustness of the pipeline for multiple different 
+            dust and detector miscalibration models. 
+            When fitting for data at <em>g = 1</em>, 
+            including BB suppresses <em>g</em> to due to compensatory shifts
+            in rotation angles. Removing BB restores expected recovery near <em>g = 1</em>.</p>
+              
         <p>This posting builds upon previous updates:</p>
   <ul>
     <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20240924_preliminary_eb_ede_results/">
@@ -40,30 +47,20 @@
     <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20250218_ede_forecast/">
         2025-02-18: EDE Forecast</a></li>
   </ul>
-  <p><strong>Summary:</strong> EB-only and full-spectrum fits both recover <em>g ≈ 0</em> with minor bias;
-rotation angles remain near zero, supporting the robustness of the pipeline.</p>
-<p><strong>Summary:</strong> Including BB suppresses <em>g</em> to ~0.62 due to compensatory shifts
-in rotation angles. Removing BB restores expected recovery near <em>g = 1</em>.</p>
-  <p>
+  <p></p>
     Here, we further demonstrate the robustness of our method for fitting early dark energy (EDE)
     parameters by expanding the pipeline to also include EE and BB spectra alongside EB. While
     EE and BB are far less sensitive to polarization rotation or EDE parameters than EB,
     their inclusion helps calibrate nuisance parameters like dust, ultimately tightening
     constraints on the EB-inferred rotation angle. 
 </p>
-<p>
-    We inject the EDE signal exclusively into the EB spectrum, consistent with the expectation
-    that EE and BB modifications from EDE are negligible in the absence of polarization rotation.
-    Since the simulations assume zero rotation angle, there are no mechanisms by which EB could
-    leak into BB or EE. Our MCMC pipeline similarly assumes that the injected signal affects only EB,
-    with no EDE contributions modeled for EE or BB.
-</p>
+
 <p>
     We jointly fit dust and EDE parameters to ensure that uncertainties in the dust model
-    are properly propagated into our estimates of ( g ) and the rotation angles.
+    are properly propagated into our estimates of \( g \) and the rotation angles.
     Across all configurations tested, we find no significant degeneracy between
     the foreground dust parameters and the EDE coupling. EB remains the primary
-    spectrum constraining ( g ), with EE and BB helping calibrate polarization amplitude
+    spectrum constraining \( g \), with EE and BB helping calibrate polarization amplitude
     and dust components.
 </p>
 
@@ -95,24 +92,23 @@ in rotation angles. Removing BB restores expected recovery near <em>g = 1</em>.<
   </p>
 
   <p>
-    The total, unrotated cross-frequency spectra \(\hat{D}_\ell^{XY,\,\nu_1 \times \nu_2}\) include CMB and foregrounds, with the assumption that foregrounds contribute no EB:
+    The cross-frequency spectra \(\hat{D}_\ell^{XY,\,\nu_1 \times \nu_2}\) include CMB and foregrounds, with the assumption 
+    that the spectral index \(\beta_d\) is shared between EE, BB, and EB, while the dust amplitudes and exponents
+    \(A_d^{XY}\) and \(\alpha_d^{XY}\) is different for each spectrum. \(f_d^{\nu}\) is the bandpass function for each receiver:
   </p>
 
   <p>
     \[
-    \hat{D}_\ell^{EE,\,\nu_1 \times \nu_2} = P_{\rm cal}^{\nu_1} P_{\rm cal}^{\nu_2} \left[ 
-    \tilde{D}_\ell^{EE,\,{\rm CMB}} + f_d^{\nu_1} f_d^{\nu_2} A_d^{EE} \left(\frac{\ell}{80}\right)^{\alpha_d^{EE}} 
-    + f_s^{\nu_1} f_s^{\nu_2} A_s^{EE} \left(\frac{\ell}{80}\right)^{\alpha_s^{EE}} 
-    \right]
+    \hat{D}_\ell^{EE,\,\nu_1 \times \nu_2} =  
+    \tilde{D}_\ell^{EE,\,{\rm CMB}} + f_d^{\nu_1}(\beta_d) f_d^{\nu_2}(\beta_d) A_d^{EE} \left(\frac{\ell}{80}\right)^{\alpha_d^{EE}} 
     \]
     \[
-    \hat{D}_\ell^{BB,\,\nu_1 \times \nu_2} = P_{\rm cal}^{\nu_1} P_{\rm cal}^{\nu_2} \left[ 
-    \tilde{D}_\ell^{BB,\,{\rm CMB}} + f_d^{\nu_1} f_d^{\nu_2} A_d^{BB} \left(\frac{\ell}{80}\right)^{\alpha_d^{BB}} 
-    + f_s^{\nu_1} f_s^{\nu_2} A_s^{BB} \left(\frac{\ell}{80}\right)^{\alpha_s^{BB}} 
-    \right]
+    \hat{D}_\ell^{BB,\,\nu_1 \times \nu_2} = 
+    \tilde{D}_\ell^{BB,\,{\rm CMB}} + f_d^{\nu_1}(\beta_d) f_d^{\nu_2}(\beta_d) A_d^{BB} \left(\frac{\ell}{80}\right)^{\alpha_d^{BB}} 
     \]
     \[
-    \hat{D}_\ell^{EB,\,\nu_1 \times \nu_2} = P_{\rm cal}^{\nu_1} P_{\rm cal}^{\nu_2} \tilde{D}_\ell^{EB,\,{\rm CMB}}
+    \hat{D}_\ell^{EB,\,\nu_1 \times \nu_2} = 
+    \tilde{D}_\ell^{EB,\,{\rm CMB}} + f_d^{\nu_1}(\beta_d) f_d^{\nu_2}(\beta_d) A_d^{EB} \left(\frac{\ell}{80}\right)^{\alpha_d^{EB}} 
     \]
   </p>
 
@@ -134,8 +130,9 @@ in rotation angles. Removing BB restores expected recovery near <em>g = 1</em>.<
     \bar{D}_{\ell}^{BE,\,\nu_1 \times \nu_2} = \hat{D}_{\ell}^{EE} \sin(2\alpha^{\nu_1}) \cos(2\alpha^{\nu_2}) - \hat{D}_{\ell}^{BB} \cos(2\alpha^{\nu_1}) \sin(2\alpha^{\nu_2}) - \hat{D}_{\ell}^{EB} \sin(2\alpha^{\nu_1}) \sin(2\alpha^{\nu_2}) + \hat{D}_{\ell}^{BE} \cos(2\alpha^{\nu_1}) \cos(2\alpha^{\nu_2})
     \]
   </p>
-</section>
-<figure>
+
+<p>These steps are summarized in <a href="#fig-summary">Figure 1.1</a>.</p>
+<figure id="fig-summary">
     <img src="visual_summary.png" width="750" height="500">
     <figcaption>
         <strong>Figure:</strong> Overview of model components and potential systematics in CMB polarization analysis.  
@@ -250,6 +247,13 @@ in rotation angles. Removing BB restores expected recovery near <em>g = 1</em>.<
     who considers other values such as \( f_{\mathrm{EDE}} = 0.0872 \) and
     \( f_{\mathrm{EDE}} = 0.1271 \). For our final fits of the coupling \( g \),
     we plan to explore a grid of \( f_{\mathrm{EDE}} \) values based on multiple best-fit spectra.
+</p>
+<p>
+    We inject the EDE signal exclusively into the EB spectrum, consistent with the expectation
+    that EE and BB modifications from EDE are negligible in the absence of polarization rotation.
+    Since the simulations assume zero rotation angle, there are no mechanisms by which EB could
+    leak into BB or EE. Our MCMC pipeline similarly assumes that the injected signal affects only EB,
+    with no EDE contributions modeled for EE or BB.
 </p>
 <p>
     For each dataset, we fit to three spectrum combinations: EB only, EE + EB, and full EE + EB + BB.
