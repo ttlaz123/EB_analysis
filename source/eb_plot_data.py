@@ -493,8 +493,16 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None,
 
         # Plot histogram of chi2 values
     if 'chi2' in modes_df.columns:
+        overflow_threshold = np.percentile(modes_df['chi2'], percentile_clip[-1])
+        bin_edges = np.linspace(modes_df['chi2'].min(), overflow_threshold, 19)  # 19 regular bins
+        bin_edges = np.append(bin_edges, [modes_df['chi2'].max()])  # last bin includes outliers
+        counts, edges = np.histogram(modes_df['chi2'], bins=bin_edges)
+        # Adjust bin labels (last bin will be overflow)
+        bin_labels = [f"{edges[i]:.1f}–{edges[i+1]:.1f}" for i in range(len(edges)-2)]
+        bin_labels.append(f">{overflow_threshold:.1f}")
         plt.figure(figsize=(7, 5))
-        plt.hist(modes_df['chi2'], bins=20, color='purple', alpha=0.7, edgecolor='black')
+        plt.bar(range(len(counts)), counts, color='purple', alpha=0.7, edgecolor='black')
+        plt.xticks(range(len(counts)), bin_labels, rotation=45, ha='right')
         plt.xlabel('Best-fit $\chi^2$')
         plt.ylabel('Number of simulations')
         plt.title('Distribution of Best-fit $\chi^2$ over Simulations')
