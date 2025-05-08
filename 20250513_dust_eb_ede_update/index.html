@@ -141,16 +141,24 @@
   </p>
   <p>
     \[
-    \bar{D}_{\ell}^{EE,\,\nu_1 \times \nu_2} = \hat{D}_{\ell}^{EE} \cos(2\alpha^{\nu_1}) \cos(2\alpha^{\nu_2}) + \hat{D}_{\ell}^{BB} \sin(2\alpha^{\nu_1}) \sin(2\alpha^{\nu_2}) - \hat{D}_{\ell}^{EB} \cos(2\alpha^{\nu_1}) \sin(2\alpha^{\nu_2}) - \hat{D}_{\ell}^{BE} \sin(2\alpha^{\nu_1}) \cos(2\alpha^{\nu_2})
+    \bar{D}_{\ell}^{EE,\,\nu_1 \times \nu_2} = \hat{D}_{\ell}^{EE} \cos(2\alpha^{\nu_1}) \cos(2\alpha^{\nu_2}) + 
+    \hat{D}_{\ell}^{BB} \sin(2\alpha^{\nu_1}) \sin(2\alpha^{\nu_2}) - \hat{D}_{\ell}^{EB} \cos(2\alpha^{\nu_1}) \sin(2\alpha^{\nu_2}) - 
+    \hat{D}_{\ell}^{BE} \sin(2\alpha^{\nu_1}) \cos(2\alpha^{\nu_2})
     \]
     \[
-    \bar{D}_{\ell}^{BB,\,\nu_1 \times \nu_2} = \hat{D}_{\ell}^{EE} \sin(2\alpha^{\nu_1}) \sin(2\alpha^{\nu_2}) + \hat{D}_{\ell}^{BB} \cos(2\alpha^{\nu_1}) \cos(2\alpha^{\nu_2}) + \hat{D}_{\ell}^{EB} \sin(2\alpha^{\nu_1}) \cos(2\alpha^{\nu_2}) + \hat{D}_{\ell}^{BE} \cos(2\alpha^{\nu_1}) \sin(2\alpha^{\nu_2})
+    \bar{D}_{\ell}^{BB,\,\nu_1 \times \nu_2} = \hat{D}_{\ell}^{EE} \sin(2\alpha^{\nu_1}) \sin(2\alpha^{\nu_2}) + 
+    \hat{D}_{\ell}^{BB} \cos(2\alpha^{\nu_1}) \cos(2\alpha^{\nu_2}) + \hat{D}_{\ell}^{EB} \sin(2\alpha^{\nu_1}) \cos(2\alpha^{\nu_2}) + 
+    \hat{D}_{\ell}^{BE} \cos(2\alpha^{\nu_1}) \sin(2\alpha^{\nu_2})
     \]
     \[
-    \bar{D}_{\ell}^{EB,\,\nu_1 \times \nu_2} = \hat{D}_{\ell}^{EE} \cos(2\alpha^{\nu_1}) \sin(2\alpha^{\nu_2}) - \hat{D}_{\ell}^{BB} \sin(2\alpha^{\nu_1}) \cos(2\alpha^{\nu_2}) + \hat{D}_{\ell}^{EB} \cos(2\alpha^{\nu_1}) \cos(2\alpha^{\nu_2}) - \hat{D}_{\ell}^{BE} \sin(2\alpha^{\nu_1}) \sin(2\alpha^{\nu_2})
+    \bar{D}_{\ell}^{EB,\,\nu_1 \times \nu_2} = \hat{D}_{\ell}^{EE} \cos(2\alpha^{\nu_1}) \sin(2\alpha^{\nu_2}) - 
+    \hat{D}_{\ell}^{BB} \sin(2\alpha^{\nu_1}) \cos(2\alpha^{\nu_2}) + \hat{D}_{\ell}^{EB} \cos(2\alpha^{\nu_1}) \cos(2\alpha^{\nu_2}) - 
+    \hat{D}_{\ell}^{BE} \sin(2\alpha^{\nu_1}) \sin(2\alpha^{\nu_2})
     \]
     \[
-    \bar{D}_{\ell}^{BE,\,\nu_1 \times \nu_2} = \hat{D}_{\ell}^{EE} \sin(2\alpha^{\nu_1}) \cos(2\alpha^{\nu_2}) - \hat{D}_{\ell}^{BB} \cos(2\alpha^{\nu_1}) \sin(2\alpha^{\nu_2}) - \hat{D}_{\ell}^{EB} \sin(2\alpha^{\nu_1}) \sin(2\alpha^{\nu_2}) + \hat{D}_{\ell}^{BE} \cos(2\alpha^{\nu_1}) \cos(2\alpha^{\nu_2})
+    \bar{D}_{\ell}^{BE,\,\nu_1 \times \nu_2} = \hat{D}_{\ell}^{EE} \sin(2\alpha^{\nu_1}) \cos(2\alpha^{\nu_2}) -
+     \hat{D}_{\ell}^{BB} \cos(2\alpha^{\nu_1}) \sin(2\alpha^{\nu_2}) - \hat{D}_{\ell}^{EB} \sin(2\alpha^{\nu_1}) \sin(2\alpha^{\nu_2}) + 
+     \hat{D}_{\ell}^{BE} \cos(2\alpha^{\nu_1}) \cos(2\alpha^{\nu_2})
     \]
   </p>
   <p>
@@ -243,6 +251,45 @@
         J. Willmert’s posting
     </a>. This helps determine whether the inferred coupling \( g \) is sensitive to dust modeling.
 </p>
+
+<h3>Differences from Mainline <em>r</em> Analysis</h3>
+<p>
+    Our analysis departs from the standard BICEP/Keck tensor-to-scalar ratio (<em>r</em>) pipeline in several key ways:
+  </p>
+  
+  <ul>
+    <li>
+      <strong>Focus on EB:</strong> While the mainline analysis relies primarily on BB spectra,
+       we incorporate the EB spectrum as the main observable, which is not used in the standard 
+       <em>r</em> analysis beyond calibrating the detector rotation.
+    </li>
+    <li>
+      <strong>Neglect of Synchrotron Radiation:</strong> 
+      We assume negligible synchrotron emission and exclude it from the model. 
+      In contrast, the main <em>r</em> pipeline jointly fits synchrotron and dust foregrounds.
+    </li>
+    <li>
+      <strong>Gaussian Likelihood:</strong> 
+      We use a Gaussian likelihood approximation for all spectra. 
+      The standard <em>r</em> analysis uses Hamimeche–Lewis tailored to non-Gaussian distributions in low-ℓ BB.
+    </li>
+    <li>
+      <strong>Extended Multipole Range:</strong> 
+      Our analysis uses data up to bin 15 (ℓ ≈ 500), 
+      beyond the typical BB-focused range of bins 2–10 used in the mainline analysis.
+    </li>
+    <li>
+      <strong>EDE Signal Injection in EB Only:</strong> 
+      We assume EDE only affects the EB spectrum, with no impact on EE or BB. 
+      The mainline <em>r</em> analysis does not include any early dark energy modeling.
+    </li>
+  </ul>
+  
+  <p>
+    These differences reflect the distinct goals of this analysis,
+    namely, probing polarization rotation and early dark energy signatures in EB,
+    rather than measuring the primordial gravitational wave amplitude via BB.
+  </p>
     </section>
 
 
@@ -338,7 +385,8 @@ This is further detailed in <a href="https://bicep.rc.fas.harvard.edu/bkcmb/anal
             </li>
             <li><strong>Map Sim num</strong>: Choose the simulation number (three digits) to view results for a particular realization.</li>
         </ul>
-        <p>This interactive plot allows detailed exploration of multicomponent analysis by adjusting map types, binning, theoretical assumptions, spectra selections, EDE signal injections, and simulation numbers.</p>
+        <p>This interactive plot allows detailed exploration of multicomponent analysis by adjusting 
+            map types, binning, theoretical assumptions, spectra selections, EDE signal injections, and simulation numbers.</p>
     </figcaption>
 
     <script type="text/javascript">
@@ -738,9 +786,11 @@ This is further detailed in <a href="https://bicep.rc.fas.harvard.edu/bkcmb/anal
                     <li>g = 0: No rotation, null birefringence.</li>
                 </ul>
             </li>
-            <li><strong>Map Sim num</strong>: Choose the simulation number (three digits) to view results for a particular realization.</li>
+            <li><strong>Map Sim num</strong>: 
+                Choose the simulation number (three digits) to view results for a particular realization.</li>
         </ul>
-        <p>This interactive plot allows detailed exploration of multicomponent analysis by adjusting map types, binning, theoretical assumptions, spectra selections, EDE signal injections, and simulation numbers.</p>
+        <p>This interactive plot allows detailed exploration of multicomponent analysis by adjusting 
+            map types, binning, theoretical assumptions, spectra selections, EDE signal injections, and simulation numbers.</p>
     </figcaption>
 
     <script type="text/javascript">
@@ -978,7 +1028,8 @@ This is further detailed in <a href="https://bicep.rc.fas.harvard.edu/bkcmb/anal
             </li>
             <li><strong>Map Sim num</strong>: Choose the simulation number (three digits) to view results for a particular realization.</li>
         </ul>
-        <p>This interactive plot allows detailed exploration of multicomponent analysis by adjusting map types, binning, theoretical assumptions, spectra selections, EDE signal injections, and simulation numbers.</p>
+        <p>This interactive plot allows detailed exploration of multicomponent analysis by adjusting 
+            map types, binning, theoretical assumptions, spectra selections, EDE signal injections, and simulation numbers.</p>
     </figcaption>
 
     <script type="text/javascript">
@@ -1164,13 +1215,15 @@ This is further detailed in <a href="https://bicep.rc.fas.harvard.edu/bkcmb/anal
              </li>
              <li><strong>Dust model</strong>: Select the theoretical dust model used for comparison:
                  <ul>
-                 Dust models acquired from <a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20210122_BK18mm_final_altdust/">J. Willmert's posting</a>
+                 Dust models acquired from 
+                 <a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20210122_BK18mm_final_altdust/">J. Willmert's posting</a>
                  </ul>
              </li>
              </li>
              <li><strong>Map Sim num</strong>: Choose the simulation number (three digits) to view results for a particular realization.</li>
          </ul>
-         <p>This interactive plot allows detailed exploration of multicomponent analysis by adjusting map types, binning, theoretical assumptions, spectra selections, EDE signal injections, and simulation numbers.</p>
+         <p>This interactive plot allows detailed exploration of multicomponent analysis by adjusting 
+            map types, binning, theoretical assumptions, spectra selections, EDE signal injections, and simulation numbers.</p>
      </figcaption>
  
      <script type="text/javascript">
