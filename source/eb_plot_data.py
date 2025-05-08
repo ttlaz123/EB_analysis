@@ -491,6 +491,21 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None,
         print('Saved to ' + outpath)
         plt.show()
 
+        # Plot histogram of chi2 values
+    if 'chi2' in modes_df.columns:
+        plt.figure(figsize=(7, 5))
+        plt.hist(modes_df['chi2'], bins=20, color='purple', alpha=0.7, edgecolor='black')
+        plt.xlabel('Best-fit $\chi^2$')
+        plt.ylabel('Number of simulations')
+        plt.title('Distribution of Best-fit $\chi^2$ over Simulations')
+        plt.grid(True)
+        hist_outpath = chains_path.split('XXX')[0] + 'chisq_hist.png'
+        plt.savefig(hist_outpath)
+        print('Saved chi2 histogram to ' + hist_outpath)
+        plt.show()
+    else:
+        print("No 'chi2' column found for histogram.")
+
 def read_sampler(filepath):
     """
     Reads MCMC sampler data from a file and returns it as a DataFrame.
