@@ -364,7 +364,7 @@ This is further detailed in <a href="https://bicep.rc.fas.harvard.edu/bkcmb/anal
                     <li>2–15: Uses bins 2 through 15.</li>
                 </ul>
             </li>
-            <li><strong>Theory comp</strong>: Select the theoretical model used for comparison:
+            <li><strong>Dust model</strong>: Select the theoretical model used for comparison:
                 <ul>
                     <li>Fixed dust fit: Dust parameters fixed to zero.</li>
                     <li>Nominal Dust fit: Dust parameters are floated in the fit.</li>
@@ -759,7 +759,7 @@ This is further detailed in <a href="https://bicep.rc.fas.harvard.edu/bkcmb/anal
                     <li>2–15: Uses bins 2 through 15.</li>
                 </ul>
             </li>
-            <li><strong>Theory comp</strong>: Select the theoretical model used for comparison:
+            <li><strong>Model</strong>: Select the theoretical model used for comparison:
                 <ul>
                     <li>Fixed dust fit: Dust parameters fixed to zero.</li>
                     <li>Nominal Dust fit: Dust parameters are floated in the fit.</li>
@@ -804,7 +804,7 @@ This is further detailed in <a href="https://bicep.rc.fas.harvard.edu/bkcmb/anal
             'Bins Used|bin_num15': [
                 '2-15|_bin15',
             ],
-            'Theory comp|theory_comp':[
+            'Model|theory_comp':[
                 'Fixed dust fit|_fixeddust',
                 'Nominal Dust fit|_gdust',
                 'Signal Only|_sigl',
@@ -1021,6 +1021,13 @@ This is further detailed in <a href="https://bicep.rc.fas.harvard.edu/bkcmb/anal
 
                 </ul>
             </li>
+            <li><strong>Spectra</strong>: Choose which spectra to include in the fit:
+                <ul>
+                    <li>All: Includes EE, EB, and BB.</li>
+                    <li>No BB: Includes EE and EB only.</li>
+                    <li>EB only: Only EB spectrum is used.</li>
+                </ul>
+            </li>
             </li>
             <li><strong>Map Sim num</strong>: Choose the simulation number (three digits) to view results for a particular realization.</li>
         </ul>
@@ -1173,7 +1180,7 @@ This is further detailed in <a href="https://bicep.rc.fas.harvard.edu/bkcmb/anal
 </section>
 
 <section>
-    <h2>Trying different dust models</h2>
+    <h2>Fitting to datasets with different dust models</h2>
     <p> Since these dust foregrounds can impact the results, 
         it's important to ensure that the dust models used are reliable and do not 
         introduce significant biases into the cosmological parameters being measured. </p>
@@ -1337,8 +1344,8 @@ This is further detailed in <a href="https://bicep.rc.fas.harvard.edu/bkcmb/anal
     ensure the robustness and consistency of our analysis.
 </p>
 <p>
-    One crucial next step is to test our results on different EB curves generated from 
-    various Fede parameters. By running MCMC chains using these alternate EB curves, 
+    One next step is to test our results on different EB curves generated from 
+    various EDE parameters. By running MCMC chains using these alternate EB curves, 
     we can verify that our results are consistent regardless of the specific choice of 
     EB spectra. The choice of EB spectrum may have subtle 
     effects on the recovered parameters, and ensuring that our analysis is insensitive 
