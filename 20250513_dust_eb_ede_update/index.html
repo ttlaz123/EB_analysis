@@ -1074,7 +1074,7 @@ This is further detailed in <a href="https://bicep.rc.fas.harvard.edu/bkcmb/anal
             let mcmc_folder = params.ede1 + params.bin_num15 + '_gdust' + params.spectra + params.inj_sig + '/';
             let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
             let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
-            if(params.m_map_type == 'sim1_summary'){
+            if(params.m_map_type == 'sim1_summary' || params.m_map_type == 'chisq_hist'){
                 name = dirpath + mcmc_folder + params.m_map_type + '.png'
             }
             console.log(name);
@@ -1274,9 +1274,9 @@ This is further detailed in <a href="https://bicep.rc.fas.harvard.edu/bkcmb/anal
              let mcmc_folder = params.eded + params.bin_num15 + params.dust_model + params.spectrad + '/';
              let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
              let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
-             if(params.m_map_type == 'sim1_summary'){
-                 name = dirpath + mcmc_folder + params.m_map_type + '.png'
-             }
+             if(params.m_map_type == 'sim1_summary' || params.m_map_type == 'chisq_hist'){
+                name = dirpath + mcmc_folder + params.m_map_type + '.png'
+            }
              console.log(name);
              return name;
          });
