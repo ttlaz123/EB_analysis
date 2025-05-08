@@ -423,7 +423,7 @@ def plot_eigenvalues_eigenvectors(matrix):
     return
 
 def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None, 
-                   use_median=True, percentile_clip=(0.5, 99.5)):
+                   use_median=True, percentile_clip=(2, 98)):
     modes_dict = {}
     single_df = None
     simcount = 0
