@@ -934,15 +934,17 @@ This is further detailed in <a href="https://bicep.rc.fas.harvard.edu/bkcmb/anal
     that better accommodates discrepancies in the BB lensing signals.
   </p>
   <p>
-    Another possible explanation is that approximations made when generating the band power  
-    window functions or the covariance matrices assume a small EB signal.  
-    The presence of an injected EDE signal can increase the EB amplitude by an order of magnitude,  
-    potentially invalidating these approximations and causing unintended coupling into BB.
-    However, this hypothesis is not strongly supported by later results.  
-    Injecting a pure polarization rotation, which also increases EB to a similar scale, does not  
-    lead to the same BB-induced suppression of <em>g</em>.  
-    This suggests that the BB-driven suppression may be more specific to how EDE alters the spectrum  
-    and interacts with the pipeline, rather than a general failure of the approximations.
+    Another possible explanation is that the approximations used in generating the band power 
+  window functions or covariance matrices assume a negligible EB signal,consistent with ΛCDM, 
+  where the theoretical expectation for EB is zero and only noise contributes to its observed amplitude.  
+  Injecting an EDE signal increases the EB power by more than an order of magnitude, 
+  potentially violating the assumptions underlying these approximations and introducing spurious 
+  coupling into BB.  
+  However, this hypothesis is not strongly supported by later results.  
+  When we inject a pure polarization rotation, which similarly boosts EB power, 
+  we do not observe the same BB-driven suppression of the coupling parameter <em>g</em>.  
+  This suggests that the suppression may be a specific feature of how EDE modifies the 
+  spectrum and interacts with the pipeline, rather than a general breakdown of approximation validity.
   </p>
   <p>
     It is also possible that a bug in the analysis code could be driving this behavior.  
