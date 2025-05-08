@@ -413,7 +413,8 @@ This is further detailed in <a href="https://bicep.rc.fas.harvard.edu/bkcmb/anal
                 'Best Fit EB|_bestfitEB',
                 'Best Fit BB|_bestfitBB',
                 'Triangle Plot|_triangle_plot',
-                'Summary Plot (Peaks histogram)|sim1_summary'
+                'Summary Plot (Peaks histogram)|sim1_summary',
+                'Chi Squared histogram|chisq_hist'
             ],
             'Bins Used|bin_num15': [
                 '2-15|_bin15',
@@ -438,7 +439,7 @@ This is further detailed in <a href="https://bicep.rc.fas.harvard.edu/bkcmb/anal
             let mcmc_folder = params.ede + params.bin_num15 + params.theory_comp + params.spectra + '/';
             let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
             let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
-            if(params.m_map_type == 'sim1_summary'){
+            if(params.m_map_type == 'sim1_summary' || params.m_map_type == 'chisq_hist'){
                 name = dirpath + mcmc_folder + params.m_map_type + '.png'
             }
             console.log(name);
@@ -799,7 +800,8 @@ This is further detailed in <a href="https://bicep.rc.fas.harvard.edu/bkcmb/anal
                 'Best Fit EB|_bestfitEB',
                 'Best Fit BB|_bestfitBB',
                 'Triangle Plot|_triangle_plot',
-                'Summary Plot (Peaks histogram)|sim1_summary'
+                'Summary Plot (Peaks histogram)|sim1_summary',
+                'Chi Squared histogram|chisq_hist'
             ],
             'Bins Used|bin_num15': [
                 '2-15|_bin15',
@@ -825,7 +827,7 @@ This is further detailed in <a href="https://bicep.rc.fas.harvard.edu/bkcmb/anal
             let mcmc_folder = params.ede + params.bin_num15 + params.theory_comp + params.spectra + '/';
             let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
             let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
-            if(params.m_map_type == 'sim1_summary'){
+            if(params.m_map_type == 'sim1_summary' || params.m_map_type == 'chisq_hist'){
                 name = dirpath + mcmc_folder + params.m_map_type + '.png'
             }
             console.log(name);

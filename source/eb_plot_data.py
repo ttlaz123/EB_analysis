@@ -423,7 +423,7 @@ def plot_eigenvalues_eigenvectors(matrix):
     return
 
 def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None, 
-                   use_median=True, percentile_clip=(0.5, 99.5)):
+                   use_median=True, percentile_clip=(2, 98)):
     modes_dict = {}
     single_df = None
     simcount = 0
@@ -490,6 +490,21 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None,
         plt.savefig(outpath)
         print('Saved to ' + outpath)
         plt.show()
+
+        # Plot histogram of chi2 values
+    if 'chi2' in modes_df.columns:
+        plt.figure(figsize=(7, 5))
+        plt.hist(modes_df['chi2'], bins=20, color='purple', alpha=0.7, edgecolor='black')
+        plt.xlabel('Best-fit $\chi^2$')
+        plt.ylabel('Number of simulations')
+        plt.title('Distribution of Best-fit $\chi^2$ over Simulations')
+        plt.grid(True)
+        hist_outpath = chains_path.split('XXX')[0] + 'chisq_hist.png'
+        plt.savefig(hist_outpath)
+        print('Saved chi2 histogram to ' + hist_outpath)
+        plt.show()
+    else:
+        print("No 'chi2' column found for histogram.")
 
 def read_sampler(filepath):
     """
