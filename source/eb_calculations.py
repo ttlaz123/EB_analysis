@@ -609,11 +609,11 @@ def filter_matrix(map_reference_header, matrix, used_maps, num_bins=None, zero_o
                                     num_bins, len(used_maps))
         if(zero_offdiag):
             offdiag = 1
-        else:
-            offdiag= reordered_mat.shape[0]
-        #before_truncate = np.linalg.inv(reordered_mat)
-        #trunc_covmat = self.truncate_covariance_matrix(reordered_mat,
-        #                                    offdiag=offdiag)
+            reordered_mat = truncate_covariance_matrix(reordered_mat,
+                                            offdiag=offdiag, block_size=num_bins)
+       
+        
+        
         return reordered_mat
 
 def reorder_cov_matrix(cov_matrix, n_bins, n_maps):
@@ -666,7 +666,7 @@ def truncate_covariance_matrix(cov_matrix, offdiag=1, block_size=1):
         # Apply the mask to the covariance matrix
         truncated_cov_matrix = cov_matrix * mask
         ### DEPRECATED 
-        ####return truncated_cov_matrix
+        return truncated_cov_matrix
     
 def calc_inverse_covmat(filtered_covmat, block_offdiag = 1):
     inverted_mat = np.linalg.inv(filtered_covmat)
