@@ -345,8 +345,6 @@ def plot_triangle(root, replace_dict={}):
     param_names = [name.name for name in samples.getParamNames().names
                    if ('chi2' not in name.name and
                        'weight' not in name.name and
-                       'betadust' not in name.name and
-                       'betasync' not in name.name and
                        'minuslogprior' not in name.name)]
     
     # Get the mean and std of the parameters for titles
