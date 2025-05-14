@@ -155,9 +155,9 @@ def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class
         )
     fig.text(
         x=0.5,  # Centered horizontally
-        y=0.02,  # Just above bottom edge
+        y=0.9,  # Just above bottom edge
         s=f"Chisq: {chis_sq:.2f}",
-        fontsize=12,
+        fontsize=14,
         color='blue',
         ha='center',
         va='bottom'
