@@ -463,6 +463,13 @@ def generate_cross_spectra(calc_spectra, do_crosses, spectra_type):
                 cross_spectra.append(cross_spectrum)
                 cross_spectrum = f"{spec1}_Ex{spec2}_E"
                 cross_spectra.append(cross_spectrum)
+            elif(spectra_type == 'noe'):
+                cross_spectrum = f"{spec1}_Ex{spec2}_B"
+                cross_spectra.append(cross_spectrum)
+                cross_spectrum = f"{spec1}_Bx{spec2}_E"
+                cross_spectra.append(cross_spectrum)
+                cross_spectrum = f"{spec1}_Bx{spec2}_B"
+                cross_spectra.append(cross_spectrum)
             elif(spectra_type == 'eb'):
                 cross_spectrum = f"{spec1}_Ex{spec2}_B"
                 cross_spectra.append(cross_spectrum)
@@ -764,7 +771,7 @@ def main():
     parser.add_argument(
         '-t', "--spectra_type",
         type=str,
-        choices=["all", "eb", "nob"],
+        choices=["all", "eb", "nob", "noe"],
         default="all",
         help=(
             "Which spectra to include. 'all' includes EE, BB, EB, etc., while 'eb' only includes EB-related spectra. "
