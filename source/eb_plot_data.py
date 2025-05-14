@@ -258,7 +258,6 @@ def plot_chisq_blocks(multicomp_class, used_maps, observed_datas, final_detectio
     print("Saving: " +outpath + '_chisqmap.png')
     plt.savefig(outpath + '_chisqmap.png')
 
-
 def plot_best_crossfit(eb_like_cls, outpath, used_maps, param_names, 
                         param_bestfit, param_stats, signal_params={}):
     
