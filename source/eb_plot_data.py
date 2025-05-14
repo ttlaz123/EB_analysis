@@ -154,7 +154,7 @@ def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class
             verticalalignment='top'
         )
     axes[0].text(1, 1.3, "Chisq: " + str(chis_sq), fontsize=12, 
-                 transform=axes[0].transAxes,
+                 transform=axes[0].transFigure,
                  color='blue', verticalalignment='top')
     plt.tight_layout(pad=2)
     print("Saving: " +outpath + '_bestfit'+ spectra_type +'.png')
