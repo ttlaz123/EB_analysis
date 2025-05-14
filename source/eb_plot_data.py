@@ -239,6 +239,7 @@ def plot_eebbeb(multicomp_class, outpath, param_names, param_bestfit, param_stat
 
 def plot_chisq_blocks(multicomp_class, used_maps, observed_datas, final_detection_dict, num_bins, outpath):
     chisq_map = np.zeros((len(used_maps), len(used_maps)))
+    chisq_sum = 0 
     for i, cross_map1 in enumerate(used_maps):
         for j, cross_map2 in enumerate(used_maps):
             block = multicomp_class.cov_inv[i*num_bins:(i+1)*num_bins,
@@ -247,6 +248,7 @@ def plot_chisq_blocks(multicomp_class, used_maps, observed_datas, final_detectio
             vector2 = observed_datas[cross_map2] - final_detection_dict[cross_map2]
             chisq = vector1.T @ block @ vector2
             chisq_map[i,j] = chisq
+            chisq_sum += chisq
 
     # Create figure with proper dimensions and spacing
     fig = plt.figure(figsize=(10, 8))  # Increase figure size
@@ -271,6 +273,7 @@ def plot_chisq_blocks(multicomp_class, used_maps, observed_datas, final_detectio
     cbar.ax.tick_params(labelsize=8)  # Adjust colorbar tick size if needed
     
     # Adjust layout to prevent cutting off labels
+    plt.title("Chisq: " + str(chisq_sum))
     plt.tight_layout(pad=2.0)  # Increase padding around plot
     fig.subplots_adjust(bottom=0.25, left=0.25)  # Adjust these values based on label length
     
