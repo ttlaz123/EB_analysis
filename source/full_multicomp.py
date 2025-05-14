@@ -521,7 +521,14 @@ def multicomp_mcmc_driver(input_args):
             updated_info, sampler = run_bk18_likelihood(params_dict, 
                                                         observation_file_path, 
                                                         input_args)
-            param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path)#, replace_dict)
+            replace_dict = {
+                'alpha_BK18_220': 0,
+                'alpha_BK18_150': 0,
+                'alpha_BK18_K95': 0,
+                'alpha_BK18_B95e': 0,
+                'gMpl': 0,
+            }
+            param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path, replace_dict)
             used_maps = SHARED_DATA_DICT["all_maps"]
             multicomp_class = BK18_full_multicomp(
                             used_maps=used_maps,
