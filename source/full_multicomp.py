@@ -463,6 +463,13 @@ def generate_cross_spectra(calc_spectra, do_crosses, spectra_type):
                 cross_spectra.append(cross_spectrum)
                 cross_spectrum = f"{spec1}_Ex{spec2}_E"
                 cross_spectra.append(cross_spectrum)
+            elif(spectra_type == 'noe'):
+                cross_spectrum = f"{spec1}_Ex{spec2}_B"
+                cross_spectra.append(cross_spectrum)
+                cross_spectrum = f"{spec1}_Bx{spec2}_E"
+                cross_spectra.append(cross_spectrum)
+                cross_spectrum = f"{spec1}_Bx{spec2}_B"
+                cross_spectra.append(cross_spectrum)
             elif(spectra_type == 'eb'):
                 cross_spectrum = f"{spec1}_Ex{spec2}_B"
                 cross_spectra.append(cross_spectrum)
@@ -523,11 +530,11 @@ def multicomp_mcmc_driver(input_args):
                                                         observation_file_path, 
                                                         input_args)
             replace_dict = {
-                #'alpha_BK18_220': 0,
-                #'alpha_BK18_150': 0,
-                #'alpha_BK18_K95': 0,
-                #'alpha_BK18_B95e': 0,
-                #'gMpl': 1,
+                'alpha_BK18_220': 0,
+                'alpha_BK18_150': 0,
+                'alpha_BK18_K95': 0,
+                'alpha_BK18_B95e': 0,
+                'gMpl': 1,
             }
             param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path, replace_dict)
             used_maps = SHARED_DATA_DICT["all_maps"]
@@ -764,7 +771,7 @@ def main():
     parser.add_argument(
         '-t', "--spectra_type",
         type=str,
-        choices=["all", "eb", "nob"],
+        choices=["all", "eb", "nob", "noe"],
         default="all",
         help=(
             "Which spectra to include. 'all' includes EE, BB, EB, etc., while 'eb' only includes EB-related spectra. "
