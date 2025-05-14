@@ -247,16 +247,39 @@ def plot_chisq_blocks(multicomp_class, used_maps, observed_datas, final_detectio
             vector2 = observed_datas[cross_map2] - final_detection_dict[cross_map2]
             chisq = vector1.T @ block @ vector2
             chisq_map[i,j] = chisq
-            
-    plt.figure()
-    print('Chisq:' + str(np.sum(chisq_map)))
+
+    # Create figure with proper dimensions and spacing
+    fig = plt.figure(figsize=(10, 8))  # Increase figure size
+    ax = fig.add_subplot(111)
+    
+    # Plot the main image
     vrange = np.std(chisq_map)
-    plt.imshow(chisq_map, cmap='bwr', vmin=-vrange, vmax=vrange)
-    plt.colorbar()
-    plt.xticks(np.arange(len(used_maps)), used_maps, rotation = 45)
-    plt.yticks(np.arange(len(used_maps)), used_maps)
-    print("Saving: " +outpath + '_chisqmap.png')
-    plt.savefig(outpath + '_chisqmap.png')
+    im = ax.imshow(chisq_map, cmap='bwr', vmin=-vrange, vmax=vrange)
+    
+    # Set up ticks and labels
+    ax.set_xticks(np.arange(len(used_maps)))
+    ax.set_xticklabels(used_maps, 
+                      rotation=45, 
+                      ha='right',  # Horizontal alignment at right edge
+                      rotation_mode='anchor')  # Keep text anchored
+    
+    ax.set_yticks(np.arange(len(used_maps)))
+    ax.set_yticklabels(used_maps)
+    
+    # Add colorbar with padding
+    cbar = fig.colorbar(im, ax=ax, pad=0.02)
+    cbar.ax.tick_params(labelsize=8)  # Adjust colorbar tick size if needed
+    
+    # Adjust layout to prevent cutting off labels
+    plt.tight_layout(pad=2.0)  # Increase padding around plot
+    fig.subplots_adjust(bottom=0.25, left=0.25)  # Adjust these values based on label length
+    
+    # Save with high resolution and bounding box
+    print("Saving: " + outpath + '_chisqmap.png')
+    plt.savefig(outpath + '_chisqmap.png', 
+               dpi=300, 
+               bbox_inches='tight')
+    plt.close(fig)
 
 def plot_best_crossfit(eb_like_cls, outpath, used_maps, param_names, 
                         param_bestfit, param_stats, signal_params={}):
@@ -458,7 +481,31 @@ def plot_eigenvalues_eigenvectors(matrix):
     plt.tight_layout()
     plt.show()
     return
+def plot_corner(outfile, sim_results_file, real_results_file):
+    
 
+    df_sim = get_mcmc_results_to_df(sim_results_file)
+    df_real = get_mcmc_results_to_df(real_results_file)
+    param_names = ['gMpl', 'aplusb_b95', 'aplusb_k95', 'aplusb_150', 'aplusb_220', 'aplusb_b95ext']
+    print(df_real.columns)
+    data_sim = df_sim[param_names].values
+    data_real = df_real[param_names].values
+    # Plot the first corner plot
+    print('first plot')
+    fig = corner.corner(data_sim, labels=param_names, 
+                        show_titles=True, title_fmt=".2f", plot_contours=True, color='red')
+    print('second plot')
+    print(df_real)
+    # Overlay the second corner plot
+    corner.corner(data_real, labels=param_names, 
+                  show_titles=True, title_fmt=".2f", plot_contours=True, color='blue', fig=fig)
+
+# Add legend
+    plt.legend(['Aggregate Sim Dataset', 'Real Dataset'])
+    title_str = ('Comparing: ' + sim_results_file.split('/')[-1] + 
+                 ' and ' + real_results_file.split('/')[-1])
+    plt.suptitle(title_str)
+    plt.savefig(outfile)
 def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None, 
                    use_median=True, percentile_clip=(4, 96)):
     modes_dict = {}
@@ -667,31 +714,7 @@ def plot_chisq_hist(sim_results_file):
     plt.ylabel('Frequency')
     plt.grid(True)
     plt.show()
-def plot_corner(outfile, sim_results_file, real_results_file):
-    
 
-    df_sim = get_mcmc_results_to_df(sim_results_file)
-    df_real = get_mcmc_results_to_df(real_results_file)
-    param_names = ['gMpl', 'aplusb_b95', 'aplusb_k95', 'aplusb_150', 'aplusb_220', 'aplusb_b95ext']
-    print(df_real.columns)
-    data_sim = df_sim[param_names].values
-    data_real = df_real[param_names].values
-    # Plot the first corner plot
-    print('first plot')
-    fig = corner.corner(data_sim, labels=param_names, 
-                        show_titles=True, title_fmt=".2f", plot_contours=True, color='red')
-    print('second plot')
-    print(df_real)
-    # Overlay the second corner plot
-    corner.corner(data_real, labels=param_names, 
-                  show_titles=True, title_fmt=".2f", plot_contours=True, color='blue', fig=fig)
-
-# Add legend
-    plt.legend(['Aggregate Sim Dataset', 'Real Dataset'])
-    title_str = ('Comparing: ' + sim_results_file.split('/')[-1] + 
-                 ' and ' + real_results_file.split('/')[-1])
-    plt.suptitle(title_str)
-    plt.savefig(outfile)
 
 
 def plot_cldl(l_bins, spectrum_dict,  output_plots, mapname,scale=100):
