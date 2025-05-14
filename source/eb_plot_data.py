@@ -89,7 +89,7 @@ def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix',
         plt.show()
 
 def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class, observed_datas,
-                      outpath, param_stats):
+                      outpath, param_stats, chis_sq):
     num_columns = len(maps_B)  # Unique maps for columns
     num_rows = len(maps_E)      # Unique maps for rows
     # Create subplots
@@ -153,6 +153,9 @@ def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class
             fontsize=10, color='black',
             verticalalignment='top'
         )
+    axes[0].text(1, 2, str(chis_sq), fontsize=12, 
+                 transform=axes[0].transAxes,
+                 color='blue', verticalalignment='top')
     plt.tight_layout(pad=2)
     print("Saving: " +outpath + '_bestfit'+ spectra_type +'.png')
     plt.savefig(outpath + '_bestfit' + spectra_type + '.png')
@@ -192,6 +195,9 @@ def plot_eebbeb(multicomp_class, outpath, param_names, param_bestfit, param_stat
     param_values = {param_names[i]:param_bestfit[i] 
                             for i in range(len(param_names))}
     theory_vec=multicomp_class.theory(param_values, override_maps=override_maps)
+    residuals = multicomp_class.binned_dl_observed_vec - theory_vec
+    # Calculate the Mahalanobis distance using the inverse covariance matrix
+    chi_squared = residuals.T @ multicomp_class.cov_inv @ residuals
     theory_dict = multicomp_class.final_detection_dict
     maps_B = set()
     maps_E = set()
@@ -214,7 +220,7 @@ def plot_eebbeb(multicomp_class, outpath, param_names, param_bestfit, param_stat
                       maps_E, 
                       maps_B, 
                       theory_dict, multicomp_class, observed_datas,
-                      outpath, param_stats)
+                      outpath, param_stats, chi_squared)
     
 
     return 
