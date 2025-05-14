@@ -221,6 +221,12 @@ def plot_eebbeb(multicomp_class, outpath, param_names, param_bestfit, param_stat
     maps_B = sorted(list(maps_B))
     maps_E = sorted(list(maps_E))
     param_stats = sorted(param_stats)
+    plot_chisq_blocks(multicomp_class=multicomp_class,
+                    used_maps=multicomp_class.used_maps,
+                    observed_datas=observed_datas,
+                    final_detection_dict=multicomp_class.final_detection_dict,
+                    num_bins=multicomp_class.num_bins,
+                    outpath = outpath)
     for spectra_type in ['EE', 'EB', 'BB']:
         plot_spectra_type(spectra_type, 
                       maps_E, 
@@ -230,6 +236,28 @@ def plot_eebbeb(multicomp_class, outpath, param_names, param_bestfit, param_stat
     
 
     return 
+
+def plot_chisq_blocks(multicomp_class, used_maps, observed_datas, final_detection_dict, num_bins, outpath):
+    chisq_map = np.zeros((len(used_maps), len(used_maps)))
+    for i, cross_map1 in enumerate(used_maps):
+        for j, cross_map2 in enumerate(used_maps):
+            block = multicomp_class.cov_inv[i*num_bins:(i+1)*num_bins,
+                                        j*num_bins:(j+1)*num_bins]
+            vector1 = observed_datas[cross_map1] - final_detection_dict[cross_map1]
+            vector2 = observed_datas[cross_map2] - final_detection_dict[cross_map2]
+            chisq = vector1.T @ block @ vector2
+            chisq_map[i,j] = chisq
+            
+    plt.figure()
+    print('Chisq:' + str(np.sum(chisq_map)))
+    vrange = np.std(chisq_map)
+    plt.imshow(chisq_map, cmap='bwr', vmin=-vrange, vmax=vrange)
+    plt.colorbar()
+    plt.xticks(np.arange(len(used_maps)), used_maps, rotation = 45)
+    plt.yticks(np.arange(len(used_maps)), used_maps)
+    print("Saving: " +outpath + '_chisqmap.png')
+    plt.savefig(outpath + '_chisqmap.png')
+
 
 def plot_best_crossfit(eb_like_cls, outpath, used_maps, param_names, 
                         param_bestfit, param_stats, signal_params={}):
