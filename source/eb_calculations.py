@@ -608,7 +608,7 @@ def filter_matrix(map_reference_header, matrix, used_maps, num_bins=None, zero_o
         reordered_mat = reorder_cov_matrix(filtered_mat, 
                                     num_bins, len(used_maps))
         if(zero_offdiag):
-            offdiag = 1
+            offdiag = 0
             reordered_mat = truncate_covariance_matrix(reordered_mat,
                                             offdiag=offdiag, block_size=num_bins)
        
@@ -640,7 +640,7 @@ def reorder_cov_matrix(cov_matrix, n_bins, n_maps):
         reordered_matrix = cov_matrix[np.ix_(new_indices, new_indices)]
     
         return reordered_matrix
-def truncate_covariance_matrix(cov_matrix, offdiag=1, block_size=1):
+def truncate_covariance_matrix(cov_matrix, offdiag=0, block_size=1):
         """
         ##DEPRECATED
         Truncate the covariance matrix by keeping only the diagonal and specified number of off-diagonals.
@@ -655,7 +655,7 @@ def truncate_covariance_matrix(cov_matrix, offdiag=1, block_size=1):
         size = cov_matrix.shape[0]
         N = size
         # Create a mask of zeros (False) initially
-        mask = np.zeros((N, N), dtype=bool) + 1
+        mask = np.zeros((N, N), dtype=bool)
         # Iterate over diagonal blocks
         for i in range(0, N, block_size):
             # Set True for the elements in the current diagonal block and its off-diagonal band
