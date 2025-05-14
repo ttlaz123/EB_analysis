@@ -509,10 +509,10 @@ def multicomp_mcmc_driver(input_args):
         parallel_simulation(input_args, params_dict)
     else:
         # define relevant files based on opts
-        if(input_args.sim_num == -1):
+        if(input_args.sim_num == -1 or input_args.sim_start == -1):
             observation_file_path = FILE_PATHS['observed_data']
-        elif(isinstance(input_args.sim_num, int) and input_args.sim_num >= 0):
-            formatted_simnum = str(input_args.sim_num).zfill(3)
+        elif(isinstance(input_args.sim_start, int) and input_args.sim_start >= 1):
+            formatted_simnum = str(input_args.sim_start).zfill(3)
             observation_file_path = FILE_PATHS['sim_path'].replace('XXX', formatted_simnum)
     
         
