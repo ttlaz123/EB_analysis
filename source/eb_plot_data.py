@@ -222,7 +222,7 @@ def plot_eebbeb(multicomp_class, outpath, param_names, param_bestfit, param_stat
     maps_E = sorted(list(maps_E))
     param_stats = sorted(param_stats)
     plot_chisq_blocks(multicomp_class=multicomp_class,
-                    used_maps=multicomp_class.used_maps,
+                    used_maps=multicomp_class.sim_common_data['used_maps'],
                     observed_datas=observed_datas,
                     final_detection_dict=multicomp_class.final_detection_dict,
                     num_bins=multicomp_class.bin_num,
