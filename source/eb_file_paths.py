@@ -11,6 +11,9 @@ def set_file_paths(dataset, fede=0.07):
     if(dataset == 'BK18lf'):
         DATASETNAME = 'BK18lf'
         DATASET_DIRNAME = 'BK18lf'
+    elif(dataset == 'BK18lf_sigl'):
+        DATASETNAME = 'BK18lfnorot'
+        DATASET_DIRNAME = 'BK18lf_sigl'
     elif(dataset == 'BK18lf_dust'):
         DATASETNAME = 'BK18lf'
         DATASET_DIRNAME = 'BK18lf_dust'
