@@ -147,8 +147,28 @@ def plot_overlay_sims(spectra_type, observed_datas_list, outpath):
             all_sims.append(observed_data)
 
         all_sims = np.array(all_sims)  # shape (N_sims, num_bins)
-        mean_vals = np.mean(all_sims, axis=0)
-        std_vals = np.std(all_sims, axis=0)
+
+        # Remove extreme outliers per bin using percentiles
+        lower_pct = 1
+        upper_pct = 99
+        clipped_sims = []
+        for bin_idx in range(all_sims.shape[1]):
+            bin_values = all_sims[:, bin_idx]
+            low = np.percentile(bin_values, lower_pct)
+            high = np.percentile(bin_values, upper_pct)
+            # Keep only values within [low, high]
+            mask = (bin_values >= low) & (bin_values <= high)
+            clipped_bin_values = bin_values[mask]
+            clipped_sims.append(clipped_bin_values)
+        
+        # Pad bins with fewer values to uniform length (for np.array conversion)
+        max_len = max(len(arr) for arr in clipped_sims)
+        clipped_sims_padded = np.full((len(clipped_sims), max_len), np.nan)
+        for i, arr in enumerate(clipped_sims):
+            clipped_sims_padded[i, :len(arr)] = arr
+
+        mean_vals = np.nanmean(clipped_sims_padded, axis=1)
+        std_vals = np.nanstd(clipped_sims_padded, axis=1)
 
         x = np.arange(len(mean_vals))
         upper = mean_vals + std_vals
