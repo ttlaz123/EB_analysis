@@ -230,6 +230,22 @@ class BK18_full_multicomp(Likelihood):
         theory_vec = self.dict_to_vec(self.final_detection_dict, self.used_maps)
         return theory_vec
     
+def load_all_sims(input_args):
+    load_shared_data(input_args)
+    dirpath = FILE_PATHS['sim_path']
+    obs_list = []
+    for sim_num in range(input_args.sim_start, input_args.sim_num):
+        formatted_simnum = str(sim_num).zfill(3)
+        observation_file_path = dirpath.replace('XXX', formatted_simnum)
+        used_maps = SHARED_DATA_DICT['used_maps']
+        binned_dl_observed_dict, map_reference_header = ld.load_observed_spectra(
+                                                            observation_file_path,
+                                                            used_maps,
+                                                            None,
+                                                            num_bins = input_args.bin_num)
+        obs_list.append(binned_dl_observed_dict)
+    return obs_list
+
 
 def load_shared_data(input_args):
     """
@@ -837,9 +853,11 @@ def main():
                 print("Deletion cancelled. Existing chains will be kept.")
         else:
             print(f"No existing chains to overwrite at: {args.output_path}")
-
-       
-    multicomp_mcmc_driver(args)
+    if True:
+        observed_datas_list = load_all_sims(input_args=args)
+        epd.plot_overlay_sims('BB', observed_datas_list, args.outpath)
+    else:
+        multicomp_mcmc_driver(args)
 
 
 if __name__ == '__main__':

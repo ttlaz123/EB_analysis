@@ -88,6 +88,90 @@ def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix',
     if(show_plot):
         plt.show()
 
+
+def plot_overlay_sims(spectra_type, observed_datas_list, outpath):
+    maps_B = set()
+    maps_E = set()
+    # Use keys from the first observed dataset
+    keys = list(observed_datas_list[0].keys())
+    for key in keys:
+        parts = key.split('x')
+        if parts[0].endswith('_B'):
+            maps_B.add(parts[0])
+        if parts[0].endswith('_E'):
+            maps_E.add(parts[0])
+        if parts[1].endswith('_B'):
+            maps_B.add(parts[1])
+        if parts[1].endswith('_E'):
+            maps_E.add(parts[1])
+    maps_B = sorted(list(maps_B))
+    maps_E = sorted(list(maps_E))
+    num_columns = len(maps_B)
+    num_rows = len(maps_E)
+    fig, axes = plt.subplots(num_rows, num_columns, figsize=(num_columns * 4, num_rows * 4))
+
+    try:
+        axes = axes.flatten()
+    except AttributeError:
+        axes = [axes]
+
+    
+
+    for key in keys:
+        spec_type = determine_spectrum_type(key)
+        parts = key.split('x')
+
+        if spectra_type in ['EB', 'BE']:
+            if spec_type in ['EE', 'BB']:
+                continue
+            row_idx = maps_E.index(parts[0]) if parts[0].endswith('_E') else maps_E.index(parts[1])
+            col_idx = maps_B.index(parts[0]) if parts[0].endswith('_B') else maps_B.index(parts[1])
+        elif spectra_type in ['EE', 'BB']:
+            if spec_type != spectra_type:
+                continue
+            row_idx = maps_E.index(parts[0]) if parts[0].endswith('_E') else maps_B.index(parts[0])
+            col_idx = maps_E.index(parts[1]) if parts[1].endswith('_E') else maps_B.index(parts[1])
+        else:
+            continue
+
+        axes_index = row_idx * num_columns + col_idx
+        ax = axes[axes_index]
+
+        all_sims = []
+        for observed_data_dict in observed_datas_list:
+            observed_data = observed_data_dict[key]
+            ax.plot(
+                range(len(observed_data)),
+                observed_data,
+                color='gray',
+                alpha=0.08,
+                linewidth=0.5,
+            )
+            all_sims.append(observed_data)
+
+        all_sims = np.array(all_sims)  # shape (500, num_bins)
+        mean_vals = np.mean(all_sims, axis=0)
+        std_vals = np.std(all_sims, axis=0)
+
+        x = np.arange(len(mean_vals))
+        ax.fill_between(
+            x,
+            mean_vals - std_vals,
+            mean_vals + std_vals,
+            color='blue',
+            alpha=0.3,
+            label='68% conf. band'
+        )
+
+        ax.set_title(key)
+        ax.legend(fontsize=8)
+
+    plt.tight_layout(pad=2)
+    print("Saving: " + outpath + f'_overlay_confband_{spectra_type}.png')
+    plt.savefig(outpath + f'_overlay_confband_{spectra_type}.png')
+    plt.close(fig)
+    return 
+
 def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class, observed_datas,
                       outpath, param_stats, chis_sq):
     num_columns = len(maps_B)  # Unique maps for columns
