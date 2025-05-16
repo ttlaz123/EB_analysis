@@ -143,8 +143,8 @@ class BK18_full_multicomp(Likelihood):
                 spectype = ec.determine_spectrum_type(map_name)
                 
                 spec = spectra_dict[map_name].copy()
-                #if(spectype == 'BB'):
-                #    spec/=1
+                if(spectype == 'BB'):
+                    spec/=1
                 big_vector.append(spec)
 
         # Concatenate all spectra arrays into a single 1D array
@@ -277,6 +277,7 @@ def load_shared_data(input_args):
                                        full_covmat, 
                                        SHARED_DATA_DICT['used_maps'], 
                                        num_bins=input_args.bin_num)
+
     #plot_covar_matrix(self.filtered_covmat, used_maps=self.used_maps)
     SHARED_DATA_DICT['inv_covmat'] = ec.calc_inverse_covmat(filtered_covmat)
     SHARED_DATA_DICT['covmat'] = filtered_covmat
