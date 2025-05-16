@@ -238,11 +238,15 @@ def load_all_sims(input_args):
         formatted_simnum = str(sim_num).zfill(3)
         observation_file_path = dirpath.replace('XXX', formatted_simnum)
         used_maps = SHARED_DATA_DICT['used_maps']
-        binned_dl_observed_dict, map_reference_header = ld.load_observed_spectra(
+        try:
+            binned_dl_observed_dict, map_reference_header = ld.load_observed_spectra(
                                                             observation_file_path,
                                                             used_maps,
                                                             None,
                                                             num_bins = input_args.bin_num)
+        except FileNotFoundError:
+            print("Skipping file: " + str(observation_file_path))
+            continue
         obs_list.append(binned_dl_observed_dict)
     return obs_list
 
