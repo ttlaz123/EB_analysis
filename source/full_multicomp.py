@@ -856,7 +856,7 @@ def main():
             print(f"No existing chains to overwrite at: {args.output_path}")
     if True:
         observed_datas_list = load_all_sims(input_args=args)
-        epd.plot_overlay_sims('BB', observed_datas_list, args.outpath)
+        epd.plot_overlay_sims('BB', observed_datas_list, args.output_path)
     else:
         multicomp_mcmc_driver(args)
 
