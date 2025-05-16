@@ -88,7 +88,6 @@ def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix',
     if(show_plot):
         plt.show()
 
-
 def plot_overlay_sims(spectra_type, observed_datas_list, outpath):
     maps_B = set()
     maps_E = set()
@@ -114,8 +113,6 @@ def plot_overlay_sims(spectra_type, observed_datas_list, outpath):
         axes = axes.flatten()
     except AttributeError:
         axes = [axes]
-
-    
 
     for key in keys:
         spec_type = determine_spectrum_type(key)
@@ -149,28 +146,33 @@ def plot_overlay_sims(spectra_type, observed_datas_list, outpath):
             )
             all_sims.append(observed_data)
 
-        all_sims = np.array(all_sims)  # shape (500, num_bins)
+        all_sims = np.array(all_sims)  # shape (N_sims, num_bins)
         mean_vals = np.mean(all_sims, axis=0)
         std_vals = np.std(all_sims, axis=0)
 
         x = np.arange(len(mean_vals))
-        ax.fill_between(
-            x,
-            mean_vals - std_vals,
-            mean_vals + std_vals,
-            color='blue',
-            alpha=0.3,
-            label='68% conf. band'
-        )
+        upper = mean_vals + std_vals
+        lower = mean_vals - std_vals
+
+        ax.fill_between(x, lower, upper, color='blue', alpha=0.3, label='68% conf. band')
+        ax.plot(x, mean_vals, color='red', linewidth=1.2, label='Mean')
+
+        # Set dynamic y-limits based on 1.5 * std from mean
+        buffer_scale = 1.5
+        y_min = np.min(lower - buffer_scale * std_vals)
+        y_max = np.max(upper + buffer_scale * std_vals)
+        ax.set_ylim(y_min, y_max)
 
         ax.set_title(key)
+        ax.grid(True, which='both', linestyle='--', linewidth=0.5, alpha=0.6)
         ax.legend(fontsize=8)
 
     plt.tight_layout(pad=2)
     print("Saving: " + outpath + f'_overlay_confband_{spectra_type}.png')
     plt.savefig(outpath + f'_overlay_confband_{spectra_type}.png')
     plt.close(fig)
-    return 
+    return
+
 
 def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class, observed_datas,
                       outpath, param_stats, chis_sq):
