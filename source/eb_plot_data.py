@@ -331,7 +331,7 @@ def plot_eebbeb(multicomp_class, outpath, param_names, param_bestfit, param_stat
                     used_maps=multicomp_class.sim_common_data['used_maps'],
                     observed_datas=observed_datas,
                     final_detection_dict=multicomp_class.final_detection_dict,
-                    num_bins=multicomp_class.bin_num,
+                    num_bins=len(multicomp_class.bin_num),
                     outpath = outpath)
     for spectra_type in ['EE', 'EB', 'BB']:
         plot_spectra_type(spectra_type, 
