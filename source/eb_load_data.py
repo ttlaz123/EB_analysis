@@ -148,9 +148,10 @@ def load_observed_spectra(observed_data_path, used_maps, map_reference_header, n
     obs_data = np.loadtxt(observed_data_path)
 
     observed_spectra_dict = {}
+    bin_idxs = [b - 2 for b in num_bins]  # convert to 0-based
     for i in range(len(used_cols)):
         input_str = used_maps[i]
-        bin_idxs = [b - 1 for b in num_bins]  # convert to 0-based
+        
         observed_spectra_dict[input_str] = obs_data[bin_idxs, used_cols[i]]
 
     
