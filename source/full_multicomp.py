@@ -682,8 +682,35 @@ def do_plotting(input_args):
     chains_path = input_args.output_path + "XXX.1.txt"
     epd.plot_sim_peaks(chains_path, input_args.sim_start, input_args.sim_num)
 
-
 def parse_bin_range(s):
+    """
+    Parse a string representing a bin range into a list of integers.
+
+    This function supports two formats:
+    - A single positive integer "n", which is interpreted as the range [2, n].
+    - A hyphenated range "start-end", which is interpreted as the range [start, end], inclusive.
+
+    Args:
+        s (str): The input string specifying the bin range.
+
+    Returns:
+        list of int: A list of integers representing the parsed bin indices.
+
+    Raises:
+        argparse.ArgumentTypeError: If the input is not a valid positive integer or range.
+
+    Examples:
+        >>> parse_bin_range("5")
+        [2, 3, 4, 5]
+        >>> parse_bin_range("3-6")
+        [3, 4, 5, 6]
+        >>> parse_bin_range("1")
+        []
+        >>> parse_bin_range("7-3")
+        Traceback (most recent call last):
+            ...
+        argparse.ArgumentTypeError: Must be a positive integer (interpreted as 2-n) or a valid range like 3-7.
+    """
     try:
         if '-' in s:
             start, end = map(int, s.split('-'))
@@ -692,13 +719,14 @@ def parse_bin_range(s):
             return list(range(start, end + 1))
         else:
             end = int(s)
-            if end < 1:
-                raise ValueError
-            return list(range(1, end + 1))
+            if end < 2:
+                return []
+            return list(range(2, end + 1))
     except ValueError:
         raise argparse.ArgumentTypeError(
-            "Must be a positive integer (interpreted as 1-n) or a valid range like 3-7."
+            "Must be a positive integer (interpreted as 2-n) or a valid range like 3-7."
         )
+
 
 def main():
     parser = argparse.ArgumentParser(
