@@ -876,7 +876,7 @@ def main():
                 print("Deletion cancelled. Existing chains will be kept.")
         else:
             print(f"No existing chains to overwrite at: {args.output_path}")
-    if True:
+    if False:
         observed_datas_list = load_all_sims(input_args=args)
         epd.plot_overlay_sims('BB', observed_datas_list, args.output_path)
     else:
