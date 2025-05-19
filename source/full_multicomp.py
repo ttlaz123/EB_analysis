@@ -683,6 +683,23 @@ def do_plotting(input_args):
     epd.plot_sim_peaks(chains_path, input_args.sim_start, input_args.sim_num)
 
 
+def parse_bin_range(s):
+    try:
+        if '-' in s:
+            start, end = map(int, s.split('-'))
+            if start > end:
+                raise ValueError
+            return list(range(start, end + 1))
+        else:
+            end = int(s)
+            if end < 1:
+                raise ValueError
+            return list(range(1, end + 1))
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            "Must be a positive integer (interpreted as 1-n) or a valid range like 3-7."
+        )
+
 def main():
     parser = argparse.ArgumentParser(
         description="Run multicomponent EB MCMC analysis using BICEP/Keck data."
@@ -756,11 +773,12 @@ def main():
         ),
     )
 
+    
     parser.add_argument(
-        '-b', "--bin_num",
-        type=int,
-        default=14,
-        help="Number of bandpower bins. Default: 14.",
+        '-b', '--bin_num',
+        type=parse_bin_range,
+        default=list(range(2, 16)),  # Default to 2–15
+        help="Bin count (interpreted as 1-n) or a specific range like 3-7. Default: 2-15."
     )
 
     parser.add_argument(

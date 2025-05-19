@@ -86,7 +86,7 @@ def check_file_header(file_path, reference_header):
                 break  # Stop reading further header lines
     return reference_header
 
-def load_observed_spectra(observed_data_path, used_maps, map_reference_header, num_bins=None):
+def load_observed_spectra(observed_data_path, used_maps, map_reference_header, num_bins):
     """
     Load observed spectra data from a specified file and filter the data based on the used maps.
 
@@ -150,7 +150,8 @@ def load_observed_spectra(observed_data_path, used_maps, map_reference_header, n
     observed_spectra_dict = {}
     for i in range(len(used_cols)):
         input_str = used_maps[i]
-        observed_spectra_dict[input_str] = obs_data[:num_bins, used_cols[i]]
+        bin_idxs = [b - 1 for b in num_bins]  # convert to 0-based
+        observed_spectra_dict[input_str] = obs_data[bin_idxs, used_cols[i]]
 
     
     return observed_spectra_dict, map_reference_header
@@ -187,9 +188,9 @@ def load_bpwf(bpwf_directory, map_reference_header, num_bins=None):
         # List to hold all loaded data
         bpwf_data = []
         if(num_bins is None):
-            num_bins = len(bpwf_files)
+            num_bins = range(len(bpwf_files))+2
         for n, bfile in enumerate(bpwf_files):
-            if(n>=num_bins):
+            if(n+2 not in num_bins):
                 print('Skipping ' + str(bfile))
                 continue
             print("Loading: " + str(bfile))
