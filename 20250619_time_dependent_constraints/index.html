@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>EDE Update</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <!-- Load up MathJax for math notation -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            TeX: { equationNumbers: { autoNumber: "AMS" } }
+        });
+    </script>
+    <script type="text/javascript" src="../mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+</head>
+
+<body>
+    <!-- Add my custom pager script -->
+    <script type="text/javascript" src="scripts/pager.js"></script>
+    <link rel="stylesheet" type="text/css" href="scripts/pager.css">
+
+    <header>
+        <h1>Another Update</h1>
+
+        <time datetime="2025 June 19" class="published updated">
+            2025 June 19
+        </time> —
+        Tongtian (Tom) Liu, Dominic Beck
+    </header>
+
+    <hr>
+    <section>
+        <h2>Introduction</h2>
+        <p><strong>Summary:</strong> 
+
+        <p>This posting builds upon previous updates:</p>
+        <ul>
+            <li><a
+                    href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20240924_preliminary_eb_ede_results/">
+                    2024-09-24: Preliminary EB EDE Results</a></li>
+            <li><a
+                    href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20241203_multicomp_eb_ede_update/">
+                    2024-12-03: Multicomponent EB EDE Update</a></li>
+            <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20250218_ede_forecast/">
+                    2025-02-18: EDE Forecast</a></li>
+        </ul>
+      
+    </section>
+
+
+
+    <section>
+ <figure>
+            <img alt="Multicomponent Analysis Spectrum" id="morebins" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+            <figcaption>
+                <p>Interactive plot pager for multicomponent analysis of the Early Dark Energy (EDE) spectrum.
+                    Visualizes the fits and triangle plots for 499 simulations.</p>
+               
+                <p>This interactive plot allows detailed exploration of multicomponent analysis by adjusting
+                    map types, binning, theoretical assumptions, spectra selections, EDE signal injections, and
+                    simulation numbers.</p>
+            </figcaption>
+
+            <script type="text/javascript">
+                function pad(num, size) {
+                    num = num.toString();
+                    while (num.length < size) num = "0" + num;
+                    return num;
+                }
+                const simnums = [];
+                for (let i = 0; i < 10; i++) {
+                    s = pad(i, 1);
+
+                    simnums[i] = s.concat('|', s);
+
+                }
+
+                pager.link("#morebins", {
+                    'Map Sim Num Digit1|digit1': simnums,
+                    'Digit2|digit2': simnums,
+                    'Digit3|digit3': simnums,
+
+                    'Map Type|m_map_type': [
+                        'Best Fit EE|_bestfitEE',
+                        'Best Fit EB|_bestfitEB',
+                        'Best Fit BB|_bestfitBB',
+                        'Triangle Plot|_triangle_plot',
+                        'Summary Plot (Peaks histogram)|sim1_summary',
+                        'Chi Squared histogram|simchisq_hist'
+                    ],
+                    'Bins Used|bin_num15': [
+                        '2-15|_bin15',
+                        '2-8|_bin2-8',
+                        '9-15|_bin9-15',
+                    ],
+                    'Injected Signal|inj_sig': [
+                        'Positive Miscalibration|_sigpos',
+                        'Negative Miscalibration|_signeg',
+                        'Balanced Miscalibration|_sigbal',
+                        'No Miscalibration|'
+                    ],
+                    'Dust Model|theory_comp': [
+                        'Fixed dust = zero|_fixeddust',
+                        'Nominal dust|_gdust',
+                    ],
+                    'Spectra|spectra': [
+                        'All|_all',
+                        'No BB|_nob',
+                        'EB only|_eb',
+                    ],
+                    'Injected EDE Signal|ede': [
+                        'Fede = 0.07, g = 1|fede01',
+                        'g = 0|zeroeb'
+                    ]
+                },
+                    function (params) {
+                        let dirbase = '/liuto'
+                        let dirpath = dirbase + '/ede_chains/';
+                        let mcmc_folder = params.ede + params.bin_num15 + params.theory_comp + params.spectra + params.inj_sig+ '/';
+                        let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
+                        let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
+                        if (params.m_map_type == 'sim1_summary' || params.m_map_type == 'simchisq_hist') {
+                            name = dirpath + mcmc_folder + params.m_map_type + '.png'
+                        }
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+                    'digit1': '0',
+                    'digit2': '0',
+                    'digit3': '1',
+                    'm_map_type': '_bestfitEB',
+                    'bin_num15': '_bin15',
+                    'ede': 'zeroeb',
+                    'spectra': '_all',
+                    'theory_comp': '_fixeddust',
+                });
+            </script>
+        </figure>
+          
+     
+    </section>
+    <section>
+        <h2>Future Directions</h2>
+
+     
+    </section>
+    <section>
+        <h2>Appendix</h2>
+        <p>All chains and plots can be found in
+            <code>/n/holylfs04/LABS/kovac_lab/Users/liuto/ede_chains</code>.
+        </p>
+    </section>
+</body>
+
+</html>
