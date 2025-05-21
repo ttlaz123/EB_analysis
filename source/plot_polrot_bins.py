@@ -27,6 +27,7 @@ def load_all_chains_in_folder(folder):
     param_names = None
     for cf in chain_files:
         root = os.path.join(folder, cf.split('.')[0])  # remove extension
+        print('Loading: ' + str(root))
         samples = loadMCSamples(root)
         if param_names is None:
             param_names = [p.name for p in samples.getParamNames().names
