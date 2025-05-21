@@ -6,6 +6,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from getdist.mcsamples import loadMCSamples
 import logging
+from scipy.stats import norm
 logging.getLogger().setLevel(logging.ERROR)
 
 def get_group_label_from_paths(dir1, dir2):
@@ -68,7 +69,15 @@ def collect_all_zscores(bin2_8_root, bin9_15_root, params, num_sims):
 
 def plot_z_histogram(zscores, param, outdir, group_label):
     plt.figure(figsize=(6,4))
-    plt.hist(zscores, bins=30, color='skyblue', edgecolor='black')
+    bins = np.linspace(-4, 4, 30)
+    plt.hist(zscores, bins=bins, color='skyblue', edgecolor='black')
+    (mu, sigma) = norm.fit(zscores)
+    
+    x = np.linspace(-4, 4, 100)
+    gaussian_pdf = norm.pdf(x, mu, sigma)
+    plt.plot(x, gaussian_pdf, 'r-', lw=2, label=f'Gaussian fit\nMean={mu:.2f}\nStd={sigma:.2f}')
+    
+    
     plt.xlabel(f"Z-score for {param}")
     plt.ylabel("Count")
     plt.title(f"Z-score Distribution: {param}\nGroup: {group_label}")
