@@ -40,6 +40,9 @@ def collect_all_zscores(bin2_8_root, bin9_15_root, params, num_sims):
     for i in range(num_sims):
         sim_folder_1 = os.path.join(bin2_8_root, f"sim{i:03d}")
         sim_folder_2 = os.path.join(bin9_15_root, f"sim{i:03d}")
+        if(i %10 == 0):
+            print("Loading: " + str(sim_folder_1))
+            print("Loading: " + str(sim_folder_2))
         try:
             samples1 = loadMCSamples(sim_folder_1)
             samples2 = loadMCSamples(sim_folder_2)
