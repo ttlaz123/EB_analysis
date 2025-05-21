@@ -67,16 +67,17 @@ def load_chains(folder):
     print(chain_files[0])
     print(root)
     samples = loadMCSamples(root)
-    
+    '''
     param_names = [name.name for name in samples.getParamNames().names
                    if ('chi2' not in name.name and
                        'weight' not in name.name and
                        'minuslogprior' not in name.name)]
-    print(param_names)
+    #print(param_names)
     
     # Clean latex labels
-    latex_labels = [name.replace("_", "\\_") for name in param_names]
-    return MCSamples(samples=samples, names=param_names, labels=latex_labels)
+    #latex_labels = [name.replace("_", "\\_") for name in param_names]
+    '''
+    return samples
 
 def group_folders_by_prefix(base_dir):
     """
