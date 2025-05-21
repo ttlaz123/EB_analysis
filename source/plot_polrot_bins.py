@@ -131,7 +131,7 @@ def main():
     parser.add_argument("--output_dir", default=None, help="Root directory to save all plots.")
     args = parser.parse_args()
     if(args.output_dir is None):
-        args.output_dir = args.base_dir
+        args.output_dir = os.path.join(args.base_dir, 'bindiffs') 
     groups = group_folders_by_prefix(args.base_dir)
     for group_label, bin_folders in groups.items():
         plot_triangle_for_group(group_label, bin_folders, args.output_dir)
