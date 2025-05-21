@@ -5,7 +5,7 @@ import re
 import argparse
 from getdist import plots
 from getdist.mcsamples import loadMCSamples
-
+import matplotlib.pyplot as plt
 BIN_TYPES = ['2-8', '9-15', '2-15']
 BIN_COLORS = {
     '2-8': 'blue',
@@ -93,38 +93,50 @@ def plot_triangle_for_group(group_label, bin_folders, output_root):
         print(f"[Skipping] Incomplete bin types for group: {group_label}")
         return
 
-    # Load all sims per bin type
-    bin_samples = {}
-    param_names = None
-    for bt in BIN_TYPES:
-        samples_list, param_names = load_all_chains_in_folder(bin_folders[bt])
-        bin_samples[bt] = samples_list
+    example_bin = BIN_TYPES[0]
+    sim_files = sorted([
+        f for f in os.listdir(bin_folders[example_bin])
+        if re.match(r"sim\d+\.1\.txt", f)
+    ])
+    n_sims = len(sim_files)
+    if n_sims == 0:
+        print(f"[Warning] No sim files found in {bin_folders[example_bin]}")
+        return
 
-    n_sims = len(next(iter(bin_samples.values())))
     print(f"[Info] Plotting {n_sims} sims for group {group_label}")
 
     plotter = plots.get_subplot_plotter()
-
-    # Create output directory for this group
     group_output_dir = os.path.join(output_root, group_label)
     os.makedirs(group_output_dir, exist_ok=True)
 
-    for sim_idx in range(n_sims):
-        try:
-            # Get the samples of sim_idx from all bins
-            samples_for_plot = [bin_samples[bt][sim_idx] for bt in BIN_TYPES]
-        except IndexError:
-            print(f"[Warning] sim_idx {sim_idx} missing in some bins, skipping")
-            continue
+    first_root = os.path.join(bin_folders[example_bin], sim_files[0].split('.')[0])
+    first_samples = loadMCSamples(first_root)
+    param_names = [p.name for p in first_samples.getParamNames().params
+                   if all(x not in p.name for x in ['chi2','weight','minuslogprior'])]
 
-        legend_labels = [f"bin {bt}" for bt in BIN_TYPES]
+    for sim_idx in range(n_sims):
+        samples_for_plot = []
+        legend_labels = []
+        sim_file_stub = f"sim{sim_idx:03d}"
+        try:
+            for bt in BIN_TYPES:
+                folder = bin_folders[bt]
+                root = os.path.join(folder, sim_file_stub)
+                samples = loadMCSamples(root)
+                samples_for_plot.append(samples)
+                legend_labels.append(f"bin {bt}")
+        except Exception as e:
+            print(f"[Warning] Missing sim {sim_file_stub} in some bins: {e}")
+            continue
 
         plotter.triangle_plot(samples_for_plot, param_names, filled=True,
                               legend_labels=legend_labels, legend_loc='upper right')
 
-        outpath = os.path.join(group_output_dir, f"sim{sim_idx:03d}.png")
+        outpath = os.path.join(group_output_dir, f"{sim_file_stub}.png")
         plotter.export(outpath)
         print(f"[Saved] {outpath}")
+
+        plt.close('all')
 
 def main():
     parser = argparse.ArgumentParser(description="Plot triangle plots for det_polrot MCMC folders across bins.")
