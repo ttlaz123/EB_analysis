@@ -64,6 +64,7 @@ def load_chains(folder):
         raise FileNotFoundError(f"No matching chains in {folder}")
 
     header, data = parse_chain_file(os.path.join(folder, chain_files[0]))
+    print(f"[DEBUG] Header: {header}")
     
     # Filter out metadata columns
     param_mask = [name for name in header if name.startswith("alpha_")]
