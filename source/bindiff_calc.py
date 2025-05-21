@@ -1,8 +1,12 @@
 import os
 import argparse
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from getdist.mcsamples import loadMCSamples
+import logging
+logging.getLogger().setLevel(logging.ERROR)
 
 def detect_alpha_params(sim_path):
     """
