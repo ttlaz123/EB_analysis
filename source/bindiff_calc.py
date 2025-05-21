@@ -83,6 +83,7 @@ def plot_z_histogram(zscores, param, outdir, group_label):
     plt.xlabel(f"Z-score for {param}")
     plt.ylabel("Count")
     plt.title(f"Z-score Distribution: {param}\nGroup: {group_label}")
+    plt.legend()
     plt.tight_layout()
     os.makedirs(outdir, exist_ok=True)
     safe_label = group_label.replace(" ", "_").replace("/", "_")
