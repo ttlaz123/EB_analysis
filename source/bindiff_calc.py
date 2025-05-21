@@ -107,7 +107,7 @@ def main():
     group_label = get_common_group_label(args.bin2_8_dir, args.bin9_15_dir)
     print(f"Auto-detected group label: {group_label}")
 
-    alpha_params = detect_alpha_params(os.path.join(args.bin2_8_dir, "sim000"))
+    alpha_params = detect_alpha_params(os.path.join(args.bin2_8_dir, "sim001"))
     print(f"Detected alpha parameters: {alpha_params}")
 
     zscores = collect_all_zscores(args.bin2_8_dir, args.bin9_15_dir, alpha_params, args.num_sims)
