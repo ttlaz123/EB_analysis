@@ -5,6 +5,7 @@ import re
 import argparse
 import numpy as np
 from getdist import plots, MCSamples
+from getdist.mcsamples import loadMCSamples
 
 BIN_TYPES = ['2-8', '9-15', '2-15']
 BIN_COLORS = {
@@ -62,20 +63,18 @@ def load_chains(folder):
 
     if not chain_files:
         raise FileNotFoundError(f"No matching chains in {folder}")
-
-    header, data = parse_chain_file(os.path.join(folder, chain_files[0]))
-    print(f"[DEBUG] Header: {header}")
+    root = chain_files[0].split('.')[0]
+    samples = loadMCSamples(root)
     
-    # Filter out metadata columns
-    param_mask = [name for name in header if name.startswith("alpha_")]
-    param_indices = [header.index(p) for p in param_mask]
-    print(f"[DEBUG] param_mask: {param_mask}")
-    print(f"[DEBUG] Indices: {param_indices}")
-    samples = data[:, param_indices]
-
+    param_names = [name.name for name in samples.getParamNames().names
+                   if ('chi2' not in name.name and
+                       'weight' not in name.name and
+                       'minuslogprior' not in name.name)]
+    print(param_names)
+    
     # Clean latex labels
-    latex_labels = [name.replace("_", "\\_") for name in param_mask]
-    return MCSamples(samples=samples, names=param_mask, labels=latex_labels)
+    latex_labels = [name.replace("_", "\\_") for name in param_names]
+    return MCSamples(samples=samples, names=param_names, labels=latex_labels)
 
 def group_folders_by_prefix(base_dir):
     """
@@ -133,22 +132,11 @@ def plot_triangle_for_group(group_label, bin_folders, output_dir):
         try:
             folder = bin_folders[bin_type]
             samples = load_chains(folder)
-            print(f"[DEBUG] {bin_type} parameters: {samples.getParamNames().names}")
             samples_list.append(samples)
             legend_labels.append(f"bin {bin_type}")
         except Exception as e:
             print(f"[Error] Failed to load {bin_type} in {folder}: {e}")
             return
-
-    # Find intersection of parameter names
-    common_params = set(samples_list[0].getParamNames().names)
-    for s in samples_list[1:]:
-        common_params &= set(s.getParamNames().names)
-    common_params = list(common_params)
-    print(f"[DEBUG] Common parameters: {common_params}")
-
-    # Filter samples to only common parameters
-    samples_list = [s.extractParams(common_params) for s in samples_list]
 
     plotter = plots.get_subplot_plotter()
     plotter.triangle_plot(samples_list, filled=True, legend_labels=legend_labels, legend_loc='upper right')
@@ -157,7 +145,6 @@ def plot_triangle_for_group(group_label, bin_folders, output_dir):
     outpath = os.path.join(output_dir, f"triangle_{group_label}.png")
     plotter.export(outpath)
     print(f"[Saved] {outpath}")
-
 
 def main():
     parser = argparse.ArgumentParser(description="Plot triangle plots for det_polrot MCMC folders across bins.")
