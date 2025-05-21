@@ -175,7 +175,7 @@
          
                     function (params) {
                         let dirbase = '/liuto'
-                        let dirpath = dirbase + '/ede_chains/bindiffs';
+                        let dirpath = dirbase + '/ede_chains/bindiffs/';
                         let mcmc_folder = params.ede + params.theory_comp + params.spectra + params.inj_sig+ '/';
                         let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
                         let name = dirpath + mcmc_folder + sim_id  + '.png';
@@ -241,8 +241,8 @@
                     function (params) {
                         let dirbase = '/liuto/home/GitHub/EB_analysis/'
                         let dirpath = dirbase + '/zscore_histograms/';
-                        let zscore1 = params.angle + '_' + params.ede + +_ + params.binset1 + params.theory_comp + params.spectra + params.inj_sig
-                        let zscore2 = params.angle + '_' + params.ede + +_ + params.binset2 + params.theory_comp + params.spectra + params.inj_sig
+                        let zscore1 = params.angle + '_' + params.ede + '_' + params.binset1 + params.theory_comp + params.spectra + params.inj_sig
+                        let zscore2 = params.angle + '_' + params.ede + '_' + params.binset2 + params.theory_comp + params.spectra + params.inj_sig
                         
                         let name = dirpath + zscore1 + '_' + zscore2 +  '.png';
             
@@ -251,9 +251,9 @@
                     });
 
                 pager.setparams({
-                    'digit1': '0',
-                    'digit2': '0',
-                    'digit3': '1',
+                    'angle': 'alpha_BK18_150',
+                    'binset1': 'bin2-8',
+                    'binset2': 'bin9-15',
                     'inj_sig': '',
                     'ede': 'zeroeb',
                     'spectra': '_eb',
