@@ -133,11 +133,22 @@ def plot_triangle_for_group(group_label, bin_folders, output_dir):
         try:
             folder = bin_folders[bin_type]
             samples = load_chains(folder)
+            print(f"[DEBUG] {bin_type} parameters: {samples.getParamNames().names}")
             samples_list.append(samples)
             legend_labels.append(f"bin {bin_type}")
         except Exception as e:
             print(f"[Error] Failed to load {bin_type} in {folder}: {e}")
             return
+
+    # Find intersection of parameter names
+    common_params = set(samples_list[0].getParamNames().names)
+    for s in samples_list[1:]:
+        common_params &= set(s.getParamNames().names)
+    common_params = list(common_params)
+    print(f"[DEBUG] Common parameters: {common_params}")
+
+    # Filter samples to only common parameters
+    samples_list = [s.extractParams(common_params) for s in samples_list]
 
     plotter = plots.get_subplot_plotter()
     plotter.triangle_plot(samples_list, filled=True, legend_labels=legend_labels, legend_loc='upper right')
@@ -146,6 +157,7 @@ def plot_triangle_for_group(group_label, bin_folders, output_dir):
     outpath = os.path.join(output_dir, f"triangle_{group_label}.png")
     plotter.export(outpath)
     print(f"[Saved] {outpath}")
+
 
 def main():
     parser = argparse.ArgumentParser(description="Plot triangle plots for det_polrot MCMC folders across bins.")
