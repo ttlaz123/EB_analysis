@@ -64,10 +64,9 @@ def load_chains(folder):
     if not chain_files:
         raise FileNotFoundError(f"No matching chains in {folder}")
     root = folder + '/' + chain_files[0].split('.')[0]
-    print(chain_files[0])
-    print(root)
+   
     samples = loadMCSamples(root)
-    '''
+    
     param_names = [name.name for name in samples.getParamNames().names
                    if ('chi2' not in name.name and
                        'weight' not in name.name and
@@ -76,8 +75,8 @@ def load_chains(folder):
     
     # Clean latex labels
     #latex_labels = [name.replace("_", "\\_") for name in param_names]
-    '''
-    return samples
+    
+    return samples, param_names
 
 def group_folders_by_prefix(base_dir):
     """
@@ -134,7 +133,7 @@ def plot_triangle_for_group(group_label, bin_folders, output_dir):
     for bin_type in BIN_TYPES:
         try:
             folder = bin_folders[bin_type]
-            samples = load_chains(folder)
+            samples, param_names = load_chains(folder)
             samples_list.append(samples)
             legend_labels.append(f"bin {bin_type}")
         except Exception as e:
@@ -142,7 +141,7 @@ def plot_triangle_for_group(group_label, bin_folders, output_dir):
             return
 
     plotter = plots.get_subplot_plotter()
-    plotter.triangle_plot(samples_list, filled=True, legend_labels=legend_labels, legend_loc='upper right')
+    plotter.triangle_plot(samples_list, param_names, filled=True, legend_labels=legend_labels, legend_loc='upper right')
 
     os.makedirs(output_dir, exist_ok=True)
     outpath = os.path.join(output_dir, f"triangle_{group_label}.png")
