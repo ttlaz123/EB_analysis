@@ -24,23 +24,18 @@ def get_common_group_label(dir1, dir2):
         # fallback if empty, e.g. root folder or something odd
         group_label = "default_group"
     return group_label
+
 def detect_alpha_params(sim_folder):
     """
     Load one sim, return all parameter names starting with 'alpha_'.
     """
-    root = os.path.join(sim_folder, "sim")
+    root = os.path.join(sim_folder, "sim001")
     samples = loadMCSamples(root)
     all_names = [p.name for p in samples.getParamNames().names]
     alpha_params = [p for p in all_names if p.startswith("alpha_")]
     return alpha_params
 
-def load_samples(sim_folder):
-    """
-    Load MCSamples once for the simulation folder.
-    """
-    root = os.path.join(sim_folder, "sim")
-    samples = loadMCSamples(root)
-    return samples
+
 def compute_z_score(mu1, std1, mu2, std2):
     denom = np.sqrt(std1**2 + std2**2)
     if denom == 0:
@@ -58,8 +53,8 @@ def collect_all_zscores(bin2_8_root, bin9_15_root, params, num_sims):
         sim_folder_1 = os.path.join(bin2_8_root, f"sim{i:03d}")
         sim_folder_2 = os.path.join(bin9_15_root, f"sim{i:03d}")
         try:
-            samples1 = load_samples(sim_folder_1)
-            samples2 = load_samples(sim_folder_2)
+            samples1 = loadMCSamples(sim_folder_1)
+            samples2 = loadMCSamples(sim_folder_2)
 
             means1 = samples1.getMeans()
             stds1 = samples1.getStd()
@@ -107,7 +102,7 @@ def main():
     group_label = get_common_group_label(args.bin2_8_dir, args.bin9_15_dir)
     print(f"Auto-detected group label: {group_label}")
 
-    alpha_params = detect_alpha_params(os.path.join(args.bin2_8_dir, "sim001"))
+    alpha_params = detect_alpha_params(args.bin2_8_dir)
     print(f"Detected alpha parameters: {alpha_params}")
 
     zscores = collect_all_zscores(args.bin2_8_dir, args.bin9_15_dir, alpha_params, args.num_sims)
