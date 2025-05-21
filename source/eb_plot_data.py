@@ -88,7 +88,7 @@ def plot_covar_matrix(mat, used_maps=None, title='Log of covar matrix',
     if(show_plot):
         plt.show()
 
-def plot_overlay_sims(spectra_type, observed_datas_list, outpath):
+def plot_overlay_sims(spectra_type, observed_datas_list, outpath, observed_datas_list2=None):
     maps_B = set()
     maps_E = set()
     # Use keys from the first observed dataset
@@ -133,34 +133,45 @@ def plot_overlay_sims(spectra_type, observed_datas_list, outpath):
 
         axes_index = row_idx * num_columns + col_idx
         ax = axes[axes_index]
-
         all_sims = []
-        for observed_data_dict in observed_datas_list:
-            observed_data = observed_data_dict[key]
-            ax.plot(
-                range(len(observed_data)),
-                observed_data,
-                color='gray',
-                alpha=0.08,
-                linewidth=0.5,
-            )
-            all_sims.append(observed_data)
+        for i in range(len(observed_datas_list)):
+            obs1 = observed_datas_list[i][key]
+            if observed_datas_list2 is not None:
+                if(i > len(observed_datas_list2)):
+                    continue
+                obs2 = observed_datas_list2[i][key]
+                diff = np.array(obs1) - np.array(obs2)
+                ax.plot(range(len(diff)), diff, color='gray', alpha=0.08, linewidth=0.5)
+                all_sims.append(diff)
+            else:
+                ax.plot(range(len(obs1)), obs1, color='gray', alpha=0.08, linewidth=0.5)
+                all_sims.append(obs1)
 
-        all_sims = np.array(all_sims)  # shape (N_sims, num_bins)
-
-        # Remove extreme outliers per bin using percentiles
-        lower_pct = 1
-        upper_pct = 99
+        n_sigma = 5  # threshold in units of standard deviation
         clipped_sims = []
+        all_sims = np.array(all_sims) 
         for bin_idx in range(all_sims.shape[1]):
             bin_values = all_sims[:, bin_idx]
-            low = np.percentile(bin_values, lower_pct)
-            high = np.percentile(bin_values, upper_pct)
-            # Keep only values within [low, high]
-            mask = (bin_values >= low) & (bin_values <= high)
+            mean = np.mean(bin_values)
+            std = np.std(bin_values)
+        
+            # Mask for inliers: within ±n_sigma
+            mask = np.abs(bin_values - mean) <= n_sigma * std
+        
+            # Mask for outliers
+            outlier_mask = ~mask
+            outlier_indices = np.where(outlier_mask)[0]
+        
+            if len(outlier_indices) > 0:
+                outlier_vals = bin_values[outlier_indices]
+                print(f"Bin {bin_idx}:")
+                for idx, val in zip(outlier_indices, outlier_vals):
+                    delta_sigma = (val - mean) / std
+                    print(f"  Sim {idx} -> value = {val:.3e}, Δσ = {delta_sigma:.2f}")
+        
             clipped_bin_values = bin_values[mask]
             clipped_sims.append(clipped_bin_values)
-        
+    
         # Pad bins with fewer values to uniform length (for np.array conversion)
         max_len = max(len(arr) for arr in clipped_sims)
         clipped_sims_padded = np.full((len(clipped_sims), max_len), np.nan)

@@ -270,14 +270,29 @@ def load_cmb_spectra(lensing_path, dust_paths, fixed_dust = False):
     return theory_dict
 
 def load_ede_spectra(ede_path, theory_dict):
+    # Read all lines to parse column headers
+    with open(ede_path, 'r') as f:
+        lines = f.readlines()
+
+    # Extract column header info
+    col_line = next((line for line in lines if line.strip().startswith('#') and '1:' in line), None)
+    if col_line is None:
+        raise ValueError("Could not find column header line in file.")
+
+    col_entries = col_line.strip('#').split()
+    col_names = [''] * len(col_entries)
+    for entry in col_entries:
+        idx, name = entry.split(':')
+        col_names[int(idx) - 1] = name
+
+    # Load the numerical data only
+    data = pd.read_csv(ede_path, delim_whitespace=True, comment='#', header=None)
+    data.columns = col_names
         
-        data = pd.read_csv(ede_path, delim_whitespace=True, comment='#', header=None)
-        data.columns = ['l', 'TT', 'EE', 'TE', 'BB', 'EB', 'TB', 'phiphi', 'TPhi', 'Ephi']
-        # Extract 'l' and 'EB' columns
-        EB_values = data['EB'].to_numpy()
-        EB_ede_dls = -EB_values * np.square(K_TO_UK) * np.square(T_CMB_K)
-        theory_dict['EB_EDE'] = EB_ede_dls
-        return theory_dict
+    EB_values = data['EB'].to_numpy()
+    EB_ede_dls = -EB_values * np.square(K_TO_UK) * np.square(T_CMB_K)
+    theory_dict['EB_EDE'] = EB_ede_dls
+    return theory_dict
 
 def include_ede_spectra(ede_path, theory_dict):
         

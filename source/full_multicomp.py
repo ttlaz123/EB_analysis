@@ -4,8 +4,6 @@ import glob
 import shutil
 import copy
 import numpy as np
-#import matplotlib.pyplot as plt
-
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from cobaya.run import run
 from cobaya.likelihood import Likelihood
@@ -81,12 +79,18 @@ class BK18_full_multicomp(Likelihood):
         self.initial_theory_dict = ec.apply_initial_conditions(self.dl_theory, self.used_maps)
         self.binned_dl_observed_vec = self.dict_to_vec(self.binned_dl_observed_dict, 
                                                     self.used_maps)
-        #print('Showing figs')
-        #plt.figure()
-        #plt.plot(self.dl_theory['EE']/100, label='EE/100')
-        #plt.plot(self.dl_theory['EB_EDE'], label = 'EB EDE')
-        #plt.legend()
-        #plt.show()
+        if False:
+            print('Showing figs')
+            import matplotlib
+            matplotlib.use('TkAgg')
+            import matplotlib.pyplot as plt
+    
+    
+            plt.figure()
+            plt.plot(self.dl_theory['EE']/100, label='EE/100')
+            plt.plot(self.dl_theory['EB_EDE'], label = 'EB EDE')
+            plt.legend()
+            plt.show()
 
     def get_requirements(self):
         """
@@ -119,7 +123,7 @@ class BK18_full_multicomp(Likelihood):
             #chi_squared = 0
             chi_squared += self.theory_eskilt(params_values)
         # Calculate the log-likelihood
-        log_likelihood = -0.5 * chi_squared
+        log_likelihood = -1/2 * chi_squared
         #print(log_likelihood)
         return log_likelihood
 
@@ -766,6 +770,8 @@ def main():
             ~~~~~ sims below ~~~~~~
             - BK18lf_fede01: Simulations with injected fEDE=0.01 signal.
             - BK18lf_fede01_sigl: fEDE=0.01 signal including sig_l scaling.
+            - BK18lf_fede01_sig: fEDE=0.01 signal including sig scaling.
+
             - BK18lf_sim: Baseline BK18lf simulations for null testing.
             - BK18lf_mhd    
             - BK18lf_mkd    
@@ -904,9 +910,11 @@ def main():
                 print("Deletion cancelled. Existing chains will be kept.")
         else:
             print(f"No existing chains to overwrite at: {args.output_path}")
-    if False:
+    if True:
         observed_datas_list = load_all_sims(input_args=args)
-        epd.plot_overlay_sims('EB', observed_datas_list, args.output_path)
+        args.dataset = 'BK18lf'
+        observed_datas_list2 = load_all_sims(input_args=args)
+        epd.plot_overlay_sims('BB', observed_datas_list, args.output_path, observed_datas_list2)
     else:
         multicomp_mcmc_driver(args)
 

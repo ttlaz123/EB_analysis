@@ -29,6 +29,10 @@ def set_file_paths(dataset, fede=0.07):
     elif(dataset == 'BK18lf_fede01'):
         DATASETNAME = 'BK18lf_fede01'
         DATASET_DIRNAME = 'BK18lf_fede01'
+    elif(dataset == 'BK18lf_fede01_sig'):
+        DATASETNAME = 'BK18lf_fede01'
+        DATASET_DIRNAME = 'BK18lf_fede01_sig'
+
     elif(dataset == 'BK18lf_fede01_sigl'):
         DATASETNAME = 'BK18lf_fede01'
         DATASET_DIRNAME = 'BK18lf_fede01_sigl'
