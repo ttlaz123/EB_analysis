@@ -56,10 +56,10 @@ def collect_all_zscores(bin2_8_root, bin9_15_root, params, num_sims):
             samples1 = loadMCSamples(sim_folder_1)
             samples2 = loadMCSamples(sim_folder_2)
 
-            means1 = samples1.getMeans()
-            stds1 = samples1.std()
-            means2 = samples2.getMeans()
-            stds2 = samples2.std()
+            means1 = samples1.getMeans(params)
+            stds1 = samples1.std(params)
+            means2 = samples2.getMeans(params)
+            stds2 = samples2.std(params)
 
             for p in params:
                 mu1, std1 = means1[p], stds1[p]
