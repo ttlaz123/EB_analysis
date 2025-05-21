@@ -69,6 +69,8 @@ def load_chains(folder):
     # Filter out metadata columns
     param_mask = [name for name in header if name.startswith("alpha_")]
     param_indices = [header.index(p) for p in param_mask]
+    print(f"[DEBUG] param_mask: {param_mask}")
+    print(f"[DEBUG] Indices: {param_indices}")
     samples = data[:, param_indices]
 
     # Clean latex labels
