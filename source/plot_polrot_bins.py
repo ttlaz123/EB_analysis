@@ -111,7 +111,7 @@ def plot_triangle_for_group(group_label, bin_folders, output_root):
 
     first_root = os.path.join(bin_folders[example_bin], sim_files[0].split('.')[0])
     first_samples = loadMCSamples(first_root)
-    param_names = [p.name for p in first_samples.getParamNames().params
+    param_names = [p.name for p in first_samples.getParamNames().names
                    if all(x not in p.name for x in ['chi2','weight','minuslogprior'])]
 
     for sim_idx in range(n_sims):
