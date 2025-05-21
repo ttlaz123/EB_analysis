@@ -56,14 +56,13 @@ def collect_all_zscores(bin2_8_root, bin9_15_root, params, num_sims):
             samples1 = loadMCSamples(sim_folder_1)
             samples2 = loadMCSamples(sim_folder_2)
 
-            means1 = samples1.getMeans()
-            stds1 = samples1.std(params)
-            means2 = samples2.getMeans()
-            stds2 = samples2.std(params)
+            
 
             for p in params:
-                mu1, std1 = means1[p], stds1[p]
-                mu2, std2 = means2[p], stds2[p]
+                mu1 = samples1.mean(p)
+                std1 = samples1.std(p)
+                mu2 = samples2.mean(p)
+                std2 = samples2.std(p)
                 z = compute_z_score(mu1, std1, mu2, std2)
                 if not np.isnan(z):
                     zscores[p].append(z)
