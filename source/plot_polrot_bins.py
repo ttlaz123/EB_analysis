@@ -29,7 +29,7 @@ def load_all_chains_in_folder(folder):
         root = os.path.join(folder, cf.split('.')[0])  # remove extension
         samples = loadMCSamples(root)
         if param_names is None:
-            param_names = [p.name for p in samples.getParamNames().params
+            param_names = [p.name for p in samples.getParamNames().names
                            if all(x not in p.name for x in ['chi2','weight','minuslogprior'])]
         samples_list.append(samples)
     return samples_list, param_names
