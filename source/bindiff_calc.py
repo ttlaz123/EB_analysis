@@ -74,7 +74,7 @@ def main():
     args = parser.parse_args()
 
     # Detect parameters starting with alpha_ from first sim
-    sim0_path = os.path.join(args.bin2_8_dir, "sim000")
+    sim0_path = os.path.join(args.bin2_8_dir, "sim001")
     alpha_params = detect_alpha_params(sim0_path)
 
     for param in alpha_params:
