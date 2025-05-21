@@ -63,7 +63,7 @@ def load_chains(folder):
 
     if not chain_files:
         raise FileNotFoundError(f"No matching chains in {folder}")
-    root = chain_files[0].split('.')[0]
+    root = folder + '/' + chain_files[0].split('.')[0]
     print(chain_files[0])
     print(root)
     samples = loadMCSamples(root)
