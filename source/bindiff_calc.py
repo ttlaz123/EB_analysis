@@ -8,22 +8,10 @@ from getdist.mcsamples import loadMCSamples
 import logging
 logging.getLogger().setLevel(logging.ERROR)
 
-def get_common_group_label(dir1, dir2):
-    # Find longest common prefix of the two absolute paths
-    abs1 = os.path.abspath(dir1)
-    abs2 = os.path.abspath(dir2)
-    common_prefix = os.path.commonprefix([abs1, abs2])
-
-    # commonprefix can cut inside folder names, so fix by going up to last os.sep
-    if not common_prefix.endswith(os.sep):
-        common_prefix = common_prefix.rsplit(os.sep, 1)[0]
-
-    # Use the last folder name of this prefix as group label
-    group_label = os.path.basename(common_prefix)
-    if not group_label:
-        # fallback if empty, e.g. root folder or something odd
-        group_label = "default_group"
-    return group_label
+def get_group_label_from_paths(dir1, dir2):
+    label1 = os.path.basename(os.path.normpath(dir1))
+    label2 = os.path.basename(os.path.normpath(dir2))
+    return f"{label1}_{label2}"
 
 def detect_alpha_params(sim_folder):
     """
@@ -40,7 +28,7 @@ def compute_z_score(mu1, std1, mu2, std2):
     denom = np.sqrt(std1**2 + std2**2)
     if denom == 0:
         return np.nan
-    return abs(mu1 - mu2) / denom
+    return (mu1 - mu2) / denom
 
 def collect_all_zscores(bin2_8_root, bin9_15_root, params, num_sims):
     """
@@ -98,7 +86,7 @@ def main():
     # Remove group_label argument
     args = parser.parse_args()
 
-    group_label = get_common_group_label(args.bin2_8_dir, args.bin9_15_dir)
+    group_label = get_group_label_from_paths(args.bin2_8_dir, args.bin9_15_dir)
     print(f"Auto-detected group label: {group_label}")
 
     alpha_params = detect_alpha_params(args.bin2_8_dir)
