@@ -6,6 +6,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from getdist.mcsamples import loadMCSamples
 import logging
+import pandas as pd
 from scipy.stats import norm
 logging.getLogger().setLevel(logging.ERROR)
 
@@ -37,34 +38,62 @@ def collect_all_zscores(bin2_8_root, bin9_15_root, params, num_sims):
     Returns dict param -> list of z-scores.
     """
     zscores = {p: [] for p in params}
+    summary_csv_1 = os.path.join(bin2_8_root, os.path.basename(bin2_8_root) + "_summary.csv")
+    summary_csv_2 = os.path.join(bin9_15_root, os.path.basename(bin9_15_root) + "_summary.csv")
 
-    for i in range(num_sims):
-        sim_folder_1 = os.path.join(bin2_8_root, f"sim{i:03d}")
-        sim_folder_2 = os.path.join(bin9_15_root, f"sim{i:03d}")
-        if(i %10 == 0):
-            print("Loading: " + str(sim_folder_1))
-            print("Loading: " + str(sim_folder_2))
-        try:
-            samples1 = loadMCSamples(sim_folder_1)
-            samples2 = loadMCSamples(sim_folder_2)
+    use_summary_1 = os.path.exists(summary_csv_1)
+    use_summary_2 = os.path.exists(summary_csv_2)
+    if use_summary_1 and use_summary_2:
+        print(f"Loading summary CSVs:\n  {summary_csv_1}\n  {summary_csv_2}")
+        df1 = pd.read_csv(summary_csv_1)
+        df2 = pd.read_csv(summary_csv_2)
 
-            
-
+        # Assumes summary CSV has columns named like 'param_mean' and 'param_std'
+        for i in range(min(len(df1), len(df2))):
             for p in params:
-                mu1 = samples1.mean(p)
-                std1 = samples1.std(p)
-                mu2 = samples2.mean(p)
-                std2 = samples2.std(p)
-                z = compute_z_score(mu1, std1, mu2, std2)
-                if not np.isnan(z):
-                    zscores[p].append(z)
+                mean_col = f"{p}_mean"
+                std_col = f"{p}_std"
+                try:
+                    mu1 = df1.at[i, mean_col]
+                    std1 = df1.at[i, std_col]
+                    mu2 = df2.at[i, mean_col]
+                    std2 = df2.at[i, std_col]
 
-        except Exception as e:
-            print(f"[Warning] Skipping sim{i:03d} due to error: {e}")
-            continue
+                    z = compute_z_score(mu1, std1, mu2, std2)
+                    if not np.isnan(z):
+                        zscores[p].append(z)
+                except KeyError as e:
+                    print(f"[Warning] Missing expected column {e} in summary CSV.")
+                    continue
+    else:
+        # Fallback to loading individual sim folders
+        for i in range(num_sims):
+            sim_folder_1 = os.path.join(bin2_8_root, f"sim{i:03d}")
+            sim_folder_2 = os.path.join(bin9_15_root, f"sim{i:03d}")
+            if i % 10 == 0:
+                print("Loading: " + sim_folder_1)
+                print("Loading: " + sim_folder_2)
+            try:
+                samples1 = loadMCSamples(sim_folder_1)
+                samples2 = loadMCSamples(sim_folder_2)
 
+                for p in params:
+                    mu1 = samples1.mean(p)
+                    std1 = samples1.std(p)
+                    mu2 = samples2.mean(p)
+                    std2 = samples2.std(p)
+                    z = compute_z_score(mu1, std1, mu2, std2)
+                    if not np.isnan(z):
+                        zscores[p].append(z)
+
+            except Exception as e:
+                print(f"[Warning] Skipping sim{i:03d} due to error: {e}")
+                continue
+
+    # Convert lists to numpy arrays
     for p in params:
         zscores[p] = np.array(zscores[p])
+
     return zscores
 
 def plot_z_histogram(zscores, param, outdir, group_label):
