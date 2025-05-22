@@ -77,8 +77,8 @@
          
                     function (params) {
                         let dirbase = '/liuto/home/GitHub/EB_analysis/'
-                        let dirpath = dirbase + '/chains/';
-                        let file = params.ede + '_overalay_confband_' + params.spectra
+                        let dirpath = dirbase + '/overlay/';
+                        let file = params.ede + '_overlay_confband_' + params.spectra
                         let name = dirpath + file +  '.png';
             
                         console.log(name);
@@ -114,7 +114,7 @@
                     function (params) {
                         let dirbase = '/liuto/home/GitHub/EB_analysis/'
                         let dirpath = dirbase + '/overlay_plots/';
-                        let file = 'diff_overalay_confband_' + params.spectra + params.dtype 
+                        let file = 'diff_overlay_confband_' + params.spectra + params.dtype 
                         let name = dirpath + file +  '.png';
             
                         console.log(name);
