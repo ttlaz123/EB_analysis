@@ -43,8 +43,8 @@ def collect_all_zscores(bin2_8_root, bin9_15_root, params, num_sims):
 
     use_summary_1 = os.path.exists(summary_csv_1)
     use_summary_2 = os.path.exists(summary_csv_2)
-    print('Summary files:' + summary_csv_1)
-    print('Summary files:' + summary_csv_2)
+    print('Summary files:' + summary_csv_1 + ' ' + str(use_summary_1))
+    print('Summary files:' + summary_csv_2+ ' ' + str(use_summary_2))
     if use_summary_1 and use_summary_2:
         print(f"Loading summary CSVs:\n  {summary_csv_1}\n  {summary_csv_2}")
         df1 = pd.read_csv(summary_csv_1)
