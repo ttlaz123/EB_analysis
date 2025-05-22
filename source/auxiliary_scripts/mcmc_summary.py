@@ -4,7 +4,7 @@ import pandas as pd
 from getdist import loadMCSamples
 def summarize_chain(root):
     """Return summary (mean, std) for all parameters in one chain."""
-    samples = loadMCSamples(file_root=root, ignore_rows=0.3)
+    samples = loadMCSamples(file_root=root)
 
     if samples is None or samples.paramNames is None:
         raise ValueError(f"Could not load MCMC samples from root: {root}")
