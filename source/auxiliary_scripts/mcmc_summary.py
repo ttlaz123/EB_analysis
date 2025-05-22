@@ -15,8 +15,8 @@ def summarize_chain(root):
 
     summary = {"chain_root": os.path.basename(root)}
     for name, mean, std in zip(names, means, stds):
-        summary[f"{name}_mean"] = mean
-        summary[f"{name}_std"] = std
+        summary[f"{name.name}_mean"] = mean
+        summary[f"{name.name}_std"] = std
 
     return summary
 
@@ -30,16 +30,17 @@ def process_directory(base_dir):
         print(f"Processing chains in: {subdir}")
         seen_roots = set()
         summaries = []
-
+        count = 0
         for f in chain_files:
             full_path = os.path.join(subdir, f)
             root = os.path.splitext(full_path)[0].rsplit('.', 1)[0]  # removes .1/.2/.txt
             if root in seen_roots:
                 continue  # already processed this chain root
             seen_roots.add(root)
-
+            count += 1
             try:
-                print(f"  → {root}")
+                if(count % 10 == 0):
+                    print(f"  → {root}")
                 summary = summarize_chain(root)
                 summaries.append(summary)
             except Exception as e:
