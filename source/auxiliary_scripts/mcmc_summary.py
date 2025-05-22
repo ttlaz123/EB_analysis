@@ -9,13 +9,15 @@ def summarize_chain(root):
     if samples is None or samples.paramNames is None:
         raise ValueError(f"Could not load MCMC samples from root: {root}")
 
-    stats = samples.getMargeStats().table()
-    summary = {
-        "chain_root": os.path.basename(root)
-    }
-    for name, mean, std in zip(stats["name"], stats["mean"], stats["err"]):
+    names = samples.getParamNames().names
+    means = samples.mean()
+    stds = samples.std()
+
+    summary = {"chain_root": os.path.basename(root)}
+    for name, mean, std in zip(names, means, stds):
         summary[f"{name}_mean"] = mean
         summary[f"{name}_std"] = std
+
     return summary
 
 def process_directory(base_dir):
