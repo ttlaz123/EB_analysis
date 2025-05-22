@@ -4,7 +4,7 @@ import pandas as pd
 from getdist import loadMCSamples
 
 def summarize_chain_file(chain_file):
-    base_name = os.path.splitext(chain_file)[0]
+    base_name = chain_file.split('.')[0]
     samples = loadMCSamples(file_root=base_name)
 
     stats = samples.getMargeStats()
