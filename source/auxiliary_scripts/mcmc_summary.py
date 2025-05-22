@@ -23,20 +23,22 @@ def summarize_chain(root):
 def process_directory(base_dir):
     """Process all subdirectories and create summary CSVs with all chains."""
     for subdir, _, files in os.walk(base_dir):
+        out_path = os.path.join(subdir, os.path.basename(subdir) + "_summary.csv")
+        if os.path.exists(out_path):
+            print(f"Skipping {subdir}, summary CSV already exists: {out_path}")
+            continue
         chain_files = sorted(f for f in files if f.endswith('.txt'))
         if not chain_files:
             continue
 
         print(f"Processing chains in: {subdir}")
-        seen_roots = set()
+        
         summaries = []
         count = 0
         for f in chain_files:
             full_path = os.path.join(subdir, f)
             root = os.path.splitext(full_path)[0].rsplit('.', 1)[0]  # removes .1/.2/.txt
-            if root in seen_roots:
-                continue  # already processed this chain root
-            seen_roots.add(root)
+            
             count += 1
             try:
                 if(count % 10 == 0):
@@ -48,7 +50,7 @@ def process_directory(base_dir):
 
         if summaries:
             summary_df = pd.DataFrame(summaries)
-            out_path = os.path.join(subdir, os.path.basename(subdir) + "_summary.csv")
+            
             summary_df.to_csv(out_path, index=False)
             print(f"Saved summary: {out_path}")
         else:

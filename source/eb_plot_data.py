@@ -626,6 +626,7 @@ def plot_corner(outfile, sim_results_file, real_results_file):
                  ' and ' + real_results_file.split('/')[-1])
     plt.suptitle(title_str)
     plt.savefig(outfile)
+    
 def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None, 
                    use_median=True, percentile_clip=(4, 96)):
     modes_dict = {}
