@@ -1,51 +1,58 @@
 import os
-import glob
+import argparse
 import pandas as pd
 from getdist import loadMCSamples
+def summarize_chain(root):
+    """Return summary (mean, std) for all parameters in one chain."""
+    samples = loadMCSamples(file_root=root, ignore_rows=0.3)
 
-def summarize_chain_file(chain_file):
-    base_name = chain_file.split('.')[0]
-    samples = loadMCSamples(file_root=base_name)
+    if samples is None or samples.paramNames is None:
+        raise ValueError(f"Could not load MCMC samples from root: {root}")
 
-    stats = samples.getMargeStats()
-    param_means = stats.means
-    param_stddevs = stats.std_devs
-    param_names = stats.parNames.names
-
+    stats = samples.getMargeStats().table()
     summary = {
-        "chain_file": os.path.basename(chain_file),
+        "chain_root": os.path.basename(root)
     }
-    for name, mean, std in zip(param_names, param_means, param_stddevs):
+    for name, mean, std in zip(stats["name"], stats["mean"], stats["err"]):
         summary[f"{name}_mean"] = mean
         summary[f"{name}_std"] = std
-
     return summary
 
-def summarize_all_chains_in_dir(parent_dir):
-    for subdir, dirs, files in os.walk(parent_dir):
-        chain_files = sorted(glob.glob(os.path.join(subdir, '*.txt')))
+def process_directory(base_dir):
+    """Process all subdirectories and create summary CSVs with all chains."""
+    for subdir, _, files in os.walk(base_dir):
+        chain_files = sorted(f for f in files if f.endswith('.txt'))
         if not chain_files:
             continue
 
         print(f"Processing chains in: {subdir}")
-        try:
-            summaries = []
-            for chain_file in chain_files:
-                summary = summarize_chain_file(chain_file)
+        seen_roots = set()
+        summaries = []
+
+        for f in chain_files:
+            full_path = os.path.join(subdir, f)
+            root = os.path.splitext(full_path)[0].rsplit('.', 1)[0]  # removes .1/.2/.txt
+            if root in seen_roots:
+                continue  # already processed this chain root
+            seen_roots.add(root)
+
+            try:
+                print(f"  → {root}")
+                summary = summarize_chain(root)
                 summaries.append(summary)
+            except Exception as e:
+                print(f"  !! Failed to process {root}: {e}")
 
+        if summaries:
             summary_df = pd.DataFrame(summaries)
-            summary_csv_path = os.path.join(subdir, os.path.basename(subdir) + "_summary.csv")
-            summary_df.to_csv(summary_csv_path, index=False)
-            print(f"Saved summary to: {summary_csv_path}")
-        except Exception as e:
-            print(f"Failed to process {subdir}: {e}")
-
+            out_path = os.path.join(subdir, os.path.basename(subdir) + "_summary.csv")
+            summary_df.to_csv(out_path, index=False)
+            print(f"Saved summary: {out_path}")
+        else:
+            print(f"No valid chains found in: {subdir}")
 if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Summarize MCMC chains using GetDist.")
-    parser.add_argument("parent_dir", help="Top-level directory containing subdirs of MCMC chains.")
+    parser = argparse.ArgumentParser(description="Summarize all MCMC chains using getdist.")
+    parser.add_argument("base_dir", type=str, help="Directory of chain subdirectories.")
     args = parser.parse_args()
 
-    summarize_all_chains_in_dir(args.parent_dir)
+    process_directory(args.base_dir)
