@@ -657,8 +657,14 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None,
                 with open(file_path, 'r') as f:
                     first_line = f.readline().strip()  # Read the first line
                     # Remove the '#' and split to get the correct column names
-                    corrected_header = first_line.replace('#', '').split()
-                    corrected_header = [col + '_mean' for col in corrected_header if col not in default_cols else col]
+                    header = first_line.replace('#', '').split()
+                    corrected_header = []
+                    for col in header:
+                        if(col in default_cols):
+                            corrected_header.append(col)
+                        else:
+                            corrected_header.append(col + '_mean')
+                    
                 break
             except FileNotFoundError:
                 print("Skipping " + file_path)
