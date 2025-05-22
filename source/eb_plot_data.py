@@ -666,7 +666,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None,
                             corrected_header.append(col)
                         else:
                             corrected_header.append(col + '_mean')
-                    
+                print('txt header: ' + str(corrected_header))
                 break
             except FileNotFoundError:
                 print("Skipping " + file_path)
