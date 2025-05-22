@@ -660,7 +660,9 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None,
                     header = first_line.replace('#', '').split()
                     corrected_header = []
                     for col in header:
-                        if(col in default_cols):
+                        if(col.split('_')[-1] == 'std'):
+                            continue 
+                        elif(col in default_cols):
                             corrected_header.append(col)
                         else:
                             corrected_header.append(col + '_mean')
