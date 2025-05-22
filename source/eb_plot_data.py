@@ -626,41 +626,57 @@ def plot_corner(outfile, sim_results_file, real_results_file):
                  ' and ' + real_results_file.split('/')[-1])
     plt.suptitle(title_str)
     plt.savefig(outfile)
-    
+
 def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None, 
                    use_median=True, percentile_clip=(4, 96)):
+    """
+    chains_path: a path pattern with 'XXX' replaced by sim number, e.g. '/path/to/sim_XXX.txt'
+    single_sim: simulation number for individual overlay plot
+    sim_nums: total number of simulations
+    single_path: optionally override single sim path
+    """
     modes_dict = {}
     single_df = None
     simcount = 0
 
-    for i in range(1, sim_nums + 1):
-        file_path = chains_path.replace('XXX', f'{i:03d}')
-        print('loading:' + str(file_path))
-        # Read the first line to get the correct header
-        try:
-            with open(file_path, 'r') as f:
-                first_line = f.readline().strip()  # Read the first line
-                # Remove the '#' and split to get the correct column names
-                corrected_header = first_line.replace('#', '').split()
-        except FileNotFoundError:
-            print("Skipping " + file_path)
-            continue
+    base_dir = os.path.dirname(chains_path)
+    base_name = os.path.basename(base_dir)
+    csv_file = os.path.join(base_dir, base_name + "_summary.csv")
+    if(os.path.exists(csv_file)):
+        print('Reading: ' + str(csv_file))
+        modes_df = pd.read_csv(csv_file)
+    else:
+        for i in range(1, sim_nums + 1):
+            file_path = chains_path.replace('XXX', f'{i:03d}')
+            print('loading:' + str(file_path))
+            # Read the first line to get the correct header
+            try:
+                with open(file_path, 'r') as f:
+                    first_line = f.readline().strip()  # Read the first line
+                    # Remove the '#' and split to get the correct column names
+                    corrected_header = first_line.replace('#', '').split()
+            except FileNotFoundError:
+                print("Skipping " + file_path)
+                continue
 
-        chain_df = pd.read_csv(file_path, delim_whitespace=True, comment='#')
-        chain_df.columns = corrected_header
+            chain_df = pd.read_csv(file_path, delim_whitespace=True, comment='#')
+            chain_df.columns = corrected_header
 
-        for column in chain_df.columns:
-            if column not in modes_dict:
-                modes_dict[column] = []
-            value = np.median(chain_df[column]) if use_median else np.mean(chain_df[column])
-            modes_dict[column].append(value)
+            for column in chain_df.columns:
+                if column not in modes_dict:
+                    modes_dict[column] = []
+                value = np.median(chain_df[column]) if use_median else np.mean(chain_df[column])
+                modes_dict[column].append(value)
 
-        simcount += 1
+            simcount += 1
 
-    modes_df = pd.DataFrame.from_dict(modes_dict)
-    default_cols = ['#', 'weight', 'minuslogpost', 'minuslogprior',
-                    'minuslogprior__0', 'chi2', 'chi2__my_likelihood']
-    param_names = [col for col in modes_df.columns if col not in default_cols]
+        modes_df = pd.DataFrame.from_dict(modes_dict)
+    default_cols = ['#', 'chain_root', 'weight', 'minuslogpost', 'minuslogprior',
+                    'minuslogprior__0', 'chi2', 'chi2__my_likelihood', 
+                    'chi2_mean', 'chi2__my_likelihood_mean',
+                    'chi2_std', 'chi2__my_likelihood_std']
+    param_names = [col for col in modes_df.columns if col not in default_cols
+                   and not col.split('_')[-1] == 'std']
     print("Parameter names for plotting:", param_names)
 
     # Compute ranges for corner plot from red summary (modes_df)
