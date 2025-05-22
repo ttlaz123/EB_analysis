@@ -340,6 +340,75 @@
                 });
             </script>
         </figure>
+        <figure>
+    <img alt="All Bin2-8 vs Bin9-15 Comparisons" id="bindiff_all_combos" src="#" width="750" height="500"
+        onerror="javascript:this.src='dne.png'" />
+    <figcaption>
+        Comparison of every bin2-8 vs bin9-15 combination
+    </figcaption>
+
+    <script type="text/javascript">
+
+        pager.link("#bindiff_all_combos", {
+            'Angle|angle':[
+                        'alpha_BK18_150|alpha_BK18_150',
+                        'alpha_BK18_K95|alpha_BK18_K95',
+                        'alpha_BK18_B95lf|alpha_BK18_B95e',
+                        'alpha_BK18_220|alpha_BK18_220',
+                    ],
+            'Injected Signal Bins 2-8|inj_sig1': [
+                'Positive Miscalibration|_sigpos',
+                'Negative Miscalibration|_signeg',
+                'Balanced Miscalibration|_sigbal',
+                'No Miscalibration|'
+            ],
+            'Injected Signal Bins 9-15|inj_sig2': [
+                'Positive Miscalibration|_sigpos',
+                'Negative Miscalibration|_signeg',
+                'Balanced Miscalibration|_sigbal',
+                'No Miscalibration|'
+            ],
+            'Model|theory_comp': [
+                'Rotation Only|_det_polrot',
+            ],
+            'Spectra|spectra': [
+                'EB only|_eb',
+            ],
+            'Injected EDE Signal Bins 2-8|ede1': [
+                'Fede = 0.07, g = 1|fede01',
+                'g = 0|zeroeb'
+            ],
+
+            'Injected EDE Signal Bins 9-15|ede2': [
+                'Fede = 0.07, g = 1|fede01',
+                'g = 0|zeroeb'
+            ]
+        },
+
+            function (params) {
+                let dirbase = '/liuto/home/GitHub/EB_analysis/'
+                let dirpath = dirbase + '/zscore_histograms/';
+                let bin1 = 'bin2-8' + params.inj_sig1;
+                let bin2 = 'bin9-15' + params.inj_sig2;
+                let zscore1 = params.angle + '_' + params.ede1 + '_' + params.binset1 + params.theory_comp + params.spectra + params.inj_sig1
+                let zscore2 = params.ede2 + '_' + params.binset2 + params.theory_comp + params.spectra + params.inj_sig2
+                        
+                let name = dirpath + 'zscore_hist_' + zscore1 + '_' + zscore2 +  '.png';
+                console.log(name);
+                return name;
+            });
+
+        pager.setparams({
+            'inj_sig1': '',
+            'inj_sig2': '',
+            'ede': 'zeroeb',
+            'spectra': '_eb',
+            'theory_comp': '_det_polrot',
+        });
+
+    </script>
+</figure>
+
     </section>
     <section>
         <h2>Future Directions</h2>
