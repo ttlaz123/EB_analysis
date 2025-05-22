@@ -49,8 +49,88 @@
     </section>
 
 
+    <sectin>
+        <h2>BB spectra comparison</h2>
+        <figure>
+            <img alt="BB curves" id="bbcomp" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+            <figcaption>
+                
+            </figcaption>
 
+            <script type="text/javascript">
+               
+
+                pager.link("#bbcomp", {
+                   
+                    
+                    'Spectra|spectro': [
+                        'BB|BB',
+                        'BB Sigl|BB_sigl',
+                        'EB|EB',
+                    ],
+                    'Injected EDE Signal|ede': [
+                        'Fede = 0.07, g = 1|fede01',
+                        'g = 0|zeroeb'
+                    ]
+                },
+         
+                    function (params) {
+                        let dirbase = '/liuto/home/GitHub/EB_analysis/'
+                        let dirpath = dirbase + '/chains/';
+                        let file = params.ede + '_overalay_confband_' + params.spectra
+                        let name = dirpath + file +  '.png';
+            
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+        
+                    'ede': 'zeroeb',
+                    'spectro': 'BB',
+                });
+            </script>
+        </figure>
+            <figure>
+            <img alt="BB Diffs" id="bbdiff" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+            <figcaption>
+                
+            </figcaption>
+
+            <script type="text/javascript">
+               
+
+                pager.link("#bbdiff", {
+                   
+                    
+                    'Data type|dtype': [
+                        'Signal + lensing|_sigl',
+                        '+Dust+Noise|'
+                    ],
+                },
+         
+                    function (params) {
+                        let dirbase = '/liuto/home/GitHub/EB_analysis/'
+                        let dirpath = dirbase + '/chains/';
+                        let file = 'diff_overalay_confband_' + params.spectra + params.dtype 
+                        let name = dirpath + file +  '.png';
+            
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+        
+                    'ede': 'zeroeb',
+                    'spectro': 'BB',
+                });
+            </script>
+        </figure>
+    </sectin>
     <section>
+        <h2>L dependent rotation</h2>
  <figure>
             <img alt="Multicomponent Analysis Spectrum" id="morebins" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
