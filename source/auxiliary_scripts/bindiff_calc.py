@@ -38,8 +38,8 @@ def collect_all_zscores(bin2_8_root, bin9_15_root, params, num_sims):
     Returns dict param -> list of z-scores.
     """
     zscores = {p: [] for p in params}
-    summary_csv_1 = os.path.join(bin2_8_root, os.path.basename(bin2_8_root) + "_summary.csv")
-    summary_csv_2 = os.path.join(bin9_15_root, os.path.basename(bin9_15_root) + "_summary.csv")
+    summary_csv_1 = os.path.join(bin2_8_root, os.path.basename(os.path.normpath(bin2_8_root) + "_summary.csv"))
+    summary_csv_2 = os.path.join(bin9_15_root, os.path.basename(os.path.normpath(bin9_15_root) + "_summary.csv"))
 
     use_summary_1 = os.path.exists(summary_csv_1)
     use_summary_2 = os.path.exists(summary_csv_2)
