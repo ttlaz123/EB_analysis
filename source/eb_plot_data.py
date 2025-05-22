@@ -638,7 +638,10 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None,
     modes_dict = {}
     single_df = None
     simcount = 0
-
+    default_cols = ['#', 'chain_root', 'weight', 'minuslogpost', 'minuslogprior',
+                    'minuslogprior__0', 'chi2', 'chi2__my_likelihood', 
+                    'chi2_mean', 'chi2__my_likelihood_mean',
+                    'chi2_std', 'chi2__my_likelihood_std']
     base_dir = os.path.dirname(chains_path)
     base_name = os.path.basename(base_dir)
     csv_file = os.path.join(base_dir, base_name + "_summary.csv")
@@ -655,7 +658,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None,
                     first_line = f.readline().strip()  # Read the first line
                     # Remove the '#' and split to get the correct column names
                     corrected_header = first_line.replace('#', '').split()
-                    corrected_header = [col + '_mean' for col in corrected_header]
+                    corrected_header = [col + '_mean' for col in corrected_header if col not in default_cols]
                 break
             except FileNotFoundError:
                 print("Skipping " + file_path)
@@ -688,10 +691,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None,
             simcount += 1
 
         modes_df = pd.DataFrame.from_dict(modes_dict)
-    default_cols = ['#', 'chain_root', 'weight', 'minuslogpost', 'minuslogprior',
-                    'minuslogprior__0', 'chi2', 'chi2__my_likelihood', 
-                    'chi2_mean', 'chi2__my_likelihood_mean',
-                    'chi2_std', 'chi2__my_likelihood_std']
+    
     param_names = [col for col in modes_df.columns if col not in default_cols
                    and not col.split('_')[-1] == 'std']
     print("Parameter names for plotting:", param_names)
