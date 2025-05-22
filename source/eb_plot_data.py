@@ -645,6 +645,23 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None,
     if(os.path.exists(csv_file)):
         print('Reading: ' + str(csv_file))
         modes_df = pd.read_csv(csv_file)
+        corrected_header = None
+        for i in range(1, sim_nums + 1):
+            file_path = chains_path.replace('XXX', f'{i:03d}')
+            print('loading:' + str(file_path))
+            # Read the first line to get the correct header
+            try:
+                with open(file_path, 'r') as f:
+                    first_line = f.readline().strip()  # Read the first line
+                    # Remove the '#' and split to get the correct column names
+                    corrected_header = first_line.replace('#', '').split()
+                    corrected_header = [col + '_mean' for col in corrected_header]
+                break
+            except FileNotFoundError:
+                print("Skipping " + file_path)
+                continue
+        if(corrected_header is None):
+            raise ValueError("Cannot find corrected header")
     else:
         for i in range(1, sim_nums + 1):
             file_path = chains_path.replace('XXX', f'{i:03d}')
