@@ -10,8 +10,8 @@ def summarize_chain(root):
         raise ValueError(f"Could not load MCMC samples from root: {root}")
 
     names = samples.getParamNames().names
-    means = samples.mean()
-    stds = samples.std()
+    means = samples.mean(names)
+    stds = samples.std(names)
 
     summary = {"chain_root": os.path.basename(root)}
     for name, mean, std in zip(names, means, stds):
