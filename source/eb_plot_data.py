@@ -19,7 +19,7 @@ from matplotlib.gridspec import GridSpec
 print("Loading Plotting  Modules")
 from getdist import plots, MCSamples
 from getdist.mcsamples import loadMCSamples
-
+import auxiliary_scripts.mcmc_summary as ms
 
 
 import bicep_data_consts as bdc
@@ -645,6 +645,8 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None,
     base_dir = os.path.dirname(chains_path)
     base_name = os.path.basename(base_dir)
     csv_file = os.path.join(base_dir, base_name + "_summary.csv")
+    if(not os.path.exists(csv_file)):
+        ms.process_single_directory(base_dir)
     if(os.path.exists(csv_file)):
         print('Reading: ' + str(csv_file))
         modes_df = pd.read_csv(csv_file)
