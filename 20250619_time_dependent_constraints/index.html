@@ -238,16 +238,36 @@
     </section>
     <section>
         <h2>Alternative EB curves with different EDE parameters</h2>
+       <p>
+    We rerun the MCMC fits for EB-only using alternative theoretical EB spectra generated 
+    from <a href="https://github.com/doicbek/class_private">CLASS</a>, with best-fit parameters 
+    from <a href="https://arxiv.org/pdf/2303.15369">Eskilt et al.</a> Each EB curve corresponds 
+    to a different EDE model motivated by recent cosmological datasets. Note that the 
+    <code>f<sub>EDE</sub> = 0.07</code> case is the same fiducial model used throughout our 
+    previous analyses.
+</p>
         <figure>
             <img alt="EDE params" id="fede" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
             <figcaption>
-                <a href="https://arxiv.org/abs/2503.14454">ACT</a>
-                <a href="https://arxiv.org/pdf/2210.16296">Planck </a>
-                <a href="https://arxiv.org/pdf/2210.16296">Planck Boss </a>
-                <a href="https://arxiv.org/pdf/2210.16296">Planck Boss SH0ES </a>
-            </figcaption>
-
+    Use the controls above to explore different MCMC fit results and diagnostic plots:<br><br>
+    <strong>Map Sim Num Digit1, Digit2, Digit3:</strong> Select the simulation instance by its digit indices (0–9), allowing you to view individual simulation chain results.<br><br>
+    <strong>Map Type:</strong> Choose the type of plot:<br>
+    &nbsp;&nbsp;- <em>Best Fit EE/EB/BB:</em> Shows the MCMC best-fit parameter constraints for each polarization spectrum.<br>
+    &nbsp;&nbsp;- <em>Triangle Plot:</em> Displays joint posterior distributions and parameter correlations.<br>
+    &nbsp;&nbsp;- <em>Summary Plot (Peaks histogram):</em> Histogram summarizing the distribution of peak values in the MCMC chains.<br>
+    &nbsp;&nbsp;- <em>Chi Squared histogram:</em> Distribution of chi-squared goodness-of-fit values across simulations.<br><br>
+    <strong>EDE parameters:</strong> Select different Early Dark Energy models based on f<sub>EDE</sub> values from various datasets:<br>
+    &nbsp;&nbsp;- ACT (f<sub>EDE</sub>=0.012)<br>
+    &nbsp;&nbsp;- Planck (f<sub>EDE</sub>=0.070)<br>
+    &nbsp;&nbsp;- Planck + BOSS (f<sub>EDE</sub>=0.087)<br>
+    &nbsp;&nbsp;- Planck + BOSS + SH0ES (f<sub>EDE</sub>=0.127)<br><br>
+    <strong>Bins Used:</strong> Select the multipole bin range used in the fit (currently fixed to bins 2–15).<br><br>
+    <strong>Dust model:</strong> Currently fixed to 'Fixed Dust = 0', indicating no dust contamination is modeled.<br><br>
+    <strong>Spectra:</strong> Choose which spectra to fit; here it is EB only.<br><br>
+    <strong>Injected EDE Signal:</strong> Select whether the simulations include an injected EDE signal (f<sub>EDE</sub>=0.07, g=1) or no signal (g=0).<br><br>
+    Use these options to examine how changes in simulation and model assumptions affect the MCMC parameter fits and diagnostic plots.
+</figcaption>
             <script type="text/javascript">
                function pad(num, size) {
                     num = num.toString();
