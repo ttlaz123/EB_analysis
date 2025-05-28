@@ -161,12 +161,16 @@
                         'Signal + lensing|_sigl',
                         '+Dust+Noise|'
                     ],
+                    'Spectra|spectrq': [
+                        'BB|BB',
+                        'EE|EE',
+                    ],
                 },
          
                     function (params) {
                         let dirbase = '/liuto/home/GitHub/EB_analysis/'
                         let dirpath = dirbase + '/overlay_plots/';
-                        let file = 'diff_overlay_confband_BB' + params.dtype 
+                        let file = 'diff_overlay_confband_' + params.spectrq + params.dtype 
                         let name = dirpath + file +  '.png';
             
                         console.log(name);
