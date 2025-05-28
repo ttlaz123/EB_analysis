@@ -143,13 +143,41 @@
                 });
             </script>
         </figure>
-        <p>It is possible to see a difference between the BB</p>
+        <p>
+  Differences between the BB curves become especially apparent in the BB sigl plots
+  when comparing the <em>g = 1</em> and <em>g = 0</em> cases. In contrast, the EE curves
+  remain largely similar between these two cases.
+</p>
+<p>
+  As expected, the EB curves center around zero when <em>g = 0</em> (no injected EDE), while
+  they resemble a scaled version of EE when <em>g = 1</em> (with EDE injection), consistent with
+  theoretical expectations that cosmic birefringence mixes E and B modes.
+</p>
+<p>
+  To better illustrate these differences, we plot the bin-by-bin differences between the mean EE
+  and BB spectra for each case. For EE, the difference straddles zero, suggesting minimal change
+  between <em>g = 0</em> and <em>g = 1</em>. However, for BB, there is a clear and consistent
+  positive excess when EDE is injected.
+</p>
+  Notably, the BB excess signal is approximately 10% of the peak BB sigl amplitude, whereas the
+  EE difference remains within 5% of its peak, as seen by comparing the vertical axis ranges.
+</p>
             <figure>
             <img alt="BB Diffs" id="bbdiff" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
-            <figcaption>
-                
-            </figcaption>
+             <figcaption>
+    Plot showing the difference between the mean spectra for <em>g = 1</em> and
+    <em>g = 0</em> cases.
+    <ul>
+      <li><strong>Data type:</strong>
+        Choose <em>Signal + lensing</em> for signal-only simulations (no dust or noise), or
+        <em>+Dust+Noise</em> for fully simulated datasets.</li>
+      <li><strong>Spectrum:</strong>
+        Toggle between <em>BB</em> and <em>EE</em> to see how EDE injection impacts each.</li>
+    </ul>
+    The gray curves represent simulation realizations, the <span style="color:blue;">blue band</span> shows
+    the 68% spread, and the <span style="color:red;">red line</span> indicates the mean difference.
+  </figcaption>
 
             <script type="text/javascript">
                
@@ -183,6 +211,30 @@
                 });
             </script>
         </figure>
+        <p>
+  Going forward, we can further verify the origin of the BB excess signal through several approaches.
+  One option is to rerun the MCMC analysis using a more realistic BB model that accounts for 
+  additional contributions from EB and EE leakage via lensing, the currently hypothesized source of this excess signal. 
+  This would help confirm the robustness of the 
+  estimator under more complete modeling of the BB spectrum.
+</p>
+<p>
+  Alternatively, we can revisit the simulation pipeline itself to better control for unwanted 
+  excess in the BB signal, ensuring that only the intended signal components (e.g., lensing, 
+  injected birefringence) are included and that the BB spectrum is not affected by these components.
+</p>
+<p>
+  These investigations reinforce that the issue identified in the previous analysis is not 
+  a bug in the estimator, but rather a mismatch between the BB signal in our simulations 
+  and the assumed BB model used in the MCMC fit. The estimator provides unbiased 
+  fits for <em>g</em> and rotation angle as long as the simulated BB is consistent with the model.
+</p>
+<p>
+  For real data, this means we must carefully check whether the inclusion of BB in the likelihood 
+  alters the best-fit values. A shift would imply that BB is indeed seeing excess rotation. 
+  The magnitude of this shift could potentially indicate a true physical signal and 
+  can be characterized by the estimator bias due to unmodeled BB structure.
+</p>
     </section>
     <section>
         <h2>Alternative EB curves with different EDE parameters</h2>
