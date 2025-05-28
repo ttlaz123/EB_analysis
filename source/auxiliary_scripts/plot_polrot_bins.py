@@ -6,12 +6,6 @@ import argparse
 from getdist import plots
 from getdist.mcsamples import loadMCSamples
 import matplotlib.pyplot as plt
-BIN_TYPES = ['2-8', '9-15', '2-15']
-BIN_COLORS = {
-    '2-8': 'blue',
-    '9-15': 'orange',
-    '2-15': 'green'
-}
 
 
 def load_all_chains_in_folder(folder):
@@ -36,8 +30,12 @@ def load_all_chains_in_folder(folder):
     return samples_list, param_names
 
 
-def group_folders_by_prefix(base_dir):
-    pattern = re.compile(r"(.+)_bin(2-8|9-15|2-15)_det_polrot_(.+)")
+
+
+def group_folders_by_prefix(base_dir, bin_types):
+
+    bin_pattern = '|'.join(re.escape(bt) for bt in bin_types)
+    pattern = re.compile(rf"(.+)_bin({bin_pattern})_det_polrot_(.+)")
     groups = {}
     for folder in os.listdir(base_dir):
         match = pattern.match(folder)
@@ -48,47 +46,7 @@ def group_folders_by_prefix(base_dir):
             groups.setdefault(key, {})[bin_type] = full_path
     return groups
 
-
-def group_folders_by_prefix(base_dir):
-    """
-    Groups MCMC result folders by shared prefix and suffix, organizing them
-    by bin type (`2-8`, `9-15`, `2-15`).
-
-    Parameters
-    ----------
-    base_dir : str
-        Path to the base directory containing MCMC result subfolders.
-
-    Returns
-    -------
-    dict
-        A dictionary mapping a group label (prefix + suffix) to a dict of
-        bin_type -> folder path.
-    """
-    pattern = re.compile(r"(.+)_bin(2-8|9-15|2-15)_det_polrot_(.+)")
-    groups = {}
-    for folder in os.listdir(base_dir):
-        match = pattern.match(folder)
-        if match:
-            prefix, bin_type, suffix = match.groups()
-            key = f"{prefix}_det_polrot_{suffix}"
-            full_path = os.path.join(base_dir, folder)
-            groups.setdefault(key, {})[bin_type] = full_path
-    return groups
-
-def group_folders_by_prefix(base_dir):
-    pattern = re.compile(r"(.+)_bin(2-8|9-15|2-15)_det_polrot_(.+)")
-    groups = {}
-    for folder in os.listdir(base_dir):
-        match = pattern.match(folder)
-        if match:
-            prefix, bin_type, suffix = match.groups()
-            key = f"{prefix}_det_polrot_{suffix}"
-            full_path = os.path.join(base_dir, folder)
-            groups.setdefault(key, {})[bin_type] = full_path
-    return groups
-
-def plot_triangle_for_group(group_label, bin_folders, output_root):
+def plot_triangle_for_group(group_label, bin_folders, output_root, BIN_TYPES):
     if not all(bt in bin_folders for bt in BIN_TYPES):
         print(f"[Skipping] Incomplete bin types for group: {group_label}")
         return
@@ -138,16 +96,25 @@ def plot_triangle_for_group(group_label, bin_folders, output_root):
 
         plt.close('all')
 
+def parse_bin_types(bin_arg):
+    return bin_arg.split(',')
+
 def main():
     parser = argparse.ArgumentParser(description="Plot triangle plots for det_polrot MCMC folders across bins.")
     parser.add_argument("base_dir", help="Path to directory containing MCMC result folders.")
     parser.add_argument("--output_dir", default=None, help="Root directory to save all plots.")
+    parser.add_argument("--bin_types", default="2-8,9-15,2-15", help="Comma-separated bin types to include (e.g., 2-8,9-15)")
     args = parser.parse_args()
+    bin_types = parse_bin_types(args.bin_types) 
     if(args.output_dir is None):
-        args.output_dir = os.path.join(args.base_dir, 'bindiffs') 
-    groups = group_folders_by_prefix(args.base_dir)
+        args.output_dir = os.path.join(args.base_dir, 'bindiffs' + str(args.bin_types)) 
+    groups = group_folders_by_prefix(args.base_dir, bin_types)
     for group_label, bin_folders in groups.items():
-        plot_triangle_for_group(group_label, bin_folders, args.output_dir)
+        print('------------------')
+        print(group_label)
+        if(group_label == 'zeroeb_det_polrot_eb'):
+            continue
+        plot_triangle_for_group(group_label, bin_folders, args.output_dir, bin_types)
 
 if __name__ == "__main__":
     main()

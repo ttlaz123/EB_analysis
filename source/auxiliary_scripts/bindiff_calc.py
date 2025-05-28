@@ -32,14 +32,14 @@ def compute_z_score(mu1, std1, mu2, std2):
         return np.nan
     return (mu1 - mu2) / denom
 
-def collect_all_zscores(bin2_8_root, bin9_15_root, params, num_sims):
+def collect_all_zscores(bin1_root, bin2_root, params, num_sims):
     """
     Load both sims once per simulation, extract all params, compute z-scores.
     Returns dict param -> list of z-scores.
     """
     zscores = {p: [] for p in params}
-    summary_csv_1 = os.path.join(bin2_8_root, os.path.basename(os.path.normpath(bin2_8_root) + "_summary.csv"))
-    summary_csv_2 = os.path.join(bin9_15_root, os.path.basename(os.path.normpath(bin9_15_root) + "_summary.csv"))
+    summary_csv_1 = os.path.join(bin1_root, os.path.basename(os.path.normpath(bin1_root) + "_summary.csv"))
+    summary_csv_2 = os.path.join(bin2_root, os.path.basename(os.path.normpath(bin2_root) + "_summary.csv"))
 
     use_summary_1 = os.path.exists(summary_csv_1)
     use_summary_2 = os.path.exists(summary_csv_2)
@@ -125,20 +125,20 @@ def plot_z_histogram(zscores, param, outdir, group_label):
 
 def main():
     parser = argparse.ArgumentParser(description="Compute and plot z-score histograms for alpha_ parameters.")
-    parser.add_argument("bin2_8_dir", help="Directory for bin 2-8 simulations")
-    parser.add_argument("bin9_15_dir", help="Directory for bin 9-15 simulations")
+    parser.add_argument("bin1_dir", help="Directory for bin first half  simulations")
+    parser.add_argument("bin2_dir", help="Directory for bin second half simulations")
     parser.add_argument("--num_sims", type=int, default=500, help="Number of simulations")
     parser.add_argument("--outdir", default="zscore_histograms", help="Output directory for histograms")
     # Remove group_label argument
     args = parser.parse_args()
 
-    group_label = get_group_label_from_paths(args.bin2_8_dir, args.bin9_15_dir)
+    group_label = get_group_label_from_paths(args.bin1_dir, args.bin2_dir)
     print(f"Auto-detected group label: {group_label}")
 
-    alpha_params = detect_alpha_params(args.bin2_8_dir)
+    alpha_params = detect_alpha_params(args.bin1_dir)
     print(f"Detected alpha parameters: {alpha_params}")
 
-    zscores = collect_all_zscores(args.bin2_8_dir, args.bin9_15_dir, alpha_params, args.num_sims)
+    zscores = collect_all_zscores(args.bin1_dir, args.bin2_dir, alpha_params, args.num_sims)
 
     for param, zs in zscores.items():
         if len(zs) > 0:

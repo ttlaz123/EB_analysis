@@ -27,9 +27,6 @@ def process_directory(base_dir):
         if os.path.exists(out_path):
             print(f"Skipping {subdir}, summary CSV already exists: {out_path}")
             continue
-        if('2-8' not in out_path and '9-15' not in out_path):
-            print('Skipping for now: ' + str(out_path))
-            continue
         chain_files = sorted(f for f in files if f.endswith('.txt'))
         if not chain_files:
             continue
