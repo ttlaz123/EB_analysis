@@ -179,7 +179,7 @@
                     'Bins Used|bin_num': [
                         '2-15|_bin2-15',
                     ],
-                    'Dust model|theory_comp': [
+                    'Dust model|theory_compf': [
                         'Fixed Dust = 0|_fixed_dust',
                     ],
                     'Spectra|spectra': [
@@ -194,7 +194,7 @@
                     function (params) {
                         let dirbase = '/liuto'
                         let dirpath = dirbase + '/ede_chains/';
-                        let mcmc_folder = params.ede + params.bin_num  + params.theory_comp + params.spectra+ params.fede +'/';
+                        let mcmc_folder = params.ede + params.bin_num  + params.theory_compf + params.spectra+ params.fede +'/';
                         let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
                         let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
                         if (params.m_map_type == 'sim1_summary' || params.m_map_type == 'simchisq_hist') {
@@ -213,7 +213,7 @@
                     'fede':'ebfede0.07',
                     'ede': 'zeroeb',
                     'spectra': '_eb',
-                    'theory_comp': '_det_polrot',
+                    'theory_compf': '_fixed_dust',
                 });
             </script>
         </figure>
