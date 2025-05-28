@@ -538,7 +538,7 @@ def multicomp_mcmc_driver(input_args):
     input_args.injected_signal = get_injected_signal(calc_spectra, 
                                             signal_type=input_args.injected_signal)
 
-    if(input_args.sim_num > 2):
+    if(input_args.sim_num > 1):
         parallel_simulation(input_args, params_dict)
     else:
         # define relevant files based on opts
@@ -912,8 +912,8 @@ def main():
             print(f"No existing chains to overwrite at: {args.output_path}")
     if False:
         observed_datas_list = load_all_sims(input_args=args)
-        args.dataset = 'BK18lf'
-        observed_datas_list2 = load_all_sims(input_args=args)
+        #args.dataset = 'BK18lf_sigl'
+        observed_datas_list2 = None #load_all_sims(input_args=args)
         epd.plot_overlay_sims('BB', observed_datas_list, args.output_path, observed_datas_list2)
     else:
         multicomp_mcmc_driver(args)

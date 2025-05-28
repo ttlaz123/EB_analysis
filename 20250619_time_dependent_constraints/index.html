@@ -44,6 +44,9 @@
                     2024-12-03: Multicomponent EB EDE Update</a></li>
             <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20250218_ede_forecast/">
                     2025-02-18: EDE Forecast</a></li>
+            <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20250513_dust_eb_ede_update/">
+                    2025-05-13: Dust analysis</a></li>
+
         </ul>
       
     </section>
@@ -129,7 +132,7 @@
         </figure>
     </section>
     <section>
-        <h2>L dependent rotation</h2>
+        <h2>L dependent rotation Bin split 2-8 and 9-15</h2>
  <figure>
             <img alt="Multicomponent Analysis Spectrum" id="morebins" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
@@ -254,7 +257,7 @@
          
                     function (params) {
                         let dirbase = '/liuto'
-                        let dirpath = dirbase + '/ede_chains/bindiffs/';
+                        let dirpath = dirbase + '/ede_chains/bindiffs2-8,9-15,2-15/';
                         let mcmc_folder = params.ede + params.theory_comp + params.spectra + params.inj_sig+ '/';
                         let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
                         let name = dirpath + mcmc_folder + sim_id  + '.png';
@@ -414,6 +417,281 @@
 </figure>
 
     </section>
+    <section>
+        <h2>L dependent rotation Bin split 2-10 and 11-15</h2>
+ <figure>
+            <img alt="Multicomponent Analysis Spectrum" id="morebins10" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+            <figcaption>
+                <p>Interactive plot pager for multicomponent analysis of the Early Dark Energy (EDE) spectrum.
+                    Visualizes the fits and triangle plots for 499 simulations.</p>
+               
+                <p>This interactive plot allows detailed exploration of multicomponent analysis by adjusting
+                    map types, binning, theoretical assumptions, spectra selections, EDE signal injections, and
+                    simulation numbers.</p>
+            </figcaption>
+
+            <script type="text/javascript">
+
+                pager.link("#morebins10", {
+                    'Map Sim Num Digit1|digit1': simnums,
+                    'Digit2|digit2': simnums,
+                    'Digit3|digit3': simnums,
+
+                    'Map Type|m_map_type': [
+                        'Best Fit EE|_bestfitEE',
+                        'Best Fit EB|_bestfitEB',
+                        'Best Fit BB|_bestfitBB',
+                        'Triangle Plot|_triangle_plot',
+                        'Summary Plot (Peaks histogram)|sim1_summary',
+                        'Chi Squared histogram|simchisq_hist'
+                    ],
+                    'Bins Used|bin_num10': [
+                        '2-10|_bin2-10',
+                        '11-15|_bin11-15',
+                        '2-15|_bin2-15',
+                    ],
+                    'Injected Signal|inj_sig': [
+                        'Positive Miscalibration|_sigpos',
+                        'Negative Miscalibration|_signeg',
+                        'Balanced Miscalibration|_sigbal',
+                        'No Miscalibration|'
+                    ],
+                    'Model|theory_comp': [
+                        'Rotation Only|_det_polrot',
+                    ],
+                    'Spectra|spectra': [
+                        'EB only|_eb',
+                    ],
+                    'Injected EDE Signal|ede': [
+                        'Fede = 0.07, g = 1|fede01',
+                        'g = 0|zeroeb'
+                    ]
+                },
+                    function (params) {
+                        let dirbase = '/liuto'
+                        let dirpath = dirbase + '/ede_chains/';
+                        let mcmc_folder = params.ede + params.bin_num10 + params.theory_comp + params.spectra + params.inj_sig+ '/';
+                        let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
+                        let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
+                        if (params.m_map_type == 'sim1_summary' || params.m_map_type == 'simchisq_hist') {
+                            name = dirpath + mcmc_folder + params.m_map_type + '.png'
+                        }
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+                    'digit1': '0',
+                    'digit2': '0',
+                    'digit3': '1',
+                    'inj_sig': '',
+                    'm_map_type': '_bestfitEB',
+                    'bin_num10': '_bin2-15',
+                    'ede': 'zeroeb',
+                    'spectra': '_eb',
+                    'theory_comp': '_det_polrot',
+                });
+            </script>
+        </figure>
+          
+      <figure>
+            <img alt="Bin diffs" id="bindiff10" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+            <figcaption>
+                
+            </figcaption>
+
+            <script type="text/javascript">
+               
+
+                pager.link("#bindiff10", {
+                    'Map Sim Num Digit1|digit1': simnums,
+                    'Digit2|digit2': simnums,
+                    'Digit3|digit3': simnums,
+
+                 
+                    'Injected Signal|inj_sig': [
+                        'Positive Miscalibration|_sigpos',
+                        'Negative Miscalibration|_signeg',
+                        'Balanced Miscalibration|_sigbal',
+                        'No Miscalibration|'
+                    ],
+                    'Model|theory_comp': [
+                        'Rotation Only|_det_polrot',
+                    ],
+                    'Spectra|spectra': [
+                        'EB only|_eb',
+                    ],
+                    'Injected EDE Signal|ede': [
+                        'Fede = 0.07, g = 1|fede01',
+                        'g = 0|zeroeb'
+                    ]
+                },
+         
+                    function (params) {
+                        let dirbase = '/liuto'
+                        let dirpath = dirbase + '/ede_chains/bindiffs2-10,11-15,2-15/';
+                        let mcmc_folder = params.ede + params.theory_comp + params.spectra + params.inj_sig+ '/';
+                        let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
+                        let name = dirpath + mcmc_folder + sim_id  + '.png';
+            
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+                    'digit1': '0',
+                    'digit2': '0',
+                    'digit3': '1',
+                    'inj_sig': '',
+                    'ede': 'zeroeb',
+                    'spectra': '_eb',
+                    'theory_comp': '_det_polrot',
+                });
+            </script>
+        </figure>
+        <figure>
+            <img alt="Z Scores" id="zscore10" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+            <figcaption>
+                
+            </figcaption>
+
+            <script type="text/javascript">
+               
+
+                pager.link("#zscore10", {
+                   
+                    'Angle|angle':[
+                        'alpha_BK18_150|alpha_BK18_150',
+                        'alpha_BK18_K95|alpha_BK18_K95',
+                        'alpha_BK18_B95lf|alpha_BK18_B95e',
+                        'alpha_BK18_220|alpha_BK18_220',
+                    ],
+                 
+                    'Injected Signal|inj_sig': [
+                        'Positive Miscalibration|_sigpos',
+                        'Negative Miscalibration|_signeg',
+                        'Balanced Miscalibration|_sigbal',
+                        'No Miscalibration|'
+                    ],
+                    'Bins compare 1|binset1b':[
+                        'Bins 2-10|bin2-10',
+                    ],
+                    'Bins compare 2|binset2b':[
+                        'Bins 11-15|bin11-15',
+                    ],
+                    'Model|theory_comp': [
+                        'Rotation Only|_det_polrot',
+                    ],
+                    'Spectra|spectra': [
+                        'EB only|_eb',
+                    ],
+                    'Injected EDE Signal|ede': [
+                        'Fede = 0.07, g = 1|fede01',
+                        'g = 0|zeroeb'
+                    ]
+                },
+         
+                    function (params) {
+                        let dirbase = '/liuto/home/GitHub/EB_analysis/'
+                        let dirpath = dirbase + '/zscore_histograms/';
+                        let zscore1 = params.angle + '_' + params.ede + '_' + params.binset1b + params.theory_comp + params.spectra + params.inj_sig
+                        let zscore2 = params.ede + '_' + params.binset2b + params.theory_comp + params.spectra + params.inj_sig
+                        
+                        let name = dirpath + 'zscore_hist_' + zscore1 + '_' + zscore2 +  '.png';
+            
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+                    'angle': 'alpha_BK18_150',
+                    'binset1b': 'bin2-10',
+                    'binset2b': 'bin11-15',
+                    'inj_sig': '',
+                    'ede': 'zeroeb',
+                    'spectra': '_eb',
+                    'theory_comp': '_det_polrot',
+                });
+            </script>
+        </figure>
+        <figure>
+    <img alt="All Bin2-10 vs Bin11-15 Comparisons" id="bindiff_all_combos10" src="#" width="750" height="500"
+        onerror="javascript:this.src='dne.png'" />
+    <figcaption>
+        Comparison of every bin2-10 vs bin11-15 combination
+    </figcaption>
+
+    <script type="text/javascript">
+
+        pager.link("#bindiff_all_combos10", {
+            'Angle|angle':[
+                        'alpha_BK18_150|alpha_BK18_150',
+                        'alpha_BK18_K95|alpha_BK18_K95',
+                        'alpha_BK18_B95lf|alpha_BK18_B95e',
+                        'alpha_BK18_220|alpha_BK18_220',
+                    ],
+            'Injected Signal Bins 2-10|inj_sig1': [
+                'Positive Miscalibration|_sigpos',
+                'Negative Miscalibration|_signeg',
+                'Balanced Miscalibration|_sigbal',
+                'No Miscalibration|'
+            ],
+            'Injected Signal Bins 11-15|inj_sig2': [
+                'Positive Miscalibration|_sigpos',
+                'Negative Miscalibration|_signeg',
+                'Balanced Miscalibration|_sigbal',
+                'No Miscalibration|'
+            ],
+            'Model|theory_comp': [
+                'Rotation Only|_det_polrot',
+            ],
+            'Spectra|spectra': [
+                'EB only|_eb',
+            ],
+            'Injected EDE Signal Bins 2-10|ede1': [
+                'Fede = 0.07, g = 1|fede01',
+                'g = 0|zeroeb'
+            ],
+
+            'Injected EDE Signal Bins 11-15|ede2': [
+                'Fede = 0.07, g = 1|fede01',
+                'g = 0|zeroeb'
+            ]
+        },
+
+            function (params) {
+                let dirbase = '/liuto/home/GitHub/EB_analysis/'
+                let dirpath = dirbase + '/zscore_histograms/';
+                let bin1 = 'bin2-10' + params.inj_sig1;
+                let bin2 = 'bin11-15' + params.inj_sig2;
+                let zscore1 = params.angle + '_' + params.ede1 + '_' + params.binset1b + params.theory_comp + params.spectra + params.inj_sig1
+                let zscore2 = params.ede2 + '_' + params.binset2b + params.theory_comp + params.spectra + params.inj_sig2
+                        
+                let name = dirpath + 'zscore_hist_' + zscore1 + '_' + zscore2 +  '.png';
+                console.log(name);
+                return name;
+            });
+
+        pager.setparams({
+            'inj_sig1': '',
+            'inj_sig2': '',
+            'ede1': 'zeroeb',
+            'ede2': 'zeroeb',
+            'spectra': '_eb',
+            'theory_comp': '_det_polrot',
+            'angle': 'alpha_BK18_150',
+            'binset1b': 'bin2-10',
+            'binset2b': 'bin11-15',
+        });
+
+    </script>
+</figure>
+
+    </section>
+
     <section>
         <h2>Future Directions</h2>
 

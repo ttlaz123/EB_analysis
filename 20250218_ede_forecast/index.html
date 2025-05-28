@@ -20,10 +20,10 @@
     <link rel="stylesheet" type="text/css" href="scripts/pager.css">
 
     <header>
-        <h1>Fisher Forecast for Early Dark Energy: Validation and Future Projections</h1>
+        <h1>Fisher Forecast for Early Dark Energy and Polarization Rotation</h1>
 
         <time datetime="2025 March 4" class="published updated">
-            2025 February 18
+            2025 March 4
         </time> —
         Tongtian (Tom) Liu, Dominic Beck
     </header>
@@ -68,7 +68,7 @@
                 F_{ij} = \frac{\partial \mu^T}{\partial \theta_i} \Sigma^{-1} \frac{\partial \mu}{\partial \theta_j} + \frac{1}{2} \text{Tr}\left( \Sigma^{-1} \frac{\partial \Sigma}{\partial \theta_i} \Sigma^{-1} \frac{\partial \Sigma}{\partial \theta_j} \right).
                 \]
                 In our case, the \(\theta\)s are the photon-axion coupling constant \(g\) and the polarization rotation angles \(\alpha_\nu\) where each \(\nu\) represents the different receiver frequencies.
-                For our fiducial model, we assume \(\mu(\theta)\) is zero for both \(g\) and each of the polarization rotation angles. A quick check verifies that using different values for 
+                For our fiducial model, we assume \(\theta\) is zero for both \(g\) and each of the polarization rotation angles. A quick check verifies that using different values for 
                 our parameters in our fiducial model has negligible effect on the Fisher forecast as long as the values are small.
             </p>
         
@@ -94,10 +94,11 @@
             <ul>
                 <li>
     <strong>Covariance Matrices from BICEP/Keck:</strong>  
-    The covariance matrices are generated using the BK18 simulation pipeline,  
+    The covariance matrices are generated using the BK18 simulation pipeline, 
     constructed with <code>scale_bpcm.m</code> in <code>make_cosmomc_dataset.m</code>.
+    Details are in <a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20241203_multicomp_eb_ede_update/">the previous update</a>.
 </li>
-                <li>Fiducial model parameters (\(\theta_i =  g, \alpha_\nu \) which are all \(\mu(\theta_i)=0\) in our case).</li>
+                <li>Fiducial model parameters (\(\theta_i =  g, \alpha_\nu \) which are all \(\theta_i=0\) in our case).</li>
             </ul>
         
             <p>
@@ -113,7 +114,8 @@
         
         Following the steps outlined above, we obtain the following uncertainties for Bin num = 15, matching 
             the empirical peak spread from the simulations in 
-            <a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20241203_multicomp_eb_ede_update/">the previous update</a>.
+            <a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20241203_multicomp_eb_ede_update/">the previous update</a>. Here, the fitting is done for the 
+            BICEP and Keck components of the BK18 dataset.
 
             <table>
                 <thead>
@@ -153,13 +155,13 @@
             </table>
             The simulation uncertainties are slightly larger than those from the Fisher forecast since 
             the Fisher bound represents a theoretical lower limit, 
-            which may not be realized in any given dataset
+            which may not be realized in any given dataset when there are non-gaussian components.
     </section><section>
     <h2>Forecast for Future Observations</h2>
     <h3>Scaling BK18 Signal and Noise</h3>
     <p>
         After verifying that the Fisher Forecast parameter uncertainties are consistent with our simulation results 
-        in the previous update, we extended the analysis by varying sky fraction, noise level, and observation time. 
+        in the previous update, we extended the analysis by varying sky fraction, noise level, and observation time, then plotting their impact on the photon-axion coupling constant \(g\). 
         At this stage, we assume uniform scaling and do not yet account for the impact of individual or new receivers 
         on the uncertainties. <strong>Uniform scaling</strong> means that noise and sky fraction scaling factors 
         are applied equally across all frequency bands and receivers.
@@ -199,12 +201,17 @@
     
     <p>
         The signal components (\(S\)) scale with sky fraction, while the noise components (\(N\)) scale with noise. 
-        Our base assumption is that each \(S\) scales with the square root of the sky fraction ratio. 
+        Our base assumption is that each \(S\) scales with the fourth root of the sky fraction ratio. 
+        This is because the standard deviation scales as \(1/\sqrt{f_{sky}}\)
+        in agreement with equation 12 of the 
+        <a href="https://arxiv.org/pdf/astro-ph/9705188">CMB Mapping Experiments</a>.
+        This means the sig component should scale as \(1/f_{sky}\), and the sn
+        components should scale as \(1/\sqrt{f_{sky}}\).
         For example, doubling the sky fraction would scale \(\text{sig}\) by:
     </p>
     
     \[
-    \frac{1}{\sqrt{2 \times 2 \times 2 \times 2}} = \frac{1}{4}
+    \frac{1}{(2 \times 2 \times 2 \times 2)^{1/4}} = \frac{1}{2}
     \]
     
     <p>
@@ -252,7 +259,7 @@
                     'Noise Only|noise'
                 ],
                 'Dataset|data':[
-                    'BK18|_BK18',
+                    'B95lf, K95, 150, 220|_BK18',
                     //'B3 + Planck|_B3_planck',
                     'B95lf Only|_B3',
                     //'B95 + 150|_BK18_part'
@@ -282,6 +289,12 @@
                     plotname = 'dne.png'
                     return dirpath + plotname;
                 }
+                if(params.data == '_B3'){
+                    params.scalar = 'BK18_B95e';
+                }
+                if(params.data == '_BK18'){
+                    params.scalar = 'None';
+                }
                 plotname = plotname + params.data + '_'+ params.scalar + '.png'
                 return dirpath + plotname;
             });
@@ -302,11 +315,11 @@
         plot: while a larger sky fraction provides more data points and initially reduces the uncertainty on \( g \), 
         the accompanying rise in noise eventually outweighs the benefits of the increased sky coverage.</p>
 
-        <p>These findings suggest two potential strategies to achieve the literature value of \( \Delta g = \pm 0.15 \):</p>
+        <p>These findings suggest two potential strategies to achieve the literature value of \( \Delta g = \pm 0.16 \):</p>
         <ul>
             <li><strong>Maintain the current sky fraction</strong> but increase the observation time by a factor of 10.</li>
-            <li><strong>Expand the observed sky area by a factor of 3</strong> while maintaining the same noise level, 
-                which would require a corresponding threefold increase in observation time.</li>
+            <li><strong>Expand the observed sky area by a factor of 3</strong> while halving the noise level, 
+                which would require a corresponding sixfold increase in observation time.</li>
         </ul>
         Unfortunately, both of these strategies require significant resources that are not realistically available.
         <h3>Scaling B3 with Planck</h3>
@@ -352,7 +365,7 @@
                 ],
                 'Dataset|data_planck':[
                     //'BK18|_BK18',
-                    'B3 + Planck|_B3_planck_real',
+                    'B95lf + Planck|_B3_planck_real',
                     'B95lf Only|_B3',
                     //'B95 + 150|_BK18_part'
                 ],
@@ -406,8 +419,27 @@
         We are currently examining the impact of a finer binning of BICEP data. With a hypothetical larger sky fraction, 
         we may be able to use finer bins to better constrain the EB curve.
     </p>
+    <p>
+    Considering the difficulty in lowering the uncertainty our parameters without significantly more data, 
+    the plan for the current project is to finish the bookkeepping on the data analysis
+    and release the results as is. Future projects may be pursued using additional data.
+    </p>
     </section>
+<section>
+<h2>Appendix</h2>
+<p>All code for generating the Fisher matrices and matrix scalings can be found in 
+<code>/n/home08/liuto/GitHub/EB_analysis/</code>
 
+The primary scripts used in the analysis are <code>multi_spectra_analysis.py</code> 
+and <code>fisher_forecast_calc.py</code>. 
+
+The covariance matrix used 
+in the scaling is <code>bpcm_data.mat</code>, which was acquired from 
+<code>bk_analysis/multicomp/make_cosmomc_dataset.m</code>
+
+
+</p>
+</section>
 </body>
 
 </html>
