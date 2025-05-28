@@ -12,7 +12,7 @@ module load python/3.10
 spectype=$1
 injectedx=$3
 dataset=$2
-binnum="9-15"
+binnum="11-15"
 #dataset="BK18lf_fede01_sigl"
 dusttype="det_polrot"
 #dusttype="fixeddust"
