@@ -176,6 +176,9 @@
                         'f_EDE = 0.087 (Planck Boss)||ebfede0.09',
                         'f_EDE = 0.127 (Planck Boss SH0ES)||ebfede0.13',
                     ], 
+                    'Bins Used|bin_num': [
+                        '2-15|_bin2-15',
+                    ],
                     'Dust model|theory_comp': [
                         'Fixed Dust = 0|_fixed_dust',
                     ],
@@ -191,7 +194,7 @@
                     function (params) {
                         let dirbase = '/liuto'
                         let dirpath = dirbase + '/ede_chains/';
-                        let mcmc_folder = params.ede  + params.theory_comp + params.spectra+ params.fede +'/';
+                        let mcmc_folder = params.ede + params.bin_num  + params.theory_comp + params.spectra+ params.fede +'/';
                         let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
                         let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
                         if (params.m_map_type == 'sim1_summary' || params.m_map_type == 'simchisq_hist') {
@@ -206,6 +209,8 @@
                     'digit2': '0',
                     'digit3': '1',
                     'inj_sig': '',
+                    'bin_num':'_bin2-15',
+                    'fede':'ebfede0.07',
                     'ede': 'zeroeb',
                     'spectra': '_eb',
                     'theory_comp': '_det_polrot',
