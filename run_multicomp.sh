@@ -61,7 +61,7 @@ echo n | python source/full_multicomp.py \
     -d "$dataset" \
     -i "$injectedx" \
     -b "$binnum" \
-    --fede "$fedename"\
+    --fede "$fede"\
     -t "$spectype" -o 
 
 python source/full_multicomp.py \
