@@ -144,7 +144,18 @@
             </figcaption>
 
             <script type="text/javascript">
-               
+               function pad(num, size) {
+                    num = num.toString();
+                    while (num.length < size) num = "0" + num;
+                    return num;
+                }
+                const simnums = [];
+                for (let i = 0; i < 10; i++) {
+                    s = pad(i, 1);
+
+                    simnums[i] = s.concat('|', s);
+
+                }
 
                 pager.link("#fede", {
                     'Map Sim Num Digit1|digit1': simnums,
@@ -217,18 +228,7 @@
             </figcaption>
 
             <script type="text/javascript">
-                function pad(num, size) {
-                    num = num.toString();
-                    while (num.length < size) num = "0" + num;
-                    return num;
-                }
-                const simnums = [];
-                for (let i = 0; i < 10; i++) {
-                    s = pad(i, 1);
-
-                    simnums[i] = s.concat('|', s);
-
-                }
+                
 
                 pager.link("#morebins", {
                     'Map Sim Num Digit1|digit1': simnums,
