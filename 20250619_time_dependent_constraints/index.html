@@ -32,7 +32,13 @@
     <hr>
     <section>
         <h2>Introduction</h2>
-        <p><strong>Summary:</strong> 
+        <p><strong>Summary:</strong>  
+    This posting presents follow-up analysis on the Early Dark Energy (EDE) signal in BICEP data, 
+    focusing on further MCMC fits and addressing simulation-related systematics identified in previous work.  
+    We assess how fitting different EB curves impacts the inferred coupling parameter \(g\),  
+    and introduce a new angular-scale-dependent birefringence analysis to test for potential scale dependence 
+    in the signal.
+  </p>
 
         <p>This posting builds upon previous updates:</p>
         <ul>
@@ -48,18 +54,59 @@
                     2025-05-13: Dust analysis</a></li>
 
         </ul>
-      
+        <p>
+    We revisit the issue raised in the May 13 dust analysis regarding bias in the 
+    maximum-likelihood (ML) estimator caused by the BB spectra.  
+    We identify that the bias is due to excess signal in the BB simulations.
+  </p>
+   <p>
+    We also rerun the MCMC fits for EB using a range of EDE parameters.  
+    In particular, we test how different theoretical EDE parameters affect the inferred value of \(g\)
+    as well as the rotation angles alpha, even when the simulated data uses a different set of EDE parameters.
+  </p>
+      <p>
+    In addition, we implement an angular-scale dependent birefringence analysis.  
+    We divide the multipole range into bins and fit independent rotation angles in each.  
+    Comparing the resulting angle fits across binning schemes allows us to check for consistency 
+    and any potential l-dependence in the signal.
+  </p>
     </section>
 
 
     <section>
         <h2>BB spectra comparison</h2>
+        <p>
+    We begin by plotting the BB and EB spectra from the simulations. Each plot shows 499 simulated 
+    curves overlaid in gray. The <span style="color:rgb(116, 116, 238);">blue shaded area</span> represents the 68% 
+    confidence band (i.e., the central range containing 68% of the simulations), while the 
+    <span style="color:red;">red line</span> shows the mean spectrum across all simulations for each bin.
+  </p>
+
+  <p>
+    The BB and EB spectra are compared against the expected input signals used to generate the simulations.  
+    In particular, the <code>Sigl</code> curves represent the signal-only case (no dust, no noise), including 
+    only the primary CMB plus lensing. This serves as a useful baseline for verifying the fidelity 
+    of the simulations and the consistency of the injected EDE signal.
+  </p>
         <figure>
             <img alt="BB curves" id="bbcomp" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
-            <figcaption>
-                
-            </figcaption>
+             <figcaption>
+  Comparison of BB and EB spectra across 499 simulations.  
+ 
+  <ul>
+    <li><strong>Spectrum type:</strong> 
+      <em>BB</em> (total BB spectrum), 
+      <em>BB Sigl</em> (BB signal-only without dust or noise), or 
+      <em>EB</em> (total EB spectrum).</li>
+    <li><strong>Injected EDE signal:</strong> 
+      <em>Fede = 0.07, g = 1</em> shows simulations with an injected Early Dark Energy signal, 
+      while <em>g = 0</em> corresponds to the null case with no EDE signal.</li>
+  </ul>
+  Each plot displays all 499 simulation realizations as gray lines.  
+  The <span style="color:blue;">blue band</span> indicates the 68% confidence interval across simulations,  
+  and the <span style="color:red;">red line</span> shows the mean spectrum in each bin.
+</figcaption>
 
             <script type="text/javascript">
                
@@ -210,7 +257,7 @@
                     'digit3': '1',
                     'inj_sig': '',
                     'bin_num':'_bin2-15',
-                    'fede':'ebfede0.07',
+                    'fede':'_ebfede0.07',
                     'ede': 'zeroeb',
                     'spectra': '_eb',
                     'theory_compf': '_fixed_dust',
