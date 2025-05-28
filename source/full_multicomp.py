@@ -888,6 +888,7 @@ def main():
     if args.plot_peaks:
         do_plotting(args)
         return
+    os.makedirs(os.path.dirname(args.output_path), exist_ok=True)
     if args.overwrite:
         # Check if the output path exists
         # Construct the glob pattern to match all files and directories with the specified prefix

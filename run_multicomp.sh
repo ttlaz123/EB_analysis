@@ -10,18 +10,23 @@ module load python/3.10
 
 # Get suffix argument (e.g., _pysm1)
 spectype=$1
-injectedx=$3
+injectedx=''
 dataset=$2
-binnum="11-15"
+fede=$3
+binnum="2-15"
 #dataset="BK18lf_fede01_sigl"
-dusttype="det_polrot"
+dusttype="fixed_dust"
 #dusttype="fixeddust"
 #theory="all"
-theory="det_polrot"
+theory="fixed_dust"
+injected=""
 if [ -n "$injectedx" ]; then
-    injected="_sig$3"
+    injected="_sig$4"
 fi
-
+fedename=""
+if [ -n "$fede" ]; then
+    fedename="_ebfede$3"
+fi
 
 if [ "$dataset" == "BK18lf" ]; then
   simdata="zeroeb"
@@ -41,7 +46,7 @@ fi
 # Define full paths using the suffix
 base_dir="/n/holylfs04/LABS/kovac_lab/Users/liuto/ede_chains"
 bin_tag="bin$binnum"
-file_suffix="${dusttype}_${spectype}${injected}/sim"
+file_suffix="${dusttype}_${spectype}${injected}${fedename}/sim"
 
 param_path="${base_dir}/${simdata}_${bin_tag}_${file_suffix}"
 
@@ -56,6 +61,7 @@ echo n | python source/full_multicomp.py \
     -d "$dataset" \
     -i "$injectedx" \
     -b "$binnum" \
+    --fede "$fedename"\
     -t "$spectype" -o 
 
 python source/full_multicomp.py \

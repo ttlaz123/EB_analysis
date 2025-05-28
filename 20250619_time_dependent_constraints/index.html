@@ -132,6 +132,77 @@
         </figure>
     </section>
     <section>
+        <h2>Alternative EB curves with different EDE parameters</h2>
+        <figure>
+            <img alt="EDE params" id="fede" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+            <figcaption>
+                <a href="https://arxiv.org/abs/2503.14454">ACT</a>
+                <a href="https://arxiv.org/pdf/2210.16296">Planck </a>
+                <a href="https://arxiv.org/pdf/2210.16296">Planck Boss </a>
+                <a href="https://arxiv.org/pdf/2210.16296">Planck Boss SH0ES </a>
+            </figcaption>
+
+            <script type="text/javascript">
+               
+
+                pager.link("#fede", {
+                    'Map Sim Num Digit1|digit1': simnums,
+                    'Digit2|digit2': simnums,
+                    'Digit3|digit3': simnums,
+
+                    'Map Type|m_map_type': [
+                        'Best Fit EE|_bestfitEE',
+                        'Best Fit EB|_bestfitEB',
+                        'Best Fit BB|_bestfitBB',
+                        'Triangle Plot|_triangle_plot',
+                        'Summary Plot (Peaks histogram)|sim1_summary',
+                        'Chi Squared histogram|simchisq_hist'
+                    ],
+                    'EDE parameters|fede': [
+                        'f_EDE = 0.012 (ACT)|ebfede0.01',
+                        'f_EDE = 0.070 (Planck)|ebfede0.07',
+                        'f_EDE = 0.087 (Planck Boss)||ebfede0.09',
+                        'f_EDE = 0.127 (Planck Boss SH0ES)||ebfede0.13',
+                    ], 
+                    'Dust model|theory_comp': [
+                        'Fixed Dust = 0|_fixed_dust',
+                    ],
+                    'Spectra|spectra': [
+                        'EB only|_eb',
+                    ],
+                    'Injected EDE Signal|ede': [
+                        'Fede = 0.07, g = 1|fede01',
+                        'g = 0|zeroeb'
+                    ]
+                },
+         
+                    function (params) {
+                        let dirbase = '/liuto'
+                        let dirpath = dirbase + '/ede_chains/';
+                        let mcmc_folder = params.ede  + params.theory_comp + params.spectra+ params.fede +'/';
+                        let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
+                        let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
+                        if (params.m_map_type == 'sim1_summary' || params.m_map_type == 'simchisq_hist') {
+                            name = dirpath + mcmc_folder + params.m_map_type + '.png'
+                        }
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+                    'digit1': '0',
+                    'digit2': '0',
+                    'digit3': '1',
+                    'inj_sig': '',
+                    'ede': 'zeroeb',
+                    'spectra': '_eb',
+                    'theory_comp': '_det_polrot',
+                });
+            </script>
+        </figure>
+    </section>
+    <section>
         <h2>L dependent rotation Bin split 2-8 and 9-15</h2>
  <figure>
             <img alt="Multicomponent Analysis Spectrum" id="morebins" src="#" width="750" height="500"
