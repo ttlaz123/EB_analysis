@@ -694,16 +694,32 @@
     </section>
     <section>
         <h2>L dependent rotation Bin split 2-8 and 9-15</h2>
+        <p>
+    This analysis investigates scale-dependent rotation angles derived from EB spectra using a multicomponent model.
+    The analysis focuses solely on polarization rotation without assuming any Early Dark Energy (EDE) model, thus g is set to 0.
+    The data is split into two multipole bin ranges: low-L (bins 2-8) and high-L (bins 9-15), to explore possible 
+    scale-dependent systematic or physical effects.
+  </p>
+    <p>
+    To quantify differences between these bin ranges, rotation angles are computed independently in each bin set,
+    and their difference is analyzed using z-scores. This enables identification of statistically significant 
+    bin-dependent rotation effects.
+  </p>
  <figure>
             <img alt="Multicomponent Analysis Spectrum" id="morebins" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
             <figcaption>
-                <p>Interactive plot pager for multicomponent analysis of the Early Dark Energy (EDE) spectrum.
-                    Visualizes the fits and triangle plots for 499 simulations.</p>
-               
-                <p>This interactive plot allows detailed exploration of multicomponent analysis by adjusting
-                    map types, binning, theoretical assumptions, spectra selections, EDE signal injections, and
-                    simulation numbers.</p>
+                <p>Pager for multicomponent analysis of the Early Dark Energy (EDE) spectrum across 499 simulations.</p>
+  <p>Options include:</p>
+  <ul>
+    <li><strong>Map Type:</strong> Best Fit EE, Best Fit EB, Best Fit BB, Triangle Plot, Summary Plot (Peaks histogram), Chi Squared histogram</li>
+    <li><strong>Bins Used:</strong> 2-8, 9-15, 2-15</li>
+    <li><strong>Injected Signal:</strong> Positive Miscalibration, Negative Miscalibration, Balanced Miscalibration, No Miscalibration</li>
+    <li><strong>Model:</strong> Rotation Only</li>
+    <li><strong>Spectra:</strong> EB only</li>
+    <li><strong>Injected EDE Signal:</strong> Fede = 0.07, g = 1; or g = 0 (no EDE)</li>
+    <li><strong>Simulation Number:</strong> 001 to 499</li>
+  </ul>
             </figcaption>
 
             <script type="text/javascript">
@@ -774,9 +790,18 @@
       <figure>
             <img alt="Bin diffs" id="bindiff" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
-            <figcaption>
-                
-            </figcaption>
+           <figcaption>
+  <p>Z-score histogram showing statistical significance of polarization angle differences.</p>
+  <p>Selectable options:</p>
+  <ul>
+    <li><strong>Angle:</strong> Polarization rotation angles measured from different BICEP frequency bands (150 GHz, K95, B95lf, 220 GHz).</li>
+    <li><strong>Injected Signal:</strong> Type of simulated miscalibration applied to the data — positive, negative, balanced, or no miscalibration.</li>
+    <li><strong>Bin sets compared:</strong> Two multipole ranges: low bins (2-8) and high bins (9-15) to compare angular scale dependencies.</li>
+    <li><strong>Model:</strong> Theoretical model assuming only polarization rotation effects.</li>
+    <li><strong>Spectra:</strong> Using EB cross-power spectrum only (E-mode and B-mode cross-correlation).</li>
+    <li><strong>Injected EDE Signal:</strong> Presence or absence of an early dark energy signal in the simulated dataset.</li>
+  </ul>
+</figcaption>
 
             <script type="text/javascript">
                
@@ -897,8 +922,16 @@
     <img alt="All Bin2-8 vs Bin9-15 Comparisons" id="bindiff_all_combos" src="#" width="750" height="500"
         onerror="javascript:this.src='dne.png'" />
     <figcaption>
-        Comparison of every bin2-8 vs bin9-15 combination
-    </figcaption>
+  <p>Comprehensive comparison of Z-score histograms between low (bins 2-8) and high (bins 9-15) multipole ranges across all parameter combinations.</p>
+  <p>Selectable options:</p>
+  <ul>
+    <li><strong>Angle:</strong> Polarization rotation angles from BICEP frequency bands (150 GHz, K95, B95lf, 220 GHz).</li>
+    <li><strong>Injected Signal for Bins 2-8:</strong> Simulated miscalibration type in low multipole bins: positive, negative, balanced, or none.</li>
+    <li><strong>Injected Signal for Bins 9-15:</strong> Same as above, but for high multipole bins.</li>
+    <li><strong>Injected EDE Signal for Bins 2-8:</strong> Early dark energy signal injected or not in low multipole bins.</li>
+    <li><strong>Injected EDE Signal for Bins 9-15:</strong> Early dark energy signal injected or not in high multipole bins.</li>
+  </ul>
+</figcaption>
 
     <script type="text/javascript">
 
@@ -969,16 +1002,22 @@
     </section>
     <section>
         <h2>L dependent rotation Bin split 2-10 and 11-15</h2>
+        
  <figure>
             <img alt="Multicomponent Analysis Spectrum" id="morebins10" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
             <figcaption>
-                <p>Interactive plot pager for multicomponent analysis of the Early Dark Energy (EDE) spectrum.
-                    Visualizes the fits and triangle plots for 499 simulations.</p>
-               
-                <p>This interactive plot allows detailed exploration of multicomponent analysis by adjusting
-                    map types, binning, theoretical assumptions, spectra selections, EDE signal injections, and
-                    simulation numbers.</p>
+                <p>Pager for multicomponent analysis of the Early Dark Energy (EDE) spectrum across 499 simulations.</p>
+  <p>Options include:</p>
+  <ul>
+    <li><strong>Map Type:</strong> Best Fit EE, Best Fit EB, Best Fit BB, Triangle Plot, Summary Plot (Peaks histogram), Chi Squared histogram</li>
+    <li><strong>Bins Used:</strong> 2-10, 11-15, 2-15</li>
+    <li><strong>Injected Signal:</strong> Positive Miscalibration, Negative Miscalibration, Balanced Miscalibration, No Miscalibration</li>
+    <li><strong>Model:</strong> Rotation Only</li>
+    <li><strong>Spectra:</strong> EB only</li>
+    <li><strong>Injected EDE Signal:</strong> Fede = 0.07, g = 1; or g = 0 (no EDE)</li>
+    <li><strong>Simulation Number:</strong> 001 to 499</li>
+  </ul>
             </figcaption>
 
             <script type="text/javascript">
@@ -1049,8 +1088,16 @@
             <img alt="Bin diffs" id="bindiff10" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
             <figcaption>
-                
-            </figcaption>
+  <p>Pager for bin difference analysis, all 3 contours for different bin sets are plotted on top of each other.</p>
+  <p>Options include:</p>
+  <ul>
+    <li><strong>Simulation Number:</strong> 001 to 499</li>
+    <li><strong>Injected Signal:</strong> Positive Miscalibration, Negative Miscalibration, Balanced Miscalibration, No Miscalibration</li>
+    <li><strong>Model:</strong> Rotation Only</li>
+    <li><strong>Spectra:</strong> EB only</li>
+    <li><strong>Injected EDE Signal:</strong> Fede = 0.07, g = 1; or g = 0 (no EDE)</li>
+  </ul>
+</figcaption>
 
             <script type="text/javascript">
                
@@ -1104,9 +1151,18 @@
         <figure>
             <img alt="Z Scores" id="zscore10" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
-            <figcaption>
-                
-            </figcaption>
+           <figcaption>
+  <p>Z-score histogram showing statistical significance of polarization angle differences.</p>
+  <p>Selectable options:</p>
+  <ul>
+    <li><strong>Angle:</strong> Polarization rotation angles measured from different BICEP frequency bands (150 GHz, K95, B95lf, 220 GHz).</li>
+    <li><strong>Injected Signal:</strong> Type of simulated miscalibration applied to the data — positive, negative, balanced, or no miscalibration.</li>
+    <li><strong>Bin sets compared:</strong> Two multipole ranges: low bins (2-10) and high bins (11-15) to compare angular scale dependencies.</li>
+    <li><strong>Model:</strong> Theoretical model assuming only polarization rotation effects.</li>
+    <li><strong>Spectra:</strong> Using EB cross-power spectrum only (E-mode and B-mode cross-correlation).</li>
+    <li><strong>Injected EDE Signal:</strong> Presence or absence of an early dark energy signal in the simulated dataset.</li>
+  </ul>
+</figcaption>
 
             <script type="text/javascript">
                
@@ -1171,8 +1227,16 @@
     <img alt="All Bin2-10 vs Bin11-15 Comparisons" id="bindiff_all_combos10" src="#" width="750" height="500"
         onerror="javascript:this.src='dne.png'" />
     <figcaption>
-        Comparison of every bin2-10 vs bin11-15 combination
-    </figcaption>
+  <p>Comprehensive comparison of Z-score histograms between low (bins 2-10) and high (bins 11-15) multipole ranges across all parameter combinations.</p>
+  <p>Selectable options:</p>
+  <ul>
+    <li><strong>Angle:</strong> Polarization rotation angles from BICEP frequency bands (150 GHz, K95, B95lf, 220 GHz).</li>
+    <li><strong>Injected Signal for Bins 2-10:</strong> Simulated miscalibration type in low multipole bins: positive, negative, balanced, or none.</li>
+    <li><strong>Injected Signal for Bins 11-15:</strong> Same as above, but for high multipole bins.</li>
+    <li><strong>Injected EDE Signal for Bins 2-10:</strong> Early dark energy signal injected or not in low multipole bins.</li>
+    <li><strong>Injected EDE Signal for Bins 11-15:</strong> Early dark energy signal injected or not in high multipole bins.</li>
+  </ul>
+</figcaption>
 
     <script type="text/javascript">
 
