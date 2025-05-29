@@ -703,7 +703,7 @@
     <p>
     To quantify differences between these bin ranges, rotation angles are computed independently in each bin set,
     and their difference is analyzed using z-scores. This enables identification of statistically significant 
-    bin-dependent rotation effects.
+    bin-dependent rotation effects. First, we generate the MCMC chains for each set of bin ranges.
   </p>
  <figure>
             <img alt="Multicomponent Analysis Spectrum" id="morebins" src="#" width="750" height="500"
@@ -786,22 +786,32 @@
                 });
             </script>
         </figure>
-          
+         <p>
+  To illustrate how different bin selections impact the likelihood calculations, 
+  we overlay the contour plots from each bin set. The blue contour represents 
+  the combined likelihood of all bins and visually confirms it is consistent with 
+  the individual red (high-ell) and gray (low-ell) contours, while providing tighter constraints. 
+  For this dataset, we see that the red contours are consistently tighter than the gray contours,
+  meaning that the high-ell bins have much stronger constraining power than the low ell bins.
+</p>
+
       <figure>
             <img alt="Bin diffs" id="bindiff" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
            <figcaption>
-  <p>Z-score histogram showing statistical significance of polarization angle differences.</p>
-  <p>Selectable options:</p>
-  <ul>
-    <li><strong>Angle:</strong> Polarization rotation angles measured from different BICEP frequency bands (150 GHz, K95, B95lf, 220 GHz).</li>
-    <li><strong>Injected Signal:</strong> Type of simulated miscalibration applied to the data — positive, negative, balanced, or no miscalibration.</li>
-    <li><strong>Bin sets compared:</strong> Two multipole ranges: low bins (2-8) and high bins (9-15) to compare angular scale dependencies.</li>
-    <li><strong>Model:</strong> Theoretical model assuming only polarization rotation effects.</li>
-    <li><strong>Spectra:</strong> Using EB cross-power spectrum only (E-mode and B-mode cross-correlation).</li>
-    <li><strong>Injected EDE Signal:</strong> Presence or absence of an early dark energy signal in the simulated dataset.</li>
-  </ul>
-</figcaption>
+    <p>
+      Bin difference analysis showing overlaid contours: red for high multipole bins, 
+      gray for low multipole bins, and blue for all bins combined.
+    </p>
+    <p>Options include:</p>
+    <ul>
+      <li><strong>Simulation Number:</strong> 001 to 499</li>
+      <li><strong>Injected Signal:</strong> Positive, Negative, Balanced Miscalibration, or None</li>
+      <li><strong>Model:</strong> Detector Polarization Rotation Only</li>
+      <li><strong>Spectra:</strong> EB cross-power spectrum only</li>
+      <li><strong>Injected EDE Signal:</strong> Early Dark Energy with Fede=0.07, g=1, or no EDE (g=0)</li>
+    </ul>
+  </figcaption>
 
             <script type="text/javascript">
                
@@ -852,11 +862,24 @@
                 });
             </script>
         </figure>
+        <p>
+            To quantify the difference in the posteriors when comparing high-ell with low-ell, we again calculate the Z-score 
+            between posteriors for each rotation angle using the high-ell bins vs the low-ell bins. 
+        </p>
         <figure>
             <img alt="Z Scores" id="zscore" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
             <figcaption>
-                
+                <p>Z-score histogram showing statistical significance of polarization angle differences.</p>
+  <p>Selectable options:</p>
+  <ul>
+    <li><strong>Angle:</strong> Polarization rotation angles measured from different BICEP frequency bands (150 GHz, K95, B95lf, 220 GHz).</li>
+    <li><strong>Injected Signal:</strong> Type of simulated miscalibration applied to the data — positive, negative, balanced, or no miscalibration.</li>
+    <li><strong>Bin sets compared:</strong> Two multipole ranges: low bins (2-8) and high bins (9-15) to compare angular scale dependencies.</li>
+    <li><strong>Model:</strong> Theoretical model assuming only polarization rotation effects.</li>
+    <li><strong>Spectra:</strong> Using EB cross-power spectrum only (E-mode and B-mode cross-correlation).</li>
+    <li><strong>Injected EDE Signal:</strong> Presence or absence of an early dark energy signal in the simulated dataset.</li>
+  </ul>
             </figcaption>
 
             <script type="text/javascript">
@@ -918,6 +941,72 @@
                 });
             </script>
         </figure>
+        <div style="display: flex; gap: 40px; font-family: Arial, sans-serif;">
+
+  <table border="1" cellpadding="6" style="border-collapse: collapse; width: 48%;">
+    <caption><strong>g = 0 (No EDE Signal)</strong></caption>
+    <thead>
+      <tr>
+        <th>Angle</th>
+        <th>Positive Miscal</th>
+        <th>Negative Miscal</th>
+        <th>Balanced Miscal</th>
+        <th>No Miscal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>alpha_BK18_150</td><td>-0.13 ± 1.1</td><td>-0.1 ± 1.1</td><td>-0.12 ± 1.11</td><td>-0.13 ± 1.13</td></tr>
+      <tr><td>alpha_BK18_220</td><td>0.01 ± 1.27</td><td>0.02 ± 1.28</td><td>0.03 ± 1.26</td><td>0.01 ± 1.25</td></tr>
+      <tr><td>alpha_BK18_K95</td><td>-0.08 ± 1.16</td><td>-0.1 ± 1.15</td><td>-0.09 ± 1.12</td><td>-0.1 ± 1.16</td></tr>
+      <tr><td>alpha_BK18_B95lf</td><td>-0.02 ± 0.98</td><td>0 ± 0.98</td><td>-0.01 ± 0.98</td><td>-0.02 ± 1.01</td></tr>
+    </tbody>
+  </table>
+
+  <table border="1" cellpadding="6" style="border-collapse: collapse; width: 48%;">
+    <caption><strong>g = 1 (Injected EDE Signal)</strong></caption>
+    <thead>
+      <tr>
+        <th>Angle</th>
+        <th>Positive Miscal</th>
+        <th>Negative Miscal</th>
+        <th>Balanced Miscal</th>
+        <th>No Miscal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>alpha_BK18_150</td><td>-0.50 ± 1.17</td><td>-0.52 ± 1.14</td><td>-0.49 ± 1.2</td><td>-0.53 ± 1.2</td></tr>
+      <tr><td>alpha_BK18_220</td><td>-0.30 ± 1.28</td><td>-0.29 ± 1.3</td><td>-0.27 ± 1.27</td><td>-0.31 ± 1.3</td></tr>
+      <tr><td>alpha_BK18_K95</td><td>-0.10 ± 1.09</td><td>-0.16 ± 1.14</td><td>-0.12 ± 1.11</td><td>-0.13 ± 1.14</td></tr>
+      <tr><td>alpha_BK18_B95lf</td><td>-0.72 ± 1.01</td><td>-0.73 ± 1.03</td><td>-0.73 ± 1.03</td><td>-0.74 ± 1.03</td></tr>
+    </tbody>
+  </table>
+
+</div>
+
+<p>
+  When <em>g = 0</em>, we expect no true discrepancy in polarization rotation angles,
+  and accordingly, the Z-scores are centered around zero.
+  The spread of these Z-scores is approximately one, indicating that noise in the EB spectrum
+  naturally causes some variation in the fitted rotation angles between high-ℓ and low-ℓ bins.
+</p>
+
+<p>
+  For <em>g = 1</em>, the overall spread of the Z-scores remains similar,
+  but the distribution notably shifts downward.
+  This shift is less than one standard deviation for all angles,
+  implying that although aggregate differences become apparent across 500 simulations,
+  such ell-dependent rotation would not be confidently detected in any single realization.
+</p>
+
+<p>
+  To explore the effect of more extreme variations in rotation,
+  we plot Z-scores comparing every possible combination of injected signals.
+  For example, we can compare cases where the low-ℓ bins have a negative angle injected,
+  while the high-ℓ bins have a positive angle injected.
+  This produces much larger Z-scores,
+  demonstrating that the EB spectrum is sensitive to significant differences in injected signals.
+</p>
+
         <figure>
     <img alt="All Bin2-8 vs Bin9-15 Comparisons" id="bindiff_all_combos" src="#" width="750" height="500"
         onerror="javascript:this.src='dne.png'" />
@@ -1088,7 +1177,9 @@
             <img alt="Bin diffs" id="bindiff10" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
             <figcaption>
-  <p>Pager for bin difference analysis, all 3 contours for different bin sets are plotted on top of each other.</p>
+  <p>Pager for bin difference analysis, all 3 contours for different bin sets are plotted on top of each other. 
+    Red for high ell, gray for low ell, and blue for all bins.
+  </p>
   <p>Options include:</p>
   <ul>
     <li><strong>Simulation Number:</strong> 001 to 499</li>
