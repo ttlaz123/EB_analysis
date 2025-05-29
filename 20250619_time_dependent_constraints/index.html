@@ -343,6 +343,132 @@
                 });
             </script>
         </figure>
+
+        <h3>g = 0</h3>
+<table border="1" cellpadding="6" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>fede = 0.12</th>
+      <th>fede = 0.07</th>
+      <th>fede = 0.087</th>
+      <th>fede = 0.127</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>alpha_BK18_220</td>
+      <td></td>
+      <td>-0.02 ± 0.27</td>
+      <td>-0.01 ± 0.22</td>
+      <td>0 ± 0.17</td>
+    </tr>
+    <tr>
+      <td>alpha_BK18_150</td>
+      <td></td>
+      <td>-0.02 ± 0.21</td>
+      <td>-0.01 ± 0.16</td>
+      <td>0 ± 0.10</td>
+    </tr>
+    <tr>
+      <td>alpha_BK18_K95</td>
+      <td></td>
+      <td>-0.03 ± 0.32</td>
+      <td>-0.04 ± 0.26</td>
+      <td>-0.01 ± 0.23</td>
+    </tr>
+    <tr>
+      <td>alpha_BK18_B95lf</td>
+      <td></td>
+      <td>-0.03 ± 0.22</td>
+      <td>-0.01 ± 0.15</td>
+      <td>-0.01 ± 0.07</td>
+    </tr>
+    <tr>
+      <td>g</td>
+      <td></td>
+      <td>0.02 ± 0.46</td>
+      <td>0.04 ± 0.41</td>
+      <td>0.03 ± 0.35</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>g = 1</h3>
+<table border="1" cellpadding="6" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>fede = 0.12</th>
+      <th>fede = 0.07</th>
+      <th>fede = 0.087</th>
+      <th>fede = 0.127</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>alpha_BK18_220</td>
+      <td></td>
+      <td>0 ± 0.30</td>
+      <td>0.13 ± 0.23</td>
+      <td>0.34 ± 0.19</td>
+    </tr>
+    <tr>
+      <td>alpha_BK18_150</td>
+      <td></td>
+      <td>0 ± 0.23</td>
+      <td>0.12 ± 0.16</td>
+      <td>0.35 ± 0.10</td>
+    </tr>
+    <tr>
+      <td>alpha_BK18_K95</td>
+      <td></td>
+      <td>0 ± 0.29</td>
+      <td>0.12 ± 0.25</td>
+      <td>0.35 ± 0.23</td>
+    </tr>
+    <tr>
+      <td>alpha_BK18_B95lf</td>
+      <td></td>
+      <td>0 ± 0.23</td>
+      <td>0.13 ± 0.15</td>
+      <td>0.36 ± 0.07</td>
+    </tr>
+    <tr>
+      <td>g</td>
+      <td></td>
+      <td>0.97 ± 0.45</td>
+      <td>0.89 ± 0.42</td>
+      <td>0.75 ± 0.37</td>
+    </tr>
+  </tbody>
+</table>
+
+
+  <p>The two tables present the fitted rotation angle parameters (denoted as <code>α</code>) across different frequency bands of the BK18 data, as well as the global rotation parameter <code>g</code>, for two distinct cases: <code>g=0</code> (no intrinsic rotation) and <code>g=1</code> (maximal rotation). These fits are performed for varying Early Dark Energy (EDE) fractions, <code>f<sub>EDE</sub></code>, with an empty slot left for <code>f<sub>EDE</sub> = 0.12</code>.</p>
+
+  <h4>1. <code>g = 0</code> Case (No Rotation)</h4>
+  <ul>
+    <li>The values of the rotation angles <code>α</code> across all frequency bands and EDE fractions are consistent with zero within their uncertainties. This indicates no detected rotation, as expected.</li>
+    <li>The global rotation parameter <code>g</code> also remains close to zero with relatively large error bars (~0.35 to 0.46), consistent with no significant signal.</li>
+    <li>Across increasing <code>f<sub>EDE</sub></code> (from 0.07 to 0.127), there is no systematic trend in the rotation angles or <code>g</code>, suggesting the fits do not falsely detect rotation in the absence of a true signal.</li>
+  </ul>
+
+  <h4>2. <code>g = 1</code> Case (With Rotation)</h4>
+  <ul>
+    <li>The fitted rotation angles <code>α</code> are systematically positive and increase with the <code>f<sub>EDE</sub></code> fraction, particularly visible in the <code>α<sub>BK18_B95lf</sub></code> and <code>α<sub>BK18_220</sub></code> bands.</li>
+    <li>The global rotation parameter <code>g</code> values are close to 1, consistent with the injected rotation, with errors roughly comparable to the <code>g=0</code> case.</li>
+    <li>The error bars shrink slightly as <code>f<sub>EDE</sub></code> increases, reflecting the increasing strength of the rotation signal.</li>
+    <li>The <code>α</code> values across different bands show similar behavior, indicating a coherent rotation effect across frequencies.</li>
+  </ul>
+
+  <h4>3. Implications and Next Steps</h4>
+  <ul>
+    <li>These results indicate the estimator’s ability to recover rotation angles and <code>g</code> correctly when a rotation signal is present (<code>g=1</code>) and to remain consistent with zero when no rotation is injected (<code>g=0</code>).</li>
+    <li>The uncertainties are moderate, suggesting that with real data, a detectable rotation signal could be distinguished from null hypotheses, but error bars must be carefully considered.</li>
+    <li>The missing column for <code>f<sub>EDE</sub> = 0.12</code> will be important to fill in for completeness and to check for smooth trends in the parameters.</li>
+    <li>Future work should also include cross-checks with different data splits and systematics tests to ensure robustness, especially since rotation estimates could be sensitive to noise and modeling assumptions.</li>
+  </ul>
     </section>
     <section>
         <h2>L dependent rotation Bin split 2-8 and 9-15</h2>
