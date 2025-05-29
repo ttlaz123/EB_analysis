@@ -479,7 +479,70 @@
     a diagnostic: if the recovered <code>g</code> and <code>α</code> change significantly across models, it could indicate
     the presence of a true EDE signal.
   </p>
+ <figure>
+            <img alt="Z Scores" id="zscoref" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+            <figcaption>
+                
+            </figcaption>
 
+            <script type="text/javascript">
+               
+
+                pager.link("#zscoref", {
+                   
+                    'Parameter|anglef':[
+                        'alpha_BK18_150|alpha_BK18_150',
+                        'alpha_BK18_K95|alpha_BK18_K95',
+                        'alpha_BK18_B95lf|alpha_BK18_B95e',
+                        'alpha_BK18_220|alpha_BK18_220',
+                        'g|gMpl',
+                    ],
+                 
+                    
+                    'Model compare 1|binset1f':[
+                        'f_EDE = 0.012 (ACT)|_ebfede0.01',
+                        'f_EDE = 0.070 (Planck)|_ebfede0.07',
+                        'f_EDE = 0.087 (Planck Boss)|_ebfede0.09',
+                        'f_EDE = 0.127 (Planck Boss SH0ES)|_ebfede0.13',
+                    ],
+                    'Model compare 2|binset2f':[
+                        'f_EDE = 0.012 (ACT)|_ebfede0.01',
+                        'f_EDE = 0.070 (Planck)|_ebfede0.07',
+                        'f_EDE = 0.087 (Planck Boss)|_ebfede0.09',
+                        'f_EDE = 0.127 (Planck Boss SH0ES)|_ebfede0.13',
+                    ],
+                
+        
+                    'Injected EDE Signal|ede': [
+                        'Fede = 0.07, g = 1|fede01',
+                        'g = 0|zeroeb'
+                    ]
+                },
+         
+                    function (params) {
+                        let dirbase = '/liuto/home/GitHub/EB_analysis/'
+                        let dirpath = dirbase + '/zscore_histograms/';
+                        let zscore1 = params.anglef + '_' + params.ede + '_bin2-15_fixed_dust_eb' + params.binset1f 
+                        let zscore2 = params.ede + '_bin2-15_fixed_dust_eb' + params.binset2f ;
+                        
+                        let name = dirpath + 'zscore_hist_' + zscore1 + '_' + zscore2 +  '.png';
+            
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+                    'angle': 'alpha_BK18_150',
+                    'binset1b': 'bin2-10',
+                    'binset2b': 'bin11-15',
+                    'inj_sig': '',
+                    'ede': 'zeroeb',
+                    'spectra': '_eb',
+                    'theory_comp': '_det_polrot',
+                });
+            </script>
+        </figure>
     </section>
     <section>
         <h2>L dependent rotation Bin split 2-8 and 9-15</h2>
