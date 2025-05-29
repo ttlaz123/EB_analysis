@@ -70,8 +70,8 @@ def collect_all_zscores(bin1_root, bin2_root, params, num_sims):
     else:
         # Fallback to loading individual sim folders
         for i in range(num_sims):
-            sim_folder_1 = os.path.join(bin2_8_root, f"sim{i:03d}")
-            sim_folder_2 = os.path.join(bin9_15_root, f"sim{i:03d}")
+            sim_folder_1 = os.path.join(bin1_root, f"sim{i:03d}")
+            sim_folder_2 = os.path.join(bin2_root, f"sim{i:03d}")
             if i % 10 == 0:
                 print("Loading: " + sim_folder_1)
                 print("Loading: " + sim_folder_2)
