@@ -480,10 +480,7 @@
     the presence of a true EDE signal. We quantify these comparisons by using the Z-score:
   </p>
 
-   <p style="text-align: center; font-size: 1.1em;">
-    <strong>\( Z = \frac{\mu_1 - \mu_2}{\sqrt{\sigma_1^2 + \sigma_2^2}} \)</strong>
-  </p>
-
+   \[ Z = \frac{\mu_1 - \mu_2}{\sqrt{\sigma_1^2 + \sigma_2^2}} \]
   <p>
     where:
     <ul>
@@ -561,85 +558,102 @@
             </script>
         </figure>
     
-  <h3>Z-Score Comparison for alpha_BK18_150</h3>
+ <h3>Z-Score Comparison for alpha_BK18_150</h3>
 
-  <h4>Case: <code>g = 0</code> (No Axion Coupling)</h4>
-  <table border="1" cellspacing="0" cellpadding="4">
-    <tr>
-      <th>Model 2 →<br>Model 1 ↓</th>
-      <th>f<sub>EDE</sub> = 0.012</th>
-      <th>0.07</th>
-      <th>0.087</th>
-      <th>0.127</th>
-    </tr>
-    <tr><td>0.12</td><td>0</td>         <td>0.01±0.52</td> <td>0.01±0.28</td>  <td>-0.04±0.58</td></tr>
-    <tr><td>0.07</td><td>-0.01±0.52</td><td>0</td>          <td>0±0.38</td>     <td>-0.04±0.92</td></tr>
-    <tr><td>0.087</td><td>-0.01±0.28</td><td>0±0.38</td>    <td>0</td>          <td>-0.05±0.74</td></tr>
-    <tr><td>0.127</td><td>0.04±0.58</td> <td>0.04±0.92</td> <td>0.05±0.74</td>  <td>0</td></tr>
-  </table>
+<div style="display: flex; gap: 40px; flex-wrap: wrap;">
 
-  <br>
+  <div style="flex: 1; min-width: 300px;">
+    <h4>Case: <code>g = 0</code> (No Axion Coupling)</h4>
+    <table border="1" cellspacing="0" cellpadding="4" style="width: 100%;">
+      <tr>
+        <th>Model 2 →<br>Model 1 ↓</th>
+        <th>f<sub>EDE</sub> = 0.012</th>
+        <th>0.07</th>
+        <th>0.087</th>
+        <th>0.127</th>
+      </tr>
+      <tr><td>0.12</td><td>0</td>         <td>0.01±0.52</td> <td>0.01±0.28</td>  <td>-0.04±0.58</td></tr>
+      <tr><td>0.07</td><td>-0.01±0.52</td><td>0</td>          <td>0±0.38</td>     <td>-0.04±0.92</td></tr>
+      <tr><td>0.087</td><td>-0.01±0.28</td><td>0±0.38</td>    <td>0</td>          <td>-0.05±0.74</td></tr>
+      <tr><td>0.127</td><td>0.04±0.58</td> <td>0.04±0.92</td> <td>0.05±0.74</td>  <td>0</td></tr>
+    </table>
+  </div>
 
-  <h4>Case: <code>g = 1</code> (Injected Axion Coupling)</h4>
-  <table border="1" cellspacing="0" cellpadding="4">
-    <tr>
-      <th>Model 2 →<br>Model 1 ↓</th>
-      <th>f<sub>EDE</sub> = 0.012</th>
-      <th>0.07</th>
-      <th>0.087</th>
-      <th>0.127</th>
-    </tr>
-    <tr><td>0.12</td><td>0</td>         <td>0.91±1.24</td> <td>0.37±1.21</td>  <td>-1.08±0.64</td></tr>
-    <tr><td>0.07</td><td>-0.91±1.24</td><td>0</td>          <td>-0.59±0.41</td> <td>-1.79±1.27</td></tr>
-    <tr><td>0.087</td><td>-0.37±1.21</td><td>-0.59±0.41</td><td>0</td>          <td>-1.42±1.23</td></tr>
-    <tr><td>0.127</td><td>1.08±0.64</td> <td>1.79±1.27</td> <td>1.42±1.23</td>  <td>0</td></tr>
-  </table>
-  <h3>Z-Score Comparison for gMpl</h3>
+  <div style="flex: 1; min-width: 300px;">
+    <h4>Case: <code>g = 1</code> (Injected Axion Coupling)</h4>
+    <table border="1" cellspacing="0" cellpadding="4" style="width: 100%;">
+      <tr>
+        <th>Model 2 →<br>Model 1 ↓</th>
+        <th>f<sub>EDE</sub> = 0.012</th>
+        <th>0.07</th>
+        <th>0.087</th>
+        <th>0.127</th>
+      </tr>
+      <tr><td>0.12</td><td>0</td>         <td>0.91±1.24</td> <td>0.37±1.21</td>  <td>-1.08±0.64</td></tr>
+      <tr><td>0.07</td><td>-0.91±1.24</td><td>0</td>          <td>-0.59±0.41</td> <td>-1.79±1.27</td></tr>
+      <tr><td>0.087</td><td>-0.37±1.21</td><td>-0.59±0.41</td><td>0</td>          <td>-1.42±1.23</td></tr>
+      <tr><td>0.127</td><td>1.08±0.64</td> <td>1.79±1.27</td> <td>1.42±1.23</td>  <td>0</td></tr>
+    </table>
+  </div>
 
-<h4>Case: <code>g = 0</code> (No Axion Coupling)</h4>
-<table border="1" cellspacing="0" cellpadding="4">
-  <tr>
-    <th>Model 2 →<br>Model 1 ↓</th>
-    <th>f<sub>EDE</sub> = 0.012</th>
-    <th>0.07</th>
-    <th>0.087</th>
-    <th>0.127</th>
-  </tr>
-  <tr>
-    <td>0.12</td><td>0</td><td>0.06±0.73</td><td>0.05±0.77</td><td>0.06±0.83</td>
-  </tr>
-  <tr>
-    <td>0.07</td><td>-0.06±0.73</td><td>0</td><td>-0.01±0.27</td><td>0±0.3</td>
-  </tr>
-  <tr>
-    <td>0.087</td><td>-0.05±0.77</td><td>0.01±0.27</td><td>0</td><td>0.02±0.23</td>
-  </tr>
-  <tr>
-    <td>0.127</td><td>-0.06±0.83</td><td>0±0.3</td><td>-0.02±0.23</td><td>0</td>
-  </tr>
-</table>
-<h4>Case: <code>g = 1</code> (Injected Axion Coupling)</h4>
-<table border="1" cellspacing="0" cellpadding="4">
-  <tr>
-    <th>Model 2 →<br>Model 1 ↓</th>
-    <th>f<sub>EDE</sub> = 0.012</th>
-    <th>0.07</th>
-    <th>0.087</th>
-    <th>0.127</th>
-  </tr>
-  <tr>
-    <td>0.12</td><td>0</td><td>1.30±1.23</td><td>1.39±1.22</td><td>1.54±0.87</td>
-  </tr>
-  <tr>
-    <td>0.07</td><td>-1.30±1.23</td><td>0</td><td>0.15±0.28</td><td>0.42±1.24</td>
-  </tr>
-  <tr>
-    <td>0.087</td><td>-1.39±1.22</td><td>-0.15±0.28</td><td>0</td><td>0.29±1.23</td>
-  </tr>
-  <tr>
-    <td>0.127</td><td>-1.54±0.87</td><td>-0.42±1.24</td><td>-0.29±1.23</td><td>0</td>
-  </tr>
-</table>
+</div>
+
+<h3>Z-Score Comparison for gMpl</h3>
+
+<div style="display: flex; gap: 40px; flex-wrap: wrap;">
+
+  <div style="flex: 1; min-width: 300px;">
+    <h4>Case: <code>g = 0</code> (No Axion Coupling)</h4>
+    <table border="1" cellspacing="0" cellpadding="4" style="width: 100%;">
+      <tr>
+        <th>Model 2 →<br>Model 1 ↓</th>
+        <th>f<sub>EDE</sub> = 0.012</th>
+        <th>0.07</th>
+        <th>0.087</th>
+        <th>0.127</th>
+      </tr>
+      <tr>
+        <td>0.12</td><td>0</td><td>0.06±0.73</td><td>0.05±0.77</td><td>0.06±0.83</td>
+      </tr>
+      <tr>
+        <td>0.07</td><td>-0.06±0.73</td><td>0</td><td>-0.01±0.27</td><td>0±0.3</td>
+      </tr>
+      <tr>
+        <td>0.087</td><td>-0.05±0.77</td><td>0.01±0.27</td><td>0</td><td>0.02±0.23</td>
+      </tr>
+      <tr>
+        <td>0.127</td><td>-0.06±0.83</td><td>0±0.3</td><td>-0.02±0.23</td><td>0</td>
+      </tr>
+    </table>
+  </div>
+
+  <div style="flex: 1; min-width: 300px;">
+    <h4>Case: <code>g = 1</code> (Injected Axion Coupling)</h4>
+    <table border="1" cellspacing="0" cellpadding="4" style="width: 100%;">
+      <tr>
+        <th>Model 2 →<br>Model 1 ↓</th>
+        <th>f<sub>EDE</sub> = 0.012</th>
+        <th>0.07</th>
+        <th>0.087</th>
+        <th>0.127</th>
+      </tr>
+      <tr>
+        <td>0.12</td><td>0</td><td>1.30±1.23</td><td>1.39±1.22</td><td>1.54±0.87</td>
+      </tr>
+      <tr>
+        <td>0.07</td><td>-1.30±1.23</td><td>0</td><td>0.15±0.28</td><td>0.42±1.24</td>
+      </tr>
+      <tr>
+        <td>0.087</td><td>-1.39±1.22</td><td>-0.15±0.28</td><td>0</td><td>0.29±1.23</td>
+      </tr>
+      <tr>
+        <td>0.127</td><td>-1.54±0.87</td><td>-0.42±1.24</td><td>-0.29±1.23</td><td>0</td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+
 
   <h4>Interpretation</h4>
    <p>
