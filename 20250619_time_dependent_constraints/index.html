@@ -786,13 +786,23 @@
                 });
             </script>
         </figure>
-         <p>
-  To illustrate how different bin selections impact the likelihood calculations, 
-  we overlay the contour plots from each bin set. The blue contour represents 
-  the combined likelihood of all bins and visually confirms it is consistent with 
-  the individual red (high-ell) and gray (low-ell) contours, while providing tighter constraints. 
-  For this dataset, we see that the red contours are consistently tighter than the gray contours,
-  meaning that the high-ell bins have much stronger constraining power than the low ell bins.
+        <p>
+  Looking at the summary plots, we see that when <em>g = 0</em>, the rotation angles stay well within
+  the range of the injected miscalibration angles and are essentially the same for both low and high ℓ.
+  However, when <em>g = 1</em>, the high-ℓ bins consistently show higher posterior angle peaks,
+  indicating that the rotation angles now depend on ℓ.
+  This matches the expectation that the <em>g = 1</em> EB spectrum is a rotated version of EE,
+  but with different rotation angles at different multipoles.
+</p>
+
+<p>
+  To demonstrate how choosing different bin sets affects the likelihood calculations,
+  we overlay contour plots from each bin set.
+  The blue contour represents the combined likelihood using all bins,
+  and it visually confirms consistency with the individual red (high-ℓ) and gray (low-ℓ) contours,
+  while also providing tighter constraints overall.
+  In this dataset, the red contours are noticeably tighter than the gray ones,
+  showing that the high-ℓ bins have significantly stronger constraining power than the low-ℓ bins.
 </p>
 
       <figure>
@@ -863,9 +873,23 @@
             </script>
         </figure>
         <p>
-            To quantify the difference in the posteriors when comparing high-ell with low-ell, we again calculate the Z-score 
-            between posteriors for each rotation angle using the high-ell bins vs the low-ell bins. 
-        </p>
+  To quantify the difference in the posteriors when comparing high-ell and low-ell bins, we calculate 
+  the Z-score between the rotation angle posteriors derived from each bin set. The Z-score is computed 
+  for each individual simulation realization, where \(\mu_1\) and \(\sigma_1\) are taken from the 
+  posterior fitted using the low-ell bins, and \(\mu_2\) and \(\sigma_2\) from the high-ell bins.
+</p>
+
+<p>
+  This yields a Z-score for each simulation realization, resulting in 499 Z-scores per rotation angle. 
+  These are plotted as histograms to visualize the distribution of differences between the two bin sets. 
+  We apply a simple Gaussian fit to each histogram to extract its peak and width.
+</p>
+
+<p>
+  When analyzing real data, the observed Z-score can be compared to these histograms to assess whether 
+  the difference between high-ell and low-ell is statistically significant and to which injected 
+  scenario it is most consistent.
+</p>
         <figure>
             <img alt="Z Scores" id="zscore" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
@@ -1091,6 +1115,10 @@
     </section>
     <section>
         <h2>L dependent rotation Bin split 2-10 and 11-15</h2>
+        <p>
+        We repeat the same analysis as in section IV, except we use a different combination of bin sets. 
+        Here, we choose bins 2-10 as our low-ell bins, and 11-15 as our high-ell bins.
+        </p>
         
  <figure>
             <img alt="Multicomponent Analysis Spectrum" id="morebins10" src="#" width="750" height="500"
@@ -1172,7 +1200,15 @@
                 });
             </script>
         </figure>
-          
+         <p>
+    Again, when g=1, the posterior peaks for the high-ell bins are consistently larger than those for the low-ell bins.
+    The shift in the maximum likelihood estimate is now even more pronounced.
+    This larger shift can be understood by examining the overlapping contours plotted below.
+    Unlike the previous case where the low-ell bins had much weaker constraining power than the high-ell bins,
+    here we redefine the low-ell and high-ell ranges so that both sets have similar constraining power.
+    This balanced split allows the difference in the MCMC fit to become more noticeable.
+    
+</p>
       <figure>
             <img alt="Bin diffs" id="bindiff10" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
@@ -1239,6 +1275,8 @@
                 });
             </script>
         </figure>
+        <p>We observe that the blue contours, representing the combined data, no longer closely follows the red contour,
+    but instead lies between the red and gray contours.</p>
         <figure>
             <img alt="Z Scores" id="zscore10" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
@@ -1314,6 +1352,59 @@
                 });
             </script>
         </figure>
+        <p>
+  The table below summarizes the Z score when comparing the data in low-ell and high-ell bins, 
+  comparing the cases of g=0 (no Early Dark Energy signal) and g=1 (with Early Dark Energy signal). 
+  For g=0, the fitted angles cluster near zero with uncertainties around 1.2, indicating no ell-dependent rotation. 
+  When g=1, the rotation angles shift downward for all frequencies, with uncertainties remaining similar. 
+  This shift reflects the presence of ell-dependent rotation induced by the Early Dark Energy signal.
+</p>
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Angle</th>
+      <th>g=0 (Rotation ± Uncertainty)</th>
+      <th>g=1 (Rotation ± Uncertainty)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>alpha_BK18_150</td>
+      <td>-0.06 ± 1.22</td>
+      <td>-1.21 ± 1.29</td>
+    </tr>
+    <tr>
+      <td>alpha_BK18_220</td>
+      <td>0.02 ± 1.28</td>
+      <td>-0.56 ± 1.20</td>
+    </tr>
+    <tr>
+      <td>alpha_BK18_K95</td>
+      <td>-0.08 ± 1.27</td>
+      <td>-0.25 ± 1.22</td>
+    </tr>
+    <tr>
+      <td>alpha_BK18_B95lf</td>
+      <td>-0.02 ± 1.06</td>
+      <td>-1.59 ± 1.09</td>
+    </tr>
+  </tbody>
+</table>
+<p>
+  Similar to the previous case, the angles alpha_BK18_150 and alpha_BK18_B95lf show the strongest 
+  discriminating power. The magnitude of the difference now suggests it is possible to detect 
+  ell-dependent rotation with the current binning scheme by fitting rotation angles separately 
+  for the two bin sets. A Z-score significantly less than 2 indicates evidence of ell-dependent 
+  rotation that is unlikely to be explained by noise alone. However, it is important to note 
+  that this result assumes an injected signal with g=1, which is much stronger than what current 
+  literature estimates, where g is expected to be less than 0.2. Therefore, while it is unlikely 
+  that ell-dependent rotation is detected in the actual BICEP data, we can still place a rough, 
+  model-independent constraint on its magnitude.
+</p>
+<p>
+    Again, we have the Z-score histograms available for all combinations of high and low ell bin configurations.
+</p>
         <figure>
     <img alt="All Bin2-10 vs Bin11-15 Comparisons" id="bindiff_all_combos10" src="#" width="750" height="500"
         onerror="javascript:this.src='dne.png'" />
