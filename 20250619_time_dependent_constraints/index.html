@@ -349,7 +349,7 @@
   <thead>
     <tr>
       <th>Parameter</th>
-      <th>fede = 0.12</th>
+      <th>fede = 0.012</th>
       <th>fede = 0.07</th>
       <th>fede = 0.087</th>
       <th>fede = 0.127</th>
@@ -399,7 +399,7 @@
   <thead>
     <tr>
       <th>Parameter</th>
-      <th>fede = 0.12</th>
+      <th>fede = 0.012</th>
       <th>fede = 0.07</th>
       <th>fede = 0.087</th>
       <th>fede = 0.127</th>
@@ -445,26 +445,40 @@
 </table>
 
 
-  <p>The two tables present the fitted rotation angle parameters (<code>α</code>) across different BK18 frequency bands,<br>
-     along with the early dark energy axion coupling parameter <code>g</code>, for two cases: <code>g=0</code> (no coupling)<br>
-     and <code>g=1</code> (maximal coupling). Fits are shown for varying Early Dark Energy fractions <code>f<sub>EDE</sub></code>.</p>
-  <h4>1. <code>g = 0</code> Case (No Axion Coupling)</h4>
+    <p>
+    The two tables report best-fit polarization rotation angles (<code>α</code>) for different BK18 frequency bands,
+    along with the early dark energy (EDE) axion coupling parameter <code>g</code>, under two scenarios:
+    <code>g = 0</code> (no coupling) and <code>g = 1</code> (strong coupling). Each case is evaluated for different
+    EDE energy fractions <code>f<sub>EDE</sub></code>.
+  </p>
+   <h4>1. <code>g = 0</code> (No Axion Coupling)</h4>
   <ul>
-    <li>Rotation angles <code>α</code> are consistent with zero within uncertainties across bands and EDE fractions.<br></li>
-    <li><code>g</code> is close to zero with large uncertainties (~0.35 to 0.46), as expected.<br></li>
-    <li>No systematic trend with EDE fraction; no spurious rotation detected.<br></li>
+    <li>Rotation angles <code>α</code> are consistent with zero within uncertainties across all bands and EDE fractions.<br></li>
+    <li>The fitted <code>g</code> values are near zero, with large error bars (~0.35–0.46), as expected.<br></li>
+    <li>No dependence on <code>f<sub>EDE</sub></code> is observed, indicating no spurious detection of rotation or coupling.<br></li>
   </ul>
 
   <h4>2. <code>g = 1</code> Case (Large Coupling)</h4>
   <ul>
-    <li>Rotation angles <code>α</code> show positive shifts increasing with EDE fraction.<br></li>
-    <li><code>g</code> values near 1 with uncertainties similar to <code>g=0</code> case.<br></li>
-    <li>Error bars shrink at higher EDE fractions while the value of g shifts down.<br></li>
-    <li>Consistent angle shifts across bands suggest a coherent rotation pattern when the EDE curve 
-        in the MCMC model do not match the EB curve in the simulations.<br></li>
+    <li>Rotation angles <code>α</code> become increasingly positive with larger <code>f<sub>EDE</sub></code> values.<br></li>
+    <li><code>g</code> is recovered close to 1 when the injected <code>f<sub>EDE</sub></code> curve matches the model used in fitting.<br></li>
+    <li>When mismatched curves are used (e.g., fitting <code>f<sub>EDE</sub> = 0.087</code> when the injected signal was <code>f<sub>EDE</sub> = 0.07</code>),
+        <code>g</code> shifts downward and <code>α</code> increases to compensate.<br></li>
+    <li>This tradeoff reflects how the estimator reallocates the signal between scale-dependent coupling and uniform rotation.<br></li>
   </ul>
-
-
+  <p>
+    When no EDE signal is injected, the estimator accurately recovers both <code>g ≈ 0</code> and <code>α ≈ 0</code>.
+    With an injected signal, recovery depends on how well the model curve matches the simulation. If the model exactly matches
+    the injected <code>f<sub>EDE</sub></code> (e.g., 0.07), <code>g = 1</code> is recovered cleanly, and all rotation angles remain zero.
+    However, when the model curve deviates from the injected one, the recovered <code>g</code> decreases, and the rotation angles
+    increase to absorb the mismatch. This tradeoff becomes more pronounced at higher <code>f<sub>EDE</sub></code>, suggesting a greater
+    degeneracy between <code>g</code> and <code>α</code> in those regimes.
+  </p>
+<p>
+    For real data, this implies that comparing results across different <code>f<sub>EDE</sub></code> model curves can serve as
+    a diagnostic: if the recovered <code>g</code> and <code>α</code> change significantly across models, it could indicate
+    the presence of a true EDE signal.
+  </p>
 
     </section>
     <section>
