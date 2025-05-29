@@ -358,35 +358,35 @@
   <tbody>
     <tr>
       <td>alpha_BK18_220</td>
-      <td></td>
+      <td>-0.00 ± 0.21</td>
       <td>-0.02 ± 0.27</td>
       <td>-0.01 ± 0.22</td>
       <td>0 ± 0.17</td>
     </tr>
     <tr>
       <td>alpha_BK18_150</td>
-      <td></td>
+      <td>-0.01 ± 0.14</td>
       <td>-0.02 ± 0.21</td>
       <td>-0.01 ± 0.16</td>
       <td>0 ± 0.10</td>
     </tr>
     <tr>
       <td>alpha_BK18_K95</td>
-      <td></td>
+      <td>-0.02 ± 0.25</td>
       <td>-0.03 ± 0.32</td>
       <td>-0.04 ± 0.26</td>
       <td>-0.01 ± 0.23</td>
     </tr>
     <tr>
       <td>alpha_BK18_B95lf</td>
-      <td></td>
+      <td>-0.01 ± 0.13</td>
       <td>-0.03 ± 0.22</td>
       <td>-0.01 ± 0.15</td>
       <td>-0.01 ± 0.07</td>
     </tr>
     <tr>
       <td>g</td>
-      <td></td>
+      <td>0.11 ± 1.1</td>
       <td>0.02 ± 0.46</td>
       <td>0.04 ± 0.41</td>
       <td>0.03 ± 0.35</td>
@@ -408,35 +408,35 @@
   <tbody>
     <tr>
       <td>alpha_BK18_220</td>
-      <td></td>
+      <td>0.20±0.21</td>
       <td>0 ± 0.30</td>
       <td>0.13 ± 0.23</td>
       <td>0.34 ± 0.19</td>
     </tr>
     <tr>
       <td>alpha_BK18_150</td>
-      <td></td>
+      <td>0.20 ± 0.15</td>
       <td>0 ± 0.23</td>
       <td>0.12 ± 0.16</td>
       <td>0.35 ± 0.10</td>
     </tr>
     <tr>
       <td>alpha_BK18_K95</td>
-      <td></td>
+      <td>0.19 ± 0.24</td>
       <td>0 ± 0.29</td>
       <td>0.12 ± 0.25</td>
       <td>0.35 ± 0.23</td>
     </tr>
     <tr>
       <td>alpha_BK18_B95lf</td>
-      <td></td>
+      <td>0.20 ± 0.13</td>
       <td>0 ± 0.23</td>
       <td>0.13 ± 0.15</td>
       <td>0.36 ± 0.07</td>
     </tr>
     <tr>
       <td>g</td>
-      <td></td>
+      <td>2.29 ± 1.2</td>
       <td>0.97 ± 0.45</td>
       <td>0.89 ± 0.42</td>
       <td>0.75 ± 0.37</td>
@@ -540,6 +540,70 @@
                 });
             </script>
         </figure>
+    
+  <h3>Z-Score Comparison Between Models</h3>
+
+  <h4>Case: <code>g = 0</code> (No Axion Coupling)</h4>
+  <table border="1" cellspacing="0" cellpadding="4">
+    <tr>
+      <th>Model 2 →<br>Model 1 ↓</th>
+      <th>f<sub>EDE</sub> = 0.012</th>
+      <th>0.07</th>
+      <th>0.087</th>
+      <th>0.127</th>
+    </tr>
+    <tr><td>0.12</td><td>0</td>         <td>0.01±0.52</td> <td>0.01±0.28</td>  <td>-0.04±0.58</td></tr>
+    <tr><td>0.07</td><td>-0.01±0.52</td><td>0</td>          <td>0±0.38</td>     <td>-0.04±0.92</td></tr>
+    <tr><td>0.087</td><td>-0.01±0.28</td><td>0±0.38</td>    <td>0</td>          <td>-0.05±0.74</td></tr>
+    <tr><td>0.127</td><td>0.04±0.58</td> <td>0.04±0.92</td> <td>0.05±0.74</td>  <td>0</td></tr>
+  </table>
+
+  <br>
+
+  <h4>Case: <code>g = 1</code> (Injected Axion Coupling)</h4>
+  <table border="1" cellspacing="0" cellpadding="4">
+    <tr>
+      <th>Model 2 →<br>Model 1 ↓</th>
+      <th>f<sub>EDE</sub> = 0.012</th>
+      <th>0.07</th>
+      <th>0.087</th>
+      <th>0.127</th>
+    </tr>
+    <tr><td>0.12</td><td>0</td>         <td>0.91±1.24</td> <td>0.37±1.21</td>  <td>-1.08±0.64</td></tr>
+    <tr><td>0.07</td><td>-0.91±1.24</td><td>0</td>          <td>-0.59±0.41</td> <td>-1.79±1.27</td></tr>
+    <tr><td>0.087</td><td>-0.37±1.21</td><td>-0.59±0.41</td><td>0</td>          <td>-1.42±1.23</td></tr>
+    <tr><td>0.127</td><td>1.08±0.64</td> <td>1.79±1.27</td> <td>1.42±1.23</td>  <td>0</td></tr>
+  </table>
+
+  <br>
+
+  <h4>Interpretation</h4>
+  <p>
+    These tables compare fitted models using a Z-score metric, where each cell reflects the normalized difference in log-likelihoods 
+    between two <code>f<sub>EDE</sub></code> values. Values are symmetric across the diagonal. Each entry is of the form:
+    <code>Z ± σ<sub>Z</sub></code>.
+  </p>
+
+  <h5>For <code>g = 0</code> (no coupling):</h5>
+  <ul>
+    <li>Z-scores are all consistent with zero within errors, indicating no significant preference between any of the EDE models.</li>
+    <li>This supports the conclusion that when no EDE signal is injected, all models are statistically indistinguishable.</li>
+  </ul>
+
+  <h5>For <code>g = 1</code> (EDE signal injected):</h5>
+  <ul>
+    <li>Clear preferences emerge: e.g., model 0.07 is significantly preferred over 0.127 (Z = -1.79 ± 1.27), indicating tension.</li>
+    <li>Model 0.127 is strongly disfavored when the injected model is 0.07, especially as it leads to compensating shifts in α and g.</li>
+    <li>Z-scores with larger magnitudes (≈1–2) suggest detectable differences between mismatched model curves.</li>
+    <li>This validates the sensitivity of the estimator to the shape of the EDE-induced EB spectrum.</li>
+  </ul>
+
+  <p>
+    Overall, these results support the strategy of scanning across <code>f<sub>EDE</sub></code> model curves: 
+    if a best-fit curve yields significantly higher likelihood than others, it could point to the presence of a true EDE signal.
+  </p>
+
+
     </section>
     <section>
         <h2>L dependent rotation Bin split 2-8 and 9-15</h2>
