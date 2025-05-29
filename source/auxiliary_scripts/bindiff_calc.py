@@ -22,7 +22,7 @@ def detect_alpha_params(sim_folder):
     root = os.path.join(sim_folder, "sim001")
     samples = loadMCSamples(root)
     all_names = [p.name for p in samples.getParamNames().names]
-    alpha_params = [p for p in all_names if p.startswith("alpha_")]
+    alpha_params = [p for p in all_names if (p.startswith("alpha_") or p=='gMpl')]
     return alpha_params
 
 
