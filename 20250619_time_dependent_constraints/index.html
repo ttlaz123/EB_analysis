@@ -477,8 +477,28 @@
 <p>
     For real data, this implies that comparing results across different <code>f<sub>EDE</sub></code> model curves can serve as
     a diagnostic: if the recovered <code>g</code> and <code>α</code> change significantly across models, it could indicate
-    the presence of a true EDE signal.
+    the presence of a true EDE signal. We quantify these comparisons by using the Z-score:
   </p>
+
+   <p style="text-align: center; font-size: 1.1em;">
+    <strong>\( Z = \frac{\mu_1 - \mu_2}{\sqrt{\sigma_1^2 + \sigma_2^2}} \)</strong>
+  </p>
+
+  <p>
+    where:
+    <ul>
+      <li><strong>μ₁</strong> and <strong>μ₂</strong> are the posterior means</li>
+      <li><strong>σ₁</strong> and <strong>σ₂</strong> are the standard deviations of the posteriors</li>
+    </ul>
+  </p>
+
+  <p>
+    This metric is useful because it takes into account both the magnitude of the shift in the mean values and the uncertainties
+    associated with those estimates. A large Z-score implies that the two posterior peaks are significantly separated
+    relative to their widths, suggesting a model-dependent shift that may reflect physical sensitivity to <code>f<sub>EDE</sub></code>.
+  </p>
+
+
  <figure>
             <img alt="Z Scores" id="zscoref" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
@@ -541,7 +561,7 @@
             </script>
         </figure>
     
-  <h3>Z-Score Comparison Between Models</h3>
+  <h3>Z-Score Comparison for alpha_BK18_150</h3>
 
   <h4>Case: <code>g = 0</code> (No Axion Coupling)</h4>
   <table border="1" cellspacing="0" cellpadding="4">
@@ -574,33 +594,118 @@
     <tr><td>0.087</td><td>-0.37±1.21</td><td>-0.59±0.41</td><td>0</td>          <td>-1.42±1.23</td></tr>
     <tr><td>0.127</td><td>1.08±0.64</td> <td>1.79±1.27</td> <td>1.42±1.23</td>  <td>0</td></tr>
   </table>
+  <h3>Z-Score Comparison for gMpl</h3>
+
+  <h4>Case: <code>g = 0</code> (No Axion Coupling)</h4>
+  <table border="1" cellspacing="0" cellpadding="4">
+    <tr>
+      <th>Model 2 →<br>Model 1 ↓</th>
+      <th>f<sub>EDE</sub> = 0.012</th>
+      <th>0.07</th>
+      <th>0.087</th>
+      <th>0.127</th>
+    </tr>
+    <tr><td>0.12</td><td>0</td>         <td>0.01±0.52</td> <td>0.01±0.28</td>  <td>-0.04±0.58</td></tr>
+    <tr><td>0.07</td><td>-0.01±0.52</td><td>0</td>          <td>0±0.38</td>     <td>-0.04±0.92</td></tr>
+    <tr><td>0.087</td><td>-0.01±0.28</td><td>0±0.38</td>    <td>0</td>          <td>-0.05±0.74</td></tr>
+    <tr><td>0.127</td><td>0.04±0.58</td> <td>0.04±0.92</td> <td>0.05±0.74</td>  <td>0</td></tr>
+  </table>
 
   <br>
 
+  <h4>Case: <code>g = 1</code> (Injected Axion Coupling)</h4>
+  <table border="1" cellspacing="0" cellpadding="4">
+    <tr>
+      <th>Model 2 →<br>Model 1 ↓</th>
+      <th>f<sub>EDE</sub> = 0.012</th>
+      <th>0.07</th>
+      <th>0.087</th>
+      <th>0.127</th>
+    </tr>
+    <tr><td>0.12</td><td>0</td>         <td>0.91±1.24</td> <td>0.37±1.21</td>  <td>-1.08±0.64</td></tr>
+    <tr><td>0.07</td><td>-0.91±1.24</td><td>0</td>          <td>-0.59±0.41</td> <td>-1.79±1.27</td></tr>
+    <tr><td>0.087</td><td>-0.37±1.21</td><td>-0.59±0.41</td><td>0</td>          <td>-1.42±1.23</td></tr>
+    <tr><td>0.127</td><td>1.08±0.64</td> <td>1.79±1.27</td> <td>1.42±1.23</td>  <td>0</td></tr>
+  </table>
+  <br>
+<h4>Case: <code>g = 0</code> (No Axion Coupling)</h4>
+<table border="1" cellspacing="0" cellpadding="4">
+  <tr>
+    <th>Model 2 →<br>Model 1 ↓</th>
+    <th>f<sub>EDE</sub> = 0.012</th>
+    <th>0.07</th>
+    <th>0.087</th>
+    <th>0.127</th>
+  </tr>
+  <tr>
+    <td>0.12</td><td>0</td><td>0.06±0.73</td><td>0.05±0.77</td><td>0.06±0.83</td>
+  </tr>
+  <tr>
+    <td>0.07</td><td>-0.06±0.73</td><td>0</td><td>-0.01±0.27</td><td>0±0.3</td>
+  </tr>
+  <tr>
+    <td>0.087</td><td>-0.05±0.77</td><td>0.01±0.27</td><td>0</td><td>0.02±0.23</td>
+  </tr>
+  <tr>
+    <td>0.127</td><td>-0.06±0.83</td><td>0±0.3</td><td>-0.02±0.23</td><td>0</td>
+  </tr>
+</table>
+<h4>Case: <code>g = 1</code> (Injected Axion Coupling)</h4>
+<table border="1" cellspacing="0" cellpadding="4">
+  <tr>
+    <th>Model 2 →<br>Model 1 ↓</th>
+    <th>f<sub>EDE</sub> = 0.012</th>
+    <th>0.07</th>
+    <th>0.087</th>
+    <th>0.127</th>
+  </tr>
+  <tr>
+    <td>0.12</td><td>0</td><td>1.30±1.23</td><td>1.39±1.22</td><td>1.54±0.87</td>
+  </tr>
+  <tr>
+    <td>0.07</td><td>-1.30±1.23</td><td>0</td><td>0.15±0.28</td><td>0.42±1.24</td>
+  </tr>
+  <tr>
+    <td>0.087</td><td>-1.39±1.22</td><td>-0.15±0.28</td><td>0</td><td>0.29±1.23</td>
+  </tr>
+  <tr>
+    <td>0.127</td><td>-1.54±0.87</td><td>-0.42±1.24</td><td>-0.29±1.23</td><td>0</td>
+  </tr>
+</table>
+
   <h4>Interpretation</h4>
-  <p>
-    These tables compare fitted models using a Z-score metric, where each cell reflects the normalized difference in log-likelihoods 
-    between two <code>f<sub>EDE</sub></code> values. Values are symmetric across the diagonal. Each entry is of the form:
-    <code>Z ± σ<sub>Z</sub></code>.
+   <p>
+    Each cell in the tables represents the normalized difference in log-likelihoods (Z-score) between two EB models with different values of 
+    <code>f<sub>EDE</sub></code>. These values are symmetric across the diagonal, consistent with the definition of the Z-score:
   </p>
 
-  <h5>For <code>g = 0</code> (no coupling):</h5>
+  <h3>Case: <code>g = 0</code> (No Axion Coupling)</h3>
+
   <ul>
-    <li>Z-scores are all consistent with zero within errors, indicating no significant preference between any of the EDE models.</li>
-    <li>This supports the conclusion that when no EDE signal is injected, all models are statistically indistinguishable.</li>
+    <li>Across <strong>all parameters</strong> (alpha_BK18_150, gMpl, etc.), the Z-scores are very close to zero.</li>
+    <li>Different EB curves with different f_EDE values do not lead to distinguishable differences in parameter posteriors under the null coupling case.</li>
+    <li>The differences in parameter values are small compared to the uncertainties when comparing the different models.</li>
   </ul>
 
-  <h5>For <code>g = 1</code> (EDE signal injected):</h5>
+   <h3>Case: <code>g = 1</code> (Injected Axion Coupling)</h3>
+
   <ul>
-    <li>Clear preferences emerge: e.g., model 0.07 is significantly preferred over 0.127 (Z = -1.79 ± 1.27), indicating tension.</li>
-    <li>Model 0.127 is strongly disfavored when the injected model is 0.07, especially as it leads to compensating shifts in α and g.</li>
-    <li>Z-scores with larger magnitudes (≈1–2) suggest detectable differences between mismatched model curves.</li>
-    <li>This validates the sensitivity of the estimator to the shape of the EDE-induced EB spectrum.</li>
+    <li>Z-scores show larger deviations, especially when comparing high EDE fractions (e.g., 0.127) to low (e.g., 0.012).</li>
+    <li>For example:
+      <ul>
+        <li><code>α<sub>BK18_150</sub></code>: comparing 0.127 → 0.012 yields <strong>Z = 1.08 ± 0.64</strong></li>
+        <li><code>g<sub>Mpl</sub></code>: 0.127 → 0.012 yields <strong>Z = 1.54 ± 0.87</strong></li>
+      </ul>
+    </li>
+    <li>These shifts suggest that with EDE axion coupling at g=1, the parameters becomes more sensitive to the modeled EB spectrum.</li>
+    <li>Still, most differences remain within 2σ.</li>
   </ul>
 
   <p>
     Overall, these results support the strategy of scanning across <code>f<sub>EDE</sub></code> model curves: 
-    if a best-fit curve yields significantly higher likelihood than others, it could point to the presence of a true EDE signal.
+    if the best-fit parameters are significantly different depending on the model EB curve, 
+    it could point to the presence of a true EDE signal. 
+
   </p>
 
 
