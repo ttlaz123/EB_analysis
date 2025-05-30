@@ -246,6 +246,38 @@
     <code>f<sub>EDE</sub> = 0.07</code> case is the same fiducial model used throughout our 
     previous analyses.
 </p>
+<figure>
+            <img alt="BB Diffs" id="edecurves" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+             <figcaption>
+    Plot showing the different EB curves generated using different Early Dark Energy parameters
+  </figcaption>
+
+            <script type="text/javascript">
+               
+
+                pager.link("#edecurves", {
+                   
+                    
+                   
+                },
+         
+                    function (params) {
+                        let dirbase = '/liuto/home/GitHub/EB_analysis/'
+                        let dirpath = dirbase + '/zscore_histograms/';
+                        let file = 'eb_ee_plot' 
+                        let name = dirpath + file +  '.png';
+            
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+        
+                });
+            </script>
+        </figure>
+        <p>Using the different EB plots, we generate the MCMC chains below.</p>
         <figure>
             <img alt="EDE params" id="fede" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
