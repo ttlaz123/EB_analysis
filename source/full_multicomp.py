@@ -207,7 +207,7 @@ class BK18_full_multicomp(Likelihood):
             
             # do cmb rotation
             
-            post_travel_dict = ec.apply_cmb_rotation(post_inflation_dict,
+            post_inflation_dict = ec.apply_cmb_rotation(post_inflation_dict,
                                                     params_values,
                                                     self.dl_theory,
                                                     self.used_maps)
