@@ -705,6 +705,17 @@
     and their difference is analyzed using z-scores. This enables identification of statistically significant 
     bin-dependent rotation effects. First, we generate the MCMC chains for each set of bin ranges.
   </p>
+  <p>
+    The rotation angles for each injected signal set is as follows for the angles in order: BK18_220, BK18_150, BK18_K95, and BK18_B95e
+            (B95lf)
+    <ul>
+                            <li>No Miscalibration: Nothing is injected</li>
+                            <li>Positive Miscalibration: Injected rotation of 0, 0.25, 0.5, 0.75</li>
+                            <li>Negative Miscalibration: Injected rotation of 0, -0.25, -0.5, -0.75</li>
+                            <li>Blanaced Miscalibration: Injected rotation of 0.5, 0, -0,5, -1</li>
+
+                        </ul>
+  </p>
  <figure>
             <img alt="Multicomponent Analysis Spectrum" id="morebins" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
@@ -1488,6 +1499,13 @@
     </section>
 <section>
     <h2>Constraining Isotropic rotation with dust</h2>
+    <p>We run the full MCMC pipeline on the no EDE injected dataset to set a constraint on 
+        the general isotropic birefringence angle \(\alpha_{CMB}\). Unfortunately, the dust 
+        calibration does not have significant constraining power on the rotation angles, so 
+        the overal isotropic rotation angle is still strongly degenerate with the individual 
+        rotation angles for each receiver. Regardless, this is still a constraint that is 
+        agnostic to any particular assumption about how dust affects the EB spectrum.
+    </p>
       <figure>
             <img alt="Isotropic angle constraints" id="alphacmb" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
@@ -1499,17 +1517,7 @@
     &nbsp;&nbsp;- <em>Triangle Plot:</em> Displays joint posterior distributions and parameter correlations.<br>
     &nbsp;&nbsp;- <em>Summary Plot (Peaks histogram):</em> Histogram summarizing the distribution of peak values in the MCMC chains.<br>
     &nbsp;&nbsp;- <em>Chi Squared histogram:</em> Distribution of chi-squared goodness-of-fit values across simulations.<br><br>
-    <strong>EDE parameters:</strong> Select different Early Dark Energy models based on f<sub>EDE</sub> values from various datasets:<br>
-    • <a href="https://arxiv.org/abs/2503.14454">ACT</a> data (f<sub>EDE</sub> ≈ 0.012).<br>
-    • <a href="https://arxiv.org/pdf/2210.16296">Planck</a> data (f<sub>EDE</sub> ≈ 0.070).<br>
-    • <a href="https://arxiv.org/pdf/2210.16296">Planck + BOSS</a> (f<sub>EDE</sub> ≈ 0.087).<br>
-    • <a href="https://arxiv.org/pdf/2210.16296">Planck + BOSS + SH0ES</a> (f<sub>EDE</sub> ≈ 0.127).<br><br>
    
-    <strong>Bins Used:</strong> Select the multipole bin range used in the fit (currently fixed to bins 2–15).<br><br>
-    <strong>Dust model:</strong> Currently fixed to 'Fixed Dust = 0', indicating no dust contamination is modeled.<br><br>
-    <strong>Spectra:</strong> Choose which spectra to fit; here it is EB only.<br><br>
-    <strong>Injected EDE Signal:</strong> Select whether the simulations include an injected EDE signal (f<sub>EDE</sub>=0.07, g=1) or no signal (g=0).<br><br>
-    
 </figcaption>
             <script type="text/javascript">
                
