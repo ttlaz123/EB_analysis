@@ -245,7 +245,10 @@ def apply_cmb_rotation(post_inflation_dict, params_values, dl_theory_dict, used_
 
         Cl_EB = post_inflation_dict[eb_map]
         Cl_BE = post_inflation_dict[be_map]
-        
+        if np.isscalar(Cl_EB):
+            Cl_EB = np.zeros_like(Cl_EE)
+        if np.isscalar(Cl_BE):
+            Cl_BE = np.zeros_like(Cl_EE)
         # Trim all arrays to the minimum length to avoid shape mismatch
         min_len = min(map(len, [Cl_EE, Cl_BB, Cl_EB, Cl_BE]))
         Cl_EE = Cl_EE[:min_len]
