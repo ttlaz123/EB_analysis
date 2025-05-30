@@ -1487,7 +1487,92 @@
 </figure>
 
     </section>
+<section>
+    <h2>Constraining Isotropic rotation with dust</h2>
+      <figure>
+            <img alt="EDE params" id="fede" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+            <figcaption>
+    Explore different MCMC fit results and diagnostic plots:<br><br>
+    <strong>Map Sim Num Digit1, Digit2, Digit3:</strong> Select the simulation instance by its digit indices (0–9), viewing individual simulation chain results.<br><br>
+    <strong>Map Type:</strong> Choose the type of plot:<br>
+    &nbsp;&nbsp;- <em>Best Fit EE/EB/BB:</em> Shows the MCMC best-fit parameter constraints for each polarization spectrum.<br>
+    &nbsp;&nbsp;- <em>Triangle Plot:</em> Displays joint posterior distributions and parameter correlations.<br>
+    &nbsp;&nbsp;- <em>Summary Plot (Peaks histogram):</em> Histogram summarizing the distribution of peak values in the MCMC chains.<br>
+    &nbsp;&nbsp;- <em>Chi Squared histogram:</em> Distribution of chi-squared goodness-of-fit values across simulations.<br><br>
+    <strong>EDE parameters:</strong> Select different Early Dark Energy models based on f<sub>EDE</sub> values from various datasets:<br>
+    • <a href="https://arxiv.org/abs/2503.14454">ACT</a> data (f<sub>EDE</sub> ≈ 0.012).<br>
+    • <a href="https://arxiv.org/pdf/2210.16296">Planck</a> data (f<sub>EDE</sub> ≈ 0.070).<br>
+    • <a href="https://arxiv.org/pdf/2210.16296">Planck + BOSS</a> (f<sub>EDE</sub> ≈ 0.087).<br>
+    • <a href="https://arxiv.org/pdf/2210.16296">Planck + BOSS + SH0ES</a> (f<sub>EDE</sub> ≈ 0.127).<br><br>
+   
+    <strong>Bins Used:</strong> Select the multipole bin range used in the fit (currently fixed to bins 2–15).<br><br>
+    <strong>Dust model:</strong> Currently fixed to 'Fixed Dust = 0', indicating no dust contamination is modeled.<br><br>
+    <strong>Spectra:</strong> Choose which spectra to fit; here it is EB only.<br><br>
+    <strong>Injected EDE Signal:</strong> Select whether the simulations include an injected EDE signal (f<sub>EDE</sub>=0.07, g=1) or no signal (g=0).<br><br>
+    
+</figcaption>
+            <script type="text/javascript">
+               
+                }
 
+                pager.link("#fede", {
+                    'Map Sim Num Digit1|digit1': simnums,
+                    'Digit2|digit2': simnums,
+                    'Digit3|digit3': simnums,
+
+                    'Map Type|m_map_type': [
+                        'Best Fit EE|_bestfitEE',
+                        'Best Fit EB|_bestfitEB',
+                        'Best Fit BB|_bestfitBB',
+                        'Triangle Plot|_triangle_plot',
+                        'Summary Plot (Peaks histogram)|sim1_summary',
+                        'Chi Squared histogram|simchisq_hist'
+                    ],
+                    'EDE parameters|feded': [
+                        'f_EDE = 0.070 (Planck)|_ebfede0.07',
+                    ], 
+                    'Bins Used|bin_num': [
+                        '2-15|_bin2-15',
+                    ],
+                    'Dust model|theory_compd': [
+                        'Gaussian Dust, no EDE|_no_ede',
+                    ],
+                    'Spectra|spectrad': [
+                        'EB only|_eb',
+                    ],
+                    'Injected EDE Signal|ede': [
+                        'g = 0|zeroeb'
+                    ]
+                },
+         
+                    function (params) {
+                        let dirbase = '/liuto'
+                        let dirpath = dirbase + '/ede_chains/';
+                        let mcmc_folder = params.ede + params.bin_num  + params.theory_compd + params.spectrad+ params.feded +'/';
+                        let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
+                        let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
+                        if (params.m_map_type == 'sim1_summary' || params.m_map_type == 'simchisq_hist') {
+                            name = dirpath + mcmc_folder + params.m_map_type + '.png'
+                        }
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+                    'digit1': '0',
+                    'digit2': '0',
+                    'digit3': '1',
+                    'inj_sig': '',
+                    'bin_num':'_bin2-15',
+                    'feded':'_ebfede0.07',
+                    'ede': 'zeroeb',
+                    'spectrad': '_eb',
+                    'theory_compd': '_no_ede',
+                });
+            </script>
+        </figure>
+</section>
     <section>
         <h2>Future Directions</h2>
         <ul>
