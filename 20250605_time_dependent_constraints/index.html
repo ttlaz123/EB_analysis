@@ -292,11 +292,12 @@
          
                     function (params) {
                         if(params.spectral == '_all'){
-                            params.bin_num = '_bin15'
+                            params.bin_num = '_bin15';
+                            params.ebede = '';
                         }
                         let dirbase = '/liuto'
                         let dirpath = dirbase + '/ede_chains/';
-                        let mcmc_folder = params.ede + params.bin_num  + '_sigl'+ params.spectral+'_ebfede0.07/';
+                        let mcmc_folder = params.ede + params.bin_num  + '_sigl'+ params.spectral+params.ebede + '/';
                         let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
                         let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
                         if (params.m_map_type == 'sim1_summary' || params.m_map_type == 'simchisq_hist') {
@@ -313,6 +314,7 @@
                     'bin_num':'_bin2-15',
                     'ede': 'zeroeb',
                     'spectral': '_alens',
+                    'ebede':'_ebfede0.07'
                 });
             </script>
         </figure>
