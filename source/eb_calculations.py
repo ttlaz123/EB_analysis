@@ -98,6 +98,14 @@ def determine_spectrum_type(spectrum_name):
     spec_type = spec1[-1] + spec2[-1]
     return spec_type
 
+def scale_lensing_amplitude(spectra_dict, params_values, used_maps):
+    A_lens = params_values['A_lens']
+    for used_map in used_maps:
+        spec_type = determine_spectrum_type(used_map)
+        if(spec_type == 'BB'):
+            spectra_dict[used_map] *= A_lens
+    return spectra_dict
+
 def apply_initial_conditions(dl_theory_dict, used_maps):
     initial_conditions_dict = {}
     for used_map in used_maps:
