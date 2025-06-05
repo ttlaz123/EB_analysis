@@ -328,7 +328,7 @@ def apply_dust(post_travel_dict, bandpasses, params_values):
             As_key = 'A_sync_EB'
             alphas_key = 'alpha_sync_EB'
         else:
-            A_keys = f'A_sync_{spec_type}'
+            As_key = f'A_sync_{spec_type}'
             alphas_key = f'alpha_sync_{spec_type}'
 
         As_dust = params_values[As_key]
