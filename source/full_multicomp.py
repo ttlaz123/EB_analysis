@@ -403,6 +403,13 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
     alpha_dust_priors = {"prior":{"min": -1, "max":1}, 
                                 "ref": {"dist":"norm", "loc":-0, "scale":0.01},
                                 "proposal":0.1}
+    
+    A_sync_priors = {"prior":{"min": -5, "max":5}, 
+                            "ref": {"dist":"norm", "loc":0, "scale":1},
+                            "proposal":1}
+    alpha_sync_priors = {"prior":{"min": -2, "max":2}, 
+                                "ref": {"dist":"norm", "loc":-0, "scale":0.01},
+                                "proposal":0.1}
     if(spectra == 'all'):
         params_dict['A_lens'] = {"prior": {"min":0.5, "max":2}, "ref": 1}
     elif(spectra in ['nob', 'eb']):
@@ -411,12 +418,17 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
         raise ValueError('Not proper spectra theory: ' + str(spectra))
     if(theory_comps == 'all'):
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
-        for spec in ['EE', 'BB']:#, 'EB']:
+        for spec in ['EE', 'BB', 'EB']:
 
             params_dict['A_dust_' + spec] = {**A_dust_priors,
                                         "latex":"A_{"+spec+",\mathrm{dust}}"}
             params_dict['alpha_dust_' + spec] = {**alpha_dust_priors,
-                                        "latex":"\\alpha_{"+spec+",\mathrm{dust}}"}
+                                     "latex":"\\alpha_{"+spec+",\mathrm{dust}}"}
+            params_dict['A_sync_' + spec] = {**A_sync_priors,
+                                        "latex":"A_{"+spec+",\mathrm{sync}}"}
+            params_dict['alpha_sync_' + spec] = {**alpha_sync_priors,
+                                     "latex":"\\alpha_{"+spec+",\mathrm{sync}}"}
+        '''
         for spec in ['EB']:
 
             params_dict['A_dust_' + spec] = {"prior":{"min": -3, "max":3}, 
@@ -425,10 +437,16 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
                                             "latex":"A_{"+spec+",\mathrm{dust}}"}
             params_dict['alpha_dust_' + spec] = {**alpha_dust_priors,
                                         "latex":"\\alpha_{"+spec+",\mathrm{dust}}"}
+        '''
         params_dict['beta_dust'] = {"prior":{"min": 0.8, "max":2.4}, 
                                     "ref": {"dist":"norm", "loc":1.6, "scale":0.02},
                                     "proposal":0.02,
                                     "latex":"\\beta_{\mathrm{dust}}"}
+        
+        params_dict['beta_sync'] = {"prior":{"min": -4, "max":0}, 
+                                    "ref": {"dist":"norm", "loc":-2, "scale":0.1},
+                                    "proposal":0.1,
+                                    "latex":"\\beta_{\mathrm{sync}}"}
     elif(theory_comps == 'eskilt'):
         params_dict['A_lens'] = 1
         params_dict['alpha_CMB'] = angle_priors
@@ -447,6 +465,11 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
                                         "latex":"A_{"+spec+",\mathrm{dust}}"}
             params_dict['alpha_dust_' + spec] = {**alpha_dust_priors,
                                         "latex":"\\alpha_{"+spec+",\mathrm{dust}}"}
+            params_dict['A_sync_' + spec] = {**A_sync_priors,
+                                        "latex":"A_{"+spec+",\mathrm{sync}}"}
+            params_dict['alpha_sync_' + spec] = {**alpha_sync_priors,
+                                     "latex":"\\alpha_{"+spec+",\mathrm{sync}}"}
+        '''
         for spec in ['EB']:
 
             params_dict['A_dust_' + spec] = {"prior":{"min": -3, "max":3}, 
@@ -455,10 +478,15 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
                                             "latex":"A_{"+spec+",\mathrm{dust}}"}
             params_dict['alpha_dust_' + spec] = {**alpha_dust_priors,
                                         "latex":"\\alpha_{"+spec+",\mathrm{dust}}"}
+        '''
         params_dict['beta_dust'] = {"prior":{"min": 0.8, "max":2.4}, 
                                     "ref": {"dist":"norm", "loc":1.6, "scale":0.02},
                                     "proposal":0.02,
                                     "latex":"\\beta_{\mathrm{dust}}"}
+        params_dict['beta_sync'] = {"prior":{"min": -4, "max":0}, 
+                                    "ref": {"dist":"norm", "loc":-2, "scale":0.1},
+                                    "proposal":0.1,
+                                    "latex":"\\beta_{\mathrm{sync}}"}
     else:
         raise ValueError()
 

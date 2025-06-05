@@ -444,6 +444,26 @@ def apply_EDE_shift(cross_map, dl_theory_dict, params_values, fixed_dust=True):
         ede_shift = (D_e1b2 - D_b1e2)
         return ede_shift * gMpl
 
+def sync_scaling(beta, bandpass, nu0, bandcenter_err):
+        """Calculates power-law scaling of synchrotron signal defined at 150 GHz
+        to specified bandpass."""
+        # Integrate power-law scaling and thermodynamic temperature conversion
+        # across experimental bandpass.
+        pl_int = np.sum(bandpass.dnu * bandpass.R[:, 1] * bandpass.R[:, 0] ** (2 + beta))
+        # Calculate values at pivot frequency.
+        pl0 = nu0 ** (2 + beta)
+        if bandcenter_err != 1:
+            nu_bar = GHZ_KELVIN * bandpass.nu_bar
+            th_err = bandcenter_err ** 4 * \
+                     np.exp(nu_bar * (bandcenter_err - 1) / T_CMB_K) * \
+                     (np.exp(nu_bar / T_CMB_K) - 1) ** 2 / \
+                     (np.exp(nu_bar * bandcenter_err / T_CMB_K) - 1) ** 2
+            pl_err = bandcenter_err ** (2 + beta)
+        else:
+            pl_err = 1
+            th_err = 1
+        # Calculate sync scaling.
+        return (pl_int / pl0) / bandpass.th_sync * (pl_err / th_err)
 
 
 
@@ -573,8 +593,31 @@ def add_foregrounds(bandpass, data_params, spectrum, lmax,lmin=0, bandcenter_err
     # l=0 gives inf, zero it out since shouldn't affect bp
     if(math.isinf(dustpow[0])):
         dustpow[0] = 0
-    dl = dustpow * dust_scale * dust_scale2
-    return dl
+    dl_dust = dustpow * dust_scale * dust_scale2
+
+    try:
+        A_sync = data_params['A_sync_' + spectrum]
+        alpha_sync = data_params['alpha_sync_' + spectrum]
+    except KeyError:
+        spectrum = spectrum[1] + spectrum[0]
+        A_sync = data_params['A_sync_' + spectrum]
+        alpha_sync = data_params['alpha_sync_' + spectrum]
+    
+    beta_sync = data_params['beta_sync']
+    sync_scale = sync_scaling(beta_sync, bandpass, FPIVOT_SYNC, bandcenter_err)
+    if(not bandpass2 is None):
+        sync_scale2 = sync_scaling(beta_sync, bandpass2, FPIVOT_SYNC, bandcenter_err)
+    else:
+        sync_scale2 = sync_scale
+    ratio = np.arange(lmin, lmax)/LPIVOT
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', category=RuntimeWarning)
+        syncpow = A_sync * np.power(ratio,alpha_sync)
+    # l=0 gives inf, zero it out since shouldn't affect bp
+    if(math.isinf(syncpow[0])):
+        syncpow[0] = 0
+    dl_sync = syncpow * sync_scale * sync_scale2
+    return dl_dust + dl_sync
 
 def filter_matrix(map_reference_header, matrix, used_maps, num_bins=None, zero_offdiag=False):
         """
