@@ -203,6 +203,11 @@ class BK18_full_multicomp(Likelihood):
                                                self.used_maps)
         else:
             post_inflation_dict = self.initial_theory_dict
+        #Scale BB lensing
+        if(self.theory_comps in ['all', 'fixed_dust', 'no_ede', 'det_polrot']):
+            post_inflation_dict = ec.scale_lensing_amplitude(post_inflation_dict, 
+                                                          params_values, 
+                                                          self.used_maps)
         if(self.theory_comps in ['no_ede']):
             
             # do cmb rotation
@@ -214,7 +219,8 @@ class BK18_full_multicomp(Likelihood):
             
             # do dust
             post_travel_dict = ec.apply_dust(post_inflation_dict, self.bandpasses, params_values)
-            
+        elif(self.theory_comps in ['all']):
+            post_travel_dict = ec.apply_dust(post_inflation_dict, self.bandpasses, params_values)
         else: 
             post_travel_dict = post_inflation_dict
         if(self.theory_comps in ['all', 'det_polrot', 'fixed_dust', 'no_ede', 'eskilt']):
@@ -365,7 +371,7 @@ def run_bk18_likelihood(params_dict, observation_file_path, input_args,
     updated_info, sampler = run(info, stop_at_error=True)
     return updated_info, sampler
 
-def define_priors(calc_spectra, theory_comps, angle_degree=10):
+def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
     """
     Defines prior distributions for angle parameters, dust parameters, and EDE params.
 
@@ -397,7 +403,12 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10):
     alpha_dust_priors = {"prior":{"min": -1, "max":1}, 
                                 "ref": {"dist":"norm", "loc":-0, "scale":0.01},
                                 "proposal":0.1}
-
+    if(spectra == 'all'):
+        params_dict['A_lens'] = {"prior": {"min":0.5, "max":2}, "ref": 1}
+    elif(spectra in ['nob', 'eb']):
+        params_dict['A_lens'] = 1
+    else:
+        raise ValueError('Not proper spectra theory: ' + str(spectra))
     if(theory_comps == 'all'):
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
         for spec in ['EE', 'BB']:#, 'EB']:
@@ -419,6 +430,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10):
                                     "proposal":0.02,
                                     "latex":"\\beta_{\mathrm{dust}}"}
     elif(theory_comps == 'eskilt'):
+        params_dict['A_lens'] = 1
         params_dict['alpha_CMB'] = angle_priors
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
     elif(theory_comps == 'det_polrot'):
@@ -534,7 +546,7 @@ def multicomp_mcmc_driver(input_args):
     load_shared_data(input_args)
     calc_spectra = ec.determine_map_freqs(input_args.map_set)
     # define dust params based on dustopts
-    params_dict = define_priors(calc_spectra, input_args.theory_comps)
+    params_dict = define_priors(calc_spectra, input_args.theory_comps, input_args.spectra_type)
     input_args.injected_signal = get_injected_signal(calc_spectra, 
                                             signal_type=input_args.injected_signal)
 
