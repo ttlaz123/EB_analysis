@@ -646,9 +646,9 @@ def run_simulation(sim_num, params_dict,input_args):
     outpath = f"{input_args.output_path}{sim_num:03d}"
     # skip chains that already exist
     if(os.path.exists(outpath + '.1.txt') and os.path.exists(outpath + '_bestfitBB.png')):
-        print(f"Rerunning existing simulation {sim_num}")
-        #print(f"Skipping existing simulation {sim_num}")
-        #return
+        #print(f"Rerunning existing simulation {sim_num}")
+        print(f"Skipping existing simulation {sim_num}")
+        return
     if(sim_num == 'real'):
             observation_file_path = FILE_PATHS['observed_data']
     elif(isinstance(sim_num, int) and sim_num >= 0):
