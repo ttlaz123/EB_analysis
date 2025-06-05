@@ -235,6 +235,78 @@
   The magnitude of this shift could potentially indicate a true physical signal and 
   can be characterized by the estimator bias due to unmodeled BB structure.
 </p>
+<figure>
+            <img alt="EDE params" id="fede" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+            <figcaption>
+    We generate new MCMC chains with A_lens scaling the BB spectrum
+</figcaption>
+            <script type="text/javascript">
+               function pad(num, size) {
+                    num = num.toString();
+                    while (num.length < size) num = "0" + num;
+                    return num;
+                }
+                const simnums = [];
+                for (let i = 0; i < 10; i++) {
+                    s = pad(i, 1);
+
+                    simnums[i] = s.concat('|', s);
+
+                }
+
+                pager.link("#fede", {
+                    'Map Sim Num Digit1|digit1': simnums,
+                    'Digit2|digit2': simnums,
+                    'Digit3|digit3': simnums,
+
+                    'Map Type|m_map_type': [
+                        'Best Fit EE|_bestfitEE',
+                        'Best Fit EB|_bestfitEB',
+                        'Best Fit BB|_bestfitBB',
+                        'Triangle Plot|_triangle_plot',
+                        'Summary Plot (Peaks histogram)|sim1_summary',
+                        'Chi Squared histogram|simchisq_hist'
+                    ],
+                    
+                    'Bins Used|bin_num': [
+                        '2-15|_bin2-15',
+                    ],
+                   
+                    'Spectra|spectral': [
+                        'EB Only|_eb',
+                        'No BB|_nob',
+                        'All|_alens',
+                    ],
+                    'Injected EDE Signal|ede': [
+                        'Fede = 0.07, g = 1|fede01',
+                        'g = 0|zeroeb'
+                    ]
+                },
+         
+                    function (params) {
+                        let dirbase = '/liuto'
+                        let dirpath = dirbase + '/ede_chains/';
+                        let mcmc_folder = params.ede + params.bin_num  + '_sigl'+ params.spectral+'ebfede0.07/';
+                        let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
+                        let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
+                        if (params.m_map_type == 'sim1_summary' || params.m_map_type == 'simchisq_hist') {
+                            name = dirpath + mcmc_folder + params.m_map_type + '.png'
+                        }
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+                    'digit1': '0',
+                    'digit2': '0',
+                    'digit3': '1',
+                    'bin_num':'_bin2-15',
+                    'ede': 'zeroeb',
+                    'spectral': '_alens',
+                });
+            </script>
+        </figure>
     </section>
     <section>
         <h2>Alternative EB curves with different EDE parameters</h2>
@@ -302,19 +374,7 @@
     
 </figcaption>
             <script type="text/javascript">
-               function pad(num, size) {
-                    num = num.toString();
-                    while (num.length < size) num = "0" + num;
-                    return num;
-                }
-                const simnums = [];
-                for (let i = 0; i < 10; i++) {
-                    s = pad(i, 1);
-
-                    simnums[i] = s.concat('|', s);
-
-                }
-
+           
                 pager.link("#fede", {
                     'Map Sim Num Digit1|digit1': simnums,
                     'Digit2|digit2': simnums,
