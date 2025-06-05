@@ -575,8 +575,7 @@ def multicomp_mcmc_driver(input_args):
                 #'gMpl': 1,
             }
             param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path, replace_dict)
-            if('A_lens' not in param_names):
-                param_names['A_lens'] = 1
+            
             used_maps = SHARED_DATA_DICT["all_maps"]
             multicomp_class = BK18_full_multicomp(
                             used_maps=used_maps,
