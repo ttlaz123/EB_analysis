@@ -235,6 +235,11 @@
   The magnitude of this shift could potentially indicate a true physical signal and 
   can be characterized by the estimator bias due to unmodeled BB structure.
 </p>
+
+<p>
+    One proposal was to multiply the BB spectra by a lensing amplitude parameter A_lens. 
+    We run the MCMC chains for this proposal below: 
+</p>
 <figure>
             <img alt="Lensing Amplitude" id="alens" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
@@ -276,7 +281,8 @@
                     'Spectra|spectral': [
                         'EB Only|_eb',
                         'No BB|_nob',
-                        'All|_alens',
+                        'All|_all',
+                        'All, BB scaled|_alens',
                     ],
                     'Injected EDE Signal|ede': [
                         'Fede = 0.07, g = 1|fede01',
@@ -307,6 +313,11 @@
                 });
             </script>
         </figure>
+        <p>
+            Allowing the BB spectra to be scaled by A_lens does decrease the bias in the EDE dataset 
+            to within the 68% confidence interval, but it also increases the bias slightly 
+            in the no EDE dataset. We should consider whether the trade off is worth including the A_lens parameter.
+        </p>
     </section>
     <section>
         <h2>Alternative EB curves with different EDE parameters</h2>
