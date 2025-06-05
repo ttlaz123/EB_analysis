@@ -317,6 +317,8 @@ def plot_eebbeb(multicomp_class, outpath, param_names, param_bestfit, param_stat
     observed_datas = multicomp_class.binned_dl_observed_dict
     param_values = {param_names[i]:param_bestfit[i] 
                             for i in range(len(param_names))}
+    if('A_lens' not in param_names):
+                param_values['A_lens'] = 1
     theory_vec=multicomp_class.theory(param_values, override_maps=override_maps)
     residuals = multicomp_class.binned_dl_observed_vec - theory_vec
     # Calculate the Mahalanobis distance using the inverse covariance matrix
