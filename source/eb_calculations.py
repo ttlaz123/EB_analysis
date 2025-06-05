@@ -617,7 +617,7 @@ def add_foregrounds(bandpass, data_params, spectrum, lmax,lmin=0, bandcenter_err
     if(math.isinf(syncpow[0])):
         syncpow[0] = 0
     dl_sync = syncpow * sync_scale * sync_scale2
-    return dl_dust + dl_sync
+    return dl_dust + dl_sync*100
 
 def filter_matrix(map_reference_header, matrix, used_maps, num_bins=None, zero_offdiag=False):
         """
