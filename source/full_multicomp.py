@@ -546,7 +546,8 @@ def multicomp_mcmc_driver(input_args):
     load_shared_data(input_args)
     calc_spectra = ec.determine_map_freqs(input_args.map_set)
     # define dust params based on dustopts
-    params_dict = define_priors(calc_spectra, input_args.theory_comps, input_args.spectra_type)
+    params_dict = define_priors(calc_spectra, input_args.theory_comps, 
+                                spectra=input_args.spectra_type)
     input_args.injected_signal = get_injected_signal(calc_spectra, 
                                             signal_type=input_args.injected_signal)
 
