@@ -290,8 +290,9 @@ def apply_dust(post_travel_dict, bandpasses, params_values):
         dict[str, np.ndarray]: Updated dictionary with added dust contamination.
     """
     beta_dust = params_values['beta_dust']
+    beta_sync = params_values['beta_sync']
     dust_cache = {}
-    
+    sync_cache = {}
     for used_map, dls in post_travel_dict.items():
         lmax = dls.shape[0]
         ratio = np.arange(lmax) / LPIVOT
@@ -304,10 +305,15 @@ def apply_dust(post_travel_dict, bandpasses, params_values):
             dust_cache[freq1] = dust_scaling(beta_dust, TDUST, bandpasses[freq1], FPIVOT_DUST, bandcenter_err=1)
         if freq2 not in dust_cache:
             dust_cache[freq2] = dust_scaling(beta_dust, TDUST, bandpasses[freq2], FPIVOT_DUST, bandcenter_err=1)
+        if freq1 not in sync_cache:
+            sync_cache[freq1] = sync_scaling(beta_sync, bandpasses[freq1], FPIVOT_SYNC, bandcenter_err=1)
+        if freq2 not in sync_cache:
+            sync_cache[freq2] = sync_scaling(beta_sync, bandpasses[freq2], FPIVOT_SYNC, bandcenter_err=1)
 
         dust_scale1 = dust_cache[freq1]
         dust_scale2 = dust_cache[freq2]
-
+        sync_scale1 = sync_cache[freq1]
+        sync_scale2 = sync_cache[freq2]
         if spec_type in ['EB', 'BE']:
             A_key = 'A_dust_EB'
             alpha_key = 'alpha_dust_EB'
@@ -318,19 +324,26 @@ def apply_dust(post_travel_dict, bandpasses, params_values):
         A_dust = params_values[A_key]
         alpha_dust = params_values[alpha_key]
 
+        if spec_type in ['EB', 'BE']:
+            As_key = 'A_sync_EB'
+            alphas_key = 'alpha_sync_EB'
+        else:
+            A_keys = f'A_sync_{spec_type}'
+            alphas_key = f'alpha_sync_{spec_type}'
+
+        As_dust = params_values[As_key]
+        alphas_dust = params_values[alphas_key]
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', category=RuntimeWarning)
             dustpow = A_dust * np.power(ratio, alpha_dust)
-
+            syncpow = As_dust * np.power(ratio, alphas_dust)
         dustpow[0] = 0 if np.isinf(dustpow[0]) else dustpow[0]
-
-        dls += dustpow * dust_scale1 * dust_scale2
+        syncpow[0] = 0 if np.isinf(syncpow[0]) else syncpow[0]
+        dust_dls = dustpow * dust_scale1 * dust_scale2
+        sync_dls = syncpow * sync_scale1 * sync_scale2
+        dls += dust_dls + sync_dls
         post_travel_dict[used_map] = dls
-        #print(f"Map: {used_map}, Spec: {spec_type}")
-        #print(f"A_dust: {A_dust}, alpha_dust: {alpha_dust}")
-        #print(f"Max dustpow: {np.max(dustpow)}, Max scaling: {np.max(dust_scale1 * dust_scale2)}")
-        #print(f"Delta Dls: {np.max(dustpow * dust_scale1 * dust_scale2)}")
-
+        
     return post_travel_dict
 
 
