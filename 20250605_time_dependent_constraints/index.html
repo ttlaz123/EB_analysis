@@ -291,6 +291,9 @@
                 },
          
                     function (params) {
+                        if(params.spectral == 'all'){
+                            params.bin_num = '_bin15'
+                        }
                         let dirbase = '/liuto'
                         let dirpath = dirbase + '/ede_chains/';
                         let mcmc_folder = params.ede + params.bin_num  + '_sigl'+ params.spectral+'_ebfede0.07/';
