@@ -346,6 +346,7 @@ def apply_dust(post_travel_dict, bandpasses, params_values):
         sync_dls = syncpow * sync_scale1 * sync_scale2
         plt.plot(dls, label=used_map)
         plt.plot(dust_dls, label=A_dust)
+        plt.legend()
         plt.show()
         dls += dust_dls + sync_dls
         post_travel_dict[used_map] = dls
