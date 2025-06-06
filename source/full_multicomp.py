@@ -393,7 +393,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
     #angle_priors = {"prior": {"min": -angle_degree*3/4, "max": angle_degree}, "ref": 0}
     angle_priors = {
         "prior": {
-            "dist": "normal",
+            "dist": "norm",
             "mu": 0.0,
             "sigma": 0.1
         },
