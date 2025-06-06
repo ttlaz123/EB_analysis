@@ -284,7 +284,8 @@ def load_shared_data(input_args):
     SHARED_DATA_DICT['theory_spectra'] = ld.load_cmb_theory(FILE_PATHS['camb_lensing'])
                                                              #FILE_PATHS['dust_models'],
                                                              #input_args.theory_comps)
-    SHARED_DATA_DICT['theory_spectra'] = ld.load_ede_spectra(FILE_PATHS['EDE_spectrum'], SHARED_DATA_DICT['theory_spectra'])
+    if(not input_args.fede is None):
+        SHARED_DATA_DICT['theory_spectra'] = ld.load_ede_spectra(FILE_PATHS['EDE_spectrum'], SHARED_DATA_DICT['theory_spectra'])
     SHARED_DATA_DICT['bandpasses'] = ld.read_bandpasses(FILE_PATHS['bandpasses'])
     SHARED_DATA_DICT['map_reference_header'] = map_reference_header
     
