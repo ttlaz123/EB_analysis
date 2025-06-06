@@ -415,7 +415,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
                             "ref": {"dist":"norm", "loc":6, "scale":1},
                             "proposal":1}
     alpha_dust_priors = {"prior":{"min": -1, "max":1}, 
-                                "ref": {"dist":"norm", "loc":-0, "scale":0.01},
+                                "ref": {"dist":"norm", "loc":-0.3, "scale":0.01},
                                 "proposal":0.1}
     
     A_sync_priors = {"prior":{"min": -5, "max":5}, 
