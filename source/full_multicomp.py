@@ -221,6 +221,11 @@ class BK18_full_multicomp(Likelihood):
             post_travel_dict = ec.apply_dust(post_inflation_dict, self.bandpasses, params_values)
         elif(self.theory_comps in ['all']):
             post_travel_dict = ec.apply_dust(post_inflation_dict, self.bandpasses, params_values)
+        elif(self.theory_comps in ['det_polrot']):
+            post_travel_dict = ec.apply_cmb_rotation(post_inflation_dict,
+                                                    params_values,
+                                                    self.dl_theory,
+                                                    self.used_maps)
         else: 
             post_travel_dict = post_inflation_dict
         if(self.theory_comps in ['all', 'det_polrot', 'fixed_dust', 'no_ede', 'eskilt']):
@@ -453,6 +458,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
         params_dict['alpha_CMB'] = angle_priors
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
     elif(theory_comps == 'det_polrot'):
+        params_dict['alpha_CMB'] = angle_priors
         pass
 
     elif(theory_comps == 'fixed_dust'):
