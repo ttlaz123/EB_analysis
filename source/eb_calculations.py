@@ -342,6 +342,7 @@ def apply_dust(post_travel_dict, bandpasses, params_values):
         dust_dls = dustpow * dust_scale1 * dust_scale2
         sync_dls = syncpow * sync_scale1 * sync_scale2
         print(used_map)
+        print("A_dust: " + str(A_dust)) 
         print("before dust")
         print(np.mean(dls))
         print(np.var(dls))
