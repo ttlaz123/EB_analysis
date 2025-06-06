@@ -393,9 +393,9 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
     #angle_priors = {"prior": {"min": -angle_degree*3/4, "max": angle_degree}, "ref": 0}
     angle_priors = {
         "prior": {
-            "dist": "norm",
-            "mu": 0.0,
-            "sigma": 0.1
+            "dist": "norm",    # valid scipy.stats distribution name
+            "loc": 0.0,        # mean
+            "scale": 0.1       # standard deviation
         },
         "ref": 0.0
     }
