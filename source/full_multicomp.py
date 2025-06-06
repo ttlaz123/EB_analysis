@@ -460,7 +460,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
 
     elif(theory_comps == 'no_ede'):
         params_dict['alpha_CMB'] = angle_priors
-        for spec in ['EE', 'BB']:#, 'EB']:
+        for spec in ['EE', 'BB', 'EB']:
 
             params_dict['A_dust_' + spec] = {**A_dust_priors,
                                         "latex":"A_{"+spec+",\mathrm{dust}}"}
