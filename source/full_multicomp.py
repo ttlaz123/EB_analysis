@@ -322,7 +322,7 @@ def load_shared_data(input_args):
     bin_starts, raw_cl, SHARED_DATA_DICT['eskilt'] = ld.load_eskilt_data()
 
 def run_bk18_likelihood(params_dict, observation_file_path, input_args, 
-                        rstop = 0.005, max_tries=10000):
+                        rstop = 0.01, max_tries=10000):
     """
     Runs the Cobaya MCMC likelihood using BK18_full_multicomp likelihood class.
 
@@ -385,7 +385,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
         dict: Dictionary defining Cobaya-compatible priors for parameters.
     """
     # define angles based on mapopts
-    angle_priors = {"prior": {"min": -angle_degree/2, "max": angle_degree}, "ref": 0}
+    angle_priors = {"prior": {"min": -angle_degree*3/4, "max": angle_degree}, "ref": 0}
     params_dict = {
         'alpha_' + spectrum: {
                 **angle_priors,
@@ -699,7 +699,7 @@ def parallel_simulation(input_args, params_dict):
     """
     sim_indices = range(input_args.sim_start, input_args.sim_start + input_args.sim_num)
     try:
-        maxworkers = 10 
+        maxworkers =50 
         with ProcessPoolExecutor(max_workers=maxworkers) as executor:
             # Submit all tasks to the executor
             future_to_sim = {
