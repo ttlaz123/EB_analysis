@@ -412,7 +412,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
                                 "proposal":0.1}
     if(spectra == 'alens'):
         params_dict['A_lens'] = {"prior": {"min":0.5, "max":2}, "ref": 1}
-    elif(spectra in ['all', 'nob', 'eb']):
+    elif(spectra in ['nob', 'eb', 'all']):
         params_dict['A_lens'] = 1
     else:
         raise ValueError('Not proper spectra theory: ' + str(spectra))
@@ -576,6 +576,8 @@ def multicomp_mcmc_driver(input_args):
     # define dust params based on dustopts
     params_dict = define_priors(calc_spectra, input_args.theory_comps, 
                                 spectra=input_args.spectra_type)
+    if(input_args.spectra_type == 'alens'):
+        input_args.spectra_type == 'all'
     input_args.injected_signal = get_injected_signal(calc_spectra, 
                                             signal_type=input_args.injected_signal)
 
@@ -887,7 +889,7 @@ def main():
     parser.add_argument(
         '-t', "--spectra_type",
         type=str,
-        choices=["all", "eb", "nob", "noe"],
+        choices=["all", "eb", "nob", "noe", 'alens'],
         default="all",
         help=(
             "Which spectra to include. 'all' includes EE, BB, EB, etc., while 'eb' only includes EB-related spectra. "
