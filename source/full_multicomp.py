@@ -390,7 +390,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
         dict: Dictionary defining Cobaya-compatible priors for parameters.
     """
     # define angles based on mapopts
-    #angle_priors = {"prior": {"min": -angle_degree*3/4, "max": angle_degree}, "ref": 0}
+    anglecmb_priors = {"prior": {"min": -angle_degree*3/4, "max": angle_degree}, "ref": 0}
     angle_priors = {
         "prior": {
             "dist": "norm",    # valid scipy.stats distribution name
@@ -463,17 +463,17 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
                                     "latex":"\\beta_{\mathrm{sync}}"}
     elif(theory_comps == 'eskilt'):
         params_dict['A_lens'] = 1
-        params_dict['alpha_CMB'] = angle_priors
+        params_dict['alpha_CMB'] = anglecmb_priors
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
     elif(theory_comps == 'det_polrot'):
-        params_dict['alpha_CMB'] = angle_priors
+        params_dict['alpha_CMB'] = anglecmb_priors
         pass
 
     elif(theory_comps == 'fixed_dust'):
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
 
     elif(theory_comps == 'no_ede'):
-        params_dict['alpha_CMB'] = angle_priors
+        params_dict['alpha_CMB'] = anglecmb_priors
         for spec in ['EE', 'BB', 'EB']:
 
             params_dict['A_dust_' + spec] = {**A_dust_priors,
