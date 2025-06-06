@@ -321,7 +321,7 @@ def load_shared_data(input_args):
     bin_starts, raw_cl, SHARED_DATA_DICT['eskilt'] = ld.load_eskilt_data()
 
 def run_bk18_likelihood(params_dict, observation_file_path, input_args, 
-                        rstop = 0.03, max_tries=10000):
+                        rstop = 0.005, max_tries=10000):
     """
     Runs the Cobaya MCMC likelihood using BK18_full_multicomp likelihood class.
 
@@ -384,7 +384,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
         dict: Dictionary defining Cobaya-compatible priors for parameters.
     """
     # define angles based on mapopts
-    angle_priors = {"prior": {"min": -angle_degree, "max": angle_degree}, "ref": 0}
+    angle_priors = {"prior": {"min": -angle_degree/2, "max": angle_degree}, "ref": 0}
     params_dict = {
         'alpha_' + spectrum: {
                 **angle_priors,
@@ -410,9 +410,9 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
     alpha_sync_priors = {"prior":{"min": -2, "max":2}, 
                                 "ref": {"dist":"norm", "loc":-0, "scale":0.01},
                                 "proposal":0.1}
-    if(spectra == 'all'):
+    if(spectra == 'alens'):
         params_dict['A_lens'] = {"prior": {"min":0.5, "max":2}, "ref": 1}
-    elif(spectra in ['nob', 'eb']):
+    elif(spectra in ['all', 'nob', 'eb']):
         params_dict['A_lens'] = 1
     else:
         raise ValueError('Not proper spectra theory: ' + str(spectra))
