@@ -289,9 +289,7 @@ def apply_dust(post_travel_dict, bandpasses, params_values):
     Returns:
         dict[str, np.ndarray]: Updated dictionary with added dust contamination.
     """
-    import matplotlib
-    matplotlib.use('TkAgg')
-    import matplotlib.pyplot as plt
+ 
     beta_dust = params_values['beta_dust']
     beta_sync = params_values['beta_sync']
     dust_cache = {}
@@ -344,11 +342,7 @@ def apply_dust(post_travel_dict, bandpasses, params_values):
         syncpow[0] = 0 if np.isinf(syncpow[0]) else syncpow[0]
         dust_dls = dustpow * dust_scale1 * dust_scale2
         sync_dls = syncpow * sync_scale1 * sync_scale2
-        plt.plot(dls, label=used_map)
-        plt.plot(dust_dls, label=str(A_dust) + ' alpha:' + str(alpha_dust))
-        plt.legend()
-        plt.xlim([0, 700])
-        plt.show()
+
         dls += dust_dls + sync_dls
         post_travel_dict[used_map] = dls
         
