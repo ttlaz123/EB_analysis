@@ -775,7 +775,13 @@ def parse_bin_range(s):
         raise argparse.ArgumentTypeError(
             "Must be a positive integer (interpreted as 2-n) or a valid range like 3-7."
         )
-
+def float_or_none(value):
+    if value == "":
+        return None  # or 0.0 or a custom default
+    try:
+        return float(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"Invalid float value: '{value}'")
 
 def main():
     parser = argparse.ArgumentParser(
@@ -898,7 +904,7 @@ def main():
     )
     parser.add_argument(
         "--fede",
-        type=float,
+        type=float_or_none,
         default="0.07",
         help=(
             "F_ede curve to use for fitting. Set the f_ede parameter"
