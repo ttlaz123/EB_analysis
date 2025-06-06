@@ -390,7 +390,15 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
         dict: Dictionary defining Cobaya-compatible priors for parameters.
     """
     # define angles based on mapopts
-    angle_priors = {"prior": {"min": -angle_degree*3/4, "max": angle_degree}, "ref": 0}
+    #angle_priors = {"prior": {"min": -angle_degree*3/4, "max": angle_degree}, "ref": 0}
+    angle_priors = {
+        "prior": {
+            "dist": "normal",
+            "mu": 0.0,
+            "sigma": 0.1
+        },
+        "ref": 0.0
+    }
     params_dict = {
         'alpha_' + spectrum: {
                 **angle_priors,
