@@ -8,11 +8,15 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from cobaya.run import run
 from cobaya.likelihood import Likelihood
 
+import bicep_data_consts as bc
 import eb_load_data as ld
 import eb_file_paths as fp
 import eb_calculations as ec
 import eb_plot_data as epd
 #import BK18_full_multicomp
+import matplotlib
+matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
 
 SHARED_DATA_DICT = {}
 FILE_PATHS = {}
@@ -113,7 +117,10 @@ class BK18_full_multicomp(Likelihood):
 
         # Get the theoretical predictions based on the parameter values
         #print(params_values)
-        theory_prediction = self.theory(params_values)
+        if(self.theory_comps == 'ldiff'):
+            theory_prediction = self.theory_diff(params_values)
+        else:
+            theory_prediction = self.theory(params_values)
 
         # Calculate the residuals
         residuals = self.binned_dl_observed_vec - theory_prediction
@@ -126,6 +133,93 @@ class BK18_full_multicomp(Likelihood):
         log_likelihood = -1/2 * chi_squared
         #print(log_likelihood)
         return log_likelihood
+    
+    def theory_diff(self, params_values):
+        l_break = int(self.sim_common_data['l_break'])
+         
+        # Create the shifted params dict
+        new_params_values = {
+            key: (val + params_values['angle_diff']) if key.startswith('alpha_') else val
+            for key, val in params_values.items()
+        }
+
+        # Split post_travel_dict into two ℓ ranges
+        first_half = {}
+        second_half = {}
+        first_theory = {}
+        second_theory = {}
+        # this does not need to be done for every iteration
+        for spec_key, cl_array in self.dl_theory.items():
+            cl_array = np.asarray(cl_array)
+            if(cl_array.ndim == 0):
+                first_theory[spec_key] = 0
+                second_theory[spec_key] = 0
+                continue
+            first_theory[spec_key] = cl_array.copy()
+            second_theory[spec_key] = cl_array.copy()
+            first_theory[spec_key][l_break+1:] = 0
+            second_theory[spec_key][:l_break+1] = 0
+        # unnecessary if only doing eb
+        for spec_key, cl_array in self.initial_theory_dict.items():
+            cl_array = np.asarray(cl_array)
+            if(cl_array.ndim == 0):
+                first_half[spec_key] = 0
+                second_half[spec_key] = 0
+                continue
+            first_half[spec_key] = cl_array.copy()
+            second_half[spec_key] = cl_array.copy()
+            first_half[spec_key][l_break+1:] = 0
+            second_half[spec_key][:l_break+1] = 0
+
+        # Apply detector rotation
+        rotated_first_half = ec.apply_det_rotation(first_half, params_values, first_theory)
+        rotated_second_half = ec.apply_det_rotation(second_half, new_params_values, second_theory)
+
+        
+        # Combine
+        post_detection_dict = {
+            key: rotated_first_half[key] + rotated_second_half[key]
+            for key in rotated_first_half
+        }
+        self.final_detection_dict = ec.apply_bpwf(self.map_reference_header,
+                                      post_detection_dict,
+                                      self.bpwf,
+                                      self.used_maps,
+                                      do_cross=True)
+        theory_vec = self.dict_to_vec(self.final_detection_dict, self.used_maps)
+        if True:
+            
+            
+            # Print parameter values used
+            print("Original params_values:")
+            for k, v in params_values.items():
+                print(f"  {k}: {v}")
+            print("\nNew (rotated) params_values:")
+            for k, v in new_params_values.items():
+                print(f"  {k}: {v}")
+
+            # Auto-select one EB-like spectrum to plot
+            spectrum_to_plot = next(
+                k for k in post_detection_dict if '_Ex' in k and 'e_B' in k
+            )
+
+            ells = np.arange(len(post_detection_dict[spectrum_to_plot]))
+
+            plt.figure(figsize=(10, 6))
+            plt.plot(ells, rotated_first_half[spectrum_to_plot], label='First half (rotated)', color='blue', linewidth=5)
+            plt.plot(ells, rotated_second_half[spectrum_to_plot], label='Second half (rotated)', color='orange', linewidth=5)
+            plt.plot(ells, post_detection_dict[spectrum_to_plot], label='Combined (rotated)', color='green')
+            plt.axvline(l_break, color='red', linestyle=':', label='l_break')
+            plt.xlabel(r'$\ell$')
+            plt.ylabel(r'$C_\ell$')
+            plt.title(f'Step-by-step: {spectrum_to_plot} spectrum angle_diff=' + str(params_values['angle_diff']))
+            plt.legend()
+            plt.grid(True)
+            plt.tight_layout()
+            plt.show()
+            plt.plot(self.final_detection_dict[spectrum_to_plot])
+            plt.show()
+        return theory_vec
 
     def dict_to_vec(self, spectra_dict, used_maps):
         """
@@ -282,7 +376,11 @@ def load_shared_data(input_args):
     global SHARED_DATA_DICT, FILE_PATHS
     map_reference_header = None
     FILE_PATHS = fp.set_file_paths(input_args.dataset, input_args.fede)
-    
+    if(input_args.bin_diff >0):
+        bin_diff = input_args.bin_diff
+        bin_centers = bc.L_BIN_CENTERS
+        l_break = 0.5 * (bin_centers[bin_diff - 1] + bin_centers[bin_diff])
+        SHARED_DATA_DICT['l_break'] = l_break
     SHARED_DATA_DICT['bpwf'], map_reference_header = ld.load_bpwf(FILE_PATHS['bpwf'], 
                                             map_reference_header, 
                                             num_bins=input_args.bin_num)
@@ -327,7 +425,7 @@ def load_shared_data(input_args):
     bin_starts, raw_cl, SHARED_DATA_DICT['eskilt'] = ld.load_eskilt_data()
 
 def run_bk18_likelihood(params_dict, observation_file_path, input_args, 
-                        rstop = 0.01, max_tries=10000):
+                        rstop = 0.03, max_tries=10000):
     """
     Runs the Cobaya MCMC likelihood using BK18_full_multicomp likelihood class.
 
@@ -352,7 +450,6 @@ def run_bk18_likelihood(params_dict, observation_file_path, input_args,
                 "used_maps": SHARED_DATA_DICT['used_maps'],
                 "map_set": input_args.map_set,
                 "dataset": input_args.dataset,
-                "forecast": input_args.forecast,
                 "bin_num":  input_args.bin_num,
                 "theory_comps": input_args.theory_comps,
                 "spectra_type": input_args.spectra_type,
@@ -391,7 +488,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
     """
     # define angles based on mapopts
     anglecmb_priors = {"prior": {"min": -angle_degree*3/4, "max": angle_degree}, "ref": 0}
-    angle_priors = {
+    angledef_priors = {
         "prior": {
             "dist": "norm",    # valid scipy.stats distribution name
             "loc": 0.0,        # mean
@@ -401,7 +498,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
     }
     params_dict = {
         'alpha_' + spectrum: {
-                **angle_priors,
+                **anglecmb_priors,
                 'latex': ("\\alpha_{" + 
                             spectrum.replace('_', '\\_') +
                             "}")
@@ -430,7 +527,10 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
         params_dict['A_lens'] = 1
     else:
         raise ValueError('Not proper spectra theory: ' + str(spectra))
-    if(theory_comps == 'all'):
+    if(theory_comps == 'ldiff'):
+        params_dict['angle_diff'] = anglecmb_priors
+
+    elif(theory_comps == 'all'):
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
         for spec in ['EE', 'BB', 'EB']:
 
@@ -503,7 +603,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
                                     "proposal":0.1,
                                     "latex":"\\beta_{\mathrm{sync}}"}
     else:
-        raise ValueError()
+        raise ValueError("Not a properly defined theory:" + str(theory_comps))
 
     
     return params_dict
@@ -713,7 +813,7 @@ def parallel_simulation(input_args, params_dict):
     """
     sim_indices = range(input_args.sim_start, input_args.sim_start + input_args.sim_num)
     try:
-        maxworkers =50 
+        maxworkers =10 
         with ProcessPoolExecutor(max_workers=maxworkers) as executor:
             # Submit all tasks to the executor
             future_to_sim = {
@@ -873,7 +973,12 @@ def main():
         ),
     )
 
-    
+    parser.add_argument(
+        '--bin_diff',
+        type=int,
+        default=0,
+        help="if doing ldiff theory, the midpoint for breaking up the angle diff, 0 means no break"
+    )
     parser.add_argument(
         '-b', '--bin_num',
         type=parse_bin_range,
@@ -930,7 +1035,7 @@ def main():
     parser.add_argument(
         '-c', "--theory_comps",
         type=str,
-        choices=["all", "fixed_dust", "det_polrot", "no_ede", "eskilt"],
+        choices=["all", "fixed_dust", "det_polrot", "no_ede", "eskilt", "ldiff"],
         default="all",
         help=(
             "Controls which theoretical components are included in the likelihood. "
@@ -938,6 +1043,7 @@ def main():
             "'fixed_dust': Fix dust and CMB angle, fit only gMpl. "
             "'det_polrot': Detectable polarization rotation only. "
             "'no_ede': Only include dust and alpha_CMB, exclude gMpl. "
+            "'ldiff': difference in angle between bins, default at bin midpoint"
             "Default: 'all'."
         ),
     )
