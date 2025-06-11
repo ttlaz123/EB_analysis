@@ -14,9 +14,9 @@ import eb_file_paths as fp
 import eb_calculations as ec
 import eb_plot_data as epd
 #import BK18_full_multicomp
-import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
+#import matplotlib
+#matplotlib.use('TkAgg')
+#import matplotlib.pyplot as plt
 
 SHARED_DATA_DICT = {}
 FILE_PATHS = {}
@@ -187,7 +187,7 @@ class BK18_full_multicomp(Likelihood):
                                       self.used_maps,
                                       do_cross=True)
         theory_vec = self.dict_to_vec(self.final_detection_dict, self.used_maps)
-        if True:
+        if False:
             
             
             # Print parameter values used

@@ -804,7 +804,8 @@
 
     </section>
     <section>
-        <h2>L dependent rotation Bin split 2-8 and 9-15</h2>
+        <h2>L dependent rotation</h2>
+        <h3> Bin split 2-8 and 9-15</h3>
         <p>
     This analysis investigates scale-dependent rotation angles derived from EB spectra using a multicomponent model.
     The analysis focuses solely on polarization rotation without assuming any Early Dark Energy (EDE) model, thus g is set to 0.
@@ -1234,9 +1235,7 @@
     </script>
 </figure>
 
-    </section>
-    <section>
-        <h2>L dependent rotation Bin split 2-10 and 11-15</h2>
+        <h3>L dependent rotation, Bin split 2-10 and 11-15</h3>
         <p>
         We repeat the same analysis as in section IV, except we use a different combination of bin sets. 
         Here, we choose bins 2-10 as our low-ell bins, and 11-15 as our high-ell bins.
@@ -1606,6 +1605,114 @@
 
     </script>
 </figure>
+<h3>Angle Difference Parameter for different Bin Splits</h3>
+<p>
+We introduce the new angle_diff parameter that determines the best fit difference
+in alpha angles across each frequency for a particular group of bins.
+</p>
+<figure>
+            <img alt="BB Diffs" id="anglediff" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+             <figcaption>
+    Plot showing an example of an EB curve with two different angles as a function of multipole. The first half is at about 0.2 degrees, while above l of about 300, the rotation angle is about 0.6. Units for y-axis are in microkelvin squared.
+  </figcaption>
+
+            <script type="text/javascript">
+               
+
+                pager.link("#anglediff", {
+                   
+                    
+                   
+                },
+         
+                    function (params) {
+                        let dirbase = '/liuto/home/GitHub/EB_analysis/'
+                        let dirpath = dirbase + '/zscore_histograms/';
+                        let file = 'lbreak_demo' 
+                        let name = dirpath + file +  '.png';
+            
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+        
+                });
+            </script>
+        </figure>
+        We have the 499 simulations plotted below. We see that for the injected EDE dataset, there is a clear difference in angle that is above zero, while the angle_diff parameter is consistent with zero for the no EDE dataset.
+<figure>
+            <img alt="Multicomponent Analysis Spectrum" id="lbreak" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+            <figcaption>
+                <p>Pager for multicomponent analysis of l dependent rotation across 499 simulations.</p>
+  <p>Options include:</p>
+  <ul>
+    <li><strong>Map Type:</strong> Best Fit EE, Best Fit EB, Best Fit BB, Triangle Plot, Summary Plot (Peaks histogram), Chi Squared histogram</li>
+    <li><strong>Bins Used:</strong> 2-10, 11-15, 2-15</li>
+    <li><strong>Injected Signal:</strong> Positive Miscalibration, Negative Miscalibration, Balanced Miscalibration, No Miscalibration</li>
+    <li><strong>Model:</strong> Rotation Only</li>
+    <li><strong>Spectra:</strong> EB only</li>
+    <li><strong>Simulation Number:</strong> 001 to 499</li>
+  </ul>
+            </figcaption>
+
+            <script type="text/javascript">
+
+                pager.link("#lbreak", {
+                    'Map Sim Num Digit1|digit1': simnums,
+                    'Digit2|digit2': simnums,
+                    'Digit3|digit3': simnums,
+
+                    'Map Type|m_map_type': [
+                        'Best Fit EE|_bestfitEE',
+                        'Best Fit EB|_bestfitEB',
+                        'Best Fit BB|_bestfitBB',
+                        'Triangle Plot|_triangle_plot',
+                        'Summary Plot (Peaks histogram)|sim1_summary',
+                        'Chi Squared histogram|simchisq_hist'
+                    ],
+                    'Bins Used|bindiff': [
+                        '2-8 vs 9-15|_ldiff8',
+                        '2-9 vs 10-15|_ldiff9',
+                        '2-10 vs 11-15|_ldiff10',
+                        '2-11 vs 12-15|_ldiff11',
+                        '2-12 vs 13-15|_ldiff12',
+                    ],
+                    'Spectra|spectra': [
+                        'EB only|_eb',
+                    ],
+                    'Injected EDE Signal|ede': [
+                        'Fede = 0.07, g = 1|fede01',
+                        'g = 0|zeroeb'
+                    ]
+                },
+                    function (params) {
+                        let dirbase = '/liuto'
+                        let dirpath = dirbase + '/ede_chains/';
+                        let mcmc_folder = params.ede + '_bin2-15' +  params.bindiff +  params.spectra +  '/';
+                        let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
+                        let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
+                        if (params.m_map_type == 'sim1_summary' || params.m_map_type == 'simchisq_hist') {
+                            name = dirpath + mcmc_folder + params.m_map_type + '.png'
+                        }
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+                    'digit1': '0',
+                    'digit2': '0',
+                    'digit3': '1',
+                    'inj_sig': '',
+                    'm_map_type': '_bestfitEB',
+                    'bindiff': '_ldiff10',
+                    'ede': 'zeroeb',
+                    'spectra': '_eb',
+                });
+            </script>
+        </figure>
 
     </section>
 <section>
@@ -1652,11 +1759,12 @@
                     ],
                     'Dust model|theory_compd': [
                         'Gaussian Dust, no EDE|_no_ede',
+                        'With Syncotron|_no_ede_asym',
                     ],
                     'Spectra|spectrad': [
                         'EB only|_all',
                     ],
-                    'Injected EDE Signal|ede': [
+                    'Injected EDE Signal|edei': [
                         'g = 0|zeroeb'
                     ]
                 },
@@ -1664,7 +1772,13 @@
                     function (params) {
                         let dirbase = '/liuto'
                         let dirpath = dirbase + '/ede_chains/';
-                        let mcmc_folder = params.ede + params.bin_num  + params.theory_compd + params.spectrad+ params.feded +'/';
+                        if(params.theory_compd == '_no_ede_asym'){
+                            params.feded = ''
+                        } else {
+                            params.feded = '_ebfede0.07'
+                        }
+                        
+                        let mcmc_folder = params.edei + params.bin_num  + params.theory_compd + params.spectrad+ params.feded +'/';
                         let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
                         let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
                         if (params.m_map_type == 'sim1_summary' || params.m_map_type == 'simchisq_hist') {
@@ -1682,12 +1796,84 @@
                     'm_map_type':'sim1_summary',
                     'bin_num':'_bin2-15',
                     'feded':'_ebfede0.07',
-                    'ede': 'zeroeb',
+                    'edei': 'zeroeb',
                     'spectrad': '_all',
                     'theory_compd': '_no_ede',
                 });
             </script>
         </figure>
+        <p>
+        We also make a plot of the Z scores when comparing the posteriors 
+        depending on which spectra is used.
+        </p>
+<figure>
+            <img alt="Z Scores" id="zscoree" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+            <figcaption>
+                
+            </figcaption>
+
+            <script type="text/javascript">
+               
+
+                pager.link("#zscoree", {
+                   
+                    'Parameter|anglef':[
+                        'alpha_BK18_150|alpha_BK18_150',
+                        'alpha_BK18_K95|alpha_BK18_K95',
+                        'alpha_BK18_B95lf|alpha_BK18_B95e',
+                        'alpha_BK18_220|alpha_BK18_220',
+                        'g|gMpl',
+                    ],
+                    'Injected Signal|inj_sig': [
+                        'Positive Miscalibration|_sigpos',
+                        'Negative Miscalibration|_signeg',
+                        'Balanced Miscalibration|_sigbal',
+                        'No Miscalibration|'
+                    ],
+                    'Model compare 1|spec1':[
+                        'EB only|_eb',
+                        'No BB|_nob',
+                        'All|_all',
+                    ],
+                    'Model compare 2|spec2':[
+                        'EB only|_eb',
+                        'No BB|_nob',
+                        'All|_all',
+                    ],
+        
+                    'Injected EDE Signal|ede': [
+                        'Fede = 0.07, g = 1|fede01',
+                        'g = 0|zeroeb'
+                    ]
+                },
+         
+                    function (params) {
+                        let dirbase = '/liuto/home/GitHub/EB_analysis/'
+                        let dirpath = dirbase + '/zscore_histograms/';
+                        let zscore1 = params.anglef + '_' + params.ede + '_bin15_gdust' + params.spec1 + params.inj_sig;
+                        let zscore2 = params.ede + '_bin15_gdust' + params.spec2 + params.inj_sig;
+                        
+                        let name = dirpath + 'zscore_hist_' + zscore1 + '_' + zscore2 +  '.png';
+            
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+                    'anglef': 'gMpl',
+                    'spec1': '_eb',
+                    'spec2': '_all',
+                    'ede': 'zeroeb',
+                    'inj_sig':'',
+                });
+            </script>
+        </figure>
+        <p>
+        We see that when comparing spectra with BB vs without BB, there is a 
+        shift in Z score from 0 for the EDE dataset. 
+        For all other configurations, the Z score is centered around 0
+        </p>
 </section>
     <section>
         <h2>Future Directions</h2>

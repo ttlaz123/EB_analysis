@@ -27,6 +27,9 @@ def process_directory(base_dir):
         if os.path.exists(out_path):
             print(f"Skipping {subdir}, summary CSV already exists: {out_path}")
             continue
+        if('gdust' not in out_path):
+            print('Skipping ' + str(out_path))
+            continue
         process_single_directory(subdir)
 
 def process_single_directory(subdir):

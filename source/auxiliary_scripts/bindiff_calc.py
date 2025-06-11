@@ -99,6 +99,12 @@ def collect_all_zscores(bin1_root, bin2_root, params, num_sims):
     return zscores
 
 def plot_z_histogram(zscores, param, outdir, group_label):
+    std = np.std(zscores)
+    median = np.median(zscores)
+    if(std > 0):
+        inds = np.abs(zscores - median) < 5 * std
+        print(np.where(~inds))
+        zscores = zscores[inds]
     plt.figure(figsize=(6,4))
     bins = np.linspace(-4, 4, 30)
     bin_width = bins[1] - bins[0]
@@ -107,6 +113,8 @@ def plot_z_histogram(zscores, param, outdir, group_label):
     
     x = np.linspace(-4, 4, 100)
     gaussian_pdf = norm.pdf(x, mu, sigma)
+    print(sigma)
+
     scaled_pdf = gaussian_pdf * bin_width * sum(counts)
     plt.plot(x, scaled_pdf, 'r-', lw=2, label=f'Gaussian fit\nMean={mu:.2f}\nStd={sigma:.2f}')
     
