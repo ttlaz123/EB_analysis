@@ -622,6 +622,8 @@ def generate_cross_spectra(calc_spectra, do_crosses, spectra_type):
         list: List of strings representing spectra types.
     """
     cross_spectra = []
+    if(spectra_type == 'alens'):
+        spectra_type = 'all'
     for spec1 in calc_spectra:
         for spec2 in calc_spectra:
             # don't do cross spectra
