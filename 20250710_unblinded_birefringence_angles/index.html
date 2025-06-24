@@ -83,7 +83,7 @@
                         let dirbase = '/liuto/home/GitHub/EB_analysis/';
                         let dirpath = dirbase + '/real_chains/';
                         let foldername = 'BK18lf_eb_bin2-15_det_polrot/';
-                        let file = 'real_'+params.plottype;
+                        let file = 'real'+params.plottype;
                         let name = dirpath + foldername + file +  '.png';
             
                         console.log(name);
@@ -92,8 +92,7 @@
 
                 pager.setparams({
         
-                    'ede': 'zeroeb',
-                    'spectro': 'BB',
+                    'plottype': '_triangle_plot',
                 });
             </script>
         </figure>
