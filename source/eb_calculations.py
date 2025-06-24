@@ -225,8 +225,10 @@ def apply_cmb_rotation(post_inflation_dict, params_values, dl_theory_dict, used_
     Returns:
         dict[str, np.ndarray]: New dictionary with rotated power spectra.
     """
-    angle_rad = np.deg2rad(params_values['alpha_CMB'])
-
+    try:
+        angle_rad = np.deg2rad(params_values['alpha_CMB'])
+    except KeyError:
+        angle_rad = 0
     sin2 = np.sin(2 * angle_rad)
     cos2 = np.cos(2 * angle_rad)
     sin4 = 2 * sin2 * cos2  # sin(4a) = 2sin(2a)cos(2a)
@@ -244,12 +246,11 @@ def apply_cmb_rotation(post_inflation_dict, params_values, dl_theory_dict, used_
         if(ee_map in used_maps): 
             Cl_EE = post_inflation_dict[ee_map]
         else:
-            CL_EE = dl_theory_dict['EE']   
-
+            Cl_EE = dl_theory_dict['EE']   
         if(bb_map in used_maps):
             Cl_BB = post_inflation_dict[bb_map]
         else:
-            CL_BB = dl_theory_dict['BB']
+            Cl_BB = dl_theory_dict['BB']
 
         Cl_EB = post_inflation_dict[eb_map]
         Cl_BE = post_inflation_dict[be_map]
