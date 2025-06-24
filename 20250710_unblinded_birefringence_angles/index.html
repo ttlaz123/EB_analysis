@@ -76,13 +76,17 @@
                         'Best Fit BB|_bestfitBB',
                         'Triangle Plot|_triangle_plot',
                         'Chi squared|_chisqmap'
+                    ],
+                    'Theory|theory':[
+                        'No birefringence|det_polrot',
+                        'Isotropic birefringence|det_polrot_betacmb'
                     ]
                 },
          
                     function (params) {
                         let dirbase = '/liuto/home/GitHub/EB_analysis/';
                         let dirpath = dirbase + '/real_chains/';
-                        let foldername = 'BK18lf_eb_bin2-15_det_polrot/';
+                        let foldername = 'BK18lf_eb_bin2-15_' + params.theory + '/';
                         let file = 'real'+params.plottype;
                         let name = dirpath + foldername + file +  '.png';
             
