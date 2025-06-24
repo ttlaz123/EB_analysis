@@ -58,7 +58,7 @@
    <section>
     <h2>Real Plots</h2>
     <figure>
-            <img alt="Real Data" id="reals" src="#" width="750" height="500"
+            <img alt="Real Data" id="reals_basic" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
              <figcaption>
 
@@ -67,7 +67,7 @@
             <script type="text/javascript">
                
 
-                pager.link("#reals", {
+                pager.link("#reals_basic", {
                    
                     
                     'Plot type|plottype':[
@@ -97,6 +97,54 @@
                 pager.setparams({
         
                     'plottype': '_triangle_plot',
+                    'theory': 'det_polrot',
+                });
+            </script>
+        </figure>
+
+         <figure>
+            <img alt="Real Data" id="reals_ede" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+             <figcaption>
+
+</figcaption>
+
+            <script type="text/javascript">
+               
+
+                pager.link("#reals_ede", {
+                   
+                    
+                    'Plot type|plottype':[
+                        'Best Fit EE|_bestfitEE',
+                        'Best Fit EB|_bestfitEB',
+                        'Best Fit BB|_bestfitBB',
+                        'Triangle Plot|_triangle_plot',
+                        'Chi squared|_chisqmap'
+                    ],
+                    'EDE parameters|fede': [
+                        'f_EDE = 0.012 (ACT)|_fede0.01',
+                        'f_EDE = 0.070 (Planck)|_fede0.07',
+                        'f_EDE = 0.087 (Planck Boss)|_fede0.09',
+                        'f_EDE = 0.127 (Planck Boss SH0ES)|_fede0.13',
+                    ], 
+                },
+         
+                    function (params) {
+                        let dirbase = '/liuto/home/GitHub/EB_analysis/';
+                        let dirpath = dirbase + '/real_chains/';
+                        let foldername = 'BK18lf_eb_bin2-15_fixed_dust' + params.fede + '/';
+                        let file = 'real'+params.plottype;
+                        let name = dirpath + foldername + file +  '.png';
+            
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+        
+                    'plottype': '_triangle_plot',
+                    'fede': '_fede0.09',
                 });
             </script>
         </figure>
