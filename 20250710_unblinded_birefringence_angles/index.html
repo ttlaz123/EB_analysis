@@ -122,6 +122,12 @@
                         'Triangle Plot|_triangle_plot',
                         'Chi squared|_chisqmap'
                     ],
+                    'Spectra|spectra': [
+                        'EB only, no foregrounds|_eb',
+                        'No BB with foregrounds|_nob',
+                        'All spectra with foregrounds|_all',
+                        'All spectra with foregrounds and A_lens|_alens'
+                    ],
                     'EDE parameters|fede': [
                         'f_EDE = 0.012 (ACT)|_fede0.01',
                         'f_EDE = 0.070 (Planck)|_fede0.07',
@@ -133,7 +139,11 @@
                     function (params) {
                         let dirbase = '/liuto/home/GitHub/EB_analysis/';
                         let dirpath = dirbase + '/real_chains/';
-                        let foldername = 'BK18lf_eb_bin2-15_fixed_dust' + params.fede + '/';
+                        let theory = 'all';
+                        if(params.spectra == '_eb'){
+                            theory = 'fixed_dust'
+                        }
+                        let foldername = 'BK18lf' + params.spectra + '_bin2-15_' + theory + params.fede + '/';
                         let file = 'real'+params.plottype;
                         let name = dirpath + foldername + file +  '.png';
             
@@ -193,7 +203,7 @@
                 pager.setparams({
         
                     'plottype': '_triangle_plot',
-                    'fede': '_fede0.09',
+                    'bindiff': '_ldiff10',
                 });
             </script>
         </figure>
