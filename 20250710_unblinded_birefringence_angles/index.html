@@ -149,6 +149,55 @@
             </script>
         </figure>
    </section>
+
+    <figure>
+            <img alt="Real Data" id="reals_ldiff" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+             <figcaption>
+
+</figcaption>
+
+            <script type="text/javascript">
+               
+
+                pager.link("#reals_ldiff", {
+                   
+                    
+                    'Plot type|plottype':[
+                        'Best Fit EE|_bestfitEE',
+                        'Best Fit EB|_bestfitEB',
+                        'Best Fit BB|_bestfitBB',
+                        'Triangle Plot|_triangle_plot',
+                        'Chi squared|_chisqmap'
+                    ],
+                    'L break|bindiff': [
+                        'lb = 265: 2-8 vs 9-15|_ldiff8',
+                        'lb = 300: 2-9 vs 10-15|_ldiff9',
+                        'lb = 335: 2-10 vs 11-15|_ldiff10',
+                        'lb = 370: 2-11 vs 12-15|_ldiff11',
+                        'lb = 405: 2-12 vs 13-15|_ldiff12',
+                    ],
+                },
+         
+                    function (params) {
+                        let dirbase = '/liuto/home/GitHub/EB_analysis/';
+                        let dirpath = dirbase + '/real_chains/';
+                        let foldername = 'BK18lf_eb_bin2-15' + params.bindiff + '/';
+                        let file = 'real'+params.plottype;
+                        let name = dirpath + foldername + file +  '.png';
+            
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+        
+                    'plottype': '_triangle_plot',
+                    'fede': '_fede0.09',
+                });
+            </script>
+        </figure>
+   </section>
     <section>
         <h2>Future Directions</h2>
        
