@@ -92,6 +92,8 @@
                         if(params.theory = 'gdust_betacmb_all'){
                             spectra = 'all';
                             params.theory = 'gdust_betacmb';
+                        } else{
+                            spectra = 'eb';
                         }
                         let foldername = 'BK18lf_' + spectra + '_bin2-15_' + params.theory + '/';
                         let file = 'real'+params.plottype;
