@@ -78,16 +78,22 @@
                         'Chi squared|_chisqmap'
                     ],
                     'Theory|theory':[
-                        'No birefringence|det_polrot',
-                        'Isotropic birefringence|det_polrot_betacmb',
-                        'Isotropic with foregrounds|gdust_betacmb',
+                        'No birefringence, EB only|det_polrot',
+                        'Isotropic birefringence, EB only|det_polrot_betacmb',
+                        'Isotropic with foregrounds, EB only|gdust_betacmb',
+                        'Isotropic with foregrounds, all spectra|gdust_betacmb_all',
                     ]
                 },
          
                     function (params) {
                         let dirbase = '/liuto/home/GitHub/EB_analysis/';
                         let dirpath = dirbase + '/real_chains/';
-                        let foldername = 'BK18lf_eb_bin2-15_' + params.theory + '/';
+                        let spectra = 'eb';
+                        if(params.theory = 'gdust_betacmb_all'){
+                            spectra = 'all';
+                            params.theory = 'gdust_betacmb';
+                        }
+                        let foldername = 'BK18lf_' + spectra + '_bin2-15_' + params.theory + '/';
                         let file = 'real'+params.plottype;
                         let name = dirpath + foldername + file +  '.png';
             
