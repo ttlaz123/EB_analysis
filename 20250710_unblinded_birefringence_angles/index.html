@@ -89,13 +89,14 @@
                         let dirbase = '/liuto/home/GitHub/EB_analysis/';
                         let dirpath = dirbase + '/real_chains/';
                         let spectra = 'eb';
-                        if(params.theory = 'gdust_betacmb_all'){
+                        let theory = params.theory;
+                        if(params.theory == 'gdust_betacmb_all'){
                             spectra = 'all';
-                            params.theory = 'gdust_betacmb';
+                            theory = 'gdust_betacmb';
                         } else{
                             spectra = 'eb';
                         }
-                        let foldername = 'BK18lf_' + spectra + '_bin2-15_' + params.theory + '/';
+                        let foldername = 'BK18lf_' + spectra + '_bin2-15_' +theory + '/';
                         let file = 'real'+params.plottype;
                         let name = dirpath + foldername + file +  '.png';
             
