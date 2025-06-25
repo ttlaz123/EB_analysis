@@ -117,7 +117,7 @@ class BK18_full_multicomp(Likelihood):
 
         # Get the theoretical predictions based on the parameter values
         #print(params_values)
-        '''
+        
         if(self.theory_comps == 'ldiff'):
             theory_prediction = self.theory_diff(params_values)
         else:
@@ -127,9 +127,9 @@ class BK18_full_multicomp(Likelihood):
         residuals = self.binned_dl_observed_vec - theory_prediction
         # Calculate the Mahalanobis distance using the inverse covariance matrix
         chi_squared = residuals.T @ self.cov_inv @ residuals
-        '''
+        
         if(self.theory_comps == 'eskilt'):
-            chi_squared = 0
+           
             chi_squared += self.theory_eskilt(params_values)
         # Calculate the log-likelihood
         log_likelihood = -1/2 * chi_squared
@@ -564,8 +564,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
                                     "proposal":0.1,
                                     "latex":"\\beta_{\mathrm{sync}}"}
     elif(theory_comps == 'eskilt'):
-        for key in params_dict:
-            params_dict[key] = 0
+   
         params_dict['A_lens'] = 1
         params_dict['alpha_CMB'] = anglecmb_priors
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
