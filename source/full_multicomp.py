@@ -422,7 +422,7 @@ def load_shared_data(input_args):
                                        num_bins=input_args.bin_num)
     SHARED_DATA_DICT['full_inv_covmat'] = ec.calc_inverse_covmat(SHARED_DATA_DICT['full_covmat'])
     
-    bin_starts, raw_cl, SHARED_DATA_DICT['eskilt'] = ld.load_eskilt_data()
+    bin_starts, raw_cl, SHARED_DATA_DICT['eskilt'] = ld.load_eskilt_data(ede_path=FILE_PATHS['EDE_spectrum'])
 
 def run_bk18_likelihood(params_dict, observation_file_path, input_args, 
                         rstop = 0.01, max_tries=10000):

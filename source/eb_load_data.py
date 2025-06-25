@@ -683,7 +683,7 @@ def read_ede_data(data_path='input_data/fEDE0.07_cl.dat'):
     EB_values = data['EB']
     return -EB_values * np.square(k_to_uk) * 2 * np.pi
 
-def load_eskilt_data(data_path = 'input_data/HFI_f_sky_092_EB_o.npy'):
+def load_eskilt_data(data_path = 'input_data/HFI_f_sky_092_EB_o.npy', ede_path = 'input_data/fEDE0.07_cl.dat'):
     """
     Loads Eskilt data, computes and bins EE and BB spectra, and returns the spectrum dictionary.
 
@@ -701,7 +701,7 @@ def load_eskilt_data(data_path = 'input_data/HFI_f_sky_092_EB_o.npy'):
     c_l_EB_o_mean_std = np.load(data_path)
     spectrum_dict['EB_observed'] = c_l_EB_o_mean_std[:, 0]
     spectrum_dict['EB_var'] = np.square(c_l_EB_o_mean_std[:, 1])
-    eb_ede = read_ede_data()
+    eb_ede = read_ede_data(ede_path)
     cl_to_dl = np.array([l*(l+1) for l in range(len(eb_ede))])/2/np.pi
     eb_ede /= cl_to_dl
     ell_min = 51
