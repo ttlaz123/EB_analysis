@@ -672,7 +672,8 @@ def filter_matrix(map_reference_header, matrix, used_maps, num_bins=None, zero_o
             num_bins = range(len(tot_bins)) + 1
         # we subtract 1 because the first element in the reference is a #
         filter_cols = [map_reference_header.index(cross_map)-1 for cross_map in used_maps]
-        all_bins = [index + (i-1) * num_maps for i in num_bins for index in filter_cols]
+        # subtract 2 because bin 1 has no covmat values
+        all_bins = [index + (i-2) * num_maps for i in num_bins for index in filter_cols]
         # Use np.ix_ to filter both rows and columns in the given indices
         filtered_mat = matrix[np.ix_(all_bins, all_bins)]
         reordered_mat = reorder_cov_matrix(filtered_mat, 
