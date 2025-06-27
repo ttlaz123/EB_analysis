@@ -99,9 +99,10 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
         g.settings.alpha_filled_add = 0.4
 
         legend_labels = []
-        for (_, _, samples, label, color, lw) in [(g, s, l, c, w) for (_, s, l, c, w) in plot_data]:
+        for (_, _, samples, label, color, lw) in plot_data:
             g.plot_1d(samples, param_name, color=color, lw=lw)
             legend_labels.append(label)
+
 
         g.add_legend(legend_labels=legend_labels)
         filename = f"{fede_key}.png"
