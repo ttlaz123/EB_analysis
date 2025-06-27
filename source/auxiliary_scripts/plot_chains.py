@@ -17,7 +17,7 @@ def find_chain_dirs(base_dir: str) -> List[str]:
 
 def get_samples(chain_path: str):
     try:
-        return loadMCSamples(chain_path, settings={"ignore_rows": 0.3})
+        return loadMCSamples(chain_path, settings={"ignore_rows": 0.1})
     except Exception as e:
         print(f"Warning: Failed to load {chain_path}: {e}")
         return None
@@ -49,7 +49,7 @@ def group_samples_by_fede(chain_dirs: List[str], base_dir: str) -> Dict[str, Lis
         if fede_key not in fede_groups:
             fede_groups[fede_key] = []
         fede_groups[fede_key].append((samples, chain_dir))
-
+    print(fede_groups)
     return fede_groups
 
 
@@ -62,7 +62,7 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
         g.settings.alpha_filled_add = 0.4
 
         for samples, label in entries:
-            param_names = filter_params(samples)
+            param_names = 'gMpl' # filter_params(samples)
             g.plot_1d(samples, param_names, label=label)
 
         g.add_legend()
