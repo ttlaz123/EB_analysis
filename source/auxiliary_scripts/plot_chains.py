@@ -46,7 +46,6 @@ def extract_fede_tag(name: str) -> str:
     match = re.search(r'fede0\.?\d+', name)
     return match.group(0) if match else "no_fede_tag"
 
-
 def group_samples_by_fede(chain_dirs: List[str], base_dir: str) -> Dict[str, List]:
     fede_groups = {}
 
@@ -200,17 +199,66 @@ def plot_trace_for_param(chain_dir: str, param_name: str, param_index: int, outp
     out_file = os.path.join(output_dir, f"{os.path.basename(chain_dir)}_trace_{param_name}.png")
     plt.savefig(out_file)
     plt.close()
+    
+def extract_ldiff_tag(name: str) -> str:
+    match = re.search(r'ldiff\d+', name)
+    return match.group(0) if match else "no_ldiff_tag"
+def get_ldiff_samples(chain_dirs, base_dir):
+    ldiff_chains = []
+    for chain_dir in chain_dirs:
+        chain_file = os.path.join(base_dir, chain_dir, "real")
+        ldiff_tag = extract_ldiff_tag(chain_dir)
+        if(ldiff_tag == 'no_ldiff_tag'):
+            continue 
+
+        samples = get_samples(chain_file)
+        if not samples:
+            continue
+        ldiff_chains.append((samples, chain_dir))
+    return ldiff_chains
+
+def plot_ldiff_posteriors(ldiff_chains, output_dir: str):
+    os.makedirs(output_dir, exist_ok=True)   
+    param_name = "angle_diff"
+    plot_data = []
+
+    for samples, dir_name in ldiff_chains:
+        mean = samples.mean(param_name)
+        std = samples.std(param_name)
+        label = f"{dir_name}: {mean:.2f} ± {std:.2f}"
+        plot_data.append((samples, label))
+
+    # Sort by label name
+    plot_data.sort(key=lambda x: x[1])
+
+    g = plots.getSubplotPlotter(width_inch=10)
+    g.settings.num_plot_contours = 1
+    g.settings.alpha_filled_add = 0.4
+
+    legend_labels = []
+    for (samples, label) in plot_data:
+        g.plot_1d(samples, param_name)
+        legend_labels.append(label)
+
+    ax = g.subplots[0, 0]
+    ax.set_xlim(-1.5, 1.5)
+    ax.axvline(0, color='gray', linestyle='--', linewidth=1)
+    ax.set_xlabel(r"$g / M_\mathrm{pl}^{-1}$", fontsize=12)
+    ax.legend(legend_labels, loc='upper left', fontsize=10)
+
+    g.export(os.path.join(output_dir, "ldiff.png"))
 
 def main():
     parser = argparse.ArgumentParser(description="Plot Cobaya MCMC chains.")
     parser.add_argument('--base_dir', required=True, help='Path to base chain directory')
     parser.add_argument('--output_dir', default='plots', help='Directory to save plots')
     parser.add_argument('--group_by_fede', action='store_true', help='Group chains by fede value')
+    parser.add_argument('--group_by_ldiff', action='store_true', help='Group chains by ldiff value')
     parser.add_argument('--plot_traces', action='store_true', help='Generate trace plots to inspect burn-in')
 
     args = parser.parse_args()
-
     chain_dirs = find_chain_dirs(args.base_dir)
+
     if args.plot_traces:
         param_name = "gMpl"
         for chain_dir in chain_dirs:
@@ -220,7 +268,6 @@ def main():
                 continue
             try:
                 param_names = samples.paramNames.list()
-                print(param_names)
                 if param_name not in param_names:
                     print(f"{param_name} not found in {chain_dir}")
                     continue
@@ -231,14 +278,17 @@ def main():
 
             trace_output_dir = os.path.join(args.output_dir, "traces")
             plot_trace_for_param(chain_path, param_name, param_index, trace_output_dir)
-    if args.group_by_fede:
+
+    elif args.group_by_ldiff:
+        ldiff_chains = get_ldiff_samples(chain_dirs, args.base_dir)
+        plot_ldiff_posteriors(ldiff_chains, args.output_dir)
+
+    elif args.group_by_fede:
         fede_groups = group_samples_by_fede(chain_dirs, args.base_dir)
         plot_grouped_posteriors(fede_groups, args.output_dir)
+
     else:
         plot_each_chain_separately(chain_dirs, args.base_dir, args.output_dir)
-    
-    
 
 if __name__ == "__main__":
     main()
-
