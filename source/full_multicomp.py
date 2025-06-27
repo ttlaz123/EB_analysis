@@ -427,7 +427,7 @@ def load_shared_data(input_args):
         bin_starts, raw_cl, SHARED_DATA_DICT['eskilt'] = ld.load_eskilt_data(ede_path=FILE_PATHS['EDE_spectrum'])
 
 def run_bk18_likelihood(params_dict, observation_file_path, input_args, 
-                        rstop = 0.01, max_tries=10000):
+                        rstop = 0.005, max_tries=10000):
     """
     Runs the Cobaya MCMC likelihood using BK18_full_multicomp likelihood class.
 
@@ -564,12 +564,12 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
                                     "proposal":0.1,
                                     "latex":"\\beta_{\mathrm{sync}}"}
     elif(theory_comps == 'eskilt'):
-   
+        params_dict['alpha_BK18_220']['ref']=-1 
         params_dict['A_lens'] = 1
         params_dict['alpha_CMB'] = anglecmb_priors
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
     elif(theory_comps == 'det_polrot'):
-        params_dict['alpha_CMB'] = 0#anglecmb_priors
+        params_dict['alpha_CMB'] = anglecmb_priors
         pass
 
     elif(theory_comps == 'fixed_dust'):
@@ -716,7 +716,7 @@ def multicomp_mcmc_driver(input_args):
         if(input_args.overwrite):
             updated_info, sampler = run_bk18_likelihood(params_dict, 
                                                         observation_file_path, 
-                                                        input_args)
+                                                     input_args)
             replace_dict = {
                 #'alpha_BK18_220': 0,
                 #'alpha_BK18_150': 0,
