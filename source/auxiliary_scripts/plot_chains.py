@@ -123,7 +123,7 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
             Line2D([0], [0], color=color, lw=lw)
             for (_, _, _, color, lw) in plot_data
         ]
-        g.subplots[0, 0].legend(custom_lines, legend_labels, loc='upper right', fontsize=10)
+        g.subplots[0, 0].legend(custom_lines, legend_labels, loc='upper left', fontsize=10)
 
         filename = f"{fede_key}.png"
         g.export(os.path.join(output_dir, filename))
