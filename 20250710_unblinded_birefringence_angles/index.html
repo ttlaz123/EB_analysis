@@ -65,50 +65,29 @@
 
 </figcaption>
 
-            <script type="text/javascript">
+        
+                <script type="text/javascript">
                
 
-                pager.link("#reals_basic", {
-                   
-                    
-                    'Plot type|plottype':[
-                        'Best Fit EE|_bestfitEE',
-                        'Best Fit EB|_bestfitEB',
-                        'Best Fit BB|_bestfitBB',
-                        'Triangle Plot|_triangle_plot',
-                        'Chi squared|_chisqmap'
-                    ],
-                    'Theory|theory':[
-                        'No birefringence, EB only|det_polrot',
-                        'Isotropic birefringence, EB only|det_polrot_betacmb',
-                        'Isotropic with foregrounds, EB only|gdust_betacmb',
-                        'Isotropic with foregrounds, all spectra|gdust_betacmb_all',
-                    ]
+                pager.link("#reals_ldiff", {
+                   'Measured|m': [
+                        'Isotropic Birefringence Constraint|betacmb',
+                    ], 
+                  
                 },
          
                     function (params) {
                         let dirbase = '/liuto/home/GitHub/EB_analysis/';
-                        let dirpath = dirbase + '/real_chains/';
-                        let spectra = 'eb';
-                        let theory = params.theory;
-                        if(params.theory == 'gdust_betacmb_all'){
-                            spectra = 'all';
-                            theory = 'gdust_betacmb';
-                        } else{
-                            spectra = 'eb';
-                        }
-                        let foldername = 'BK18lf_' + spectra + '_bin2-15_' +theory + '/';
-                        let file = 'real'+params.plottype;
-                        let name = dirpath + foldername + file +  '.png';
+                        let dirpath = dirbase + '/paper_plots/';
+                        let file = params.n;
+                        let name = dirpath + file +  '.png';
             
                         console.log(name);
                         return name;
                     });
 
                 pager.setparams({
-        
-                    'plottype': '_triangle_plot',
-                    'theory': 'det_polrot',
+                        'n':'betacmb',
                 });
             </script>
         </figure>
