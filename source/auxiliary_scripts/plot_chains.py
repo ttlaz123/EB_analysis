@@ -221,33 +221,58 @@ def get_ldiff_samples(chain_dirs, base_dir):
 def plot_ldiff_posteriors(ldiff_chains, output_dir: str):
     os.makedirs(output_dir, exist_ok=True)   
     param_name = "angle_diff"
+
+    # Mapping ldiff tag → (legend label, color)
+    ldiff_map = {
+        "ldiff8":  ("$\ell_b=265$", "#1f77b4"),
+        "ldiff9":  ("$\ell_b=300$", "#ff7f0e"),
+        "ldiff10": ("$\ell_b=335$", "#2ca02c"),
+        "ldiff11": ("$\ell_b=370$", "#d62728"),
+        "ldiff12": ("$\ell_b=405$", "#9467bd"),
+    }
+
     plot_data = []
 
     for samples, dir_name in ldiff_chains:
+        ldiff_tag = extract_ldiff_tag(dir_name)
+        if ldiff_tag not in ldiff_map:
+            continue
+
+        label, color = ldiff_map[ldiff_tag]
         mean = samples.mean(param_name)
         std = samples.std(param_name)
-        label = f"{dir_name}: {mean:.2f} ± {std:.2f}"
-        plot_data.append((samples, label))
+        full_label = f"{label}: {mean:.2f} ± {std:.2f}"
+        # Store numeric ldiff for sorting, samples, label, and color
+        plot_data.append((int(ldiff_tag.replace("ldiff", "")), samples, full_label, color))
 
-    # Sort by label name
-    plot_data.sort(key=lambda x: x[1])
+    # Sort by numeric ldiff value
+    plot_data.sort(key=lambda x: x[0])
 
     g = plots.getSubplotPlotter(width_inch=10)
     g.settings.num_plot_contours = 1
     g.settings.alpha_filled_add = 0.4
 
     legend_labels = []
-    for (samples, label) in plot_data:
+    custom_lines = []
+
+    for (_, samples, label, color) in plot_data:
         g.plot_1d(samples, param_name)
+        line = g.subplots[0, 0].get_lines()[-1]
+        line.set_color(color)
+        line.set_linewidth(2.0)
         legend_labels.append(label)
+        custom_lines.append(Line2D([0], [0], color=color, lw=2))
 
     ax = g.subplots[0, 0]
     ax.set_xlim(-1.5, 1.5)
     ax.axvline(0, color='gray', linestyle='--', linewidth=1)
-    ax.set_xlabel(r"$g / M_\mathrm{pl}^{-1}$", fontsize=12)
-    ax.legend(legend_labels, loc='upper left', fontsize=10)
+    ax.set_xlabel(r"$\Delta\beta_{\ell_b}$", fontsize=14)
+    ax.legend(custom_lines, legend_labels, loc='upper left', fontsize=10)
 
-    g.export(os.path.join(output_dir, "ldiff.png"))
+    filename = os.path.join(output_dir, "ldiff.png")
+    print('Saving:', filename)
+    g.export(filename)
+
 
 def main():
     parser = argparse.ArgumentParser(description="Plot Cobaya MCMC chains.")
