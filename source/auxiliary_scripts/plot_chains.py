@@ -215,6 +215,7 @@ def get_ldiff_samples(chain_dirs, base_dir):
         if not samples:
             continue
         ldiff_chains.append((samples, chain_dir))
+    print(ldiff_chains)
     return ldiff_chains
 
 def plot_ldiff_posteriors(ldiff_chains, output_dir: str):
@@ -280,6 +281,7 @@ def main():
             plot_trace_for_param(chain_path, param_name, param_index, trace_output_dir)
 
     elif args.group_by_ldiff:
+        print('Doing ldiff')
         ldiff_chains = get_ldiff_samples(chain_dirs, args.base_dir)
         plot_ldiff_posteriors(ldiff_chains, args.output_dir)
 
