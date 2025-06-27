@@ -105,15 +105,15 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
         legend_labels = []
         for (_, samples, label, color, lw) in plot_data:
             g.plot_1d(samples, param_name)
-            # Apply color and linewidth manually
-            line = g.subplots[0].get_lines()[-1]
+            # Fix color and line width manually
+            line = g.subplots[0, 0].get_lines()[-1]
             line.set_color(color)
             line.set_linewidth(lw)
             legend_labels.append(label)
 
-        # Customize axis limits and add vertical line at 0
-        g.subplots[0].set_xlim(-1, 1)
-        g.subplots[0].axvline(0, color='gray', linestyle='--', linewidth=1)
+        # Axis range and vertical line at 0
+        g.subplots[0, 0].set_xlim(-1, 1)
+        g.subplots[0, 0].axvline(0, color='gray', linestyle='--', linewidth=1)
 
         g.add_legend(legend_labels=legend_labels)
         filename = f"{fede_key}.png"
