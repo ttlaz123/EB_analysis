@@ -21,7 +21,7 @@
     <link rel="stylesheet" type="text/css" href="scripts/pager.css">
 
     <header>
-        <h1>Unblinded Birefringence Data</h1>
+        <h1>Unblinded Birefringence Raw Chains</h1>
 
         <time datetime="2025 July 10" class="published updated">
             2025 July 10
@@ -33,23 +33,15 @@
     <section>
         <h2>Introduction</h2>
         <p><strong>Summary:</strong>  
-
+            Raw chains with unblinded angle data. 
   </p>
 
-        <p>This posting builds upon previous updates:</p>
+        <p>This posting is linked by:</p>
         <ul>
             <li><a
-                    href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20240924_preliminary_eb_ede_results/">
-                    2024-09-24: Preliminary EB EDE Results</a></li>
-            <li><a
-                    href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20241203_multicomp_eb_ede_update/">
-                    2024-12-03: Multicomponent EB EDE Update</a></li>
-            <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20250218_ede_forecast/">
-                    2025-02-18: EDE Forecast</a></li>
-            <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20250513_dust_eb_ede_update/">
-                    2025-05-13: Dust analysis</a></li>
-            <li><a href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20250605_time_dependent_constraints/">
-            2025-06-05: Multipole dependent analysis</a></li>
+                    href="https://bicep.rc.fas.harvard.edu/bkcmb/analysis_logbook/analysis/20250710_unblinded_birefringence_results/">
+                    2025-07-10: Unblinded Birefringence Results</a></li>
+         
 
         </ul>
         <p>
@@ -57,7 +49,7 @@
    </p>
    </section>
    <section>
-    <h2>Summary Plots</h2>
+    <h2>Real Plots</h2>
     <figure>
             <img alt="Real Data" id="reals_basic" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
@@ -126,22 +118,37 @@
                 pager.link("#reals_ede", {
                    
                     
-            
+                    'Plot type|plottype':[
+                        'Best Fit EE|_bestfitEE',
+                        'Best Fit EB|_bestfitEB',
+                        'Best Fit BB|_bestfitBB',
+                        'Triangle Plot|_triangle_plot',
+                        'Chi squared|_chisqmap'
+                    ],
+                    'Spectra|spectra': [
+                        'EB only, no foregrounds|_eb',
+                        'No BB with foregrounds|_nob',
+                        'All spectra with foregrounds|_all',
+                        'All spectra with foregrounds and A_lens|_alens'
+                    ],
                     'EDE parameters|fede': [
-                        'f_EDE = 0.012 (ACT)|fede0.01',
-                        'f_EDE = 0.070 (Planck)|fede0.07',
-                        'f_EDE = 0.087 (Planck Boss)|fede0.09',
-                        'f_EDE = 0.127 (Planck Boss SH0ES)|fede0.13',
+                        'f_EDE = 0.012 (ACT)|_fede0.01',
+                        'f_EDE = 0.070 (Planck)|_fede0.07',
+                        'f_EDE = 0.087 (Planck Boss)|_fede0.09',
+                        'f_EDE = 0.127 (Planck Boss SH0ES)|_fede0.13',
                     ], 
                 },
          
                     function (params) {
                         let dirbase = '/liuto/home/GitHub/EB_analysis/';
-                        let dirpath = dirbase + '/paper_plots/';
-                       
-                        
-                        let file = params.fede;
-                        let name = dirpath + file +  '.png';
+                        let dirpath = dirbase + '/real_chains/';
+                        let theory = 'all';
+                        if(params.spectra == '_eb'){
+                            theory = 'fixed_dust'
+                        }
+                        let foldername = 'BK18lf' + params.spectra + '_bin2-15_' + theory + params.fede + '/';
+                        let file = 'real'+params.plottype;
+                        let name = dirpath + foldername + file +  '.png';
             
                         console.log(name);
                         return name;
@@ -149,12 +156,66 @@
 
                 pager.setparams({
         
+                    'plottype': '_triangle_plot',
                     'fede': '_fede0.09',
+                    'spectra': '_eb',
                 });
             </script>
         </figure>
 
- 
+        <figure>
+            <img alt="Real Data" id="reals_combined" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+             <figcaption>
+
+</figcaption>
+
+            <script type="text/javascript">
+               
+
+                pager.link("#reals_combined", {
+                   
+                    
+                    'Plot type|plottype':[
+                        'Best Fit EE|_bestfitEE',
+                        'Best Fit EB|_bestfitEB',
+                        'Best Fit BB|_bestfitBB',
+                        'Triangle Plot|_triangle_plot',
+                        'Chi squared|_chisqmap'
+                    ],
+                    'Dataset|data':[
+                        'Eskilt Only|only',
+                        'Eskilt + BK18lf|BK18lf'
+                    ],
+                    'EDE parameters|fede': [
+                        'f_EDE = 0.012 (ACT)|_fede0.01',
+                        'f_EDE = 0.070 (Planck)|_fede0.07',
+                        'f_EDE = 0.087 (Planck Boss)|_fede0.09',
+                        'f_EDE = 0.127 (Planck Boss SH0ES)|_fede0.13',
+                    ], 
+                },
+         
+                    function (params) {
+                        let dirbase = '/liuto/home/GitHub/EB_analysis/';
+                        let dirpath = dirbase + '/real_chains/';
+                       
+                        let foldername = 'eskilt_' + params.data + params.fede + '/';
+                        let file = 'real'+params.plottype;
+                        let name = dirpath + foldername + file +  '.png';
+            
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+        
+                    'plottype': '_triangle_plot',
+                    'fede': '_fede0.09',
+                });
+            </script>
+        </figure>
+   </section>
+
     <figure>
             <img alt="Real Data" id="reals_ldiff" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
@@ -167,14 +228,29 @@
 
                 pager.link("#reals_ldiff", {
                    
-                  
+                    
+                    'Plot type|plottype':[
+                        'Best Fit EE|_bestfitEE',
+                        'Best Fit EB|_bestfitEB',
+                        'Best Fit BB|_bestfitBB',
+                        'Triangle Plot|_triangle_plot',
+                        'Chi squared|_chisqmap'
+                    ],
+                    'L break|bindiff': [
+                        'lb = 265: 2-8 vs 9-15|_ldiff8',
+                        'lb = 300: 2-9 vs 10-15|_ldiff9',
+                        'lb = 335: 2-10 vs 11-15|_ldiff10',
+                        'lb = 370: 2-11 vs 12-15|_ldiff11',
+                        'lb = 405: 2-12 vs 13-15|_ldiff12',
+                    ],
                 },
          
                     function (params) {
                         let dirbase = '/liuto/home/GitHub/EB_analysis/';
-                        let dirpath = dirbase + '/paper_plots/';
-                        let file = 'ldiff';
-                        let name = dirpath + file +  '.png';
+                        let dirpath = dirbase + '/real_chains/';
+                        let foldername = 'BK18lf_eb_bin2-15' + params.bindiff + '/';
+                        let file = 'real'+params.plottype;
+                        let name = dirpath + foldername + file +  '.png';
             
                         console.log(name);
                         return name;
@@ -182,6 +258,8 @@
 
                 pager.setparams({
         
+                    'plottype': '_triangle_plot',
+                    'bindiff': '_ldiff10',
                 });
             </script>
         </figure>
