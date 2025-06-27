@@ -108,48 +108,120 @@
     </section>
 
     <section>
-        <h2>Early Dark Energy Constraints</h2>
-        We run the MCMC estimator defined in the dust analysis posting. We use different EDE 
-        parameters for the EB curve to test the fit for various best fit EDE parameters. 
-        For each EB-EDE curve, we run six different estimators:
-        With foregrounds: EE+EB, EE+EB+BB, EE+EB+scaled BB. 
-        The foreground analysis verifies that foregrounds do not significantly impact 
-        the value or spread of the early dark energy parameter.
+    <h2>Early Dark Energy Constraints</h2>
 
-        Without foregrounds: BK18 EB, Eskilt 2023, Eskilt + 2023.
-        We rerun Eskilt's analysis with their published data to verify their results for the 
-        multiple different EDE curves. Multiple MCMC runs at the R-1 convergence criteria 
-        at 0.005 show consistency of peak and spread of within 0.01 for g. 
-        We run the estimator for the BK18 3 year dataset, which gives us different constraints 
-        for different values of EDE, consistent with Eskilt's results. 
-        Finally, we run the combined Eskilt and BK18 estimator by combining their likelihoods, 
-        which provides us slightly stronger constraints on g. 
-        <figure>
-            <img alt="EDE posteriors" id="reals_ede" src="#" width="750" height="500"
-                onerror="javascript:this.src='dne.png'" />
-            <figcaption>
-                Posterior distributions for the EDE coupling parameter \( g/M_{\text{pl}}^{-1} \),
-                shown for four different fixed values of \( f_{\text{EDE}} \) taken from ACT and Planck+BOSS+SH0ES.
-            </figcaption>
+    <p>
+        We run the MCMC estimators defined in the dust analysis posting, now applied to real data with various fixed EDE fractions \( f_{\text{EDE}} \). 
+        For each fixed \( f_{\text{EDE}} \) value, we explore six different configurations:
+    </p>
+    <ul>
+        <li><strong>With foregrounds:</strong> EE+EB, EE+EB+BB, EE+EB+scaled BB</li>
+        <li><strong>Without foregrounds:</strong> BK18 EB-only, Eskilt-only (2023), and combined Eskilt+BK18 EB</li>
+    </ul>
 
-            <script type="text/javascript">
-                pager.link("#reals_ede", {
-                    'EDE parameters|fede': [
-                        'f_EDE = 0.012 (ACT)|fede0.01',
-                        'f_EDE = 0.070 (Planck)|fede0.07',
-                        'f_EDE = 0.087 (Planck BOSS)|fede0.09',
-                        'f_EDE = 0.127 (Planck BOSS SH0ES)|fede0.13',
-                    ],
-                }, function (params) {
-                    let dirbase = '/liuto/home/GitHub/EB_analysis/';
-                    let dirpath = dirbase + '/paper_plots/';
-                    return dirpath + params.fede + '.png';
-                });
+    <p>
+        The foregrounded results help validate that the inclusion of dust and synchrotron parameters 
+        does not significantly affect the posterior mean or width for the coupling parameter \( g/M_{\mathrm{pl}}^{-1} \). 
+        Multiple runs with R−1 < 0.005 show stable posteriors within ±0.01 of each other. 
+        We also successfully reproduce the Eskilt 2023 constraints using their publicly available data.
+    </p>
 
-                pager.setparams({ 'fede': 'fede0.09' });
-            </script>
-        </figure>
-    </section>
+    <figure>
+        <img alt="EDE posteriors" id="reals_ede" src="#" width="750" height="500"
+            onerror="javascript:this.src='dne.png'" />
+        <figcaption>
+            Posterior distributions for the EDE coupling parameter \( g/M_{\text{pl}}^{-1} \),
+            shown for four fixed values of \( f_{\text{EDE}} \) from ACT and Planck+BOSS+SH0ES.
+        </figcaption>
+
+        <script type="text/javascript">
+            pager.link("#reals_ede", {
+                'EDE parameters|fede': [
+                    'f_EDE = 0.012 (ACT)|fede0.01',
+                    'f_EDE = 0.070 (Planck)|fede0.07',
+                    'f_EDE = 0.087 (Planck BOSS)|fede0.09',
+                    'f_EDE = 0.127 (Planck BOSS SH0ES)|fede0.13',
+                ],
+            }, function (params) {
+                let dirbase = '/liuto/home/GitHub/EB_analysis/';
+                let dirpath = dirbase + '/paper_plots/';
+                return dirpath + params.fede + '.png';
+            });
+
+            pager.setparams({ 'fede': 'fede0.09' });
+        </script>
+    </figure>
+
+    <table border="1" cellspacing="0" cellpadding="6" style="border-collapse: collapse; margin-top: 1em;">
+        <thead>
+            <tr>
+                <th>Configuration</th>
+                <th>f<sub>EDE</sub> = 0.012</th>
+                <th>f<sub>EDE</sub> = 0.070</th>
+                <th>f<sub>EDE</sub> = 0.087</th>
+                <th>f<sub>EDE</sub> = 0.127</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>BK18 EE+EB</td>
+                <td>0.41 ± 1.01</td>
+                <td>0.12 ± 0.41</td>
+                <td>0.14 ± 0.38</td>
+                <td>0.17 ± 0.31</td>
+            </tr>
+            <tr>
+                <td>BK18 EE+EB+BB</td>
+                <td>0.28 ± 1.01</td>
+                <td>0.07 ± 0.40</td>
+                <td>0.11 ± 0.37</td>
+                <td>0.11 ± 0.31</td>
+            </tr>
+            <tr>
+                <td>BK18 EE+EB+scaled BB</td>
+                <td>0.21 ± 1.02</td>
+                <td>0.06 ± 0.43</td>
+                <td>0.08 ± 0.37</td>
+                <td>0.10 ± 0.31</td>
+            </tr>
+            <tr>
+                <td>BK18 EB (no foregr.)</td>
+                <td>0.48 ± 0.99</td>
+                <td>0.20 ± 0.46</td>
+                <td>0.21 ± 0.39</td>
+                <td>0.23 ± 0.30</td>
+            </tr>
+            <tr>
+                <td>Eskilt-only</td>
+                <td>0.05 ± 0.44</td>
+                <td>0.05 ± 0.18</td>
+                <td>0.03 ± 0.16</td>
+                <td>0.03 ± 0.13</td>
+            </tr>
+            <tr>
+                <td>Eskilt + BK18 EB</td>
+                <td>0.21 ± 0.40</td>
+                <td>0.08 ± 0.17</td>
+                <td>0.07 ± 0.14</td>
+                <td>0.05 ± 0.12</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p><strong>Analysis:</strong></p>
+    <p>
+        The posteriors are broadly consistent with zero across all \( f_{\text{EDE}} \) values, indicating 
+        no statistically significant evidence for an EDE-induced birefringence signal. Notably, the 
+        combined likelihood (Eskilt + BK18 EB) consistently gives the tightest constraints. 
+    </p>
+
+    <p>
+        For low \( f_{\text{EDE}} \), BK18-only EB posteriors show slightly elevated central values with larger uncertainties, 
+        while the Eskilt-only analysis remains closer to zero. The inclusion of foregrounds appears to have minimal effect 
+        on the mean, although BB inclusion modestly tightens uncertainties at higher \( f_{\text{EDE}} \).
+    </p>
+</section>
+
 
     <section>
         <h2>Multipole Dependence</h2>
