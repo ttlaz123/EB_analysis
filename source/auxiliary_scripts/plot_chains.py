@@ -49,7 +49,10 @@ def group_samples_by_fede(chain_dirs: List[str], base_dir: str) -> Dict[str, Lis
         if fede_key not in fede_groups:
             fede_groups[fede_key] = []
         fede_groups[fede_key].append((samples, chain_dir))
-    print(fede_groups)
+    for key in fede_groups:
+        print(key)
+        for x in fede_groups[key]:
+            print(x[1])
     return fede_groups
 
 
@@ -61,11 +64,13 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
         g.settings.num_plot_contours = 1
         g.settings.alpha_filled_add = 0.4
 
+        labels = []
         for samples, label in entries:
-            param_names = 'gMpl' # filter_params(samples)
-            g.plot_1d(samples, param_names, label=label)
+            param_name = 'gMpl'  # or filter_params(samples)[0] if you want auto-select
+            g.plot_1d(samples, param_name, label=label)
+            labels.append(label)
 
-        g.add_legend()
+        g.add_legend(legend_labels=labels)  # ✅ Fix: Pass legend_labels
         filename = f"{fede_key}.png"
         g.export(os.path.join(output_dir, filename))
 
