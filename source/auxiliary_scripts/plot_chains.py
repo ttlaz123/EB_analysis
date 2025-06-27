@@ -225,7 +225,7 @@ def main():
             if not samples:
                 continue
             try:
-                param_names = samples.paramNames.names
+                param_names = samples.paramNames.list()
                 print(param_names)
                 if param_name not in param_names:
                     print(f"{param_name} not found in {chain_dir}")
