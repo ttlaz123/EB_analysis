@@ -275,7 +275,7 @@ def plot_ldiff_posteriors(ldiff_chains, output_dir: str):
     g.export(filename)
 def plot_betacmb_posteriors(chain_dirs: List[str], base_dir: str, output_dir: str):
     os.makedirs(output_dir, exist_ok=True)
-    param_name = "alpha_cmb"
+    param_name = "alpha_CMB"
     plot_data = []
 
     for chain_dir in chain_dirs:
