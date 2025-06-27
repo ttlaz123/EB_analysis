@@ -111,19 +111,35 @@
     <h2>Early Dark Energy Constraints</h2>
 
     <p>
-        We run the MCMC estimators defined in the dust analysis posting, now applied to real data with various fixed EDE fractions \( f_{\text{EDE}} \). 
+        We run the MCMC estimators defined in the Dust Analysis posting, now applied to real data with various fixed EDE fractions \( f_{\text{EDE}} \).
         For each fixed \( f_{\text{EDE}} \) value, we explore six different configurations:
     </p>
     <ul>
-        <li><strong>With foregrounds:</strong> EE+EB, EE+EB+BB, EE+EB+scaled BB</li>
-        <li><strong>Without foregrounds:</strong> BK18 EB-only, Eskilt-only (2023), and combined Eskilt+BK18 EB</li>
+        <li><strong>With foregrounds:</strong>
+            <ul>
+                <li>EE+EB</li>
+                <li>EE+EB+BB</li>
+                <li>EE+EB+scaled BB</li>
+            </ul>
+        </li>
+        <li><strong>Without foregrounds:</strong>
+            <ul>
+                <li>BK18 EB-only</li>
+                <li>Eskilt-only (2023)</li>
+                <li>Combined Eskilt + BK18 EB</li>
+            </ul>
+        </li>
     </ul>
 
     <p>
-        The foregrounded results help validate that the inclusion of dust and synchrotron parameters 
-        does not significantly affect the posterior mean or width for the coupling parameter \( g/M_{\mathrm{pl}}^{-1} \). 
-        Multiple runs with R−1 < 0.005 show stable posteriors within ±0.01 of each other. 
+        The foregrounded results validate that including galactic dust and synchrotron modeling does not significantly affect the posterior mean or width of the coupling parameter \( g/M_{\mathrm{pl}}^{-1} \).
+        Multiple independent runs with \( R - 1 < 0.005 \) confirm posterior stability, with central values varying by less than ±0.01.
         We also successfully reproduce the Eskilt 2023 constraints using their publicly available data.
+    </p>
+
+    <p>
+        As discussed in the Multipole-Dependent Analysis posting, the scaled BB configuration allows the lensing amplitude to vary freely,
+        which reduces bias in \( g \) due to mismodeling of the lensing signal in the BB spectrum.
     </p>
 
     <figure>
@@ -203,24 +219,43 @@
                 <td>0.21 ± 0.40</td>
                 <td>0.08 ± 0.17</td>
                 <td>0.07 ± 0.14</td>
-                <td>0.05 ± 0.12</td>
+                <td><strong>0.05 ± 0.12</strong></td>
             </tr>
         </tbody>
     </table>
 
     <p><strong>Analysis:</strong></p>
-    <p>
-        The posteriors are broadly consistent with zero across all \( f_{\text{EDE}} \) values, indicating 
-        no statistically significant evidence for an EDE-induced birefringence signal. Notably, the 
-        combined likelihood (Eskilt + BK18 EB) consistently gives the tightest constraints. 
-    </p>
+<p>
+    The posteriors are broadly consistent with zero across all \( f_{\text{EDE}} \) values, indicating
+    no statistically significant evidence for an EDE-induced birefringence signal. The combined likelihood
+    from Eskilt + BK18 EB consistently yields the tightest constraints, with the strongest result
+    at \( f_{\text{EDE}} = 0.127 \): <strong>\( g = 0.05 \pm 0.12 \)</strong>. This represents a modest but meaningful
+    improvement over the standalone Planck-based constraint.
+</p>
 
-    <p>
-        For low \( f_{\text{EDE}} \), BK18-only EB posteriors show slightly elevated central values with larger uncertainties, 
-        while the Eskilt-only analysis remains closer to zero. The inclusion of foregrounds appears to have minimal effect 
-        on the mean, although BB inclusion modestly tightens uncertainties at higher \( f_{\text{EDE}} \).
-    </p>
+<p>
+    Notably, at \( f_{\text{EDE}} = 0.087 \), the combined analysis improves upon the baseline Eskilt-only result
+    of \( g = 0.04 \pm 0.16 \) (not shown here but available in previous postings), tightening it to
+    \( g = 0.07 \pm 0.14 \). This demonstrates the added constraining power of BK18 EB data,
+    even without including foreground modeling or BB information.
+</p>
+
+<p>
+    BK18 EB-only posteriors exhibit slightly higher central values with broader uncertainties,
+    yet remain consistent with zero. The inclusion of foreground modeling has minimal impact on
+    the inferred mean or spread of \( g \), validating the robustness of the constraint.
+</p>
+
+<p>
+    Interestingly, tighter constraints are obtained at larger \( f_{\text{EDE}} \) values. This trend likely arises
+    because larger \( f_{\text{EDE}} \) values produce EB curves that differ more significantly from
+    the rotated EE curve, enhancing their power to break degeneracies with instrumental parameters.
+    The weakest constraints occur for \( f_{\text{EDE}} = 0.012 \), where the EB signal is both small and
+    nearly degenerate with the rotated EE template, limiting statistical leverage.
+</p>
+
 </section>
+
 
 
     <section>
