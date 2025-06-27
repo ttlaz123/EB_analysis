@@ -168,16 +168,15 @@ def plot_each_chain_separately(chain_dirs: List[str], base_dir: str, output_dir:
         g.export(os.path.join(output_dir, filename))
 
 def plot_trace_for_param(chain_dir: str, param_name: str, param_index: int, output_dir: str):
-    import numpy as np
-    import matplotlib.pyplot as plt
+    
     chains = []
-    for i in range(1, 100):  # Look for real.1.txt, real.2.txt, etc.
+    for i in range(1, 2):  # Look for real.1.txt, real.2.txt, etc.
         chain_file = os.path.join(chain_dir, f"real.{i}.txt")
         if not os.path.exists(chain_file):
             break
         try:
             data = np.loadtxt(chain_file)
-            chains.append(data[:, param_index])
+            chains.append(data[:2000, param_index])
         except Exception as e:
             print(f"Failed to read {chain_file}: {e}")
             continue
