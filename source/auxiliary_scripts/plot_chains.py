@@ -72,12 +72,14 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
     group_order = {"with_fg": 0, "no_fg": 1, "eskilt": 2, "combined": 3}
 
     for fede_key, entries in fede_groups.items():
+        print('Plotting:', fede_key)
+        if fede_key == 'no_fede_tag':
+            print('Skipping:', fede_key)
+            continue
+
         plot_data = []
         param_name = "gMpl"
-        print('Plotting: ' + str(fede_key))
-        if(fede_key == 'no_fede_tag'):
-            print('Skipping: ' + fede_key)
-            continue
+
         for samples, dir_name in entries:
             match = None
             for key in model_config:
@@ -91,10 +93,9 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
             mean = samples.mean(param_name)
             std = samples.std(param_name)
             full_label = f"{label}: {mean:.2f} ± {std:.2f}"
-            # Store all needed data, including group and subgroup sort keys
             plot_data.append(((group_order[group], subgroup_priority), samples, full_label, color, lw))
 
-        # Sort by (group priority, subgroup priority)
+        # Sort by (group group_priority, subgroup_priority)
         plot_data.sort(key=lambda x: x[0])
 
         g = plots.getSubplotPlotter(width_inch=10)
@@ -103,9 +104,16 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
 
         legend_labels = []
         for (_, samples, label, color, lw) in plot_data:
-            g.plot_1d(samples, param_name, color=color, lw=lw)
+            g.plot_1d(samples, param_name)
+            # Apply color and linewidth manually
+            line = g.subplots[0].get_lines()[-1]
+            line.set_color(color)
+            line.set_linewidth(lw)
             legend_labels.append(label)
 
+        # Customize axis limits and add vertical line at 0
+        g.subplots[0].set_xlim(-1, 1)
+        g.subplots[0].axvline(0, color='gray', linestyle='--', linewidth=1)
 
         g.add_legend(legend_labels=legend_labels)
         filename = f"{fede_key}.png"
