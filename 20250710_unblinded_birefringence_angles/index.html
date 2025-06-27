@@ -109,6 +109,21 @@
 
     <section>
         <h2>Early Dark Energy Constraints</h2>
+        We run the MCMC estimator defined in the dust analysis posting. We use different EDE 
+        parameters for the EB curve to test the fit for various best fit EDE parameters. 
+        For each EB-EDE curve, we run six different estimators:
+        With foregrounds: EE+EB, EE+EB+BB, EE+EB+scaled BB. 
+        The foreground analysis verifies that foregrounds do not significantly impact 
+        the value or spread of the early dark energy parameter.
+
+        Without foregrounds: BK18 EB, Eskilt 2023, Eskilt + 2023.
+        We rerun Eskilt's analysis with their published data to verify their results for the 
+        multiple different EDE curves. Multiple MCMC runs at the R-1 convergence criteria 
+        at 0.005 show consistency of peak and spread of within 0.01 for g. 
+        We run the estimator for the BK18 3 year dataset, which gives us different constraints 
+        for different values of EDE, consistent with Eskilt's results. 
+        Finally, we run the combined Eskilt and BK18 estimator by combining their likelihoods, 
+        which provides us slightly stronger constraints on g. 
         <figure>
             <img alt="EDE posteriors" id="reals_ede" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />

@@ -111,7 +111,7 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
             line.set_color(color)
             line.set_linewidth(lw)
             legend_labels.append(label)
-
+            print(label )
         # Axis range and vertical line at 0
         g.subplots[0, 0].set_xlim(-1.5, 1.5)
         g.subplots[0, 0].axvline(0, color='gray', linestyle='--', linewidth=1)
