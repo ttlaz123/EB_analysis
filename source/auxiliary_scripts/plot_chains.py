@@ -266,7 +266,7 @@ def plot_ldiff_posteriors(ldiff_chains, output_dir: str):
     ax = g.subplots[0, 0]
     ax.set_xlim(-1.5, 1.5)
     ax.axvline(0, color='gray', linestyle='--', linewidth=1)
-    ax.set_xlabel(r"$\Delta\beta_{\ell_b}$", fontsize=14)
+    ax.set_xlabel(r"$\Delta\beta_{\ell_b}$ (degrees)", fontsize=14)
     ax.legend(custom_lines, legend_labels, loc='upper left', fontsize=10)
 
     filename = os.path.join(output_dir, "ldiff.png")
