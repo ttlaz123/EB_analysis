@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>EDE Update</title>
+    <title>Real Results</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <!-- Load up MathJax for math notation -->
     <script type="text/x-mathjax-config">
@@ -16,170 +16,167 @@
 </head>
 
 <body>
-    <!-- Add my custom pager script -->
+    <!-- Add custom pager script -->
     <script type="text/javascript" src="scripts/pager.js"></script>
     <link rel="stylesheet" type="text/css" href="scripts/pager.css">
 
     <header>
         <h1>Unblinded Birefringence Data</h1>
-
-        <time datetime="2025 July 10" class="published updated">
-            2025 July 10
-        </time> —
+        <time datetime="2025-07-10" class="published updated">2025 July 10</time> —
         Tongtian (Tom) Liu, Dominic Beck
     </header>
 
     <hr>
+
     <section>
         <h2>Introduction</h2>
-        <p><strong>Summary:</strong>  
-
-  </p>
+        <p><strong>Summary:</strong>
+            We unblind the EB curve and run MCMC chains to extract multipole-dependent
+            birefringence constraints. The full unblinded angles are provided in the appendix,
+            while the main body presents plots intended for the upcoming paper.
+            All measures of multipole dependence are consistent with zero,
+            placing strong constraints on deviations from ΛCDM.
+        </p>
 
         <p>This posting builds upon previous updates:</p>
         <ul>
-            <li><a
-                    href="../20240924_preliminary_eb_ede_results/">
-                    2024-09-24: Preliminary EB EDE Results</a></li>
-            <li><a
-                    href="../20241203_multicomp_eb_ede_update/">
-                    2024-12-03: Multicomponent EB EDE Update</a></li>
-            <li><a href="../20250218_ede_forecast/">
-                    2025-02-18: EDE Forecast</a></li>
-            <li><a href="../20250513_dust_eb_ede_update/">
-                    2025-05-13: Dust analysis</a></li>
-            <li><a href="../20250605_time_dependent_constraints/">
-            2025-06-05: Multipole dependent analysis</a></li>
-
+            <li><a href="../20240924_preliminary_eb_ede_results/">2024-09-24: Preliminary EB EDE Results</a></li>
+            <li><a href="../20241203_multicomp_eb_ede_update/">2024-12-03: Multicomponent EB EDE Update</a></li>
+            <li><a href="../20250218_ede_forecast/">2025-02-18: EDE Forecast</a></li>
+            <li><a href="../20250513_dust_eb_ede_update/">2025-05-13: Dust Analysis</a></li>
+            <li><a href="../20250605_time_dependent_constraints/">2025-06-05: Multipole-Dependent Analysis</a></li>
         </ul>
+
         <p>
-            We run all the MCMC chains on real data.
-   </p>
-   </section>
-   <section>
-    <h2>Summary Plots</h2>
-    <figure>
-            <img alt="Real Data" id="reals_basic" src="#" width="750" height="500"
+            All MCMC chains here are based on real data and use the validated estimators developed
+            in the Dust and Multipole-Dependent analyses. We first analyze isotropic birefringence
+            by varying the \( \beta_{\text{cmb}} \) term. Then we constrain the
+            Early Dark Energy (EDE) model explored in Eskilt 2023 using the parameter \( g/M_{\text{pl}}^{-1} \).
+            Finally, we introduce the first constraints on multipole dependence using
+            \( \Delta\beta_{\ell_b} \).
+        </p>
+    </section>
+
+    <section>
+        <h2>Isotropic Birefringence</h2>
+        <p>
+            We are still discussing whether these results and forecasts will be included in the final paper.
+            The plots below show that when galactic dust is modeled, the isotropic rotation angle
+            remains completely degenerate with the individual receiver polarization angle miscalibrations.
+        </p>
+
+        <p>
+            Although it may appear that \( \beta_{\text{cmb}} \) is constrained, this effect is due to the MCMC chains
+            reaching the edges of their priors. Running with tighter convergence criteria and broader priors tends
+            to flatten the posterior, making it indistinguishable from the prior.
+        </p>
+
+        <figure>
+            <img alt="Isotropic birefringence" id="reals_basic" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
-             <figcaption>
-
-</figcaption>
-
-        
-                <script type="text/javascript">
-               
-
-                pager.link("#reals_basic", {
-                   'Measured|n': [
-                        'Isotropic Birefringence Constraint|betacmb',
-                    ], 
-                  
-                },
-         
-                    function (params) {
-                        let dirbase = '/liuto/home/GitHub/EB_analysis/';
-                        let dirpath = dirbase + '/paper_plots/';
-                        let file = params.n;
-                        let name = dirpath + file +  '.png';
-            
-                        console.log(name);
-                        return name;
-                    });
-
-                pager.setparams({
-                        'n':'betacmb',
-                });
-            </script>
-        </figure>
-
-         <figure>
-            <img alt="Real Data" id="reals_ede" src="#" width="750" height="500"
-                onerror="javascript:this.src='dne.png'" />
-             <figcaption>
-
-</figcaption>
+            <figcaption>
+                Posterior distributions for the isotropic birefringence angle \( \beta_{\text{cmb}} \),
+                shown for three scenarios: EB-only without foregrounds, EB-only with foregrounds,
+                and EE+EB+BB with foregrounds.
+                
+            </figcaption>
 
             <script type="text/javascript">
-               
+                pager.link("#reals_basic", {
+                    'Measured|n': [
+                        'Isotropic Birefringence Constraint|betacmb',
+                    ],
+                }, function (params) {
+                    let dirbase = '/liuto/home/GitHub/EB_analysis/';
+                    let dirpath = dirbase + '/paper_plots/';
+                    let file = params.n;
+                    return dirpath + file + '.png';
+                });
 
-                pager.link("#reals_ede", {
-                   
-                    
+                pager.setparams({ 'n': 'betacmb' });
+            </script>
+        </figure>
+        <p>
+            Surprisingly, adding foreground parameters weakens constraints rather 
+            than breaking the degeneracy between \( \beta_{\text{cmb}} \) and receiver angle miscalibrations.
             
+            This is because in the EB-only case, it is harder for the sampler to jointly vary \( \beta_{\text{cmb}} \)
+            and the four receiver angles to preserve the EB signal, increasing the penalty in \( \chi^2 \).
+            Adding foreground parameters introduces extra degrees of freedom, allowing easier exploration
+            of alternative \( \beta_{\text{cmb}} \) values.
+        </p>
+    </section>
+
+    <section>
+        <h2>Early Dark Energy Constraints</h2>
+        <figure>
+            <img alt="EDE posteriors" id="reals_ede" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+            <figcaption>
+                Posterior distributions for the EDE coupling parameter \( g/M_{\text{pl}}^{-1} \),
+                shown for four different fixed values of \( f_{\text{EDE}} \) taken from ACT and Planck+BOSS+SH0ES.
+            </figcaption>
+
+            <script type="text/javascript">
+                pager.link("#reals_ede", {
                     'EDE parameters|fede': [
                         'f_EDE = 0.012 (ACT)|fede0.01',
                         'f_EDE = 0.070 (Planck)|fede0.07',
-                        'f_EDE = 0.087 (Planck Boss)|fede0.09',
-                        'f_EDE = 0.127 (Planck Boss SH0ES)|fede0.13',
-                    ], 
-                },
-         
-                    function (params) {
-                        let dirbase = '/liuto/home/GitHub/EB_analysis/';
-                        let dirpath = dirbase + '/paper_plots/';
-                       
-                        
-                        let file = params.fede;
-                        let name = dirpath + file +  '.png';
-            
-                        console.log(name);
-                        return name;
-                    });
-
-                pager.setparams({
-        
-                    'fede': 'fede0.09',
+                        'f_EDE = 0.087 (Planck BOSS)|fede0.09',
+                        'f_EDE = 0.127 (Planck BOSS SH0ES)|fede0.13',
+                    ],
+                }, function (params) {
+                    let dirbase = '/liuto/home/GitHub/EB_analysis/';
+                    let dirpath = dirbase + '/paper_plots/';
+                    return dirpath + params.fede + '.png';
                 });
+
+                pager.setparams({ 'fede': 'fede0.09' });
             </script>
         </figure>
+    </section>
 
- 
-    <figure>
-            <img alt="Real Data" id="reals_ldiff" src="#" width="750" height="500"
+    <section>
+        <h2>Multipole Dependence</h2>
+        <figure>
+            <img alt="Multipole-dependent birefringence" id="reals_ldiff" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
-             <figcaption>
-
-</figcaption>
+            <figcaption>
+                Posterior distributions for the multipole-dependent birefringence parameter \( \Delta\beta_{\ell_b} \)
+                at several band centers: \( \ell_b = 265, 300, 335, 370, 405 \).
+                All measurements are consistent with zero, placing tight constraints on birefringence variation
+                across angular scales.
+            </figcaption>
 
             <script type="text/javascript">
-               
-
                 pager.link("#reals_ldiff", {
-                   'Measured|m': [
+                    'Measured|m': [
                         'Delta Beta lb|ldiff',
-                    ], 
-                  
-                },
-         
-                    function (params) {
-                        let dirbase = '/liuto/home/GitHub/EB_analysis/';
-                        let dirpath = dirbase + '/paper_plots/';
-                        let file = params.m;
-                        let name = dirpath + file +  '.png';
-            
-                        console.log(name);
-                        return name;
-                    });
-
-                pager.setparams({
-                        'm':'ldiff',
+                    ],
+                }, function (params) {
+                    let dirbase = '/liuto/home/GitHub/EB_analysis/';
+                    let dirpath = dirbase + '/paper_plots/';
+                    return dirpath + params.m + '.png';
                 });
+
+                pager.setparams({ 'm': 'ldiff' });
             </script>
         </figure>
-   </section>
-    <section>
-        <h2>Future Directions</h2>
-       
-     
     </section>
+
+    <section>
+        <h2>Paper Draft</h2>
+        
+    </section>
+
     <section>
         <h2>Appendix</h2>
-        <p>All chains and plots can be found in
-            <code>/n/holylfs04/LABS/kovac_lab/Users/liuto/ede_chains</code>.
+        <p>All chains and plots are available at:
+            <code>/n/holylfs04/LABS/kovac_lab/Users/liuto/ede_chains</code>
         </p>
-        For raw plots with angles unblinded, see <li><a href="./raw_chains.html">
-            the raw chains</a></li>
-
+        <ul>
+            <li><a href="./raw_chains.html">Raw chains with unblinded angles</a></li>
+        </ul>
     </section>
 </body>
 
