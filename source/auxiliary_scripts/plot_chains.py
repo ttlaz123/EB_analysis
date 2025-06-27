@@ -6,14 +6,14 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from getdist import loadMCSamples, plots
-
+from matplotlib.lines import Line2D
 model_config = {
     "BK18lf_nob_bin2-15_all":       ("with_fg", 1, "BK18 EE+EB with foregrounds",         "#57b9ff", 1),
     "BK18lf_all_bin2-15_all":       ("with_fg", 2, "BK18 EE+EB+BB with foregrounds",       "#1ea1ff", 1),
     "BK18lf_eb_bin2-15_gdust":      ("with_fg", 0, "BK18 EB with foregrounds","#84ccff", 1),
-    "BK18lf_eb_bin2-15_fixed_dust": ("no_fg",   0, "BK18 EB no foregrounds",               "#ff7f0e", 1.5),
-    "eskilt_only":                  ("eskilt",  0, "Eskilt 2023",                           "#2ca02c", 1.5),
-    "eskilt_BK18lf":                ("combined",0, "Eskilt 2023 + BK18 EB no foregrounds", "#d62728", 3.0),
+    "BK18lf_eb_bin2-15_fixed_dust": ("no_fg",   0, "BK18 EB no foregrounds",               "#ff7f0e", 3),
+    "eskilt_only":                  ("eskilt",  0, "Eskilt 2023",                           "#2ca02c", 3),
+    "eskilt_BK18lf":                ("combined",0, "Eskilt 2023 + BK18 EB no foregrounds", "#d62728", 5),
     "BK18lf_alens_bin2-15_all":     ("with_fg", 3, "BK18 EE+EB+scaled BB with foregrounds", "#1375bc", 1)
 }
 
@@ -27,7 +27,7 @@ def find_chain_dirs(base_dir: str) -> List[str]:
 
 def get_samples(chain_path: str):
     try:
-        return loadMCSamples(chain_path, settings={"ignore_rows": 0.0})
+        return loadMCSamples(chain_path, settings={"ignore_rows": 0.02})
     except Exception as e:
         print(f"Warning: Failed to load {chain_path}: {e}")
         return None
@@ -112,10 +112,17 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
             legend_labels.append(label)
 
         # Axis range and vertical line at 0
-        g.subplots[0, 0].set_xlim(-1, 1)
+        g.subplots[0, 0].set_xlim(-1.5, 1.5)
         g.subplots[0, 0].axvline(0, color='gray', linestyle='--', linewidth=1)
+        g.subplots[0, 0].set_xlabel(r"$g / M_\mathrm{pl}^{-1}$", fontsize=12)
+        
 
-        g.add_legend(legend_labels=legend_labels)
+        custom_lines = [
+            Line2D([0], [0], color=color, lw=lw)
+            for (_, _, _, color, lw) in plot_data
+        ]
+        g.subplots[0, 0].legend(custom_lines, legend_labels, loc='upper right', fontsize=10)
+
         filename = f"{fede_key}.png"
         g.export(os.path.join(output_dir, filename))
 
