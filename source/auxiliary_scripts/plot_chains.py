@@ -52,7 +52,9 @@ def group_samples_by_fede(chain_dirs: List[str], base_dir: str) -> Dict[str, Lis
 
     for chain_dir in chain_dirs:
         chain_file = os.path.join(base_dir, chain_dir, "real")
-        samples = get_samples(chain_file)
+        samples = loadMCSamples(chain_file, settings={"ignore_rows": 0.0})
+        samples.trim(start=250)
+        #samples = get_samples(chain_file)
         if not samples:
             continue
 
