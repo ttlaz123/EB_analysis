@@ -224,10 +224,10 @@ def plot_ldiff_posteriors(ldiff_chains, output_dir: str):
 
     # Mapping ldiff tag → (legend label, color)
     ldiff_map = {
-        "ldiff8":  ("$\ell_b=265$", "#1f77b4"),
+        "ldiff8":  ("$\ell_b=265$", "#f30800"),
         "ldiff9":  ("$\ell_b=300$", "#ff7f0e"),
         "ldiff10": ("$\ell_b=335$", "#2ca02c"),
-        "ldiff11": ("$\ell_b=370$", "#d62728"),
+        "ldiff11": ("$\ell_b=370$", "#2727d6"),
         "ldiff12": ("$\ell_b=405$", "#9467bd"),
     }
 
