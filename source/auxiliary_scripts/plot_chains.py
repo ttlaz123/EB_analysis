@@ -218,6 +218,7 @@ def get_ldiff_samples(chain_dirs, base_dir):
     print(ldiff_chains)
     return ldiff_chains
 
+
 def plot_ldiff_posteriors(ldiff_chains, output_dir: str):
     os.makedirs(output_dir, exist_ok=True)   
     param_name = "angle_diff"
@@ -272,8 +273,56 @@ def plot_ldiff_posteriors(ldiff_chains, output_dir: str):
     filename = os.path.join(output_dir, "ldiff.png")
     print('Saving:', filename)
     g.export(filename)
+def plot_betacmb_posteriors(chain_dirs: List[str], base_dir: str, output_dir: str):
+    os.makedirs(output_dir, exist_ok=True)
+    param_name = "alpha_cmb"
+    plot_data = []
 
+    for chain_dir in chain_dirs:
+        if "betacmb" not in chain_dir:
+            continue
 
+        chain_file = os.path.join(base_dir, chain_dir, "real")
+        samples = get_samples(chain_file)
+        if not samples:
+            continue
+
+        if param_name not in samples.paramNames.list():
+            print(f"Skipping {chain_dir}: {param_name} not found")
+            continue
+
+        mean = samples.mean(param_name)
+        std = samples.std(param_name)
+        label = f"{chain_dir}: {mean:.2f} ± {std:.2f}"
+        plot_data.append((samples, label))
+
+    if not plot_data:
+        print("No valid betacmb chains found.")
+        return
+
+    # Plot
+    g = plots.getSubplotPlotter(width_inch=10)
+    g.settings.num_plot_contours = 1
+    g.settings.alpha_filled_add = 0.4
+
+    legend_labels = []
+    colors = plt.cm.viridis(np.linspace(0, 1, len(plot_data)))
+
+    for (i, (samples, label)) in enumerate(plot_data):
+        g.plot_1d(samples, param_name)
+        line = g.subplots[0, 0].get_lines()[-1]
+        line.set_color(colors[i])
+        line.set_linewidth(2.0)
+        legend_labels.append(label)
+
+    ax = g.subplots[0, 0]
+    ax.axvline(0, color='gray', linestyle='--', linewidth=1)
+    ax.set_xlabel(r"$\beta_\mathrm{cmb}$", fontsize=14)
+    ax.legend(legend_labels, loc='upper left', fontsize=9)
+
+    out_path = os.path.join(output_dir, "betacmb.png")
+    print(f"Saving: {out_path}")
+    g.export(out_path)
 def main():
     parser = argparse.ArgumentParser(description="Plot Cobaya MCMC chains.")
     parser.add_argument('--base_dir', required=True, help='Path to base chain directory')
@@ -281,7 +330,8 @@ def main():
     parser.add_argument('--group_by_fede', action='store_true', help='Group chains by fede value')
     parser.add_argument('--group_by_ldiff', action='store_true', help='Group chains by ldiff value')
     parser.add_argument('--plot_traces', action='store_true', help='Generate trace plots to inspect burn-in')
-
+    parser.add_argument('--group_by_cmb', action='store_true', help='Group chains by cmb value')
+    
     args = parser.parse_args()
     chain_dirs = find_chain_dirs(args.base_dir)
 
@@ -313,6 +363,8 @@ def main():
     elif args.group_by_fede:
         fede_groups = group_samples_by_fede(chain_dirs, args.base_dir)
         plot_grouped_posteriors(fede_groups, args.output_dir)
+    elif args.group_by_cmb:
+        plot_betacmb_posteriors(chain_dirs, args.base_dir, args.output_dir)
 
     else:
         plot_each_chain_separately(chain_dirs, args.base_dir, args.output_dir)
