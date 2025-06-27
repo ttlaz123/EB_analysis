@@ -28,7 +28,7 @@ def find_chain_dirs(base_dir: str) -> List[str]:
 
 def get_samples(chain_path: str):
     try:
-        return loadMCSamples(chain_path)
+        return loadMCSamples(chain_path, settings={"ignore_rows":250})
     except Exception as e:
         print(f"Warning: Failed to load {chain_path}: {e}")
         return None
@@ -52,9 +52,8 @@ def group_samples_by_fede(chain_dirs: List[str], base_dir: str) -> Dict[str, Lis
 
     for chain_dir in chain_dirs:
         chain_file = os.path.join(base_dir, chain_dir, "real")
-        samples = loadMCSamples(chain_file, settings={"ignore_rows": 0.0})
-        samples.trim(start=250)
-        #samples = get_samples(chain_file)
+
+        samples = get_samples(chain_file)
         if not samples:
             continue
 
