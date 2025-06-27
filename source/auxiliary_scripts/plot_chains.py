@@ -212,13 +212,6 @@ def main():
     args = parser.parse_args()
 
     chain_dirs = find_chain_dirs(args.base_dir)
-    '''
-    if args.group_by_fede:
-        fede_groups = group_samples_by_fede(chain_dirs, args.base_dir)
-        plot_grouped_posteriors(fede_groups, args.output_dir)
-    else:
-        plot_each_chain_separately(chain_dirs, args.base_dir, args.output_dir)
-    '''
     if args.plot_traces:
         param_name = "gMpl"
         for chain_dir in chain_dirs:
@@ -239,6 +232,13 @@ def main():
 
             trace_output_dir = os.path.join(args.output_dir, "traces")
             plot_trace_for_param(chain_path, param_name, param_index, trace_output_dir)
+    if args.group_by_fede:
+        fede_groups = group_samples_by_fede(chain_dirs, args.base_dir)
+        plot_grouped_posteriors(fede_groups, args.output_dir)
+    else:
+        plot_each_chain_separately(chain_dirs, args.base_dir, args.output_dir)
+    
+    
 
 if __name__ == "__main__":
     main()
