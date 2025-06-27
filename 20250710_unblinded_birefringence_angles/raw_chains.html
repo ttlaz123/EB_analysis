@@ -54,7 +54,9 @@
             <img alt="Real Data" id="reals_basic" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
              <figcaption>
-
+    Posterior distributions and diagnostics for isotropic birefringence analysis using real BK18 data.
+    This includes cases with and without galactic foreground modeling. The triangle plots illustrate 
+    degeneracies between the rotation angle \( \beta_{\text{cmb}} \), receiver angle miscalibrations, and foreground parameters.
 </figcaption>
 
             <script type="text/javascript">
@@ -107,11 +109,15 @@
         </section>
         <section>
         <h2>Early Dark Energy </h2>
+        <h3>BK18 Only</h3>
          <figure>
             <img alt="Real Data" id="reals_ede" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
              <figcaption>
-
+    Posterior distributions and best-fit comparisons for the EDE coupling parameter \( g/M_{\text{pl}}^{-1} \),
+    using BK18-only data. Includes configurations with EB-only, EE+EB, EE+EB+BB, and scaled BB spectra,
+    under different fixed \( f_{\text{EDE}} \) values from ACT and Planck datasets. Triangle plots show constraints 
+    marginalized over dust and synchrotron parameters where applicable.
 </figcaption>
 
             <script type="text/javascript">
@@ -164,12 +170,14 @@
                 });
             </script>
         </figure>
-
+        <h3>Combined with Eskilt data</h3>
         <figure>
             <img alt="Real Data" id="reals_combined" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
-             <figcaption>
-
+            <figcaption>
+    EDE birefringence constraints from combined datasets. Posterior distributions and diagnostics 
+    are shown for the joint analysis of BK18 and Eskilt (2023) EB data, and for Eskilt-only results. 
+    This allows direct comparison and validation of EDE signals across independent experiments.
 </figcaption>
 
             <script type="text/javascript">
@@ -222,8 +230,11 @@
     <figure>
             <img alt="Real Data" id="reals_ldiff" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
-             <figcaption>
-
+        <figcaption>
+    Posterior distributions for multipole-dependent birefringence angle differences \( \Delta\beta_{\ell_b} \),
+    evaluated by splitting the BK18 EB spectrum at various bandpower midpoints. Each configuration corresponds 
+    to a two-bin analysis (e.g., \( \ell = 2\text{--}10 \) vs \( 11\text{--}15 \)) centered on \( \ell_b = 265 \) to \( 405 \).
+    These triangle plots test for angular scale dependence in the rotation angle.
 </figcaption>
 
             <script type="text/javascript">
