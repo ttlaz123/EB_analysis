@@ -75,6 +75,9 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
         plot_data = []
         param_name = "gMpl"
         print('Plotting: ' + str(fede_key))
+        if(fede_key == 'no_fede_tag'):
+            print('Skipping: ' + fede_key)
+            continue
         for samples, dir_name in entries:
             match = None
             for key in model_config:
