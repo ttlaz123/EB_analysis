@@ -275,8 +275,15 @@ def plot_ldiff_posteriors(ldiff_chains, output_dir: str):
     g.export(filename)
 def plot_betacmb_posteriors(chain_dirs: List[str], base_dir: str, output_dir: str):
     os.makedirs(output_dir, exist_ok=True)
-    param_name = "alpha_CMB"
+    param_name = "alpha_cmb"
     plot_data = []
+
+    # Define custom labels and order
+    label_priority = {
+        "BK18lf_all_bin2-15_gdust_betacmb": "EE+EB+BB with foregrounds",
+        "BK18lf_eb_bin2-15_gdust_betacmb": "EB with foregrounds",
+        "BK18lf_eb_bin2-15_det_polrot_betacmb": "EB no foregrounds",
+    }
 
     for chain_dir in chain_dirs:
         if "betacmb" not in chain_dir:
@@ -288,18 +295,26 @@ def plot_betacmb_posteriors(chain_dirs: List[str], base_dir: str, output_dir: st
             continue
 
         if param_name not in samples.paramNames.list():
-            
-            print(f"Skipping {chain_dir}: {param_name} not found in " + str(samples.paramNames.list()))
+            print(f"Skipping {chain_dir}: {param_name} not found")
             continue
 
         mean = samples.mean(param_name)
         std = samples.std(param_name)
-        label = f"{chain_dir}: {mean:.2f} ± {std:.2f}"
-        plot_data.append((samples, label))
+
+        if chain_dir not in label_priority:
+            print(f"Skipping unknown betacmb chain: {chain_dir}")
+            continue
+
+        label = f"{label_priority[chain_dir]}: {mean:.2f} ± {std:.2f}"
+        plot_data.append((label_priority[chain_dir], samples, label))
 
     if not plot_data:
         print("No valid betacmb chains found.")
         return
+
+    # Sort in desired order
+    desired_order = ["EE+EB+BB with foregrounds", "EB with foregrounds", "EB no foregrounds"]
+    plot_data.sort(key=lambda x: desired_order.index(x[0]))
 
     # Plot
     g = plots.getSubplotPlotter(width_inch=10)
@@ -309,7 +324,7 @@ def plot_betacmb_posteriors(chain_dirs: List[str], base_dir: str, output_dir: st
     legend_labels = []
     colors = plt.cm.viridis(np.linspace(0, 1, len(plot_data)))
 
-    for (i, (samples, label)) in enumerate(plot_data):
+    for i, (_, samples, label) in enumerate(plot_data):
         g.plot_1d(samples, param_name)
         line = g.subplots[0, 0].get_lines()[-1]
         line.set_color(colors[i])
@@ -319,11 +334,12 @@ def plot_betacmb_posteriors(chain_dirs: List[str], base_dir: str, output_dir: st
     ax = g.subplots[0, 0]
     ax.axvline(0, color='gray', linestyle='--', linewidth=1)
     ax.set_xlabel(r"$\beta_\mathrm{cmb}$", fontsize=14)
-    ax.legend(legend_labels, loc='upper left', fontsize=9)
+    ax.legend(legend_labels, loc='upper left', fontsize=10)
 
     out_path = os.path.join(output_dir, "betacmb.png")
     print(f"Saving: {out_path}")
     g.export(out_path)
+
 def main():
     parser = argparse.ArgumentParser(description="Plot Cobaya MCMC chains.")
     parser.add_argument('--base_dir', required=True, help='Path to base chain directory')
