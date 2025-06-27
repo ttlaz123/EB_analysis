@@ -149,7 +149,7 @@
 
                 pager.setparams({
         
-                    'fede': '_fede0.09',
+                    'fede': 'fede0.09',
                 });
             </script>
         </figure>
@@ -166,14 +166,16 @@
                
 
                 pager.link("#reals_ldiff", {
-                   
+                   'Measured|m': [
+                        'Delta Beta lb|ldiff',
+                    ], 
                   
                 },
          
                     function (params) {
                         let dirbase = '/liuto/home/GitHub/EB_analysis/';
                         let dirpath = dirbase + '/paper_plots/';
-                        let file = 'ldiff';
+                        let file = params.m;
                         let name = dirpath + file +  '.png';
             
                         console.log(name);
@@ -181,7 +183,7 @@
                     });
 
                 pager.setparams({
-        
+                        'm':'ldiff',
                 });
             </script>
         </figure>
