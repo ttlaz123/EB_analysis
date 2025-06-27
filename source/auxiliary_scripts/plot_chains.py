@@ -7,6 +7,16 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from getdist import loadMCSamples, plots
 
+model_config = {
+    "BK18lf_nob_bin2-15_all":       ("with_fg", 0, "BK18 EE+EB with foregrounds",         "#1f77b4", 1.5),
+    "BK18lf_all_bin2-15_all":       ("with_fg", 1, "BK18 EE+EB+BB with foregrounds",       "#1f77b4", 1.5),
+    "BK18lf_eb_bin2-15_gdust":      ("with_fg", 2, "BK18 EE+EB+scaled BB with foregrounds","#1f77b4", 1.5),
+    "BK18lf_eb_bin2-15_fixed_dust": ("no_fg",   0, "BK18 EB no foregrounds",               "#ff7f0e", 1.5),
+    "eskilt_only":                  ("eskilt",  0, "Eskilt 2023",                           "#2ca02c", 1.5),
+    "eskilt_BK18lf":                ("combined",0, "Eskilt 2023 + BK18 EB no foregrounds", "#d62728", 3.0),
+    "BK18lf_alens_bin2-15_all":     ("with_fg", 3, "BK18 EE+EB+BB alens",                  "#1f77b4", 1.5)
+}
+
 
 def find_chain_dirs(base_dir: str) -> List[str]:
     return [
@@ -59,22 +69,44 @@ def group_samples_by_fede(chain_dirs: List[str], base_dir: str) -> Dict[str, Lis
 def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
     os.makedirs(output_dir, exist_ok=True)
 
+    group_order = {"with_fg": 0, "no_fg": 1, "eskilt": 2, "combined": 3}
+
     for fede_key, entries in fede_groups.items():
-        if(fede_key == 'no_fede_tag'):
-            continue
+        plot_data = []
+        param_name = "gMpl"
+
+        for samples, dir_name in entries:
+            match = None
+            for key in model_config:
+                if key in dir_name:
+                    match = key
+                    break
+            if not match:
+                continue
+
+            group, subgroup_priority, label, color, lw = model_config[match]
+            mean = samples.mean(param_name)
+            std = samples.std(param_name)
+            full_label = f"{label}: {mean:.2f} ± {std:.2f}"
+            # Store all needed data, including group and subgroup sort keys
+            plot_data.append(((group_order[group], subgroup_priority), samples, full_label, color, lw))
+
+        # Sort by (group priority, subgroup priority)
+        plot_data.sort(key=lambda x: x[0])
+
         g = plots.getSubplotPlotter(width_inch=10)
         g.settings.num_plot_contours = 1
         g.settings.alpha_filled_add = 0.4
 
-        labels = []
-        for samples, label in entries:
-            param_name = 'gMpl'  # or filter_params(samples)[0] if you want auto-select
-            g.plot_1d(samples, param_name, label=label)
-            labels.append(label)
+        legend_labels = []
+        for (_, _, samples, label, color, lw) in [(g, s, l, c, w) for (_, s, l, c, w) in plot_data]:
+            g.plot_1d(samples, param_name, color=color, lw=lw)
+            legend_labels.append(label)
 
-        g.add_legend(legend_labels=labels)  # ✅ Fix: Pass legend_labels
+        g.add_legend(legend_labels=legend_labels)
         filename = f"{fede_key}.png"
         g.export(os.path.join(output_dir, filename))
+
 
 
 def plot_each_chain_separately(chain_dirs: List[str], base_dir: str, output_dir: str):
