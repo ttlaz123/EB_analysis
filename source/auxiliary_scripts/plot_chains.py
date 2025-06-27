@@ -205,6 +205,7 @@ def main():
     parser.add_argument('--base_dir', required=True, help='Path to base chain directory')
     parser.add_argument('--output_dir', default='plots', help='Directory to save plots')
     parser.add_argument('--group_by_fede', action='store_true', help='Group chains by fede value')
+    parser.add_argument('--plot_traces', action='store_true', help='Generate trace plots to inspect burn-in')
 
     args = parser.parse_args()
 
