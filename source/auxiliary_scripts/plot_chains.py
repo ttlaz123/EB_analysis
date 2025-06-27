@@ -99,7 +99,7 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
         g.settings.alpha_filled_add = 0.4
 
         legend_labels = []
-        for (_, _, samples, label, color, lw) in plot_data:
+        for (_, samples, label, color, lw) in plot_data:
             g.plot_1d(samples, param_name, color=color, lw=lw)
             legend_labels.append(label)
 
