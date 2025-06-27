@@ -27,7 +27,7 @@ def find_chain_dirs(base_dir: str) -> List[str]:
 
 def get_samples(chain_path: str):
     try:
-        return loadMCSamples(chain_path, settings={"ignore_rows": 0.02})
+        return loadMCSamples(chain_path, settings={"ignore_rows": 0.005})
     except Exception as e:
         print(f"Warning: Failed to load {chain_path}: {e}")
         return None
