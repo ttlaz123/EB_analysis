@@ -60,6 +60,8 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
     os.makedirs(output_dir, exist_ok=True)
 
     for fede_key, entries in fede_groups.items():
+        if(fede_key == 'no_fede_tag'):
+            continue
         g = plots.getSubplotPlotter(width_inch=10)
         g.settings.num_plot_contours = 1
         g.settings.alpha_filled_add = 0.4
