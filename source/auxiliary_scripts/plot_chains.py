@@ -7,6 +7,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from getdist import loadMCSamples, plots
 from matplotlib.lines import Line2D
+import numpy as np
 model_config = {
     "BK18lf_nob_bin2-15_all":       ("with_fg", 1, "BK18 EE+EB with foregrounds",         "#57b9ff", 1),
     "BK18lf_all_bin2-15_all":       ("with_fg", 2, "BK18 EE+EB+BB with foregrounds",       "#1ea1ff", 1),
