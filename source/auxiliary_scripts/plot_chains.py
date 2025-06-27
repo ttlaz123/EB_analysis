@@ -288,7 +288,8 @@ def plot_betacmb_posteriors(chain_dirs: List[str], base_dir: str, output_dir: st
             continue
 
         if param_name not in samples.paramNames.list():
-            print(f"Skipping {chain_dir}: {param_name} not found")
+            
+            print(f"Skipping {chain_dir}: {param_name} not found in " + str(samples.paramNames.list()))
             continue
 
         mean = samples.mean(param_name)
