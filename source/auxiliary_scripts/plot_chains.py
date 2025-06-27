@@ -167,6 +167,38 @@ def plot_each_chain_separately(chain_dirs: List[str], base_dir: str, output_dir:
         filename = f"{chain_dir}.png"
         g.export(os.path.join(output_dir, filename))
 
+def plot_trace_for_param(chain_dir: str, param_name: str, param_index: int, output_dir: str):
+    import numpy as np
+    import matplotlib.pyplot as plt
+    chains = []
+    for i in range(1, 100):  # Look for real.1.txt, real.2.txt, etc.
+        chain_file = os.path.join(chain_dir, f"real.{i}.txt")
+        if not os.path.exists(chain_file):
+            break
+        try:
+            data = np.loadtxt(chain_file)
+            chains.append(data[:, param_index])
+        except Exception as e:
+            print(f"Failed to read {chain_file}: {e}")
+            continue
+
+    if not chains:
+        print(f"No chains found in {chain_dir}")
+        return
+
+    plt.figure(figsize=(10, 6))
+    for i, chain in enumerate(chains):
+        plt.plot(chain, label=f"Chain {i+1}", alpha=0.7)
+    plt.xlabel("Step")
+    plt.ylabel(param_name)
+    plt.title(f"Trace plot for {param_name} in {os.path.basename(chain_dir)}")
+    plt.legend()
+    plt.tight_layout()
+
+    os.makedirs(output_dir, exist_ok=True)
+    out_file = os.path.join(output_dir, f"{os.path.basename(chain_dir)}_trace_{param_name}.png")
+    plt.savefig(out_file)
+    plt.close()
 
 def main():
     parser = argparse.ArgumentParser(description="Plot Cobaya MCMC chains.")
@@ -177,13 +209,32 @@ def main():
     args = parser.parse_args()
 
     chain_dirs = find_chain_dirs(args.base_dir)
-
+    '''
     if args.group_by_fede:
         fede_groups = group_samples_by_fede(chain_dirs, args.base_dir)
         plot_grouped_posteriors(fede_groups, args.output_dir)
     else:
         plot_each_chain_separately(chain_dirs, args.base_dir, args.output_dir)
+    '''
+    if args.plot_traces:
+        param_name = "gMpl"
+        for chain_dir in chain_dirs:
+            chain_path = os.path.join(args.base_dir, chain_dir)
+            samples = get_samples(os.path.join(chain_path, "real"))
+            if not samples:
+                continue
+            try:
+                param_names = samples.paramNames.names
+                if param_name not in param_names:
+                    print(f"{param_name} not found in {chain_dir}")
+                    continue
+                param_index = param_names.index(param_name)
+            except Exception as e:
+                print(f"Error finding param index in {chain_dir}: {e}")
+                continue
 
+            trace_output_dir = os.path.join(args.output_dir, "traces")
+            plot_trace_for_param(chain_path, param_name, param_index, trace_output_dir)
 
 if __name__ == "__main__":
     main()
