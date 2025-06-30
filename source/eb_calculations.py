@@ -243,11 +243,11 @@ def apply_cmb_rotation(post_inflation_dict, params_values, dl_theory_dict, used_
         spec = determine_spectrum_type(m)
         
         ee_map, bb_map, eb_map, be_map = get_other_spec_map(m, used_maps)
-        if(ee_map in used_maps): 
+        if(ee_map in post_inflation_dict): 
             Cl_EE = post_inflation_dict[ee_map]
         else:
             Cl_EE = dl_theory_dict['EE']   
-        if(bb_map in used_maps):
+        if(bb_map in post_inflation_dict):
             Cl_BB = post_inflation_dict[bb_map]
         else:
             Cl_BB = dl_theory_dict['BB']
