@@ -274,29 +274,37 @@ def plot_ldiff_posteriors(ldiff_chains, output_dir: str):
     print('Saving:', filename)
     g.export(filename)
 
-    # Additional plot: mean ± std vs lb
+    # Additional plot: mean ± std vs lb, using same colors as first plot
     lbs = []
     means = []
     stds = []
+    colors = []
 
-    for (ldiff_number, samples, _, _) in plot_data:
-        lb_center = 230 + (ldiff_number - 7) * 35  # Adjust based on your binning
+    for (ldiff_number, samples, _, color) in plot_data:
+        lb_center = 230 + (ldiff_number - 7) * 35  # Adjust if needed
         lbs.append(lb_center)
         means.append(samples.mean(param_name))
         stds.append(samples.std(param_name))
+        colors.append(color)
 
     fig, ax = plt.subplots(figsize=(8, 5))
-    ax.errorbar(lbs, means, yerr=stds, fmt='o', capsize=4, color='black', ecolor='gray')
+    for lb, mean, std, color in zip(lbs, means, stds, colors):
+        ax.errorbar(lb, mean, yerr=std, fmt='o', capsize=4, color=color, ecolor=color, label=f"$\ell_b={lb}$")
+
     ax.axhline(0, color='gray', linestyle='--', linewidth=1)
-    ax.set_xlabel(r'Multipole break point $\ell_b$', fontsize=14)
-    ax.set_ylabel(r'$\Delta\beta$ (deg)', fontsize=14)
+    ax.set_xlabel(r'Multipole bin center $\ell_b$', fontsize=14)
+    ax.set_ylabel(r'Mean $\Delta\beta$ (deg)', fontsize=14)
     ax.set_title(r'Posterior Mean and 1$\sigma$ vs. $\ell_b$', fontsize=14)
     ax.grid(True)
 
-    out_path = os.path.join(output_dir, "ldiff_bandpower.png")
+    # Optional: custom legend
+    ax.legend(fontsize=10)
+
+    out_path = os.path.join(output_dir, "ldiff_mean_vs_lb.png")
     print('Saving:', out_path)
     fig.savefig(out_path, bbox_inches='tight')
     plt.close(fig)
+
 
 
 def plot_betacmb_posteriors(chain_dirs: List[str], base_dir: str, output_dir: str):
