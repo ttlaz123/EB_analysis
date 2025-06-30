@@ -273,6 +273,32 @@ def plot_ldiff_posteriors(ldiff_chains, output_dir: str):
     filename = os.path.join(output_dir, "ldiff.png")
     print('Saving:', filename)
     g.export(filename)
+
+    # Additional plot: mean ± std vs lb
+    lbs = []
+    means = []
+    stds = []
+
+    for (ldiff_number, samples, _, _) in plot_data:
+        lb_center = 230 + (ldiff_number - 7) * 35  # Adjust based on your binning
+        lbs.append(lb_center)
+        means.append(samples.mean(param_name))
+        stds.append(samples.std(param_name))
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.errorbar(lbs, means, yerr=stds, fmt='o', capsize=4, color='black', ecolor='gray')
+    ax.axhline(0, color='gray', linestyle='--', linewidth=1)
+    ax.set_xlabel(r'Multipole break point $\ell_b$', fontsize=14)
+    ax.set_ylabel(r'$\Delta\beta$ (deg)', fontsize=14)
+    ax.set_title(r'Posterior Mean and 1$\sigma$ vs. $\ell_b$', fontsize=14)
+    ax.grid(True)
+
+    out_path = os.path.join(output_dir, "ldiff_bandpower.png")
+    print('Saving:', out_path)
+    fig.savefig(out_path, bbox_inches='tight')
+    plt.close(fig)
+
+
 def plot_betacmb_posteriors(chain_dirs: List[str], base_dir: str, output_dir: str):
     os.makedirs(output_dir, exist_ok=True)
     param_name = "alpha_CMB"
