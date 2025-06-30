@@ -291,6 +291,7 @@ class BK18_full_multicomp(Likelihood):
 
     def theory(self, params_values, override_maps=None):
         # define relevant dictionaries
+        all_maps = self.sim_common_data['all_maps']
         if(self.theory_comps in ['all', 'fixed_dust', 'eskilt']):
             # do ede shift
             post_inflation_dict = ec.apply_EDE(self.initial_theory_dict,
@@ -321,7 +322,9 @@ class BK18_full_multicomp(Likelihood):
             post_travel_dict = ec.apply_cmb_rotation(post_inflation_dict,
                                                     params_values,
                                                     self.dl_theory,
-                                                    self.used_maps)
+                                                    all_maps
+                                                    #self.used_maps
+                                                    )
         else: 
             post_travel_dict = post_inflation_dict
         if(self.theory_comps in ['all', 'det_polrot', 'fixed_dust', 'no_ede', 'eskilt']):
@@ -329,7 +332,7 @@ class BK18_full_multicomp(Likelihood):
             post_detection_dict = ec.apply_det_rotation(post_travel_dict, 
                                                         params_values, 
                                                         self.dl_theory,
-                                                        override_maps=override_maps)
+                                                        override_maps=self.used_maps)
 
 
         # apply bpwf

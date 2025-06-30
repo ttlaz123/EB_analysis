@@ -382,13 +382,13 @@ def apply_det_rotation(post_travel_dict, params_values, dl_theory_dict, override
         c2, s2 = get_trigs(angle2_name)
         if(ee_map in post_travel_dict):
             EE = post_travel_dict[ee_map]
-        else:
-            EE = dl_theory_dict['EE']
+        #else:
+        #    EE = dl_theory_dict['EE']
 
         if(bb_map in post_travel_dict):
             BB = post_travel_dict[bb_map]
-        else:
-            BB = dl_theory_dict['BB']
+        #else:
+        #    BB = dl_theory_dict['BB']
 
         EB = post_travel_dict[eb_map]
         BE = post_travel_dict[be_map]
