@@ -301,7 +301,7 @@ class BK18_full_multicomp(Likelihood):
         else:
             post_inflation_dict = self.initial_theory_dict
         #Scale BB lensing
-        if(self.theory_comps in ['all', 'fixed_dust', 'no_ede', 'det_polrot']):
+        if(self.theory_comps in ['all', 'fixed_dust', 'det_polrot']):
             post_inflation_dict = ec.scale_lensing_amplitude(post_inflation_dict, 
                                                           params_values, 
                                                           self.used_maps)

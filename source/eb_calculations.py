@@ -296,6 +296,7 @@ def apply_dust(post_travel_dict, bandpasses, params_values):
     dust_cache = {}
     sync_cache = {}
     for used_map, dls in post_travel_dict.items():
+        print(used_map)
         lmax = dls.shape[0]
         ratio = np.arange(lmax) / LPIVOT
 
@@ -382,7 +383,8 @@ def apply_det_rotation(post_travel_dict, params_values, dl_theory_dict, override
         c2, s2 = get_trigs(angle2_name)
         if(ee_map in post_travel_dict):
             EE = post_travel_dict[ee_map]
-        #else:
+        else:
+            print(post_travel_dict.keys())
         #    EE = dl_theory_dict['EE']
 
         if(bb_map in post_travel_dict):
