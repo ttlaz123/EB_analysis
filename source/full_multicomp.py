@@ -312,7 +312,8 @@ class BK18_full_multicomp(Likelihood):
             post_inflation_dict = ec.apply_cmb_rotation(post_inflation_dict,
                                                     params_values,
                                                     self.dl_theory,
-                                                    self.used_maps)
+                                                    all_maps)
+                                                    #self.used_maps)
             
             # do dust
             post_travel_dict = ec.apply_dust(post_inflation_dict, self.bandpasses, params_values)
