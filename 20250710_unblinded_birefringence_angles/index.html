@@ -78,7 +78,7 @@
                 Posterior distributions for the isotropic birefringence angle \( \beta_{\text{cmb}} \),
                 shown for three scenarios: EB-only without foregrounds, EB-only with foregrounds,
                 and EE+EB+BB with foregrounds.
-                
+
             </figcaption>
 
             <script type="text/javascript">
@@ -97,9 +97,9 @@
             </script>
         </figure>
         <p>
-            Surprisingly, adding foreground parameters weakens constraints rather 
+            Surprisingly, adding foreground parameters weakens constraints rather
             than breaking the degeneracy between \( \beta_{\text{cmb}} \) and receiver angle miscalibrations.
-            
+
             This is because in the EB-only case, it is harder for the sampler to jointly vary \( \beta_{\text{cmb}} \)
             and the four receiver angles to preserve the EB signal, increasing the penalty in \( \chi^2 \).
             Adding foreground parameters introduces extra degrees of freedom, allowing easier exploration
@@ -108,237 +108,247 @@
     </section>
 
     <section>
-    <h2>Early Dark Energy Constraints</h2>
+        <h2>Early Dark Energy Constraints</h2>
 
-    <p>
-        We run the MCMC estimators defined in the Dust Analysis posting, now applied to real data with various fixed EDE fractions \( f_{\text{EDE}} \).
-        For each fixed \( f_{\text{EDE}} \) value, we explore six different configurations:
-    </p>
-    <ul>
-        <li><strong>With foregrounds (R-1 < 0.01):</strong>
-            <ul>
-                <li>EE+EB</li>
-                <li>EE+EB+BB</li>
-                <li>EE+EB+scaled BB</li>
-            </ul>
-        </li>
-        <li><strong>Without foregrounds (R-1 < 0.005):</strong>
-            <ul>
-                <li>BK18 EB-only</li>
-                <li>Eskilt-only (2023)</li>
-                <li>Combined Eskilt + BK18 EB</li>
-            </ul>
-        </li>
-    </ul>
+        <p>
+            We run the MCMC estimators defined in the Dust Analysis posting, now applied to real data with various fixed
+            EDE fractions \( f_{\text{EDE}} \).
+            For each fixed \( f_{\text{EDE}} \) value, we explore six different configurations:
+        </p>
+        <ul>
+            <li><strong>With foregrounds (R-1 < 0.01):</strong>
+                        <ul>
+                            <li>EE+EB</li>
+                            <li>EE+EB+BB</li>
+                            <li>EE+EB+scaled BB</li>
+                        </ul>
+            </li>
+            <li><strong>Without foregrounds (R-1 < 0.005):</strong>
+                        <ul>
+                            <li>BK18 EB-only</li>
+                            <li>Eskilt-only (2023)</li>
+                            <li>Combined Eskilt + BK18 EB</li>
+                        </ul>
+            </li>
+        </ul>
 
-    <p>
-        The foregrounded results validate that including galactic dust and synchrotron modeling does not significantly affect the posterior mean or width of the coupling parameter \( g/M_{\mathrm{pl}}^{-1} \).
-        Multiple independent runs with \( R - 1 < 0.005 \) confirm posterior stability, with central values varying by less than ±0.02.
-        We also successfully reproduce the Eskilt 2023 constraints using their publicly available data.
-    </p>
+        <p>
+            The foregrounded results validate that including galactic dust and synchrotron modeling does not
+            significantly affect the posterior mean or width of the coupling parameter \( g/M_{\mathrm{pl}}^{-1} \).
+            Multiple independent runs with \( R - 1 < 0.005 \) confirm posterior stability, with central values varying
+                by less than ±0.02. We also successfully reproduce the Eskilt 2023 constraints using their publicly
+                available data. </p>
 
-    <p>
-        As discussed in the Multipole-Dependent Analysis posting, the scaled BB configuration allows the lensing amplitude to vary freely,
-        which reduces bias in \( g \) due to mismodeling of the lensing signal in the BB spectrum.
-    </p>
+                <p>
+                    As discussed in the Multipole-Dependent Analysis posting, the scaled BB configuration allows the
+                    lensing amplitude to vary freely,
+                    which reduces bias in \( g \) due to mismodeling of the lensing signal in the BB spectrum.
+                </p>
 
-    <figure>
-        <img alt="EDE posteriors" id="reals_ede" src="#" width="750" height="500"
-            onerror="javascript:this.src='dne.png'" />
-        <figcaption>
-            Posterior distributions for the EDE coupling parameter \( g/M_{\text{pl}}^{-1} \),
-            shown for four fixed values of \( f_{\text{EDE}} \) from ACT and Planck+BOSS+SH0ES.
-        </figcaption>
+                <figure>
+                    <img alt="EDE posteriors" id="reals_ede" src="#" width="750" height="500"
+                        onerror="javascript:this.src='dne.png'" />
+                    <figcaption>
+                        Posterior distributions for the EDE coupling parameter \( g/M_{\text{pl}}^{-1} \),
+                        shown for four fixed values of \( f_{\text{EDE}} \) from ACT and Planck+BOSS+SH0ES.
+                    </figcaption>
 
-        <script type="text/javascript">
-            pager.link("#reals_ede", {
-                'EDE parameters|fede': [
-                    'f_EDE = 0.012 (ACT)|fede0.01',
-                    'f_EDE = 0.070 (Planck)|fede0.07',
-                    'f_EDE = 0.087 (Planck BOSS)|fede0.09',
-                    'f_EDE = 0.127 (Planck BOSS SH0ES)|fede0.13',
-                ],
-            }, function (params) {
-                let dirbase = '/liuto/home/GitHub/EB_analysis/';
-                let dirpath = dirbase + '/paper_plots/';
-                return dirpath + params.fede + '.png';
-            });
+                    <script type="text/javascript">
+                        pager.link("#reals_ede", {
+                            'EDE parameters|fede': [
+                                'f_EDE = 0.012 (ACT)|fede0.01',
+                                'f_EDE = 0.070 (Planck)|fede0.07',
+                                'f_EDE = 0.087 (Planck BOSS)|fede0.09',
+                                'f_EDE = 0.127 (Planck BOSS SH0ES)|fede0.13',
+                            ],
+                        }, function (params) {
+                            let dirbase = '/liuto/home/GitHub/EB_analysis/';
+                            let dirpath = dirbase + '/paper_plots/';
+                            return dirpath + params.fede + '.png';
+                        });
 
-            pager.setparams({ 'fede': 'fede0.09' });
-        </script>
-    </figure>
+                        pager.setparams({ 'fede': 'fede0.09' });
+                    </script>
+                </figure>
 
-    <table border="1" cellspacing="0" cellpadding="6" style="border-collapse: collapse; margin-top: 1em;">
-        <thead>
-            <tr>
-                <th>Configuration</th>
-                <th>f<sub>EDE</sub> = 0.012</th>
-                <th>f<sub>EDE</sub> = 0.070</th>
-                <th>f<sub>EDE</sub> = 0.087</th>
-                <th>f<sub>EDE</sub> = 0.127</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>BK18 EE+EB</td>
-                <td>0.41 ± 1.01</td>
-                <td>0.12 ± 0.41</td>
-                <td>0.14 ± 0.38</td>
-                <td>0.17 ± 0.31</td>
-            </tr>
-            <tr>
-                <td>BK18 EE+EB+BB</td>
-                <td>0.28 ± 1.01</td>
-                <td>0.07 ± 0.40</td>
-                <td>0.11 ± 0.37</td>
-                <td>0.11 ± 0.31</td>
-            </tr>
-            <tr>
-                <td>BK18 EE+EB+scaled BB</td>
-                <td>0.21 ± 1.02</td>
-                <td>0.06 ± 0.43</td>
-                <td>0.08 ± 0.37</td>
-                <td>0.10 ± 0.31</td>
-            </tr>
-            <tr>
-                <td>BK18 EB (no foregr.)</td>
-                <td>0.48 ± 0.99</td>
-                <td>0.20 ± 0.46</td>
-                <td>0.21 ± 0.39</td>
-                <td>0.23 ± 0.30</td>
-            </tr>
-            <tr>
-                <td>Eskilt-only</td>
-                <td>0.05 ± 0.44</td>
-                <td>0.05 ± 0.18</td>
-                <td><strong>0.03 ± 0.16</strong></td>
-                <td>0.03 ± 0.13</td>
-            </tr>
-            <tr>
-                <td>Eskilt + BK18 EB</td>
-                <td>0.21 ± 0.40</td>
-                <td>0.08 ± 0.17</td>
-                <td><strong>0.07 ± 0.14</strong></td>
-                <td>0.05 ± 0.12</td>
-            </tr>
-        </tbody>
-    </table>
+                <table border="1" cellspacing="0" cellpadding="6" style="border-collapse: collapse; margin-top: 1em;">
+                    <thead>
+                        <tr>
+                            <th>Configuration</th>
+                            <th>f<sub>EDE</sub> = 0.012</th>
+                            <th>f<sub>EDE</sub> = 0.070</th>
+                            <th>f<sub>EDE</sub> = 0.087</th>
+                            <th>f<sub>EDE</sub> = 0.127</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>BK18 EE+EB</td>
+                            <td>0.41 ± 1.01</td>
+                            <td>0.12 ± 0.41</td>
+                            <td>0.14 ± 0.38</td>
+                            <td>0.17 ± 0.31</td>
+                        </tr>
+                        <tr>
+                            <td>BK18 EE+EB+BB</td>
+                            <td>0.28 ± 1.01</td>
+                            <td>0.07 ± 0.40</td>
+                            <td><strong>0.11 ± 0.37</strong></td>
+                            <td>0.11 ± 0.31</td>
+                        </tr>
+                        <tr>
+                            <td>BK18 EE+EB+scaled BB</td>
+                            <td>0.21 ± 1.02</td>
+                            <td>0.06 ± 0.43</td>
+                            <td>0.08 ± 0.37</td>
+                            <td>0.10 ± 0.31</td>
+                        </tr>
+                        <tr>
+                            <td>BK18 EB (no foregr.)</td>
+                            <td>0.48 ± 0.99</td>
+                            <td>0.20 ± 0.46</td>
+                            <td>0.21 ± 0.39</td>
+                            <td>0.23 ± 0.30</td>
+                        </tr>
+                        <tr>
+                            <td>Eskilt-only</td>
+                            <td>0.05 ± 0.44</td>
+                            <td>0.05 ± 0.18</td>
+                            <td><strong>0.03 ± 0.16</strong></td>
+                            <td>0.03 ± 0.13</td>
+                        </tr>
+                        <tr>
+                            <td>Eskilt + BK18 EB</td>
+                            <td>0.21 ± 0.40</td>
+                            <td>0.08 ± 0.17</td>
+                            <td>0.07 ± 0.14</td>
+                            <td>0.05 ± 0.12</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-    <p><strong>Analysis:</strong></p>
-<p>
-    The posteriors are broadly consistent with zero across all \( f_{\text{EDE}} \) values, indicating
-    no statistically significant evidence for an EDE-induced birefringence signal. The combined likelihood
-    from Eskilt + BK18 EB consistently yields the tightest constraints. This represents a slight
-    improvement over the standalone Planck-based constraint.
-</p>
+                <p><strong>Analysis:</strong></p>
+                <p>
+                    The posteriors are broadly consistent with zero across all \( f_{\text{EDE}} \) values, indicating
+                    no statistically significant evidence for an EDE-induced birefringence signal. The combined
+                    likelihood
+                    from Eskilt + BK18 EB consistently yields the tightest constraints. This represents a slight
+                    improvement over the standalone Planck-based constraint.
+                </p>
 
-<p>
-    Notably, at \( f_{\text{EDE}} = 0.087 \), the combined analysis slightly improves upon the baseline Eskilt-only result
-    of \( g = 0.04 \pm 0.16 \) (our MCMC run of Eskilt's data is different by 0.01), slightly tightening it to
-    \( g = 0.07 \pm 0.14 \).
-</p>
+                <p>
+                    Notably, at \( f_{\text{EDE}} = 0.087 \), the combined analysis slightly improves upon the baseline
+                    Eskilt-only result
+                    of \( g = 0.04 \pm 0.16 \) (our MCMC run of Eskilt's data is different by 0.01), slightly tightening
+                    it to
+                    \( g = 0.07 \pm 0.14 \).
+                </p>
 
-<p>
-    BK18 EB-only posteriors exhibit slightly higher central values with broader uncertainties,
-    yet remain consistent with zero. The inclusion of foreground modeling has minimal impact on
-    the inferred mean or spread of \( g \), validating the robustness of the constraint.
-</p>
+                <p>
+                    BK18 EB-only posteriors exhibit slightly higher central values with broader uncertainties,
+                    yet remain consistent with zero. The inclusion of foreground modeling has minimal impact on
+                    the inferred mean or spread of \( g \), validating the robustness of the constraint.
+                </p>
 
-<p>
-    Interestingly, tighter constraints are obtained at larger \( f_{\text{EDE}} \) values. This trend likely arises
-    because larger \( f_{\text{EDE}} \) values produce EB curves that differ more significantly from
-    the rotated EE curve, enhancing their power to break degeneracies with instrumental rotation miscalibrations.
-    This is highlighted by the weakest constraint on \( g \) for \( f_{\text{EDE}} = 0.012 \), where the EB signal is both small and
-    nearly degenerate with the rotated EE template, limiting statistical leverage.
-</p>
+                <p>
+                    Interestingly, tighter constraints are obtained at larger \( f_{\text{EDE}} \) values. This trend
+                    likely arises
+                    because larger \( f_{\text{EDE}} \) values produce EB curves that differ more significantly from
+                    the rotated EE curve, enhancing their power to break degeneracies with instrumental rotation
+                    miscalibrations.
+                    This is highlighted by the weakest constraint on \( g \) for \( f_{\text{EDE}} = 0.012 \), where the
+                    EB signal is both small and
+                    nearly degenerate with the rotated EE template, limiting statistical leverage.
+                </p>
 
-</section>
+    </section>
 
 
 
     <section>
-    <h2>Multipole Dependence</h2>
-    <p>
-        We extend our birefringence analysis by fitting a multipole-dependent rotation angle
-        \( \Delta\beta_{\ell_b} \) in each BICEP bandpower bin, using the MCMC estimator developed
-        in the <a href="../20250605_time_dependent_constraints/">2025-06-05: Multipole-Dependent Analysis</a> posting.
-        These band-specific birefringence parameters capture potential angular variation in rotation,
-        and can be used to test for scale-dependent physics.
-    </p>
+        <h2>Multipole Dependence</h2>
+        <p>
+            We extend our birefringence analysis by fitting a multipole-dependent rotation angle
+            \( \Delta\beta_{\ell_b} \) in each BICEP bandpower bin, using the MCMC estimator developed
+            in the <a href="../20250605_time_dependent_constraints/">2025-06-05: Multipole-Dependent Analysis</a>
+            posting.
+            These band-specific birefringence parameters capture potential angular variation in rotation,
+            and can be used to test for scale-dependent physics.
+        </p>
 
-    <p>
-        As shown in the plot and table below, all five \( \Delta\beta_{\ell_b} \) values are consistent
-        with zero at the \( 1\sigma \) level. This places strong constraints on any possible deviation
-        from isotropy or scale-independent birefringence.
-    </p>
+        <p>
+            As shown in the plot and table below, all five \( \Delta\beta_{\ell_b} \) values are consistent
+            with zero at the \( 1\sigma \) level. This places strong constraints on any possible deviation
+            from isotropy or scale-independent birefringence.
+        </p>
 
-    <figure>
-        <img alt="Multipole-dependent birefringence" id="reals_ldiff" src="#" width="750" height="500"
-            onerror="javascript:this.src='dne.png'" />
-        <figcaption>
-            Posterior distributions for the multipole-dependent birefringence parameter \( \Delta\beta_{\ell_b} \)
-            at several band centers: \( \ell_b = 265, 300, 335, 370, 405 \).
-            All are consistent with zero, with uncertainties around \( \pm 0.13 \)--\(0.15\) degrees.
-        </figcaption>
+        <figure>
+            <img alt="Multipole-dependent birefringence" id="reals_ldiff" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+            <figcaption>
+                Posterior distributions for the multipole-dependent birefringence parameter \( \Delta\beta_{\ell_b} \)
+                at several band centers: \( \ell_b = 265, 300, 335, 370, 405 \).
+                All are consistent with zero, with uncertainties around \( \pm 0.13 \)--\(0.15\) degrees.
+            </figcaption>
 
-        <script type="text/javascript">
-            pager.link("#reals_ldiff", {
-                'Measured|m': [
-                    'Delta Beta lb|ldiff',
-                ],
-            }, function (params) {
-                let dirbase = '/liuto/home/GitHub/EB_analysis/';
-                let dirpath = dirbase + '/paper_plots/';
-                return dirpath + params.m + '.png';
-            });
+            <script type="text/javascript">
+                pager.link("#reals_ldiff", {
+                    'Measured|m': [
+                        'Delta Beta lb|ldiff',
+                    ],
+                }, function (params) {
+                    let dirbase = '/liuto/home/GitHub/EB_analysis/';
+                    let dirpath = dirbase + '/paper_plots/';
+                    return dirpath + params.m + '.png';
+                });
 
-            pager.setparams({ 'm': 'ldiff' });
-        </script>
-    </figure>
+                pager.setparams({ 'm': 'ldiff' });
+            </script>
+        </figure>
 
-    <table border="1" cellspacing="0" cellpadding="6" style="border-collapse: collapse; margin-top: 1em;">
-        <thead>
-            <tr>
-                <th>Band center \( \ell_b \)</th>
-                <th>\( \Delta\beta_{\ell_b} \) [degrees]</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>265</td>
-                <td>\(-0.15 \pm 0.15\)</td>
-            </tr>
-            <tr>
-                <td>300</td>
-                <td>\(-0.01 \pm 0.14\)</td>
-            </tr>
-            <tr>
-                <td>335</td>
-                <td>\(0.05 \pm 0.13\)</td>
-            </tr>
-            <tr>
-                <td>370</td>
-                <td>\(0.11 \pm 0.13\)</td>
-            </tr>
-            <tr>
-                <td>405</td>
-                <td>\(0.09 \pm 0.15\)</td>
-            </tr>
-        </tbody>
-    </table>
+        <table border="1" cellspacing="0" cellpadding="6" style="border-collapse: collapse; margin-top: 1em;">
+            <thead>
+                <tr>
+                    <th>Band center \( \ell_b \)</th>
+                    <th>\( \Delta\beta_{\ell_b} \) [degrees]</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>265</td>
+                    <td>\(-0.15 \pm 0.15\)</td>
+                </tr>
+                <tr>
+                    <td>300</td>
+                    <td>\(-0.01 \pm 0.14\)</td>
+                </tr>
+                <tr>
+                    <td>335</td>
+                    <td>\(0.05 \pm 0.13\)</td>
+                </tr>
+                <tr>
+                    <td>370</td>
+                    <td>\(0.11 \pm 0.13\)</td>
+                </tr>
+                <tr>
+                    <td>405</td>
+                    <td>\(0.09 \pm 0.15\)</td>
+                </tr>
+            </tbody>
+        </table>
 
-    <p>
-        While the central values show a mild upward trend with increasing \( \ell_b \), the uncertainties
-        remain large enough that this is consistent with statistical noise as demonstrated in our simulation runs. 
-        We conclude that no statistically
-        significant multipole-dependent birefringence is detected.
-    </p>
-</section>
+        <p>
+            While the central values show a mild upward trend with increasing \( \ell_b \), the uncertainties
+            remain large enough that this is consistent with statistical noise as demonstrated in our simulation runs.
+            We conclude that no statistically
+            significant multipole-dependent birefringence is detected.
+        </p>
+    </section>
 
 
     <section>
         <h2>Paper Draft</h2>
-        
+
     </section>
 
     <section>
