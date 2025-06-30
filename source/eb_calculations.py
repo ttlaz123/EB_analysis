@@ -296,7 +296,7 @@ def apply_dust(post_travel_dict, bandpasses, params_values):
     dust_cache = {}
     sync_cache = {}
     for used_map, dls in post_travel_dict.items():
-        print(used_map)
+       
         lmax = dls.shape[0]
         ratio = np.arange(lmax) / LPIVOT
 
