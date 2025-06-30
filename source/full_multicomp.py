@@ -430,7 +430,7 @@ def load_shared_data(input_args):
         bin_starts, raw_cl, SHARED_DATA_DICT['eskilt'] = ld.load_eskilt_data(ede_path=FILE_PATHS['EDE_spectrum'])
 
 def run_bk18_likelihood(params_dict, observation_file_path, input_args, 
-                        rstop = 0.001, max_tries=10000):
+                        rstop = 0.01, max_tries=10000):
     """
     Runs the Cobaya MCMC likelihood using BK18_full_multicomp likelihood class.
 
@@ -493,7 +493,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
     """
     # define angles based on mapopts
     anglecmb_priors = {"prior": {"min": -angle_degree*3/4, "max": angle_degree}, 
-                       "ref": -4}
+                       "ref": -0}
     angledef_priors = {
         "prior": {
             "dist": "norm",    # valid scipy.stats distribution name
@@ -574,7 +574,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
     elif(theory_comps == 'det_polrot'):
         params_dict['alpha_CMB'] = anglecmb_priors
-        params_dict['alpha_CMB']['ref']=4
+        params_dict['alpha_CMB']['ref']=0
         pass
 
     elif(theory_comps == 'fixed_dust'):
