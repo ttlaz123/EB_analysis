@@ -304,7 +304,7 @@ def plot_ldiff_posteriors(ldiff_chains, output_dir: str):
     # Optional: custom legend
     ax.legend(fontsize=10)
 
-    out_path = os.path.join(output_dir, "ldiff_mean_vs_lb.png")
+    out_path = os.path.join(output_dir, "ldiff_bandpower.png")
     print('Saving:', out_path)
     fig.savefig(out_path, bbox_inches='tight')
     plt.close(fig)
