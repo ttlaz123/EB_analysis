@@ -292,6 +292,7 @@ def plot_ldiff_posteriors(ldiff_chains, output_dir: str):
 
     fig, ax = plt.subplots(figsize=(8, 5))
     for lb, mean, std, color in zip(lbs, means, stds, colors):
+        print('Color: ' + str(color))
         ax.errorbar(lb, mean, yerr=std, fmt='o', capsize=4, color=color, ecolor=color, label=f"$\ell_b={lb}$")
 
     ax.axhline(0, color='gray', linestyle='--', linewidth=1)
