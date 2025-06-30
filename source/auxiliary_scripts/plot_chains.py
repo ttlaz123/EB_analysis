@@ -10,7 +10,7 @@ from matplotlib.lines import Line2D
 import numpy as np
 model_config = {
     "BK18lf_nob_bin2-15_all":       ("with_fg", 1, "BK18 EE+EB with foregrounds",         "#57b9ff", 1),
-    "BK18lf_all_bin2-15_all":       ("with_fg", 2, "BK18 EE+EB+BB with foregrounds",       "#1ea1ff", 1),
+    "BK18lf_all_bin2-15_all":       ("with_fg", 2, "BK18 EE+EB+BB with foregrounds",       "#a020f0", 5),
     "BK18lf_eb_bin2-15_gdust":      ("with_fg", 0, "BK18 EB with foregrounds","#84ccff", 1),
     "BK18lf_eb_bin2-15_fixed_dust": ("no_fg",   0, "BK18 EB no foregrounds",               "#ff7f0e", 3),
     "eskilt_only":                  ("eskilt",  0, "Eskilt 2023",                           "#2ca02c", 3),
@@ -91,6 +91,9 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
                 continue
 
             group, subgroup_priority, label, color, lw = model_config[match]
+            if(group == 'combined'):
+                print('Skipping: ' + label)
+                continue
             mean = samples.mean(param_name)
             std = samples.std(param_name)
             full_label = f"{label}: {mean:.2f} ± {std:.2f}"
