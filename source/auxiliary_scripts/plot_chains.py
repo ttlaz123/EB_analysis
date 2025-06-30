@@ -296,9 +296,9 @@ def plot_ldiff_posteriors(ldiff_chains, output_dir: str):
         ax.errorbar(lb, mean, yerr=std, fmt='o', capsize=4, color=color, ecolor=color, label=f"$\ell_b={lb}$")
 
     ax.axhline(0, color='gray', linestyle='--', linewidth=1)
-    ax.set_xlabel(r'Multipole bin center $\ell_b$', fontsize=14)
-    ax.set_ylabel(r'Mean $\Delta\beta$ (deg)', fontsize=14)
-    ax.set_title(r'Posterior Mean and 1$\sigma$ vs. $\ell_b$', fontsize=14)
+    ax.set_xlabel(r'Multipole breakpoint $\ell_b$', fontsize=14)
+    ax.set_ylabel(r'$\Delta\beta$ (deg)', fontsize=14)
+    ax.set_title(r'$\Delta\beta$ Mean and 1$\sigma$b$', fontsize=14)
     ax.grid(True)
 
     # Optional: custom legend
