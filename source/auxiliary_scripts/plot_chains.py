@@ -27,7 +27,7 @@ def find_chain_dirs(base_dir: str) -> List[str]:
 
 
 def get_samples(chain_path: str):
-    loadMCSamples(chain_path, settings={"ignore_rows":100})
+    return loadMCSamples(chain_path, settings={"ignore_rows":100})
     
 
 
