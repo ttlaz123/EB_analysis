@@ -328,7 +328,7 @@ def plot_betacmb_posteriors(chain_dirs: List[str], base_dir: str, output_dir: st
         samples = get_samples(chain_file)
         if not samples:
             continue
-
+        print(chain_dir)
         if param_name not in samples.paramNames.list():
             print(f"Skipping {chain_dir}: {param_name} not found")
             continue
