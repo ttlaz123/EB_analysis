@@ -323,7 +323,7 @@ def plot_betacmb_posteriors(chain_dirs: List[str], base_dir: str, output_dir: st
     for chain_dir in chain_dirs:
         if "betacmb" not in chain_dir:
             continue
-
+        print(chain_dir)
         chain_file = os.path.join(base_dir, chain_dir, "real")
         samples = get_samples(chain_file)
         if not samples:
