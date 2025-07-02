@@ -416,7 +416,12 @@ def plot_marginalized_triangle(chain_path, param_names,
     # Plot triangle
     g = plots.get_subplot_plotter()
     g.triangle_plot(samples_obj, filled=True)
-    plt.suptitle("\n".join(mean_std_strings), fontsize=10)
+    # Add text box in top right blank space
+    textstr = "\n".join(mean_std_strings)
+
+    # Coordinates are relative to the figure (0 to 1)
+    plt.gcf().text(0.93, 0.75, textstr, fontsize=10, verticalalignment='top',
+                   bbox=dict(boxstyle='round,pad=0.5', facecolor='white', alpha=0.8))
     plt.tight_layout()
 
     # Save and show
