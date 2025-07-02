@@ -420,7 +420,7 @@ def plot_marginalized_triangle(chain_path, param_names,
     textstr = "\n".join(mean_std_strings)
 
     # Coordinates are relative to the figure (0 to 1)
-    plt.gcf().text(0.75, 0.75, textstr, fontsize=10, verticalalignment='top',
+    plt.gcf().text(0.55, 0.75, textstr, fontsize=10, verticalalignment='top',
                    bbox=dict(boxstyle='round,pad=0.5', facecolor='white', alpha=0.8))
     plt.tight_layout()
 
