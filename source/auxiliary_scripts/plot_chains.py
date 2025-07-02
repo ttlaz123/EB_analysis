@@ -380,13 +380,7 @@ def plot_marginalized_triangle(chain_path, param_names,
                 param_labels=None, outdir='sample_plots', weight_col='weight', burn_in=100):
     """
     Load an MCMC chain and plot a triangle plot for a subset of parameters using getdist.
-
-    Parameters:
-    - chain_path (str): Path to the MCMC chain file (.txt or .csv with headers).
-    - param_names (list of str): List of parameter names to include in the triangle plot.
-    - param_labels (list of str or None): LaTeX-style labels to use in the plot (optional).
-    - weight_col (str): Name of the column with weights (default 'weight'). Set to None if no weights.
-    - burn_in (int): Number of samples to discard from start (optional).
+    Displays mean ± std on the plot.
     """
 
     # Load the chain
@@ -412,24 +406,18 @@ def plot_marginalized_triangle(chain_path, param_names,
     # Create MCSamples object
     samples_obj = MCSamples(samples=samples, names=param_names, labels=param_labels, weights=weights)
 
+    # Get mean ± std for title
+    mean_std_strings = []
+    for name, label in zip(param_names, param_labels):
+        mean = samples_obj.mean(name)
+        std = samples_obj.std(name)
+        mean_std_strings.append(f"${label}$ = {mean:.3f} ± {std:.3f}")
+
     # Plot triangle
     g = plots.get_subplot_plotter()
     g.triangle_plot(samples_obj, filled=True)
-
-    # Add mean ± std as a textbox in upper-left subplot
-    stats = samples_obj.getMargeStats()
-    summary_lines = []
-    for name, label in zip(param_names, param_labels):
-        mean = stats.mean(name)
-        std = stats.std(name)
-        summary_lines.append(f"${label}$ = {mean:.3f} ± {std:.3f}")
-    summary_text = "\n".join(summary_lines)
-
-    # Add to top-left corner of the first subplot
-    ax = plt.gcf().axes[0]
-    ax.text(0.95, 0.95, summary_text, transform=ax.transAxes,
-            verticalalignment='top', horizontalalignment='right',
-            fontsize=10, bbox=dict(boxstyle='round', facecolor='white', alpha=0.9))
+    plt.suptitle("\n".join(mean_std_strings), fontsize=10)
+    plt.tight_layout()
 
     # Save and show
     os.makedirs(outdir, exist_ok=True)
@@ -438,7 +426,7 @@ def plot_marginalized_triangle(chain_path, param_names,
     g.export(out_path)
     plt.show()
 
-    
+
 def main():
     parser = argparse.ArgumentParser(description="Plot Cobaya MCMC chains.")
     parser.add_argument('--base_dir', required=True, help='Path to base chain directory')
@@ -453,7 +441,7 @@ def main():
     if(args.isodust):
         param_names = ['alpha_CMB', 'A_dust_EB']
         param_labels = [r'\beta_{\rm CMB}', r'A_{\rm dust}^{EB}']
-        plot_marginalized_triangle(args.base_dir, param_names, param_labels)
+        plot_marginalized_triangle(args.base_dir, param_names, param_labels, outdir=args.output_dir)
         return
     chain_dirs = find_chain_dirs(args.base_dir)
 
