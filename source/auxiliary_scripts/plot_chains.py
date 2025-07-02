@@ -412,13 +412,33 @@ def plot_marginalized_triangle(chain_path, param_names,
     # Create MCSamples object
     samples_obj = MCSamples(samples=samples, names=param_names, labels=param_labels, weights=weights)
 
-    # Plot triangle plot
+    # Plot triangle
     g = plots.get_subplot_plotter()
     g.triangle_plot(samples_obj, filled=True)
+
+    # Add mean ± std as a textbox in upper-left subplot
+    stats = samples_obj.getMargeStats()
+    summary_lines = []
+    for name, label in zip(param_names, param_labels):
+        mean = stats.mean(name)
+        std = stats.std(name)
+        summary_lines.append(f"${label}$ = {mean:.3f} ± {std:.3f}")
+    summary_text = "\n".join(summary_lines)
+
+    # Add to top-left corner of the first subplot
+    ax = plt.gcf().axes[0]
+    ax.text(0.95, 0.95, summary_text, transform=ax.transAxes,
+            verticalalignment='top', horizontalalignment='right',
+            fontsize=10, bbox=dict(boxstyle='round', facecolor='white', alpha=0.9))
+
+    # Save and show
+    os.makedirs(outdir, exist_ok=True)
     out_path = os.path.join(outdir, "isobeta_and_dust.png")
-    print('Saving: ' + str(out_path))
+    print('Saving:', out_path)
     g.export(out_path)
     plt.show()
+
+    
 def main():
     parser = argparse.ArgumentParser(description="Plot Cobaya MCMC chains.")
     parser.add_argument('--base_dir', required=True, help='Path to base chain directory')
