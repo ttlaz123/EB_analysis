@@ -5,7 +5,7 @@ from typing import List, Dict
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from getdist import loadMCSamples, plots
+from getdist import loadMCSamples, plots, MCSamples
 from matplotlib.lines import Line2D
 import numpy as np
 model_config = {
@@ -295,7 +295,7 @@ def plot_ldiff_posteriors(ldiff_chains, output_dir: str):
     ax.axhline(0, color='gray', linestyle='--', linewidth=1)
     ax.set_xlabel(r'Multipole breakpoint $\ell_b$', fontsize=14)
     ax.set_ylabel(r'$\Delta\beta$ (deg)', fontsize=14)
-    ax.set_title(r'$\Delta\beta$ Mean and 1$\sigma$b$', fontsize=14)
+    ax.set_title('Rotation Difference', fontsize=14)
     ax.grid(True)
 
     # Optional: custom legend
@@ -375,6 +375,63 @@ def plot_betacmb_posteriors(chain_dirs: List[str], base_dir: str, output_dir: st
     print(f"Saving: {out_path}")
     g.export(out_path)
 
+
+def plot_marginalized_triangle(chain_path, param_names, 
+                param_labels=None, outdir='sample_plots', weight_col='weight', burn_in=100):
+    """
+    Load an MCMC chain and plot a triangle plot for a subset of parameters using getdist.
+    Displays mean ± std on the plot.
+    """
+
+    # Load the chain
+    data = np.genfromtxt(chain_path, names=True)
+
+    # Apply burn-in if requested
+    if burn_in > 0:
+        data = data[burn_in:]
+
+    # Get weights if present
+    weights = data[weight_col] if weight_col in data.dtype.names else None
+
+    # Stack samples of selected parameters
+    try:
+        samples = np.vstack([data[param] for param in param_names]).T
+    except KeyError as e:
+        raise ValueError(f"Parameter not found in chain: {e}")
+
+    # Use default labels if not provided
+    if param_labels is None:
+        param_labels = param_names
+
+    # Create MCSamples object
+    samples_obj = MCSamples(samples=samples, names=param_names, labels=param_labels, weights=weights)
+
+    # Get mean ± std for title
+    mean_std_strings = []
+    for name, label in zip(param_names, param_labels):
+        mean = samples_obj.mean(name)
+        std = samples_obj.std(name)
+        mean_std_strings.append(f"${label}$ = {mean:.3f} ± {std:.3f}")
+
+    # Plot triangle
+    g = plots.get_subplot_plotter()
+    g.triangle_plot(samples_obj, filled=True)
+    # Add text box in top right blank space
+    textstr = "\n".join(mean_std_strings)
+
+    # Coordinates are relative to the figure (0 to 1)
+    plt.gcf().text(0.55, 0.75, textstr, fontsize=10, verticalalignment='top',
+                   bbox=dict(boxstyle='round,pad=0.5', facecolor='white', alpha=0.8))
+    plt.tight_layout()
+
+    # Save and show
+    os.makedirs(outdir, exist_ok=True)
+    out_path = os.path.join(outdir, "isobeta_and_dust.png")
+    print('Saving:', out_path)
+    g.export(out_path)
+    plt.show()
+
+
 def main():
     parser = argparse.ArgumentParser(description="Plot Cobaya MCMC chains.")
     parser.add_argument('--base_dir', required=True, help='Path to base chain directory')
@@ -383,8 +440,14 @@ def main():
     parser.add_argument('--group_by_ldiff', action='store_true', help='Group chains by ldiff value')
     parser.add_argument('--plot_traces', action='store_true', help='Generate trace plots to inspect burn-in')
     parser.add_argument('--group_by_cmb', action='store_true', help='Group chains by cmb value')
+    parser.add_argument('--isodust', action='store_true', help='only plotting dust and iso angle')
     
     args = parser.parse_args()
+    if(args.isodust):
+        param_names = ['alpha_CMB', 'A_dust_EB']
+        param_labels = [r'\beta_{\rm CMB}', r'A_{\rm dust}^{EB}']
+        plot_marginalized_triangle(args.base_dir, param_names, param_labels, outdir=args.output_dir)
+        return
     chain_dirs = find_chain_dirs(args.base_dir)
 
     if args.plot_traces:
