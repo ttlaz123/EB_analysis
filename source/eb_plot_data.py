@@ -523,6 +523,18 @@ def plot_best_crossfit(eb_like_cls, outpath, used_maps, param_names,
     return 
 
 
+# Calculate safe plot ranges (expand by 20% beyond data range)
+def get_safe_ranges(samples_list, padding_factor=0.2):
+    all_samples = np.vstack([s.samples for s in samples_list])
+    ranges = {}
+    for i, name in enumerate(samples_list[0].getParamNames().names):
+        vals = all_samples[:, i]
+        span = vals.max() - vals.min()
+        ranges[name] = (
+            vals.min() - padding_factor * span,
+            vals.max() + padding_factor * span
+        )
+    return ranges
 
 def plot_triangle(root, replace_dict={}):
     # Load MCMC samples from the specified root
@@ -552,11 +564,12 @@ def plot_triangle(root, replace_dict={}):
             mean_std_strings.append(f"{param}: {mean:.2f} ± {std:.2f}")
 
         means.append(mean)
-
+    plot_ranges = get_safe_ranges([samples])
     # Create a triangle plot with all variables
     fig = plt.figure()
     g = plots.get_subplot_plotter()
-    g.triangle_plot(samples, param_names, filled=True)
+    g.triangle_plot(samples, param_names, filled=True,
+                    plot_ranges=plot_ranges)
 
     # Add the mean and std to the plot title
     plt.suptitle("\n".join(mean_std_strings), fontsize=10)
