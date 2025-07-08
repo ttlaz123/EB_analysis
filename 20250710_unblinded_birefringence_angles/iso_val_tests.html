@@ -132,12 +132,11 @@
                         'Best Fit BB|_bestfitBB',
                         'Triangle Plot|_triangle_plot',
                         'Chi squared|_chisqmap',
-                        'Summary|_summary'
                     ],
                     'Test|test':[
                         'All angles set to zero|zero',
                     ],
-                    'Configuration|config':[
+                    'Configuration|config2':[
                         'Yes Foregrounds, all 4 angles, EB only|_all_dust',
                         'Yes Foregrounds, all 4 angles, EB + BB +EE|_all_dust_eebbeb',
                     ],
@@ -150,9 +149,9 @@
                         
                         
                         
-                        let foldername = params.test + params.config +  '/';
+                        let foldername = params.test + params.config2 +  '/';
                         
-                        let sim_id = 'sim1'
+                        let sim_id = 'sim'
                         let file = sim_id + params.plottype;
                         let name = dirpath + foldername + file +  '.png';
             
@@ -164,7 +163,7 @@
               
                     'plottype': '_summary',
                     'test': 'zero',
-                     'config': '_all',
+                     'config2': '_all',
                 });
             </script>
         </figure>
