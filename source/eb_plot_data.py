@@ -451,7 +451,7 @@ def plot_best_crossfit(eb_like_cls, outpath, used_maps, param_names,
     plt.yticks(np.arange(len(used_maps)), used_maps)
     print("Saving: " +outpath + '_chisqmap.png')
     plt.savefig(outpath + '_chisqmap.png')
-    #plt.show()
+    #ddplt.show()
     # Initialize lists to store unique maps ending with _E and _B
     maps_B = set()
     maps_E = set()
@@ -528,9 +528,11 @@ def get_safe_ranges(samples_list, padding_factor=0.2):
     all_samples = np.vstack([s.samples for s in samples_list])
     ranges = {}
     for i, name in enumerate(samples_list[0].getParamNames().names):
+        if('chi2' in name.name):
+            continue
         vals = all_samples[:, i]
         span = vals.max() - vals.min()
-        ranges[name] = (
+        ranges[name.name] = (
             vals.min() - padding_factor * span,
             vals.max() + padding_factor * span
         )
@@ -564,13 +566,12 @@ def plot_triangle(root, replace_dict={}):
             mean_std_strings.append(f"{param}: {mean:.2f} ± {std:.2f}")
 
         means.append(mean)
-    plot_ranges = get_safe_ranges([samples])
+    #plot_ranges = get_safe_ranges([samples])
     # Create a triangle plot with all variables
     fig = plt.figure()
     g = plots.get_subplot_plotter()
-    g.triangle_plot(samples, param_names, filled=True,
-                    plot_ranges=plot_ranges)
-
+    g.triangle_plot(samples, param_names, filled=True)
+                    #param_limits=plot_ranges)
     # Add the mean and std to the plot title
     plt.suptitle("\n".join(mean_std_strings), fontsize=10)
     plt.tight_layout()
@@ -743,13 +744,15 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None,
         file_path = single_path if single_path is not None else chains_path.replace('XXX', f'{i:03d}')
         single_df = pd.read_csv(file_path, delim_whitespace=True, comment='#')
         single_df.columns = corrected_header
-
-        corner.corner(single_df[param_names],
+        try:
+            corner.corner(single_df[param_names],
                       labels=param_names,
                       show_titles=False,
                       hist_kwargs={'color': 'blue', 'density': True},
                       contour_kwargs={'colors': 'blue'},
                       fig=fig)
+        except AttributeError:
+            print('Not printing single chain')
 
         supertitle = f'Sim {i} (blue) on top of {simcount} sims (red)'
         plt.suptitle(supertitle)

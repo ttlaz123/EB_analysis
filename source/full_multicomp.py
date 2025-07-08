@@ -431,7 +431,7 @@ def load_shared_data(input_args):
         bin_starts, raw_cl, SHARED_DATA_DICT['eskilt'] = ld.load_eskilt_data(ede_path=FILE_PATHS['EDE_spectrum'])
 
 def run_bk18_likelihood(params_dict, observation_file_path, input_args, 
-                        rstop = 0.0003, max_tries=10000):
+                        rstop = 0.01, max_tries=10000):
     """
     Runs the Cobaya MCMC likelihood using BK18_full_multicomp likelihood class.
 
@@ -480,7 +480,7 @@ def run_bk18_likelihood(params_dict, observation_file_path, input_args,
     updated_info, sampler = run(info, stop_at_error=True)
     return updated_info, sampler
 
-def define_priors(calc_spectra, theory_comps, angle_degree=15, spectra='all'):
+def define_priors(calc_spectra, theory_comps, angle_degree=5, spectra='all'):
     """
     Defines prior distributions for angle parameters, dust parameters, and EDE params.
 
@@ -493,7 +493,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=15, spectra='all'):
         dict: Dictionary defining Cobaya-compatible priors for parameters.
     """
     # define angles based on mapopts
-    anglecmb_priors = {"prior": {"min": -angle_degree*3/4, "max": angle_degree}, 
+    anglecmb_priors = {"prior": {"min": -angle_degree, "max": angle_degree}, 
                        "ref": -0}
     angledef_priors = {
         "prior": {
@@ -576,6 +576,8 @@ def define_priors(calc_spectra, theory_comps, angle_degree=15, spectra='all'):
     elif(theory_comps == 'det_polrot'):
         params_dict['alpha_CMB'] = anglecmb_priors
         params_dict['alpha_CMB']['ref']=0
+        params_dict['alpha_BK18_B95e'] = 0
+        params_dict['alpha_BK18_150']=0
         pass
 
     elif(theory_comps == 'fixed_dust'):
@@ -1087,8 +1089,13 @@ def main():
                 for item in matching_items:
                     if os.path.isdir(item):
                         shutil.rmtree(item)  # Remove directory
+                        
                     else:
                         os.remove(item)  # Remove file
+                for f in os.listdir(os.path.dirname(args.output_path)):
+                    if f.endswith('.csv'):
+                        csv_path = os.path.join(args.output_path, file)
+                        os.remove(csv_path)
                 print(f"Deleted existing chains at: {args.output_path}")
             else:
                 print("Deletion cancelled. Existing chains will be kept.")
