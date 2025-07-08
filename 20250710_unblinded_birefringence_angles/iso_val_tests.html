@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>EDE Update</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <!-- Load up MathJax for math notation -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            TeX: { equationNumbers: { autoNumber: "AMS" } }
+        });
+    </script>
+    <script type="text/javascript" src="../mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+</head>
+
+<body>
+    <!-- Add my custom pager script -->
+    <script type="text/javascript" src="scripts/pager.js"></script>
+    <link rel="stylesheet" type="text/css" href="scripts/pager.css">
+
+    <header>
+        <h1>Unblinded Birefringence Raw Chains</h1>
+
+        <time datetime="2025 July 10" class="published updated">
+            2025 July 10
+        </time> —
+        Tongtian (Tom) Liu, Dominic Beck
+    </header>
+
+    <hr>
+    <section>
+    <h2>Introduction</h2>
+    <p><strong>Summary:</strong>  
+       Some tests for comparing MCMC and matmin
+    </p>
+
+</section>
+
+   <section>
+    <h2>Isotropic Birefringence</h2>
+    <figure>
+            <img alt="Real Data" id="reals_basic" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+             <figcaption>
+    Posterior distributions and diagnostics for isotropic birefringence analysis using real BK18 data.
+    This includes cases with and without galactic foreground modeling. The triangle plots illustrate 
+    degeneracies between the rotation angle \( \beta_{\text{cmb}} \), receiver angle miscalibrations, and foreground parameters.
+</figcaption>
+
+            <script type="text/javascript">
+               
+
+                pager.link("#reals_basic", {
+                   
+                    
+                    'Plot type|plottype':[
+                        'Best Fit EE|_bestfitEE',
+                        'Best Fit EB|_bestfitEB',
+                        'Best Fit BB|_bestfitBB',
+                        'Triangle Plot|_triangle_plot',
+                        'Chi squared|_chisqmap'
+                    ],
+                    'Test|test':[
+                        'All but one angle set to zero degree|notzero',
+                        'All but one angle set to one degree|notone',
+                    ],
+                    'Free Angle|angle':[
+                        'alpha_BK18_150|150',
+                        'alpha_BK18_K95|K95',
+                        'alpha_BK18_B95lf|B95',
+                        'alpha_BK18_220|220',
+                    ],
+
+                },
+         
+                    function (params) {
+                        let dirbase = '/liuto/home/GitHub/EB_analysis/';
+                        let dirpath = dirbase + '/iso_val_chains/';
+                        let spectra = '_eb';
+                        
+                        
+                        let foldername = params.test + '_' + params.angle + params.spectra + '/';
+                        let file = 'sim1'+params.plottype;
+                        let name = dirpath + foldername + file +  '.png';
+            
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+        
+                    'plottype': '_triangle_plot',
+                    'test': 'notzero',
+                     'angle': 'B95',
+                });
+            </script>
+        </figure>
+        </section>
+        
+</body>
+
+</html>
