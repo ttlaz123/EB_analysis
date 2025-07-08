@@ -133,7 +133,7 @@
                         'Triangle Plot|_triangle_plot',
                         'Chi squared|_chisqmap',
                     ],
-                    'Test|test':[
+                    'Test|test2':[
                         'All angles set to zero|zero',
                     ],
                     'Configuration|config2':[
@@ -149,7 +149,7 @@
                         
                         
                         
-                        let foldername = params.test + params.config2 +  '/';
+                        let foldername = params.test2 + params.config2 +  '/';
                         
                         let sim_id = 'sim'
                         let file = sim_id + params.plottype;
@@ -162,7 +162,7 @@
                 pager.setparams({
               
                     'plottype': '_summary',
-                    'test': 'zero',
+                    'test2': 'zero',
                      'config2': '_all',
                 });
             </script>
@@ -189,7 +189,7 @@
                         'Triangle Plot|_triangle_plot',
                         'Chi squared|_chisqmap'
                     ],
-                    'Test|test':[
+                    'Test|test3':[
                         'All but one angle set to zero degree|notzero',
                         'All but one angle set to one degree|notone',
                     ],
@@ -208,7 +208,7 @@
                         let spectra = '_eb';
                         
                         
-                        let foldername = params.test + '_' + params.angle + spectra + '/';
+                        let foldername = params.test3 + '_' + params.angle + spectra + '/';
                         let file = 'sim1'+params.plottype;
                         let name = dirpath + foldername + file +  '.png';
             
@@ -219,7 +219,7 @@
                 pager.setparams({
         
                     'plottype': '_triangle_plot',
-                    'test': 'notzero',
+                    'test3': 'notzero',
                      'angle': 'B95',
                 });
             </script>
