@@ -10,24 +10,29 @@ def summarize_chain(root):
 
     if samples is None or samples.paramNames is None:
         raise ValueError(f"Could not load MCMC samples from root: {root}")
-
+    
     names = samples.getParamNames().names
     param_labels = [name.name for name in names]
+    chi2_index = param_labels.index("chi2")
+    arr = samples.samples
+    chi2_vals = arr[:, chi2_index]
 
+    # Find the index of the minimum chi2 value
+    min_idx = np.argmin(chi2_vals)
+    best_fit_row = arr[min_idx, :]
     means = samples.mean(names)
     stds = samples.std(names)
 
     # Get best-fit parameters and min chi-squared using getLikeStats()
-    best_fit_params, min_chi2 = samples.getLikeStats()
+    
 
     summary = {"chain_root": os.path.basename(root)}
-    for name, mean, std, best_fit in zip(param_labels, means, stds, best_fit_params):
+    for name, mean, std, best_fit in zip(param_labels, means, stds, best_fit_row):
         summary[f"{name}_mean"] = mean
         summary[f"{name}_std"] = std
         summary[f"{name}_minchi2"] = best_fit
 
-    # Optionally, also save the min chi2 value itself
-    summary["min_chi2"] = min_chi2
+
 
     return summary
 
