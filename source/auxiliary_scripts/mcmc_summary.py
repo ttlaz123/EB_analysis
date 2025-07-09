@@ -23,23 +23,23 @@ def summarize_chain(root):
 
     # Find chi2 index in params
     chi2_index = None
+    param_labels = [name.name for name in samples.getParamNames().names]
     for i, name in enumerate(param_labels):
         if name == 'chi2':
             chi2_index = i
             break
+
     if chi2_index is None:
         raise RuntimeError("No 'chi2' parameter found in samples.")
 
-    # Extract chi2 values as a numpy array
-    chi2_vals = samples.getParams().array[:, chi2_index]
-
-    # Find min chi2 index
+    chi2_vals = arr[:, chi2_index]
     min_idx = np.argmin(chi2_vals)
 
-    # Add min-chi2 parameters
+    summary = {"chain_root": os.path.basename(root)}
     for i, name in enumerate(param_labels):
-        val = samples.getParams().array[min_idx, i]
-        summary[f"{name}_minchi2"] = val
+        summary[f"{name}_mean"] = samples.mean(name)
+        summary[f"{name}_std"] = samples.std(name)
+        summary[f"{name}_minchi2"] = arr[min_idx, i]
 
     return summary
 
