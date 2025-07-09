@@ -692,13 +692,42 @@ def make_titles(means_df, stds_df, minchisq_df, param_names):
         std_val = stds_df[p].mean() if p in stds_df.columns else np.nan
         minchi2_mean = minchisq_df[p].mean()
         minchi2_std = minchisq_df[p].std()  # spread of the minchi2 peaks
-        title = (f"Mean ± Std:\n{mean_val:.3f} ± {std_val:.3f}\n"
-                 f"Minχ² peak ± spread:\n{minchi2_mean:.3f} ± {minchi2_std:.3f}")
+        title = (f"Peak ± spread:\n{minchi2_mean:.3f} ± {minchi2_std:.3f}\n"
+                 f"Mean ± Std:\n{mean_val:.3f} ± {std_val:.3f}\n")
         titles.append(title)
     return titles
 
 def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None, 
                    percentile_clip=(0, 100)):
+    """
+    Create a corner plot visualizing simulation parameter distributions.
+
+    Plots three sets of contours/histograms overlaid:
+      - Means and std deviations from all realizations (in red)
+      - Parameter values corresponding to minimum chi-squared per realization (in green)
+      - Full MCMC chain samples from a single simulation (in blue)
+
+    Args:
+        chains_path (str): Path pattern to the directory containing summary CSVs
+                           with 'mean', 'std', and 'minchi2' columns.
+        single_sim (int): Simulation number used to select the single chain file
+                          (used to replace "XXX" in path if single_path not provided).
+        sim_nums (list or None): Optional list of simulation numbers to plot.
+        single_path (str or None): Explicit path to a single simulation chain file
+                                   (overrides chains_path replacement).
+        percentile_clip (tuple): Percentile range (min, max) used to clip parameter ranges
+                                for plotting (default: full range (0, 100)).
+
+    Prints:
+        Dictionary of best-fit parameter values (minimum chi-squared) for the simulations.
+
+    Saves:
+        Corner plot PNG file named as `{base_chains_path}{single_sim}_summary.png`.
+
+    Notes:
+        Requires functions `load_summary_csv`, `compute_corner_ranges`, and `make_titles`
+        which should return appropriate DataFrames and titles for corner plot.
+    """
     means_df, stds_df, minchisq_df, param_names = load_summary_csv(chains_path)
     ranges = compute_corner_ranges(means_df, param_names, percentile_clip)
 
@@ -721,6 +750,12 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
                   hist_kwargs={'color': 'green', 'density': True},
                   contour_kwargs={'colors': 'green'},
                   fig=fig)
+
+    # Print best-fit (min chi²) parameter values
+    best_fit_params = minchisq_df[param_names].iloc[0].to_dict()
+    print(f"Best-fit parameters (min chi²) for sim {single_sim}:")
+    for k, v in best_fit_params.items():
+        print(f"  {k}: {v}")
 
     # Overlay single chain (blue)
     single_chain_path = single_path or chains_path.replace("XXX", f"{single_sim:03d}")
@@ -745,7 +780,9 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     plt.suptitle(f"Sim {single_sim}: mean (red), bestfit (green), full chain (blue)")
     plt.savefig(outpath)
     print(f"Saved to {outpath}")
-    plt.show()
+
+
+
 
 def read_sampler(filepath):
     """
