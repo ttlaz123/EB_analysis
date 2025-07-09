@@ -686,14 +686,15 @@ def compute_corner_ranges(df, param_names, percentile_clip=(0, 100)):
     return [np.percentile(df[param], percentile_clip) for param in param_names]
 
 def make_titles(means_df, stds_df, minchisq_df, param_names):
-    """Create multi-line titles: mean ± std and minchi2 peak."""
+    """Create multi-line titles with mean±std for means and minchi2 peak ± spread."""
     titles = []
     for p in param_names:
         mean_val = means_df[p].mean()
         std_val = stds_df[p].mean() if p in stds_df.columns else np.nan
-        minchi2_val = minchisq_df[p].mean()
+        minchi2_mean = minchisq_df[p].mean()
+        minchi2_std = minchisq_df[p].std()  # spread of the minchi2 peaks
         title = (f"Mean ± Std:\n{mean_val:.3f} ± {std_val:.3f}\n"
-                 f"Minχ² peak:\n{minchi2_val:.3f}")
+                 f"Minχ² peak ± spread:\n{minchi2_mean:.3f} ± {minchi2_std:.3f}")
         titles.append(title)
     return titles
 
@@ -746,7 +747,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     plt.savefig(outpath)
     print(f"Saved to {outpath}")
     plt.show()
-    
+
 def read_sampler(filepath):
     """
     Reads MCMC sampler data from a file and returns it as a DataFrame.
