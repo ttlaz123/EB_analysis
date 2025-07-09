@@ -13,35 +13,24 @@ def summarize_chain(root):
 
     names = samples.getParamNames().names
     param_labels = [name.name for name in names]
+
     means = samples.mean(names)
     stds = samples.std(names)
 
+    # Get best-fit parameters and min chi-squared using getLikeStats()
+    best_fit_params, min_chi2 = samples.getLikeStats()
+
     summary = {"chain_root": os.path.basename(root)}
-    for name, mean, std in zip(param_labels, means, stds):
+    for name, mean, std, best_fit in zip(param_labels, means, stds, best_fit_params):
         summary[f"{name}_mean"] = mean
         summary[f"{name}_std"] = std
+        summary[f"{name}_minchi2"] = best_fit
 
-    # Find chi2 index in params
-    chi2_index = None
-    param_labels = [name.name for name in samples.getParamNames().names]
-    for i, name in enumerate(param_labels):
-        if name == 'chi2':
-            chi2_index = i
-            break
-
-    if chi2_index is None:
-        raise RuntimeError("No 'chi2' parameter found in samples.")
-
-    chi2_vals = arr[:, chi2_index]
-    min_idx = np.argmin(chi2_vals)
-
-    summary = {"chain_root": os.path.basename(root)}
-    for i, name in enumerate(param_labels):
-        summary[f"{name}_mean"] = samples.mean(name)
-        summary[f"{name}_std"] = samples.std(name)
-        summary[f"{name}_minchi2"] = arr[min_idx, i]
+    # Optionally, also save the min chi2 value itself
+    summary["min_chi2"] = min_chi2
 
     return summary
+
 
 def process_directory(base_dir):
     """Walk through all subdirectories of base_dir and process each one."""
