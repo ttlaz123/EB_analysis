@@ -646,147 +646,107 @@ def plot_corner(outfile, sim_results_file, real_results_file):
     plt.suptitle(title_str)
     plt.savefig(outfile)
 
-def plot_sim_peaks(chains_path, single_sim, sim_nums, single_path=None, 
-                   use_median=True, percentile_clip=(1, 99)):
-    """
-    chains_path: a path pattern with 'XXX' replaced by sim number, e.g. '/path/to/sim_XXX.txt'
-    single_sim: simulation number for individual overlay plot
-    sim_nums: total number of simulations
-    single_path: optionally override single sim path
-    """
-    modes_dict = {}
-    single_df = None
-    simcount = 0
-    default_cols = ['#', 'chain_root', 'weight', 'minuslogpost', 'minuslogprior',
-                    'minuslogprior__0', 'chi2', 'chi2__my_likelihood', 
-                    'chi2_mean', 'chi2__my_likelihood_mean',
-                    'chi2_std', 'chi2__my_likelihood_std']
+def load_summary_csv(chains_path):
+    """Load summary CSV with mean, std, and minchi2 columns."""
+    import ms  # Your module with process_single_directory
+
     base_dir = os.path.dirname(chains_path)
     base_name = os.path.basename(base_dir)
     csv_file = os.path.join(base_dir, base_name + "_summary.csv")
-    if(not os.path.exists(csv_file)):
+
+    if not os.path.exists(csv_file):
         ms.process_single_directory(base_dir)
-    if(os.path.exists(csv_file)):
-        print('Reading: ' + str(csv_file))
-        modes_df = pd.read_csv(csv_file)
-        simcount = len(modes_df)
-        corrected_header = None
-        for i in range(1, sim_nums + 1):
-            file_path = chains_path.replace('XXX', f'{i:03d}')
-            print('loading:' + str(file_path))
-            # Read the first line to get the correct header
-            try:
-                with open(file_path, 'r') as f:
-                    first_line = f.readline().strip()  # Read the first line
-                    # Remove the '#' and split to get the correct column names
-                    header = first_line.replace('#', '').split()
-                    corrected_header = []
-                    for col in header:
-                        if(col.split('_')[-1] == 'std'):
-                            continue 
-                        elif(col in default_cols):
-                            corrected_header.append(col)
-                        else:
-                            corrected_header.append(col + '_mean')
-                print('txt header: ' + str(corrected_header))
-                break
-            except FileNotFoundError:
-                print("Skipping " + file_path)
-                continue
-        if(corrected_header is None):
-            raise ValueError("Cannot find corrected header")
-    else:
-        for i in range(1, sim_nums + 1):
-            file_path = chains_path.replace('XXX', f'{i:03d}')
-            print('loading:' + str(file_path))
-            # Read the first line to get the correct header
-            try:
-                with open(file_path, 'r') as f:
-                    first_line = f.readline().strip()  # Read the first line
-                    # Remove the '#' and split to get the correct column names
-                    corrected_header = first_line.replace('#', '').split()
-            except FileNotFoundError:
-                print("Skipping " + file_path)
-                continue
 
-            chain_df = pd.read_csv(file_path, delim_whitespace=True, comment='#')
-            chain_df.columns = corrected_header
+    df = pd.read_csv(csv_file)
 
-            for column in chain_df.columns:
-                if column not in modes_dict:
-                    modes_dict[column] = []
-                value = np.median(chain_df[column]) if use_median else np.mean(chain_df[column])
-                modes_dict[column].append(value)
+    # Reprocess if minchi2 missing
+    min_cols = [col for col in df.columns if col.endswith('_minchi2')]
+    if not min_cols:
+        print(f"Missing _minchi2 columns in {csv_file}, reprocessing...")
+        ms.process_single_directory(base_dir)
+        df = pd.read_csv(csv_file)
+        min_cols = [col for col in df.columns if col.endswith('_minchi2')]
 
-            simcount += 1
+    mean_cols = [col for col in df.columns if col.endswith('_mean')]
+    std_cols = [col for col in df.columns if col.endswith('_std')]
+    param_names = [col.replace('_mean', '') for col in mean_cols]
 
-        modes_df = pd.DataFrame.from_dict(modes_dict)
-    
-    param_names = [col for col in modes_df.columns if col not in default_cols
-                   and not col.split('_')[-1] == 'std']
-    print("Parameter names for plotting:", param_names)
+    means_df = df[mean_cols].copy()
+    means_df.columns = param_names
 
-    # Compute ranges for corner plot from red summary (modes_df)
-    ranges = []
-    for param in param_names:
-        low, high = np.percentile(modes_df[param], percentile_clip)
-        ranges.append((low, high))
+    stds_df = df[std_cols].copy()
+    stds_df.columns = [col.replace('_std', '') for col in std_cols]
 
-    for i in range(single_sim, single_sim + 1):
-        fig = corner.corner(modes_df[param_names],
-                            labels=param_names,
-                            show_titles=True,
-                            title_kwargs={"fontsize": 12},
-                            hist_kwargs={'color': 'red', 'density': True},
-                            contour_kwargs={'colors': 'red'},
-                            range=ranges)
+    minchisq_df = df[min_cols].copy()
+    minchisq_df.columns = param_names
 
-        file_path = single_path if single_path is not None else chains_path.replace('XXX', f'{i:03d}')
-        single_df = pd.read_csv(file_path, delim_whitespace=True, comment='#')
-        single_df.columns = corrected_header
-        try:
-            corner.corner(single_df[param_names],
+    return means_df, stds_df, minchisq_df, param_names
+
+def compute_corner_ranges(df, param_names, percentile_clip=(0, 100)):
+    return [np.percentile(df[param], percentile_clip) for param in param_names]
+
+def make_titles(means_df, stds_df, minchisq_df, param_names):
+    """Create multi-line titles: mean ± std and minchi2 peak."""
+    titles = []
+    for p in param_names:
+        mean_val = means_df[p].mean()
+        std_val = stds_df[p].mean() if p in stds_df.columns else np.nan
+        minchi2_val = minchisq_df[p].mean()
+        title = (f"Mean ± Std:\n{mean_val:.3f} ± {std_val:.3f}\n"
+                 f"Minχ² peak:\n{minchi2_val:.3f}")
+        titles.append(title)
+    return titles
+
+def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None, 
+                   percentile_clip=(0, 100)):
+    means_df, stds_df, minchisq_df, param_names = load_summary_csv(chains_path)
+    ranges = compute_corner_ranges(means_df, param_names, percentile_clip)
+
+    titles = make_titles(means_df, stds_df, minchisq_df, param_names)
+
+    # Plot means (red)
+    fig = corner.corner(means_df[param_names],
+                        labels=param_names,
+                        show_titles=True,
+                        titles=titles,
+                        title_kwargs={"fontsize": 9, "multialignment": "center"},
+                        hist_kwargs={'color': 'red', 'density': True},
+                        contour_kwargs={'colors': 'red'},
+                        range=ranges)
+
+    # Overlay minchi2 (green)
+    corner.corner(minchisq_df[param_names],
+                  labels=param_names,
+                  show_titles=False,
+                  hist_kwargs={'color': 'green', 'density': True},
+                  contour_kwargs={'colors': 'green'},
+                  fig=fig)
+
+    # Overlay single chain (blue)
+    single_chain_path = single_path or chains_path.replace("XXX", f"{single_sim:03d}")
+    try:
+        with open(single_chain_path, 'r') as f:
+            header_line = f.readline().strip().replace('#', '')
+        param_header = header_line.split()
+        df_chain = pd.read_csv(single_chain_path, delim_whitespace=True, comment='#')
+        df_chain.columns = param_header
+        df_chain = df_chain[param_names]  # keep only params
+        corner.corner(df_chain,
                       labels=param_names,
                       show_titles=False,
                       hist_kwargs={'color': 'blue', 'density': True},
                       contour_kwargs={'colors': 'blue'},
                       fig=fig)
-        except AttributeError:
-            print('Not printing single chain')
+    except Exception as e:
+        print(f"Could not overlay single sim: {e}")
 
-        supertitle = f'Sim {i} (blue) on top of {simcount} sims (red)'
-        plt.suptitle(supertitle)
-        outpath = chains_path.split('XXX')[0] + f'{i}_summary.png'
-        plt.savefig(outpath)
-        print('Saved to ' + outpath)
-        plt.show()
-
-        # Plot histogram of chi2 values
-    if 'chi2' in modes_df.columns or 'chi2_mean' in modes_df.columns:
-        chi2_name = 'chi2'
-        if('chi2_mean' in modes_df.columns):
-            chi2_name = 'chi2_mean'
-        overflow_threshold = np.percentile(modes_df[chi2_name], percentile_clip[-1])
-        bin_edges = np.linspace(modes_df[chi2_name].min(), overflow_threshold, 19)  # 19 regular bins
-        bin_edges = np.append(bin_edges, [modes_df[chi2_name].max()])  # last bin includes outliers
-        counts, edges = np.histogram(modes_df[chi2_name], bins=bin_edges)
-        # Adjust bin labels (last bin will be overflow)
-        bin_labels = [f"{edges[i]:.1f}–{edges[i+1]:.1f}" for i in range(len(edges)-2)]
-        bin_labels.append(f">{overflow_threshold:.1f}")
-        plt.figure(figsize=(7, 5))
-        plt.bar(range(len(counts)), counts, color='purple', alpha=0.7, edgecolor='black')
-        plt.xticks(range(len(counts)), bin_labels, rotation=45, ha='right')
-        plt.xlabel('Best-fit $\chi^2$')
-        plt.ylabel('Number of simulations')
-        plt.title('Distribution of Best-fit $\chi^2$ over Simulations')
-        plt.grid(True)
-        hist_outpath = chains_path.split('XXX')[0] + 'chisq_hist.png'
-        plt.savefig(hist_outpath)
-        print('Saved chi2 histogram to ' + hist_outpath)
-        plt.show()
-    else:
-        print("No 'chi2' column found for histogram.")
-
+    # Save and show
+    outpath = chains_path.split("XXX")[0] + f"{single_sim}_summary.png"
+    plt.suptitle(f"Sim {single_sim}: mean (red), bestfit (green), full chain (blue)")
+    plt.savefig(outpath)
+    print(f"Saved to {outpath}")
+    plt.show()
+    
 def read_sampler(filepath):
     """
     Reads MCMC sampler data from a file and returns it as a DataFrame.
