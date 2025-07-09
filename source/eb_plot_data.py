@@ -648,7 +648,6 @@ def plot_corner(outfile, sim_results_file, real_results_file):
 
 def load_summary_csv(chains_path):
     """Load summary CSV with mean, std, and minchi2 columns."""
-    import ms  # Your module with process_single_directory
 
     base_dir = os.path.dirname(chains_path)
     base_name = os.path.basename(base_dir)
