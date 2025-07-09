@@ -1,9 +1,11 @@
 import os
 import argparse
 import pandas as pd
+import numpy as np
 from getdist import loadMCSamples
+
 def summarize_chain(root):
-    """Return summary (mean, std) for all parameters in one chain."""
+    """Return summary (mean, std, min-chi2 point) for all parameters in one chain."""
     samples = loadMCSamples(file_root=root)
 
     if samples is None or samples.paramNames is None:
@@ -12,11 +14,23 @@ def summarize_chain(root):
     names = samples.getParamNames().names
     means = samples.mean(names)
     stds = samples.std(names)
+    param_labels = [name.name for name in names]
 
+    # Summary dictionary for mean and std
     summary = {"chain_root": os.path.basename(root)}
-    for name, mean, std in zip(names, means, stds):
-        summary[f"{name.name}_mean"] = mean
-        summary[f"{name.name}_std"] = std
+    for name, mean, std in zip(param_labels, means, stds):
+        summary[f"{name}_mean"] = mean
+        summary[f"{name}_std"] = std
+
+    # Add minimum-chi2 parameter values
+    try:
+        full_chain = samples.getParams()  # shape: (nsamples, nparams)
+        chi2 = samples.getChiSquared()
+        min_idx = np.argmin(chi2)
+        for i, name in enumerate(param_labels):
+            summary[f"{name}_minchi2"] = full_chain[min_idx, i]
+    except Exception as e:
+        print(f"  !! Could not extract min-chi2 for {root}: {e}")
 
     return summary
 
@@ -27,7 +41,7 @@ def process_directory(base_dir):
         if os.path.exists(out_path):
             print(f"Skipping {subdir}, summary CSV already exists: {out_path}")
             continue
-        if('gdust' not in out_path):
+        if 'gdust' not in out_path:
             print('Skipping ' + str(out_path))
             continue
         process_single_directory(subdir)
@@ -35,7 +49,6 @@ def process_directory(base_dir):
 def process_single_directory(subdir):
     """Process a single directory and create a summary CSV from all chains inside it."""
     out_path = os.path.join(subdir, os.path.basename(subdir) + "_summary.csv")
-
 
     chain_files = sorted(f for f in os.listdir(subdir) if f.endswith('.txt'))
     if not chain_files:
@@ -62,6 +75,7 @@ def process_single_directory(subdir):
         print(f"Saved summary: {out_path}")
     else:
         print(f"No valid chains found in: {subdir}")
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Summarize all MCMC chains using getdist.")
     parser.add_argument("base_dir", type=str, help="Directory of chain subdirectories.")
