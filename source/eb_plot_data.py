@@ -783,7 +783,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     # Save and show
     outpath = chains_path.split("XXX")[0] + f"{single_sim}_summary.png"
     plt.suptitle(f"Sim {single_sim}: contour means (red), minchi2 peaks (green), Single chain (blue)")
-    plt.savefig(outpath)
+    plt.savefig(outpath, bbox_inches='tight')
     print(f"Saved to {outpath}")
 
 
