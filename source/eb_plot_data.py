@@ -751,11 +751,16 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
                   contour_kwargs={'colors': 'green'},
                   fig=fig)
 
-    # Print best-fit (min chi²) parameter values
-    best_fit_params = minchisq_df[param_names].iloc[0].to_dict()
-    print(f"Best-fit parameters (min chi²) for sim {single_sim}:")
-    for k, v in best_fit_params.items():
-        print(f"  {k}: {v}")
+    mean_params = means_df[param_names].mean().to_dict()
+    std_params = stds_df[param_names].mean().to_dict()
+
+    print("Mean of parameter peaks (across all simulations):")
+    for k, v in mean_params.items():
+        print(f"  {k}: {v:.4g}")
+
+    print("\nSpread (std) of parameter peaks (across all simulations):")
+    for k, v in std_params.items():
+        print(f"  {k}: {v:.4g}")
 
     # Overlay single chain (blue)
     single_chain_path = single_path or chains_path.replace("XXX", f"{single_sim:03d}")
