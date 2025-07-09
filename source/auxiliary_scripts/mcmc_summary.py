@@ -12,25 +12,34 @@ def summarize_chain(root):
         raise ValueError(f"Could not load MCMC samples from root: {root}")
 
     names = samples.getParamNames().names
+    param_labels = [name.name for name in names]
     means = samples.mean(names)
     stds = samples.std(names)
-    param_labels = [name.name for name in names]
 
-    # Summary dictionary for mean and std
     summary = {"chain_root": os.path.basename(root)}
     for name, mean, std in zip(param_labels, means, stds):
         summary[f"{name}_mean"] = mean
         summary[f"{name}_std"] = std
 
-    # Add minimum-chi2 parameter values
-    try:
-        full_chain = samples.getParams()  # shape: (nsamples, nparams)
-        chi2 = samples.getChiSquared()
-        min_idx = np.argmin(chi2)
-        for i, name in enumerate(param_labels):
-            summary[f"{name}_minchi2"] = full_chain[min_idx, i]
-    except Exception as e:
-        print(f"  !! Could not extract min-chi2 for {root}: {e}")
+    # Find chi2 index in params
+    chi2_index = None
+    for i, name in enumerate(param_labels):
+        if name == 'chi2':
+            chi2_index = i
+            break
+    if chi2_index is None:
+        raise RuntimeError("No 'chi2' parameter found in samples.")
+
+    # Extract chi2 values as a numpy array
+    chi2_vals = samples.getParams().array[:, chi2_index]
+
+    # Find min chi2 index
+    min_idx = np.argmin(chi2_vals)
+
+    # Add min-chi2 parameters
+    for i, name in enumerate(param_labels):
+        val = samples.getParams().array[min_idx, i]
+        summary[f"{name}_minchi2"] = val
 
     return summary
 
