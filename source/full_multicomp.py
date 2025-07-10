@@ -431,7 +431,7 @@ def load_shared_data(input_args):
         bin_starts, raw_cl, SHARED_DATA_DICT['eskilt'] = ld.load_eskilt_data(ede_path=FILE_PATHS['EDE_spectrum'])
 
 def run_bk18_likelihood(params_dict, observation_file_path, input_args, 
-                        rstop = 0.01, max_tries=10000):
+                        rstop = 0.0001, max_tries=10000):
     """
     Runs the Cobaya MCMC likelihood using BK18_full_multicomp likelihood class.
 
@@ -575,9 +575,11 @@ def define_priors(calc_spectra, theory_comps, angle_degree=5, spectra='all'):
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
     elif(theory_comps == 'det_polrot'):
         params_dict['alpha_CMB'] = anglecmb_priors
-        params_dict['alpha_CMB']['ref']=0
-        params_dict['alpha_BK18_B95e'] = 0
-        params_dict['alpha_BK18_150']=0
+        params_dict['alpha_CMB']['ref']=3
+        #params_dict['alpha_BK18_B95e'] = 1
+        #params_dict['alpha_BK18_150']=1
+        #params_dict['alpha_BK18_220'] = 1
+        #params_dict['alpha_BK18_K95'] = 1
         pass
 
     elif(theory_comps == 'fixed_dust'):
@@ -585,6 +587,11 @@ def define_priors(calc_spectra, theory_comps, angle_degree=5, spectra='all'):
 
     elif(theory_comps == 'no_ede'):
         params_dict['alpha_CMB'] = anglecmb_priors
+        #params_dict['alpha_BK18_B95e'] = 0
+        #params_dict['alpha_BK18_150']=0
+        #params_dict['alpha_BK18_220'] = 0
+        #params_dict['alpha_BK18_K95'] = 0
+
         for spec in ['EE', 'BB', 'EB']:
 
             params_dict['A_dust_' + spec] = {**A_dust_priors,
@@ -733,7 +740,13 @@ def multicomp_mcmc_driver(input_args):
                 #'gMpl': 1,
             }
             param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path, replace_dict)
-            
+            for key in params_dict:
+                if key not in param_names:
+                    print('Adding fixed value: ' + str(key) + ':' 
+                            + str(params_dict[key]))
+                    param_names.append(key)
+                    means.append(params_dict[key])
+                    mean_std_strs.append(f"{key}: {params_dict[key]:.2f} ± 0")
             used_maps = SHARED_DATA_DICT["all_maps"]
             multicomp_class = BK18_full_multicomp(
                             used_maps=used_maps,
@@ -826,7 +839,7 @@ def parallel_simulation(input_args, params_dict):
     """
     sim_indices = range(input_args.sim_start, input_args.sim_start + input_args.sim_num)
     try:
-        maxworkers =10 
+        maxworkers = 10 
         with ProcessPoolExecutor(max_workers=maxworkers) as executor:
             # Submit all tasks to the executor
             future_to_sim = {
@@ -1094,7 +1107,7 @@ def main():
                         os.remove(item)  # Remove file
                 for f in os.listdir(os.path.dirname(args.output_path)):
                     if f.endswith('.csv'):
-                        csv_path = os.path.join(args.output_path, file)
+                        csv_path = os.path.join(args.output_path, f)
                         os.remove(csv_path)
                 print(f"Deleted existing chains at: {args.output_path}")
             else:
