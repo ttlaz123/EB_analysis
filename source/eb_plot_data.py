@@ -709,6 +709,7 @@ def plot_logp_surface(model, param1, param2, range1, range2, fixed_params, grid_
         grid_size: Number of grid points per parameter
     """
     # Create grid
+    print('Making 2D likelihood plot')
     p1_vals = np.linspace(*range1, grid_size)
     p2_vals = np.linspace(*range2, grid_size)
     logp_vals = np.zeros((grid_size, grid_size))
@@ -722,11 +723,11 @@ def plot_logp_surface(model, param1, param2, range1, range2, fixed_params, grid_
 
     # Plot
     plt.figure(figsize=(8, 6))
-    cp = plt.contourf(p1_vals, p2_vals, logp_vals, levels=50, 
-                      cmap='viridis')
+    levels = np.linspace(-2000, 0, 50)
+    cp = plt.contourf(p1_vals, p2_vals, logp_vals, levels=levels, cmap='viridis')
+                    
 
     cbar = plt.colorbar(cp, label='log-likelihood')
-    cbar.set_clim(-2000, 0)
     plt.xlabel(param1)
     plt.ylabel(param2)
     plt.title(f'Log-likelihood surface: {param1} vs {param2}')
