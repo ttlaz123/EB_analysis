@@ -753,6 +753,7 @@ def multicomp_mcmc_driver(input_args):
                 'alpha_BK18_K95': 0,
                 'alpha_BK18_B95e': 0,
                 'alpha_CMB': 0,
+                'A_lens': 1,
             }
         epd.plot_logp_surface(multicomp_class, 
                               param1='alpha_CMB',
