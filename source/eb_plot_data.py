@@ -697,6 +697,40 @@ def make_titles(means_df, stds_df, minchisq_df, param_names):
         titles.append(title)
     return titles
 
+def plot_logp_surface(model, param1, param2, range1, range2, fixed_params, grid_size=100):
+    """
+    Generate and plot a 2D log-likelihood surface over two parameters.
+    
+    Parameters:
+        model: Object with a method model.logp(**params)
+        param1, param2: Names of the parameters to vary
+        range1, range2: Tuples (min, max) for param1 and param2
+        fixed_params: Dictionary of all other fixed parameters
+        grid_size: Number of grid points per parameter
+    """
+    # Create grid
+    p1_vals = np.linspace(*range1, grid_size)
+    p2_vals = np.linspace(*range2, grid_size)
+    logp_vals = np.zeros((grid_size, grid_size))
+
+    for i, p1 in enumerate(p1_vals):
+        for j, p2 in enumerate(p2_vals):
+            params = fixed_params.copy()
+            params[param1] = p1
+            params[param2] = p2
+            logp_vals[j, i] = model.logp(**params)  # Note: rows = y, cols = x
+
+    # Plot
+    plt.figure(figsize=(8, 6))
+    cp = plt.contourf(p1_vals, p2_vals, logp_vals, levels=50, cmap='viridis')
+    plt.colorbar(cp, label='log-likelihood')
+    plt.xlabel(param1)
+    plt.ylabel(param2)
+    plt.title(f'Log-likelihood surface: {param1} vs {param2}')
+    plt.tight_layout()
+    plt.savefig('2dlikemap.png')
+    plt.show()
+
 def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None, 
                    percentile_clip=(0, 100)):
     """
