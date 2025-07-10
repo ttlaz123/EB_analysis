@@ -725,35 +725,43 @@ def multicomp_mcmc_driver(input_args):
             updated_info, sampler = run_bk18_likelihood(params_dict, 
                                                         observation_file_path, 
                                                      input_args)
-            replace_dict = {
-                #'alpha_BK18_220': 0,
-                #'alpha_BK18_150': 0,
-                #'alpha_BK18_K95': 0,
-                #'alpha_BK18_B95e': 0,
-                #'gMpl': 1,
+            
+        
+        used_maps = SHARED_DATA_DICT["all_maps"]
+        multicomp_class = BK18_full_multicomp(
+                        used_maps=used_maps,
+                        map_set= input_args.map_set,
+                        dataset= input_args.dataset,
+                        forecast= input_args.forecast,
+                        bin_num= input_args.bin_num,
+                        theory_comps= input_args.theory_comps,
+                        spectra_type= input_args.spectra_type,
+                        injected_signal = input_args.injected_signal,
+                        #"sim_common_data":SHARED_DATA_DICT,
+                        observe_filepath= observation_file_path,
+                        sim_common_dat = SHARED_DATA_DICT)
+        fixed_dict = {
+                'alpha_BK18_220': 0,
+                'alpha_BK18_150': 0,
+                'alpha_BK18_K95': 0,
+                'alpha_BK18_B95e': 0,
+                'alpha_CMB': 0,
             }
-            param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path, replace_dict)
-            
-            used_maps = SHARED_DATA_DICT["all_maps"]
-            multicomp_class = BK18_full_multicomp(
-                            used_maps=used_maps,
-                            map_set= input_args.map_set,
-                            dataset= input_args.dataset,
-                            forecast= input_args.forecast,
-                            bin_num= input_args.bin_num,
-                            theory_comps= input_args.theory_comps,
-                            spectra_type= input_args.spectra_type,
-                            injected_signal = input_args.injected_signal,
-                            #"sim_common_data":SHARED_DATA_DICT,
-                            observe_filepath= observation_file_path,
-                            sim_common_dat = SHARED_DATA_DICT)
-            
-            epd.plot_eebbeb(multicomp_class, 
-                           input_args.output_path, 
-                           param_names, 
-                           means, 
-                           mean_std_strs,
-                           override_maps = used_maps)
+        epd.plot_logp_surface(multicomp_class, 
+                              param1='alpha_CMB',
+                              param2='alpha_BK18_B95e',
+                              range1=[-5,5],
+                              range2=[-5,5],
+                              fixed_params=fixed_dict
+                              )
+        param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path, replace_dict)
+        
+        epd.plot_eebbeb(multicomp_class, 
+                        input_args.output_path, 
+                        param_names, 
+                        means, 
+                        mean_std_strs,
+                        override_maps = used_maps)
     # plot mcmc results
     replace_dict ={}# {"alpha_BK18_220":0.6}
     print(input_args.output_path)
