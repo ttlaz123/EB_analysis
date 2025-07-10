@@ -722,7 +722,9 @@ def plot_logp_surface(model, param1, param2, range1, range2, fixed_params, grid_
 
     # Plot
     plt.figure(figsize=(8, 6))
-    cp = plt.contourf(p1_vals, p2_vals, logp_vals, levels=50, cmap='viridis')
+    cp = plt.contourf(p1_vals, p2_vals, logp_vals, levels=50, 
+                      cmap='viridis', vmin=-3000, vmax=0)
+
     plt.colorbar(cp, label='log-likelihood')
     plt.xlabel(param1)
     plt.ylabel(param2)
