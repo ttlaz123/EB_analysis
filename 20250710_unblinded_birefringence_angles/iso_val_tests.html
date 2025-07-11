@@ -80,12 +80,13 @@
                     'Configuration|config':[
                         'No foregrounds, 150 and 95 EB only|15095',
                         'No foregrounds, all 4 angles, EB only|_all',
+                      
                     ],
 
                 },
          
                     function (params) {
-                        let dirbase = '/liuto/home/GitHub/EB_analysis/';
+                        let dirbase = '/liuto';
                         let dirpath = dirbase + '/iso_val_chains/';
                         
                         
@@ -229,7 +230,69 @@
             </script>
         </figure>
         </section>
-        
+        <section>
+            <h2>
+                Constraining beta
+            </h2>
+
+             <figure>
+            <img alt="Test Data" id="planck" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+             <figcaption></figcaption>
+
+            <script type="text/javascript">
+               
+
+                pager.link("#planck", {
+                   'Map Sim Num Digit1|digit1': simnums,
+                    'Digit2|digit2': simnums,
+                    'Digit3|digit3': simnums,
+                    
+                    'Plot type|plottype':[
+                        'Best Fit EE|_bestfitEE',
+                        'Best Fit EB|_bestfitEB',
+                        'Best Fit BB|_bestfitBB',
+                        'Triangle Plot|_triangle_plot',
+                        'Chi squared|_chisqmap',
+                        'Summary|_summary'
+                    ],
+                    'Configuration|config':[
+                        'BK18 + planck with foregrounds|BK18lf_all_bin2-15_planck_dust',
+                      
+                    ],
+
+                },
+         
+                    function (params) {
+                        let dirbase = '/liuto';
+                        let dirpath = dirbase + '/iso_val_chains/';
+                        
+                        
+                        
+                        let foldername =  params.config +  '/';
+                        
+                        let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
+                        if(params.plottype == '_summary'){
+                            sim_id = 'sim1';
+                        }
+                        let file = sim_id + params.plottype;
+                        let name = dirpath + foldername + file +  '.png';
+            
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+                    'digit1': '0',
+                    'digit2': '0',
+                    'digit3': '1',
+                    'plottype': '_summary',
+                    'test': 'zero',
+                     'config': '_all',
+                });
+            </script>
+        </figure>
+        </section>
 </body>
 
 </html>
