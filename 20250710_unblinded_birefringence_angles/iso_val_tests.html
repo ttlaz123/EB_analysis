@@ -229,6 +229,58 @@
                 });
             </script>
         </figure>
+        <figure>
+            <img alt="Test Data" id="loglike" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+             <figcaption>
+   BK18lf sim set, beta remains with same spread of +-0.05 even with foregrounds. 
+</figcaption>
+
+            <script type="text/javascript">
+             
+
+                pager.link("#loglike", {
+             
+                    
+                    'Angle|freq':[
+                        'alpha_BK18_150|alpha_BK18_150',
+                        'alpha_BK18_K95|alpha_BK18_K95',
+                        'alpha_BK18_B95lf|alpha_BK18_B95lf',
+                        'alpha_BK18_220|alpha_BK18_220',
+                        'alpha_P217e|alpha_P217e',
+                        'alpha_P353e|alpha_P353e',
+                    ],
+                    'Configureation|config9':[
+                        'All other angles fixed, BK18 + Planck Data|fixed_else',
+                        'EB Only, no foregrounds, only one dataset|degen',
+                        'EE+BB+EB, with foregrounds, only one dataset|only_one'
+                    ]
+
+                },
+         
+                    function (params) {
+                        let dirbase = '/liuto/home/GitHub/EB_analysis';
+                        let dirpath = dirbase + '/lieklihood_2dmaps/';
+                        
+                        
+                        
+                        let foldername =  params.config9 +  '/';
+                        
+                        let file = '2dlikemap_' + params.freq + '_alpha_CMB';
+                        let name = dirpath + foldername + file +  '.png';
+            
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+              
+                    'freq': 'alpha_BK18_220',
+                    'config9': 'fixed_else',
+                });
+            </script>
+        </figure>
+        
         </section>
         <section>
             <h2>
