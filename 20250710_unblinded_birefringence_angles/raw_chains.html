@@ -78,6 +78,10 @@
                         'Isotropic birefringence, EB only|det_polrot_betacmb',
                         'Isotropic with foregrounds, EB only|gdust_betacmb',
                         'Isotropic with foregrounds, all spectra|gdust_betacmb_all',
+                    ],
+                    'R-1 Criteria|rstop':[
+                        'R-1 < 0.01|',
+                        'R-1 < 0.001|2'
                     ]
                 },
          
@@ -92,7 +96,7 @@
                         } else{
                             spectra = 'eb';
                         }
-                        let foldername = 'BK18lf_' + spectra + '_bin2-15_' +theory + '/';
+                        let foldername = 'BK18lf_' + spectra + '_bin2-15_' +theory + params.rstop + '/';
                         let file = 'real'+params.plottype;
                         let name = dirpath + foldername + file +  '.png';
             
@@ -104,6 +108,7 @@
         
                     'plottype': '_triangle_plot',
                     'theory': 'det_polrot',
+                    'rstop':'',
                 });
             </script>
         </figure>
