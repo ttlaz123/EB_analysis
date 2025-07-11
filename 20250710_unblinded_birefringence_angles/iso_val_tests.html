@@ -232,8 +232,20 @@
         <figure>
             <img alt="Test Data" id="loglike" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
-             <figcaption>
-   BK18lf sim set, beta remains with same spread of +-0.05 even with foregrounds. 
+           <figcaption>
+Configuration options (<code>config9</code>): 
+<ul>
+  <li><b>All other angles fixed, BK18 + Planck Data</b>: 
+    All polarization rotation angles except the one being scanned 
+    are fixed to their best-fit values. Uses both BK18 and Planck data.</li>
+  <li><b>EB Only, no foregrounds, only one dataset</b>: 
+    Uses only the EB spectrum, excludes foreground modeling, 
+    and includes only a single dataset to highlight parameter degeneracies
+    without foregrounds.</li>
+  <li><b>EE+BB+EB, with foregrounds, only one dataset</b> : 
+    Fits all three spectra (EE, BB, EB) including foregrounds, 
+    but using only one dataset at a time. We see slight constraining power in higher frequencies.</li>
+</ul>
 </figcaption>
 
             <script type="text/javascript">
@@ -245,7 +257,7 @@
                     'Angle|freq':[
                         'alpha_BK18_150|alpha_BK18_150',
                         'alpha_BK18_K95|alpha_BK18_K95',
-                        'alpha_BK18_B95lf|alpha_BK18_B95lf',
+                        'alpha_BK18_B95lf|alpha_BK18_B95e',
                         'alpha_BK18_220|alpha_BK18_220',
                         'alpha_P217e|alpha_P217e',
                         'alpha_P353e|alpha_P353e',
