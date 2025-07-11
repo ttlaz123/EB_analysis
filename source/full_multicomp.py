@@ -734,7 +734,7 @@ def multicomp_mcmc_driver(input_args):
                                                      input_args)
             
         
-        used_maps = SHARED_DATA_DICT["all_maps"]
+        used_maps = SHARED_DATA_DICT["used_maps"]#all_maps"]
         multicomp_class = BK18_full_multicomp(
                         used_maps=used_maps,
                         map_set= input_args.map_set,
@@ -752,17 +752,37 @@ def multicomp_mcmc_driver(input_args):
                 'alpha_BK18_150': 0,
                 'alpha_BK18_K95': 0,
                 'alpha_BK18_B95e': 0,
-                'alpha_CMB': 0,
+                'alpha_P030e': 0,
+                'alpha_P044e': 0,
+                'alpha_P143e': 0,
+                'alpha_P217e': 0,
+                'alpha_P353e': 0,
+
                 'A_lens': 1,
+                'beta_dust': 1.6,
+                'alpha_dust_EE': -0.23,
+                'A_dust_EE': 7,
+                'alpha_dust_BB': -0.23,
+                'A_dust_BB': 4,
+                'alpha_dust_EB': -0.4,
+                'A_dust_EB': 0,
+                'beta_sync': -3,
+                'alpha_sync_EE': -0.23,
+                'A_sync_EE': 0,
+                'alpha_sync_BB': -0.23,
+                'A_sync_BB': 0,
+                'alpha_sync_EB': -0.4,
+                'A_sync_EB': 0,
+
             }
         epd.plot_logp_surface(multicomp_class, 
-                              param1='alpha_CMB',
-                              param2='alpha_BK18_B95e',
-                              range1=[-5,5],
-                              range2=[-5,5],
+                              param1='alpha_P353e',
+                              param2='alpha_CMB',
+                              range1=[-20,20],
+                              range2=[-20,20],
                               fixed_params=fixed_dict
                               )
-        param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path, replace_dict)
+        param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path)
         for key in params_dict:
                 if key not in param_names:
                     print('Adding fixed value: ' + str(key) + ':' 
@@ -849,7 +869,7 @@ def parallel_simulation(input_args, params_dict):
     """
     sim_indices = range(input_args.sim_start, input_args.sim_start + input_args.sim_num)
     try:
-        maxworkers = 10 
+        maxworkers = 50 
         with ProcessPoolExecutor(max_workers=maxworkers) as executor:
             # Submit all tasks to the executor
             future_to_sim = {

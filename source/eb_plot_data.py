@@ -11,6 +11,7 @@ else:
     matplotlib.use('TkAgg')  # if running with GUI (e.g., locally)
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+from matplotlib.colors import BoundaryNorm
 
 from getdist.mcsamples import MCSamplesFromCobaya
 from getdist.mcsamples import loadMCSamples
@@ -697,7 +698,7 @@ def make_titles(means_df, stds_df, minchisq_df, param_names):
         titles.append(title)
     return titles
 
-def plot_logp_surface(model, param1, param2, range1, range2, fixed_params, grid_size=100):
+def plot_logp_surface(model, param1, param2, range1, range2, fixed_params, grid_size=200):
     """
     Generate and plot a 2D log-likelihood surface over two parameters.
     
@@ -719,20 +720,29 @@ def plot_logp_surface(model, param1, param2, range1, range2, fixed_params, grid_
             params = fixed_params.copy()
             params[param1] = p1
             params[param2] = p2
+            
             logp_vals[j, i] = model.logp(**params)  # Note: rows = y, cols = x
+    print(logp_vals)
 
     # Plot
     plt.figure(figsize=(8, 6))
-    levels = np.linspace(-2000, 0, 50)
-    cp = plt.contourf(p1_vals, p2_vals, logp_vals, levels=levels, cmap='viridis')
+    vmin = 27#-np.max(logp_vals)
+    vmax = 29#-np.min(logp_vals)
+    levels = np.linspace(vmin, vmax, 51)
+    print(levels)
+    norm = BoundaryNorm(boundaries=levels, ncolors=256, extend='both')
+    cp = plt.contourf(p1_vals, p2_vals, -logp_vals, levels=levels, 
+                norm=norm, cmap='viridis',extend='both')
                     
 
-    cbar = plt.colorbar(cp, label='log-likelihood')
-    plt.xlabel(param1)
-    plt.ylabel(param2)
-    plt.title(f'Log-likelihood surface: {param1} vs {param2}')
+    cbar = plt.colorbar(cp, label='-log-likelihood')
+    plt.xlabel(param1 + ' [deg]')
+    plt.ylabel(param2 + ' [deg]')
+    plt.title(f'Minus Log-likelihood surface: {param1} vs {param2}')
     plt.tight_layout()
-    plt.savefig('2dlikemap.png')
+    filename = '2dlikemap_' + param1 + '_' + param2 + '.png'
+    print('Saving:' + filename)
+    plt.savefig(filename)
     plt.show()
 
 def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None, 

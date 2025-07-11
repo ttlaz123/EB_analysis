@@ -2,9 +2,9 @@
 #SBATCH --job-name=ede_sim
 #SBATCH --output=ede_sim_%j.out
 #SBATCH --error=ede_sim_%j.err
-#SBATCH --mem=10G
-#SBATCH --cpus-per-task=1
-#SBATCH --time=24:00:00
+#SBATCH --mem=500G
+#SBATCH --cpus-per-task=50
+#SBATCH --time=30:00:00
 
 module load python/3.10  
 
@@ -20,25 +20,15 @@ mapset="BK18_planck"
 #theory="det_polrot"
 #theory="no_ede"
 #theory="fixed_dust"
-fedename=""
-fede=$3
-if [ -n "$fede" ]; then
-    fedename="_fede$3"
-fi
 
 # Define full paths using the suffix
 real_data="BK18lf"
-dataset="BK18lf_norot_allbins"
-base_dir="real_chains/"
+dataset="BK18lf"
+base_dir="chain_store/iso_val_chains/"
 bin_tag="bin$binnum"
-if [ -n "$bindiff" ]; then
-    theoryname=${theory}${bindiff}
-else
-    theoryname=${theory}
-    bindiff=0
-fi
-theoryname="gdust_betacmb_planck"
-file_suffix="${theoryname}${fedename}/real"
+
+theoryname="planck_dust"
+file_suffix="${theoryname}/test"
 
 param_path="${base_dir}/${real_data}_${spectype}_${bin_tag}_${file_suffix}"
 echo $param_path
@@ -46,14 +36,22 @@ echo $param_path
 # Run your script with max_workers implicitly handled
 if true ; then
 echo n | python source/full_multicomp.py \
-    -s -1 -n -1 -c $theory \
+    -s 1 -n 500 -c $theory \
     -p "$param_path" \
     -d "$dataset" \
     -b "$binnum" \
     -m "$mapset" \
     --fede "$fede"\
-    --bin_diff "$bindiff"\
-    -t "$spectype"\
-    -o 
+    -t "$spectype" -o 
+fi
+if true ; then
+echo n | python source/full_multicomp.py \
+    -s 1 -n 500 -c $theory \
+    -p "$param_path" \
+    -d "$dataset" \
+    -b "$binnum" \
+    -m "$mapset" \
+    --fede "$fede"\
+    -t "$spectype" -q 
 fi
 

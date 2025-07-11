@@ -4,26 +4,26 @@
 #SBATCH --error=ede_sim_%j.err
 #SBATCH --mem=10G
 #SBATCH --cpus-per-task=1
-#SBATCH --time=24:00:00
+#SBATCH --time=3:00:00
 
 module load python/3.10  
 
 # Get suffix argument (e.g., _pysm1)
-spectype=$1
-theory=$2
+fede=$1
+spectype='eb'
+theory="eskilt"
 binnum="2-15"
 bindiff=""
-mapset="BK18_planck"
-#mapset="BK18"
+#mapset="BK18_planck"
+mapset="BK18"
 #theory="all"
 #theory="ldiff"
 #theory="det_polrot"
 #theory="no_ede"
 #theory="fixed_dust"
 fedename=""
-fede=$3
 if [ -n "$fede" ]; then
-    fedename="_fede$3"
+    fedename="_fede$1"
 fi
 
 # Define full paths using the suffix
@@ -37,15 +37,14 @@ else
     theoryname=${theory}
     bindiff=0
 fi
-theoryname="gdust_betacmb_planck"
-file_suffix="${theoryname}${fedename}/real"
+file_suffix="eskilt_only${fedename}/real"
 
-param_path="${base_dir}/${real_data}_${spectype}_${bin_tag}_${file_suffix}"
+param_path="${base_dir}/${file_suffix}"
 echo $param_path
 
 # Run your script with max_workers implicitly handled
 if true ; then
-echo n | python source/full_multicomp.py \
+echo y | python source/full_multicomp.py \
     -s -1 -n -1 -c $theory \
     -p "$param_path" \
     -d "$dataset" \
@@ -53,7 +52,6 @@ echo n | python source/full_multicomp.py \
     -m "$mapset" \
     --fede "$fede"\
     --bin_diff "$bindiff"\
-    -t "$spectype"\
-    -o 
+    -t "$spectype" -o 
 fi
 

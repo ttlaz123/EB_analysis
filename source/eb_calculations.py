@@ -340,11 +340,15 @@ def apply_dust(post_travel_dict, bandpasses, params_values):
             warnings.simplefilter('ignore', category=RuntimeWarning)
             dustpow = A_dust * np.power(ratio, alpha_dust)
             syncpow = As_dust * np.power(ratio, alphas_dust)
-        dustpow[0] = 0 if np.isinf(dustpow[0]) else dustpow[0]
-        syncpow[0] = 0 if np.isinf(syncpow[0]) else syncpow[0]
+            #print(dustpow)
+            #print(syncpow)
+        dustpow[0] = 0 if (np.isinf(dustpow[0]) or np.isnan(dustpow[0])) else dustpow[0]
+        syncpow[0] = 0 if (np.isinf(syncpow[0]) or np.isnan(syncpow[0])) else syncpow[0]
         dust_dls = dustpow * dust_scale1 * dust_scale2
         sync_dls = syncpow * sync_scale1 * sync_scale2
-
+        #print(dust_dls)
+        #print(sync_dls)
+        #print('000000')
         dls += dust_dls + sync_dls
         post_travel_dict[used_map] = dls
         

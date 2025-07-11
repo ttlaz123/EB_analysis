@@ -3,8 +3,8 @@
 #SBATCH --output=ede_sim_%j.out
 #SBATCH --error=ede_sim_%j.err
 #SBATCH --mem=100G
-#SBATCH --cpus-per-task=10
-#SBATCH --time=10:00:00
+#SBATCH --cpus-per-task=11
+#SBATCH --time=24:00:00
 
 module load python/3.10  
 
@@ -14,11 +14,18 @@ injectedx=''
 dataset=$2
 fede=$3
 binnum="2-15"
+bindiff=12
 #dataset="BK18lf_fede01_sigl"
-dusttype="fixed_dust"
-#dusttype="fixeddust"
-#theory="all"
-theory="fixed_dust"
+#dusttype="ldiff${bindiff}"
+#dusttype="no_ede_asym"
+#mapset="BK18_planck"
+mapset="BK18"
+#dusttype="isorot"
+theory="all"
+#theory="ldiff"
+#theory="det_polrot"
+#theory="no_ede"
+#theory="fixed_dust"
 injected=""
 if [ -n "$injectedx" ]; then
     injected="_sig$4"
@@ -42,11 +49,15 @@ else
   echo "Unknown dataset: $dataset"
   simdata="unknown"
 fi
-
+if [ "$spectype" == "alens" ] ; then
+    specname="alens"
+else
+    specname=$spectype
+fi
 # Define full paths using the suffix
 base_dir="/n/holylfs04/LABS/kovac_lab/Users/liuto/ede_chains"
 bin_tag="bin$binnum"
-file_suffix="${dusttype}_${spectype}${injected}${fedename}/sim"
+file_suffix="${dusttype}_${specname}${injected}${fedename}/sim"
 
 param_path="${base_dir}/${simdata}_${bin_tag}_${file_suffix}"
 
@@ -55,21 +66,28 @@ if [ -z "$injectedx" ]; then
   injectedx="none"
 fi
 # Run your script with max_workers implicitly handled
+if true ; then
 echo n | python source/full_multicomp.py \
     -s 1 -n 500 -c $theory \
     -p "$param_path" \
     -d "$dataset" \
     -i "$injectedx" \
     -b "$binnum" \
+    -m "$mapset" \
     --fede "$fede"\
+    --bin_diff "$bindiff"\
     -t "$spectype" -o 
+fi
 
-python source/full_multicomp.py \
+if true ; then
+
+    python source/full_multicomp.py \
     -s 1 -n 500 -c $theory \
     -p "$param_path" \
     -d "$dataset" \
     -i "$injectedx" \
     -b "$binnum" \
+    -m "$mapset" \
     -t "$spectype" -q
 
-
+fi
