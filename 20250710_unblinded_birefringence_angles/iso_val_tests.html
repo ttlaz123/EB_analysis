@@ -256,7 +256,7 @@
                         'Chi squared|_chisqmap',
                         'Summary|_summary'
                     ],
-                    'Configuration|config':[
+                    'Configuration|config4':[
                         'BK18 + planck with foregrounds|BK18lf_all_bin2-15_planck_dust',
                       
                     ],
@@ -269,11 +269,11 @@
                         
                         
                         
-                        let foldername =  params.config +  '/';
+                        let foldername =  params.config4 +  '/';
                         
                         let sim_id = 'test' + params.digit1 + params.digit2 + params.digit3;
                         if(params.plottype == '_summary'){
-                            sim_id = 'sim1';
+                            sim_id = 'test1';
                         }
                         let file = sim_id + params.plottype;
                         let name = dirpath + foldername + file +  '.png';
@@ -288,7 +288,7 @@
                     'digit3': '1',
                     'plottype': '_summary',
                     'test': 'zero',
-                     'config': '_all',
+                     'config4': '_all',
                 });
             </script>
         </figure>
