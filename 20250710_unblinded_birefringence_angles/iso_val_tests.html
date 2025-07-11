@@ -260,7 +260,7 @@
          
                     function (params) {
                         let dirbase = '/liuto/home/GitHub/EB_analysis';
-                        let dirpath = dirbase + '/lieklihood_2dmaps/';
+                        let dirpath = dirbase + '/likelihood_2dmaps/';
                         
                         
                         
@@ -300,7 +300,7 @@
                     'Digit2|digit2': simnums,
                     'Digit3|digit3': simnums,
                     
-                    'Plot type|plottype':[
+                    'Plot type|plottype2':[
                         'Best Fit EE|_bestfitEE',
                         'Best Fit EB|_bestfitEB',
                         'Best Fit BB|_bestfitBB',
@@ -327,7 +327,7 @@
                         if(params.plottype == '_summary'){
                             sim_id = 'test1';
                         }
-                        let file = sim_id + params.plottype;
+                        let file = sim_id + params.plottype2;
                         let name = dirpath + foldername + file +  '.png';
             
                         console.log(name);
@@ -338,7 +338,7 @@
                     'digit1': '0',
                     'digit2': '0',
                     'digit3': '1',
-                    'plottype': '_summary',
+                    'plottype2': '_summary',
                     'test': 'zero',
                      'config4': 'BK18lf_all_bin2-15_planck_dust',
                 });
