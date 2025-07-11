@@ -66,7 +66,7 @@
                     'Digit2|digit2': simnums,
                     'Digit3|digit3': simnums,
                     
-                    'Plot type|plottype':[
+                    'Plot type|plottype2':[
                         'Best Fit EE|_bestfitEE',
                         'Best Fit EB|_bestfitEB',
                         'Best Fit BB|_bestfitBB',
@@ -94,10 +94,10 @@
                         let foldername = params.test + params.config +  '/';
                         
                         let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
-                        if(params.plottype == '_summary'){
+                        if(params.plottype2 == '_summary'){
                             sim_id = 'sim1';
                         }
-                        let file = sim_id + params.plottype;
+                        let file = sim_id + params.plottype2;
                         let name = dirpath + foldername + file +  '.png';
             
                         console.log(name);
@@ -108,7 +108,7 @@
                     'digit1': '0',
                     'digit2': '0',
                     'digit3': '1',
-                    'plottype': '_summary',
+                    'plottype2': '_summary',
                     'test': 'zero',
                      'config': '_all',
                 });
