@@ -33,11 +33,10 @@ def find_spectrum_columns(column_names):
                          f"TT: {tt_col}, EE: {ee_col}, BB: {bb_col}")
 
     return tt_col, ee_col, bb_col
-
 def read_spectrum_file(filepath):
     """
     Read a power spectrum file (.fits or .dat).
-    Returns: ell, cl_ee, cl_bb, cl_eb
+    Returns: ell, cl_ee, cl_bb, cl_eb, scale_factor
     """
     ext = os.path.splitext(filepath)[-1].lower()
 
@@ -48,7 +47,6 @@ def read_spectrum_file(filepath):
             ee_col = find_spectrum_columns(cols)[1]
             bb_col = find_spectrum_columns(cols)[2]
 
-            # Try to find EB column, fallback to zeros
             eb_col = None
             for col in cols:
                 if 'eb' in col.lower():
@@ -59,6 +57,7 @@ def read_spectrum_file(filepath):
             cl_ee = data[ee_col]
             cl_bb = data[bb_col]
             cl_eb = data[eb_col] if eb_col else np.zeros_like(cl_ee)
+            scale_factor = 1e12
 
     elif ext == '.dat':
         arr = np.loadtxt(filepath, comments='#')
@@ -66,23 +65,17 @@ def read_spectrum_file(filepath):
             raise ValueError("Expected at least 5 columns (l, TT, EE, TE, BB).")
 
         ell = arr[:, 0].astype(int)
-        cl_ee = arr[:, 2]  # EE = column 3
-        cl_bb = arr[:, 4]  # BB = column 5
+        cl_ee = arr[:, 2]
+        cl_bb = arr[:, 4]
         cl_eb = arr[:, 5] if arr.shape[1] >= 6 else np.zeros_like(cl_ee)
+        scale_factor = 1  # Already dimensionless (l(l+1)/2pi) D_l
 
     else:
         raise ValueError(f"Unsupported file type: {filepath}")
 
-    return ell, cl_ee, cl_bb, cl_eb
+    return ell, cl_ee, cl_bb, cl_eb, scale_factor
 
-def plot_scaled_comparison(ell_dict, cl_dict, output_path=None):
-    """
-    Plot EE, BB, EB for two files with scaling:
-    - ell_dict = {fname1: ell1, fname2: ell2}
-    - cl_dict = {fname1: {ee, bb, eb}, fname2: {ee, bb, eb}}
-
-    BB is scaled by A_lens, EB by g.
-    """
+def plot_scaled_comparison(ell_dict, cl_dict, scale_dict, output_path=None):
     a_lens_vals = np.arange(0.9, 1.21, 0.1)
     g_vals = np.arange(0.0, 1.0, 0.3)
 
@@ -96,36 +89,34 @@ def plot_scaled_comparison(ell_dict, cl_dict, output_path=None):
         cl_ee = cl_dict[fname]['ee']
         cl_bb = cl_dict[fname]['bb']
         cl_eb = cl_dict[fname]['eb']
+        scale = scale_dict[fname]
 
         factor = ell * (ell + 1) / (2 * np.pi)
-        dl_ee = factor * cl_ee * 1e12
-        dl_bb = factor * cl_bb * 1e12
-        dl_eb = factor * cl_eb * 1e12
+        dl_ee = factor * cl_ee * scale
+        dl_bb = factor * cl_bb * scale
+        dl_eb = factor * cl_eb * scale
 
         base_color = base_colors[i]
 
-        # EE (single line)
         axes[0].plot(ell, dl_ee, label=f"EE ({fname})", color=base_color)
 
-        # BB × A_lens
         for j, a in enumerate(a_lens_vals):
             shade = mcolors.to_rgba(base_color, alpha=0.4 + 0.15 * j)
             axes[1].plot(ell, a * dl_bb, label=fr"$A_\mathrm{{lens}}={a:.1f}$ ({fname})", color=shade)
 
-        # EB × g
         for j, g in enumerate(g_vals):
             shade = mcolors.to_rgba(base_color, alpha=0.4 + 0.15 * j)
             axes[2].plot(ell, g * dl_eb, label=fr"$g={g:.1f}$ ({fname})", color=shade)
 
-    # Axis labels and formatting
+    for ax in axes:
+        ax.set_xlim(0, 700)
+        ax.legend()
+        ax.grid(True)
+
     axes[0].set_ylabel(r"$D_\ell^{EE}$ [$\mu K^2$]")
     axes[1].set_ylabel(r"$D_\ell^{BB}$ [$\mu K^2$]")
     axes[2].set_ylabel(r"$D_\ell^{EB}$ [$\mu K^2$]")
     axes[2].set_xlabel(r"Multipole $\ell$")
-
-    for ax in axes:
-        ax.legend()
-        ax.grid(True)
 
     plt.suptitle("EE, BB (scaled), EB (scaled) Spectra Comparison")
     plt.tight_layout()
@@ -137,6 +128,7 @@ def plot_scaled_comparison(ell_dict, cl_dict, output_path=None):
     else:
         plt.show()
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Compare two spectra files.')
     parser.add_argument('file1', type=str)
@@ -147,13 +139,14 @@ if __name__ == "__main__":
     fname1 = os.path.basename(args.file1)
     fname2 = os.path.basename(args.file2)
 
-    ell1, ee1, bb1, eb1 = read_spectrum_file(args.file1)
-    ell2, ee2, bb2, eb2 = read_spectrum_file(args.file2)
+    ell1, ee1, bb1, eb1, scale1 = read_spectrum_file(args.file1)
+    ell2, ee2, bb2, eb2, scale2 = read_spectrum_file(args.file2)
 
     ell_dict = {fname1: ell1, fname2: ell2}
     cl_dict = {
         fname1: {"ee": ee1, "bb": bb1, "eb": eb1},
         fname2: {"ee": ee2, "bb": bb2, "eb": eb2},
     }
+    scale_dict = {fname1: scale1, fname2: scale2}
 
-    plot_scaled_comparison(ell_dict, cl_dict, args.output)
+    plot_scaled_comparison(ell_dict, cl_dict, scale_dict, args.output)
