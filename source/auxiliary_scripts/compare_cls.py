@@ -66,8 +66,6 @@ def read_spectrum_file(filepath):
         ell = arr[:, 0].astype(int)
         cl_ee = arr[:, 2]  # EE = column 3
         cl_bb = arr[:, 4]  # BB = column 5
-
-        # EB = column 6 if available
         cl_eb = arr[:, 5] if arr.shape[1] >= 6 else np.zeros_like(cl_ee)
 
     else:
@@ -75,23 +73,24 @@ def read_spectrum_file(filepath):
 
     return ell, cl_ee, cl_bb, cl_eb
 
-
-def plot_scaled_comparison(ell, cl_dict, output_path=None):
+def plot_scaled_comparison(ell_dict, cl_dict, output_path=None):
     """
-    cl_dict = {
-        'file1': {'ee': ..., 'bb': ..., 'eb': ...},
-        'file2': {'ee': ..., 'bb': ..., 'eb': ...}
-    }
+    Plot EE, BB, EB for two files with scaling:
+    - ell_dict = {fname1: ell1, fname2: ell2}
+    - cl_dict = {fname1: {ee, bb, eb}, fname2: {ee, bb, eb}}
+
+    BB is scaled by A_lens, EB by g.
     """
     a_lens_vals = np.arange(0.9, 1.21, 0.1)
     g_vals = np.arange(0.0, 1.0, 0.3)
 
     files = list(cl_dict.keys())
-    base_colors = ['tab:blue', 'tab:red']  # Adjust if comparing more files
+    base_colors = ['tab:blue', 'tab:red']
 
-    fig, axes = plt.subplots(3, 1, figsize=(9, 12), sharex=True)
+    fig, axes = plt.subplots(3, 1, figsize=(9, 12), sharex=False)
 
     for i, fname in enumerate(files):
+        ell = ell_dict[fname]
         cl_ee = cl_dict[fname]['ee']
         cl_bb = cl_dict[fname]['bb']
         cl_eb = cl_dict[fname]['eb']
@@ -103,34 +102,28 @@ def plot_scaled_comparison(ell, cl_dict, output_path=None):
 
         base_color = base_colors[i]
 
-        # --- EE (just one line per file)
+        # EE (single line)
         axes[0].plot(ell, dl_ee, label=f"EE ({fname})", color=base_color)
 
-        # --- BB scaled by A_lens
+        # BB × A_lens
         for j, a in enumerate(a_lens_vals):
             shade = mcolors.to_rgba(base_color, alpha=0.4 + 0.15 * j)
             axes[1].plot(ell, a * dl_bb, label=fr"$A_\mathrm{{lens}}={a:.1f}$ ({fname})", color=shade)
 
-        # --- EB scaled by g
+        # EB × g
         for j, g in enumerate(g_vals):
             shade = mcolors.to_rgba(base_color, alpha=0.4 + 0.15 * j)
             axes[2].plot(ell, g * dl_eb, label=fr"$g={g:.1f}$ ({fname})", color=shade)
 
-    # EE plot settings
+    # Axis labels and formatting
     axes[0].set_ylabel(r"$D_\ell^{EE}$ [$\mu K^2$]")
-    axes[0].legend()
-    axes[0].grid(True)
-
-    # BB plot settings
     axes[1].set_ylabel(r"$D_\ell^{BB}$ [$\mu K^2$]")
-    axes[1].legend()
-    axes[1].grid(True)
-
-    # EB plot settings
     axes[2].set_ylabel(r"$D_\ell^{EB}$ [$\mu K^2$]")
     axes[2].set_xlabel(r"Multipole $\ell$")
-    axes[2].legend()
-    axes[2].grid(True)
+
+    for ax in axes:
+        ax.legend()
+        ax.grid(True)
 
     plt.suptitle("EE, BB (scaled), EB (scaled) Spectra Comparison")
     plt.tight_layout()
@@ -142,7 +135,6 @@ def plot_scaled_comparison(ell, cl_dict, output_path=None):
     else:
         plt.show()
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Compare two spectra files.')
     parser.add_argument('file1', type=str)
@@ -150,15 +142,16 @@ if __name__ == "__main__":
     parser.add_argument('--output', type=str, default=None)
     args = parser.parse_args()
 
+    fname1 = os.path.basename(args.file1)
+    fname2 = os.path.basename(args.file2)
+
     ell1, ee1, bb1, eb1 = read_spectrum_file(args.file1)
     ell2, ee2, bb2, eb2 = read_spectrum_file(args.file2)
 
-    if not np.array_equal(ell1, ell2):
-        raise ValueError("Mismatch in ell arrays")
-
+    ell_dict = {fname1: ell1, fname2: ell2}
     cl_dict = {
-        os.path.basename(args.file1): {'ee': ee1, 'bb': bb1, 'eb': eb1},
-        os.path.basename(args.file2): {'ee': ee2, 'bb': bb2, 'eb': eb2},
+        fname1: {"ee": ee1, "bb": bb1, "eb": eb1},
+        fname2: {"ee": ee2, "bb": bb2, "eb": eb2},
     }
 
-    plot_scaled_comparison(ell1, cl_dict, args.output)
+    plot_scaled_comparison(ell_dict, cl_dict, args.output)
