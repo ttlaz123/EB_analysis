@@ -1,7 +1,8 @@
 import numpy as np
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import matplotlib.colors as mcolors
+
 from astropy.io import fits
 import argparse
 import os
@@ -30,83 +31,134 @@ def find_spectrum_columns(column_names):
                          f"TT: {tt_col}, EE: {ee_col}, BB: {bb_col}")
 
     return tt_col, ee_col, bb_col
-def compare_cls_spectra(file1, file2, output_path=None):
-    # Open FITS files
-    with fits.open(file1) as hdul1, fits.open(file2) as hdul2:
-        data1 = hdul1[1].data
-        data2 = hdul2[1].data
 
-        cols1 = data1.names
-        cols2 = data2.names
+def read_spectrum_file(filepath):
+    """
+    Read a power spectrum file (.fits or .dat).
+    Returns: ell, cl_ee, cl_bb, cl_eb
+    """
+    ext = os.path.splitext(filepath)[-1].lower()
 
-        # Find columns automatically
-        tt1, ee1, bb1 = find_spectrum_columns(cols1)
-        tt2, ee2, bb2 = find_spectrum_columns(cols2)
+    if ext == '.fits':
+        with fits.open(filepath) as hdul:
+            data = hdul[1].data
+            cols = data.names
+            ee_col = find_spectrum_columns(cols)[1]
+            bb_col = find_spectrum_columns(cols)[2]
 
-        ell = np.arange(len(data1))
+            # Try to find EB column, fallback to zeros
+            eb_col = None
+            for col in cols:
+                if 'eb' in col.lower():
+                    eb_col = col
+                    break
 
-        # Extract spectra
-        cl_tt_1 = data1[tt1]
-        cl_ee_1 = data1[ee1]
-        cl_bb_1 = data1[bb1]
+            ell = np.arange(len(data))
+            cl_ee = data[ee_col]
+            cl_bb = data[bb_col]
+            cl_eb = data[eb_col] if eb_col else np.zeros_like(cl_ee)
 
-        cl_tt_2 = data2[tt2]
-        cl_ee_2 = data2[ee2]
-        cl_bb_2 = data2[bb2]
+    elif ext == '.dat':
+        arr = np.loadtxt(filepath, comments='#')
+        if arr.shape[1] < 5:
+            raise ValueError("Expected at least 5 columns (l, TT, EE, TE, BB).")
 
-        # Convert to D_ell
+        ell = arr[:, 0].astype(int)
+        cl_ee = arr[:, 2]  # EE = column 3
+        cl_bb = arr[:, 4]  # BB = column 5
+
+        # EB = column 6 if available
+        cl_eb = arr[:, 5] if arr.shape[1] >= 6 else np.zeros_like(cl_ee)
+
+    else:
+        raise ValueError(f"Unsupported file type: {filepath}")
+
+    return ell, cl_ee, cl_bb, cl_eb
+
+
+def plot_scaled_comparison(ell, cl_dict, output_path=None):
+    """
+    cl_dict = {
+        'file1': {'ee': ..., 'bb': ..., 'eb': ...},
+        'file2': {'ee': ..., 'bb': ..., 'eb': ...}
+    }
+    """
+    a_lens_vals = np.arange(0.9, 1.21, 0.1)
+    g_vals = np.arange(0.0, 1.0, 0.3)
+
+    files = list(cl_dict.keys())
+    base_colors = ['tab:blue', 'tab:red']  # Adjust if comparing more files
+
+    fig, axes = plt.subplots(3, 1, figsize=(9, 12), sharex=True)
+
+    for i, fname in enumerate(files):
+        cl_ee = cl_dict[fname]['ee']
+        cl_bb = cl_dict[fname]['bb']
+        cl_eb = cl_dict[fname]['eb']
+
         factor = ell * (ell + 1) / (2 * np.pi)
-        dl_tt_1 = factor * cl_tt_1 * 1e12
-        dl_ee_1 = factor * cl_ee_1 * 1e12
-        dl_bb_1 = factor * cl_bb_1 * 1e12
+        dl_ee = factor * cl_ee * 1e12
+        dl_bb = factor * cl_bb * 1e12
+        dl_eb = factor * cl_eb * 1e12
 
-        dl_tt_2 = factor * cl_tt_2 * 1e12
-        dl_ee_2 = factor * cl_ee_2 * 1e12
-        dl_bb_2 = factor * cl_bb_2 * 1e12
+        base_color = base_colors[i]
 
-        # Prepare labels
-        label1 = os.path.basename(file1)
-        label2 = os.path.basename(file2)
+        # --- EE (just one line per file)
+        axes[0].plot(ell, dl_ee, label=f"EE ({fname})", color=base_color)
 
-        # Plot
-        fig, axes = plt.subplots(3, 1, figsize=(8, 10), sharex=True)
+        # --- BB scaled by A_lens
+        for j, a in enumerate(a_lens_vals):
+            shade = mcolors.to_rgba(base_color, alpha=0.4 + 0.15 * j)
+            axes[1].plot(ell, a * dl_bb, label=fr"$A_\mathrm{{lens}}={a:.1f}$ ({fname})", color=shade)
 
-        axes[0].plot(ell, dl_tt_1, label=label1, color='blue')
-        axes[0].plot(ell, dl_tt_2, label=label2, color='red', linestyle='--')
-        axes[0].set_ylabel(r'$D_\ell^{TT}$ [$\mu K^2$]')
-        axes[0].legend()
-        axes[0].grid(True)
+        # --- EB scaled by g
+        for j, g in enumerate(g_vals):
+            shade = mcolors.to_rgba(base_color, alpha=0.4 + 0.15 * j)
+            axes[2].plot(ell, g * dl_eb, label=fr"$g={g:.1f}$ ({fname})", color=shade)
 
-        axes[1].plot(ell, dl_ee_1, label=label1, color='green')
-        axes[1].plot(ell, dl_ee_2, label=label2, color='orange', linestyle='--')
-        axes[1].set_ylabel(r'$D_\ell^{EE}$ [$\mu K^2$]')
-        axes[1].legend()
-        axes[1].grid(True)
+    # EE plot settings
+    axes[0].set_ylabel(r"$D_\ell^{EE}$ [$\mu K^2$]")
+    axes[0].legend()
+    axes[0].grid(True)
 
-        axes[2].plot(ell, dl_bb_1, label=label1, color='purple')
-        axes[2].plot(ell, dl_bb_2, label=label2, color='brown', linestyle='--')
-        axes[2].set_ylabel(r'$D_\ell^{BB}$ [$\mu K^2$]')
-        axes[2].set_xlabel(r'Multipole $\ell$')
-        axes[2].legend()
-        axes[2].grid(True)
+    # BB plot settings
+    axes[1].set_ylabel(r"$D_\ell^{BB}$ [$\mu K^2$]")
+    axes[1].legend()
+    axes[1].grid(True)
 
-        plt.suptitle(f'Power Spectra Comparison: {label1} vs {label2}')
-        plt.tight_layout()
-        plt.subplots_adjust(top=0.93)
+    # EB plot settings
+    axes[2].set_ylabel(r"$D_\ell^{EB}$ [$\mu K^2$]")
+    axes[2].set_xlabel(r"Multipole $\ell$")
+    axes[2].legend()
+    axes[2].grid(True)
 
-        if output_path:
-            plt.savefig(output_path)
-            print(f"Saved figure to {output_path}")
-        else:
-            plt.show()
+    plt.suptitle("EE, BB (scaled), EB (scaled) Spectra Comparison")
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.92)
+
+    if output_path:
+        plt.savefig(output_path)
+        print(f"Saved plot to {output_path}")
+    else:
+        plt.show()
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Compare power spectra from two FITS files.')
-    parser.add_argument('file1', type=str, help='Path to first FITS file')
-    parser.add_argument('file2', type=str, help='Path to second FITS file')
-    parser.add_argument('--output', type=str, default=None, help='Output image filename (optional)')
-
+    parser = argparse.ArgumentParser(description='Compare two spectra files.')
+    parser.add_argument('file1', type=str)
+    parser.add_argument('file2', type=str)
+    parser.add_argument('--output', type=str, default=None)
     args = parser.parse_args()
 
-    compare_cls_spectra(args.file1, args.file2, args.output)
+    ell1, ee1, bb1, eb1 = read_spectrum_file(args.file1)
+    ell2, ee2, bb2, eb2 = read_spectrum_file(args.file2)
+
+    if not np.array_equal(ell1, ell2):
+        raise ValueError("Mismatch in ell arrays")
+
+    cl_dict = {
+        os.path.basename(args.file1): {'ee': ee1, 'bb': bb1, 'eb': eb1},
+        os.path.basename(args.file2): {'ee': ee2, 'bb': bb2, 'eb': eb2},
+    }
+
+    plot_scaled_comparison(ell1, cl_dict, args.output)
