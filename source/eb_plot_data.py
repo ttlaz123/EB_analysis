@@ -698,7 +698,8 @@ def make_titles(means_df, stds_df, minchisq_df, param_names):
         titles.append(title)
     return titles
 
-def plot_logp_surface(model, param1, param2, range1, range2, fixed_params, grid_size=200):
+def plot_logp_surface(model, param1, param2, range1, range2, 
+                    fixed_params, grid_size=100):
     """
     Generate and plot a 2D log-likelihood surface over two parameters.
     
@@ -726,8 +727,8 @@ def plot_logp_surface(model, param1, param2, range1, range2, fixed_params, grid_
 
     # Plot
     plt.figure(figsize=(8, 6))
-    vmin = 27#-np.max(logp_vals)
-    vmax = 29#-np.min(logp_vals)
+    vmin = -np.max(logp_vals)
+    vmax = vmin+2#40#-np.min(logp_vals)
     levels = np.linspace(vmin, vmax, 51)
     print(levels)
     norm = BoundaryNorm(boundaries=levels, ncolors=256, extend='both')
@@ -830,7 +831,8 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
 
     # Save and show
     outpath = chains_path.split("XXX")[0] + f"{single_sim}_summary.png"
-    plt.suptitle(f"Sim {single_sim}: contour means (red), minchi2 peaks (green), Single chain (blue)")
+    n_chains = len(means_df)
+    plt.suptitle(f"(N={n_chains} sims) Contour means (red), minchi2 peaks (green), Single chain (blue)")
     plt.savefig(outpath, bbox_inches='tight')
     print(f"Saved to {outpath}")
 

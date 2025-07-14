@@ -431,7 +431,7 @@ def load_shared_data(input_args):
         bin_starts, raw_cl, SHARED_DATA_DICT['eskilt'] = ld.load_eskilt_data(ede_path=FILE_PATHS['EDE_spectrum'])
 
 def run_bk18_likelihood(params_dict, observation_file_path, input_args, 
-                        rstop = 0.0001, max_tries=10000):
+                        rstop = 0.03, max_tries=10000):
     """
     Runs the Cobaya MCMC likelihood using BK18_full_multicomp likelihood class.
 
@@ -480,7 +480,7 @@ def run_bk18_likelihood(params_dict, observation_file_path, input_args,
     updated_info, sampler = run(info, stop_at_error=True)
     return updated_info, sampler
 
-def define_priors(calc_spectra, theory_comps, angle_degree=5, spectra='all'):
+def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
     """
     Defines prior distributions for angle parameters, dust parameters, and EDE params.
 
@@ -569,7 +569,6 @@ def define_priors(calc_spectra, theory_comps, angle_degree=5, spectra='all'):
                                     "proposal":0.1,
                                     "latex":"\\beta_{\mathrm{sync}}"}
     elif(theory_comps == 'eskilt'):
-        params_dict['alpha_BK18_220']['ref']=-1 
         params_dict['A_lens'] = 1
         params_dict['alpha_CMB'] = anglecmb_priors
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
@@ -775,14 +774,17 @@ def multicomp_mcmc_driver(input_args):
                 'A_sync_EB': 0,
 
             }
-        epd.plot_logp_surface(multicomp_class, 
+        if(False):
+            epd.plot_logp_surface(multicomp_class, 
                               param1='alpha_P353e',
                               param2='alpha_CMB',
-                              range1=[-20,20],
-                              range2=[-20,20],
+                              range1=[-80,80],
+                              range2=[-80,80],
                               fixed_params=fixed_dict
                               )
+     
         param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path)
+        
         for key in params_dict:
                 if key not in param_names:
                     print('Adding fixed value: ' + str(key) + ':' 
@@ -830,7 +832,8 @@ def run_simulation(sim_num, params_dict,input_args):
 
     params_copy = copy.deepcopy(params_dict)
     input_args.output_path = outpath
-    updated_info, sampler = run_bk18_likelihood(params_copy, 
+    if(input_args.overwrite):
+        updated_info, sampler = run_bk18_likelihood(params_copy, 
                                             observation_file_path, 
                                             input_args)
     param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path)#, replace_dict)

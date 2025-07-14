@@ -318,10 +318,11 @@ def plot_betacmb_posteriors(chain_dirs: List[str], base_dir: str, output_dir: st
         "BK18lf_all_bin2-15_gdust_betacmb2": "EE+EB+BB with foregrounds",
         "BK18lf_eb_bin2-15_gdust_betacmb2": "EB with foregrounds",
         "BK18lf_eb_bin2-15_det_polrot_betacmb2": "EB no foregrounds",
+        "BK18lf_all_bin2-15_gdust_betacmb_planck": "EE+EB+BB with foregrounds and Planck"
     }
 
     for chain_dir in chain_dirs:
-        if "betacmb2" not in chain_dir:
+        if "betacmb2" not in chain_dir and "betacmb_planck" not in chain_dir:
             continue
         print(chain_dir)
         chain_file = os.path.join(base_dir, chain_dir, "real")
@@ -348,7 +349,10 @@ def plot_betacmb_posteriors(chain_dirs: List[str], base_dir: str, output_dir: st
         return
 
     # Sort in desired order
-    desired_order = ["EE+EB+BB with foregrounds", "EB with foregrounds", "EB no foregrounds"]
+    desired_order = ["EE+EB+BB with foregrounds and Planck",
+                        "EE+EB+BB with foregrounds", 
+                        "EB with foregrounds", 
+                        "EB no foregrounds"]
     plot_data.sort(key=lambda x: desired_order.index(x[0]))
 
     # Plot
