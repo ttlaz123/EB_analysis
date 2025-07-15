@@ -24,7 +24,7 @@ def sweep_param(base_params, param_name, values):
 
 def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, outpath):
 
-    eb_map = eb_maps[1]
+    eb_map = eb_maps[0]
 
     # Step 1: Identify varying keys
     varying_keys = []
@@ -99,7 +99,7 @@ def get_plotted_values():
         'alpha_BK18_220': 1,
         'alpha_CMB': -0.3,
         'A_dust_EE': 7,
-        'A_dust_BB': 0,
+        'A_dust_BB': 4,
         'A_dust_EB': 0,
         'alpha_dust_EE': -0.5,
         'alpha_dust_BB': -0.5,
@@ -115,8 +115,8 @@ def get_plotted_values():
     }
 
     # Choose which parameter to sweep here:
-    param_to_sweep = 'A_dust_BB'
-    sweep_values = [0, 5, 20, 100]
+    param_to_sweep = 'alpha_BK18_220'
+    sweep_values = [1, 0.5, 0, -0.5, -1]
 
     # Generate parameter sweep
     params_values = sweep_param(base_params, param_to_sweep, sweep_values)
