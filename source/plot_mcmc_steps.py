@@ -72,7 +72,7 @@ def plot_rotation_values(params_values, eb_maps, dl_theory, used_map, outpath):
     plt.savefig(outpath)
     plt.close()
 
-def plot_dust_values(eb_maps, params_values, bandpasses, used_map, dl_theory, outpath):
+def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, outpath):
 
     eb_map = eb_maps[1]
 
@@ -87,11 +87,11 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_map, dl_theory, ou
     print("Varying parameters used in legend:", varying_keys)
 
     # Step 2: Prepare a dummy run to extract all map keys
-    dummy_rot = ec.apply_cmb_rotation(eb_map, params_values[0], dl_theory, [used_map])
+    dummy_rot = ec.apply_cmb_rotation(eb_map, params_values[0], dl_theory, used_maps)
     dummy_dust = ec.apply_dust(dummy_rot, bandpasses, params_values[0])
     dummy_detrot = ec.apply_det_rotation(dummy_dust, params_values[0], dl_theory)
     map_keys = list(dummy_detrot.keys())
-
+    print(map_keys)
     # Step 3: Set up subplots
     n_maps = len(map_keys)
     fig, axs = plt.subplots(n_maps, 1, figsize=(10, 3.5 * n_maps), sharex=True)
@@ -110,8 +110,7 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_map, dl_theory, ou
         post_dust_dict = ec.apply_dust(post_rot_dict, bandpasses, param_values)
         post_detrot_dict = ec.apply_det_rotation(post_dust_dict,
                                                  param_values,
-                                                 dl_theory,
-                                                 override_maps=map_keys)
+                                                 dl_theory)
         
         # Create concise label
         label_parts = [f"{k}={param_values[k]}" for k in varying_keys]
@@ -140,7 +139,9 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_map, dl_theory, ou
 def get_plotted_values():
     fede=0.07
     FILE_PATHS = fp.set_file_paths('BK18lf', fede=fede)
-    used_map = 'BK18_220_BxBK18_220_E'
+    used_maps = ['BK18_220_BxBK18_220_E',
+                 'BK18_220_BxBK18_220_B',
+                 'BK18_220_ExBK18_220_E',]
     '''
     params_values = [
         {'alpha_CMB': -0.9},
