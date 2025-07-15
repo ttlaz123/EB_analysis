@@ -65,7 +65,7 @@ def plot_param_values(params_values, eb_maps, dl_theory, used_map, outpath):
         ax[i].grid(True, linestyle='--', alpha=0.6)
 
     ax[0].set_ylabel(r'$D_\ell^{EB}$ [$\mu$K$^2$]', fontsize=14)
-    ax[1].legend(fontsize=12, loc='upper right')
+    ax[1].legend(fontsize=12, loc='upper left')
     plt.tight_layout()
     
     print('Saving:', outpath)
