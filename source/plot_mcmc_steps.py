@@ -73,8 +73,9 @@ def plot_rotation_values(params_values, eb_maps, dl_theory, used_map, outpath):
     plt.close()
 
 def plot_dust_values(eb_maps, params_values, bandpasses, used_map, dl_theory, outpath):
-  
-    plt.figure(figsize=(10, 6))
+    import matplotlib.pyplot as plt
+    import numpy as np
+
     eb_map = eb_maps[1]
 
     # Step 1: Identify varying keys
@@ -87,39 +88,56 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_map, dl_theory, ou
 
     print("Varying parameters used in legend:", varying_keys)
 
-    # Step 2: Plot each parameter set and label only by changing parameters
+    # Step 2: Prepare a dummy run to extract all map keys
+    dummy_rot = ec.apply_cmb_rotation(eb_map, params_values[0], dl_theory, [used_map])
+    dummy_dust = ec.apply_dust(dummy_rot, bandpasses, params_values[0])
+    dummy_detrot = ec.apply_det_rotation(dummy_dust, params_values[0], dl_theory, override_maps=[used_map])
+    map_keys = list(dummy_detrot.keys())
+
+    # Step 3: Set up subplots
+    n_maps = len(map_keys)
+    fig, axs = plt.subplots(n_maps, 1, figsize=(10, 3.5 * n_maps), sharex=True)
+
+    if n_maps == 1:
+        axs = [axs]  # Make it iterable even for 1 plot
+
+    # Step 4: Plot each map in its own subplot
     for param_values in params_values:
         post_rot_dict = ec.apply_cmb_rotation(
             eb_map,
             param_values,
             dl_theory,
-            [used_map]
+            map_keys
         )
         post_dust_dict = ec.apply_dust(post_rot_dict, bandpasses, param_values)
         post_detrot_dict = ec.apply_det_rotation(post_dust_dict,
                                                  param_values,
                                                  dl_theory,
-                                                 override_maps=[used_map])
+                                                 override_maps=map_keys)
         
         # Create concise label
         label_parts = [f"{k}={param_values[k]}" for k in varying_keys]
         label = ", ".join(label_parts)
 
-        ell = np.arange(len(post_detrot_dict[used_map]))
-        plt.plot(ell, post_detrot_dict[used_map], label=label)
+        for i, key in enumerate(map_keys):
+            ell = np.arange(len(post_detrot_dict[key]))
+            axs[i].plot(ell, post_detrot_dict[key], label=label)
+            axs[i].set_title(key.replace("_", " "), fontsize=14)
+            axs[i].grid(True, linestyle='--', alpha=0.6)
+            axs[i].set_xlim(0, 700)
 
-    # Step 3: Formatting
-    plt.xlim([0, 700])
-    plt.xlabel(r'Multipole $\ell$', fontsize=14)
-    plt.ylabel(r'$D_\ell^{EB}$ [$\mu$K$^2$]', fontsize=14)
-    plt.title('EB Spectrum After Dust and Detector Rotation', fontsize=16)
-    plt.grid(True, linestyle='--', alpha=0.6)
-    plt.legend(fontsize=10)
+    # Step 5: Final formatting
+    axs[-1].set_xlabel(r'Multipole $\ell$', fontsize=14)
+    for ax in axs:
+        ax.set_ylabel(r'$D_\ell$ [$\mu$K$^2$]', fontsize=12)
+
+    axs[0].legend(fontsize=10)
     plt.tight_layout()
-
+    
     print('Saving:', outpath)
     plt.savefig(outpath)
     plt.close()
+
 
 def get_plotted_values():
     fede=0.07
