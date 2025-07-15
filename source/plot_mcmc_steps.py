@@ -48,6 +48,9 @@ def get_plotted_values(outpath):
     FILE_PATHS = fp.set_file_paths('BK18lf', fede=fede)
     used_map = 'BK18_B95e_BxBK18_B95e_E'
     params_values = [
+        {'alpha_CMB': -0.9},
+        {'alpha_CMB': -0.6},
+        {'alpha_CMB': -0.3},
         {'alpha_CMB': 0},
         {'alpha_CMB': 0.3},
         {'alpha_CMB': 0.6},
