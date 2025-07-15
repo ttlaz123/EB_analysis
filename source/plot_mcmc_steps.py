@@ -72,8 +72,9 @@ def plot_rotation_values(params_values, eb_maps, dl_theory, used_map, outpath):
     plt.savefig(outpath)
     plt.close()
 
-def plot_dust_values(eb_map, params_values, bandpasses, used_map, dl_theory, outpath):
+def plot_dust_values(eb_maps, params_values, bandpasses, used_map, dl_theory, outpath):
     plt.figure()
+    eb_map = eb_maps[1]
     for param_values in params_values:
         post_rot_dict = ec.apply_cmb_rotation(
                 eb_map,
