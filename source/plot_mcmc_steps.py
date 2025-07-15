@@ -14,7 +14,7 @@ import eb_calculations as ec
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot_param_values(params_values, eb_maps, dl_theory, used_map, outpath):
+def plot_rotation_values(params_values, eb_maps, dl_theory, used_map, outpath):
     
 
     fig, ax = plt.subplots(1, len(eb_maps), figsize=(14, 6), sharey=True)
@@ -72,12 +72,26 @@ def plot_param_values(params_values, eb_maps, dl_theory, used_map, outpath):
     plt.savefig(outpath)
     plt.close()
 
+def plot_dust_values(eb_map, params_values, bandpasses, used_map, dl_theory, outpath):
+    plt.figure()
+    for param_values in params_values:
+        post_rot_dict = ec.apply_cmb_rotation(
+                eb_map,
+                param_values,
+                dl_theory,
+                [used_map]
+            )
+        post_dust_dict =  ec.apply_dust(post_rot_dict, bandpasses, param_values)
+        plt.plot(post_dust_dict[used_map], label=param_values)
+    print('Saving:', outpath)
+    plt.savefig(outpath)
+    plt.close()
 
-
-def get_plotted_values(outpath):
+def get_plotted_values():
     fede=0.07
     FILE_PATHS = fp.set_file_paths('BK18lf', fede=fede)
     used_map = 'BK18_B95e_BxBK18_B95e_E'
+    '''
     params_values = [
         {'alpha_CMB': -0.9},
         {'alpha_CMB': -0.6},
@@ -86,6 +100,77 @@ def get_plotted_values(outpath):
         {'alpha_CMB': 0.3},
         {'alpha_CMB': 0.6},
         {'alpha_CMB': 0.9},
+    ]
+    '''
+    params_values = [
+        {
+        'alpha_CMB':-0.3,
+        'A_dust_EE': 6, 
+        'A_dust_BB': 6, 
+        'A_dust_EB': 6, 
+        'alpha_dust_EE': -0.5,
+        'alpha_dust_BB': -0.5,
+        'alpha_dust_EB': -0.5,
+        'beta_dust':1.6,
+        'A_sync_EE': 6, 
+        'A_sync_BB': 6, 
+        'A_sync_EB': 6, 
+        'alpha_sync_EE': -0.5,
+        'alpha_sync_BB': -0.5,
+        'alpha_sync_EB': -0.5,
+        'beta_sync':-3,
+        },
+        {
+        'alpha_CMB':-0.3,
+        'A_dust_EE': 6, 
+        'A_dust_BB': 6, 
+        'A_dust_EB': 6, 
+        'alpha_dust_EE': -0.5,
+        'alpha_dust_BB': -0.5,
+        'alpha_dust_EB': -0.5,
+        'beta_dust':1.6,
+        'A_sync_EE': 6, 
+        'A_sync_BB': 6, 
+        'A_sync_EB': 6, 
+        'alpha_sync_EE': -0.3,
+        'alpha_sync_BB': -0.5,
+        'alpha_sync_EB': -0.5,
+        'beta_sync':-3,
+        },
+        {
+        'alpha_CMB':-0.3,
+        'A_dust_EE': 10, 
+        'A_dust_BB': 6, 
+        'A_dust_EB': 6, 
+        'alpha_dust_EE': -0.5,
+        'alpha_dust_BB': -0.5,
+        'alpha_dust_EB': -0.5,
+        'beta_dust':1.6,
+        'A_sync_EE': 6, 
+        'A_sync_BB': 6, 
+        'A_sync_EB': 6, 
+        'alpha_sync_EE': -0.5,
+        'alpha_sync_BB': -0.5,
+        'alpha_sync_EB': -0.5,
+        'beta_sync':-3,
+        },
+        {
+        'alpha_CMB':-0.3,
+        'A_dust_EE': 10, 
+        'A_dust_BB': 6, 
+        'A_dust_EB': 6, 
+        'alpha_dust_EE': -0.3,
+        'alpha_dust_BB': -0.5,
+        'alpha_dust_EB': -0.5,
+        'beta_dust':1.6,
+        'A_sync_EE': 6, 
+        'A_sync_BB': 6, 
+        'A_sync_EB': 6, 
+        'alpha_sync_EE': -0.5,
+        'alpha_sync_BB': -0.5,
+        'alpha_sync_EB': -0.5,
+        'beta_sync':-3,
+        },
     ]
 
     dl_theory = ld.load_cmb_theory(FILE_PATHS['camb_lensing'])
@@ -99,14 +184,17 @@ def get_plotted_values(outpath):
     },
     
     ]
-
-    plot_param_values(params_values, eb_maps, dl_theory, used_map, outpath)
+    bandpasses = ld.read_bandpasses(FILE_PATHS['bandpasses'])
+    return eb_maps, params_values, bandpasses, used_map, dl_theory
+    
     
 def main():
     parser =argparse.ArgumentParser()
     parser.add_argument('-p', '--outpath')
     args = parser.parse_args()
-    get_plotted_values(args.outpath)
 
+    eb_maps, params_values, bandpasses, used_map, dl_theory = get_plotted_values()
+    plot_dust_values(eb_maps, params_values, bandpasses, used_map, dl_theory, args.outpath)
+    #plot_rotation_values(params_values, eb_maps, dl_theory, used_map, args.outpath)
 if __name__=='__main__':
     main()
