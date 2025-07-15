@@ -24,7 +24,7 @@ def plot_param_values(params_values, eb_maps, dl_theory, used_map, outpath):
     params_values_sorted = sorted(params_values, key=lambda p: p['alpha_CMB'])
 
     # Custom colormaps
-    neg_cmap = cm.get_cmap('Blues')
+    neg_cmap = cm.get_cmap('Blues_r')
     pos_cmap = cm.get_cmap('Reds')
     zero_color = 'gray'
 
