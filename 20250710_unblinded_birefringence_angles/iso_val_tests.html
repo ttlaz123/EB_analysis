@@ -31,24 +31,24 @@
 
     <hr>
     <section>
-    <h2>Introduction</h2>
-    <p><strong>Summary:</strong>  
-       Some tests for comparing MCMC and matmin
-    </p>
+        <h2>Introduction</h2>
+        <p><strong>Summary:</strong>
+            Some tests for comparing MCMC and matmin
+        </p>
 
-</section>
+    </section>
 
-   <section>
-    <h2>Isotropic Birefringence Sanity Checks</h2>
-    <figure>
+    <section>
+        <h2>Isotropic Birefringence Sanity Checks</h2>
+        <figure>
             <img alt="Test Data" id="isotest" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
-             <figcaption>
-   BK18lf sim set, only EB, no foregrounds. Beta_cmb has a spread of about +-0.05 in both configurations.
-</figcaption>
+            <figcaption>
+                BK18lf sim set, only EB, no foregrounds. Beta_cmb has a spread of about +-0.05 in both configurations.
+            </figcaption>
 
             <script type="text/javascript">
-               function pad(num, size) {
+                function pad(num, size) {
                     num = num.toString();
                     while (num.length < size) num = "0" + num;
                     return num;
@@ -62,11 +62,11 @@
                 }
 
                 pager.link("#isotest", {
-                   'Map Sim Num Digit1|digit1': simnums,
+                    'Map Sim Num Digit1|digit1': simnums,
                     'Digit2|digit2': simnums,
                     'Digit3|digit3': simnums,
-                    
-                    'Plot type|plottype2':[
+
+                    'Plot type|plottype2': [
                         'Best Fit EE|_bestfitEE',
                         'Best Fit EB|_bestfitEB',
                         'Best Fit BB|_bestfitBB',
@@ -74,32 +74,32 @@
                         'Chi squared|_chisqmap',
                         'Summary|_summary'
                     ],
-                    'Test|test':[
+                    'Test|test': [
                         'All angles set to zero|zero',
                     ],
-                    'Configuration|config':[
+                    'Configuration|config': [
                         'No foregrounds, 150 and 95 EB only|15095',
                         'No foregrounds, all 4 angles, EB only|_all',
-                      
+
                     ],
 
                 },
-         
+
                     function (params) {
                         let dirbase = '/liuto';
                         let dirpath = dirbase + '/iso_val_chains/';
-                        
-                        
-                        
-                        let foldername = params.test + params.config +  '/';
-                        
+
+
+
+                        let foldername = params.test + params.config + '/';
+
                         let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
-                        if(params.plottype2 == '_summary'){
+                        if (params.plottype2 == '_summary') {
                             sim_id = 'sim1';
                         }
                         let file = sim_id + params.plottype2;
-                        let name = dirpath + foldername + file +  '.png';
-            
+                        let name = dirpath + foldername + file + '.png';
+
                         console.log(name);
                         return name;
                     });
@@ -110,95 +110,95 @@
                     'digit3': '1',
                     'plottype2': '_summary',
                     'test': 'zero',
-                     'config': '_all',
+                    'config': '_all',
                 });
             </script>
         </figure>
 
-        In plots below, I only look at realization 1. 
-<figure>
+        In plots below, I only look at realization 1.
+        <figure>
             <img alt="Test Data" id="isodust" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
-             <figcaption>
-   BK18lf sim set, beta remains with same spread of +-0.05 even with foregrounds. 
-</figcaption>
+            <figcaption>
+                BK18lf sim set, beta remains with same spread of +-0.05 even with foregrounds.
+            </figcaption>
 
             <script type="text/javascript">
-             
+
 
                 pager.link("#isodust", {
-             
-                    
-                    'Plot type|plottype':[
+
+
+                    'Plot type|plottype': [
                         'Best Fit EE|_bestfitEE',
                         'Best Fit EB|_bestfitEB',
                         'Best Fit BB|_bestfitBB',
                         'Triangle Plot|_triangle_plot',
                         'Chi squared|_chisqmap',
                     ],
-                    'Test|test2':[
+                    'Test|test2': [
                         'All angles set to zero|zero',
                     ],
-                    'Configuration|config2':[
+                    'Configuration|config2': [
                         'Yes Foregrounds, all 4 angles, EB only|_all_dust',
                         'Yes Foregrounds, all 4 angles, EB + BB +EE|_all_dust_eebbeb',
                     ],
 
                 },
-         
+
                     function (params) {
                         let dirbase = '/liuto/';
                         let dirpath = dirbase + '/iso_val_chains/';
-                        
-                        
-                        
-                        let foldername = params.test2 + params.config2 +  '/';
-                        
+
+
+
+                        let foldername = params.test2 + params.config2 + '/';
+
                         let sim_id = 'sim'
                         let file = sim_id + params.plottype;
-                        let name = dirpath + foldername + file +  '.png';
-            
+                        let name = dirpath + foldername + file + '.png';
+
                         console.log(name);
                         return name;
                     });
 
                 pager.setparams({
-              
+
                     'plottype': '_summary',
                     'test2': 'zero',
-                     'config2': '_all_dust_eebbeb',
+                    'config2': '_all_dust_eebbeb',
                 });
             </script>
         </figure>
-        
-                        
-    <figure>
+
+
+        <figure>
             <img alt="test Data" id="reals_basic" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
-             <figcaption>
-   Setting angles to 1 forces beta to be -1. Setting angles to 0 forces beta to be 0. Spread 
-   on beta remains to be about 0.05, except when B95 is the one allowed to vary, in which case 
-   the constraint is looser. 
-</figcaption>
+            <figcaption>
+                Setting angles to 1 forces beta to be -1. Setting angles to 0 forces beta to be 0. Spread
+                on beta remains to be about 0.05, except when B95 is the one allowed to vary, in which case
+                the constraint is looser.
+            </figcaption>
 
             <script type="text/javascript">
-               
+
 
                 pager.link("#reals_basic", {
-                   
-                    
-                    'Plot type|plottype':[
+
+
+                    'Plot type|plottype': [
                         'Best Fit EE|_bestfitEE',
                         'Best Fit EB|_bestfitEB',
                         'Best Fit BB|_bestfitBB',
                         'Triangle Plot|_triangle_plot',
                         'Chi squared|_chisqmap'
                     ],
-                    'Test|test3':[
+                    'Test|test3': [
                         'All but one angle set to zero degree|notzero',
                         'All but one angle set to one degree|notone',
                     ],
-                    'Free Angle|angle':[
+                    'Free Angle|angle': [
                         'alpha_BK18_150|150',
                         'alpha_BK18_K95|K95',
                         'alpha_BK18_B95lf|B95',
@@ -206,26 +206,26 @@
                     ],
 
                 },
-         
+
                     function (params) {
                         let dirbase = '/liuto';
                         let dirpath = dirbase + '/iso_val_chains/';
                         let spectra = '_eb';
-                        
-                        
+
+
                         let foldername = params.test3 + '_' + params.angle + spectra + '/';
-                        let file = 'sim1'+params.plottype;
-                        let name = dirpath + foldername + file +  '.png';
-            
+                        let file = 'sim1' + params.plottype;
+                        let name = dirpath + foldername + file + '.png';
+
                         console.log(name);
                         return name;
                     });
 
                 pager.setparams({
-        
+
                     'plottype': '_triangle_plot',
                     'test3': 'notzero',
-                     'angle': 'B95',
+                    'angle': 'B95',
                 });
             </script>
         </figure>
@@ -233,29 +233,30 @@
         <figure>
             <img alt="Test Data" id="loglike" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
-           <figcaption>
-Configuration options (<code>config9</code>): 
-<ul>
-  <li><b>All other angles fixed, BK18 + Planck Data</b>: 
-    All polarization rotation angles except the one being scanned 
-    are fixed to their best-fit values. Uses both BK18 and Planck data.</li>
-  <li><b>EB Only, no foregrounds, only one dataset</b>: 
-    Uses only the EB spectrum, excludes foreground modeling, 
-    and includes only a single dataset to highlight parameter degeneracies
-    without foregrounds.</li>
-  <li><b>EE+BB+EB, with foregrounds, only one dataset</b> : 
-    Fits all three spectra (EE, BB, EB) including foregrounds, 
-    but using only one dataset at a time. We see slight constraining power in higher frequencies.</li>
-</ul>
-</figcaption>
+            <figcaption>
+                Configuration options (<code>config9</code>):
+                <ul>
+                    <li><b>All other angles fixed, BK18 + Planck Data</b>:
+                        All polarization rotation angles except the one being scanned
+                        are fixed to their best-fit values. Uses both BK18 and Planck data.</li>
+                    <li><b>EB Only, no foregrounds, only one dataset</b>:
+                        Uses only the EB spectrum, excludes foreground modeling,
+                        and includes only a single dataset to highlight parameter degeneracies
+                        without foregrounds.</li>
+                    <li><b>EE+BB+EB, with foregrounds, only one dataset</b> :
+                        Fits all three spectra (EE, BB, EB) including foregrounds,
+                        but using only one dataset at a time. We see slight constraining power in higher frequencies.
+                    </li>
+                </ul>
+            </figcaption>
 
             <script type="text/javascript">
-             
+
 
                 pager.link("#loglike", {
-             
-                    
-                    'Angle|freq':[
+
+
+                    'Angle|freq': [
                         'alpha_BK18_150|alpha_BK18_150',
                         'alpha_BK18_K95|alpha_BK18_K95',
                         'alpha_BK18_B95lf|alpha_BK18_B95e',
@@ -263,57 +264,56 @@ Configuration options (<code>config9</code>):
                         'alpha_P217e|alpha_P217e',
                         'alpha_P353e|alpha_P353e',
                     ],
-                    'Configureation|config9':[
+                    'Configureation|config9': [
                         'All other angles fixed, BK18 + Planck Data|fixed_else',
                         'EB Only, no foregrounds, only one dataset|degen',
                         'EE+BB+EB, with foregrounds, only one dataset|only_one'
                     ]
 
                 },
-         
+
                     function (params) {
                         let dirbase = '/liuto/home/GitHub/EB_analysis';
                         let dirpath = dirbase + '/loglikelihood_2dmaps/';
-                        
-                        
-                        
-                        let foldername =  params.config9 +  '/';
-                        
+
+
+
+                        let foldername = params.config9 + '/';
+
                         let file = '2dlikemap_' + params.freq + '_alpha_CMB';
-                        let name = dirpath + foldername + file +  '.png';
-            
+                        let name = dirpath + foldername + file + '.png';
+
                         console.log(name);
                         return name;
                     });
 
                 pager.setparams({
-              
+
                     'freq': 'alpha_BK18_220',
                     'config9': 'fixed_else',
                 });
             </script>
         </figure>
-        
-        </section>
-        <section>
-            <h2>
-                Constraining beta
-            </h2>
 
-             <figure>
-            <img alt="Test Data" id="planck" src="#" width="750" height="500"
-                onerror="javascript:this.src='dne.png'" />
-             <figcaption></figcaption>
+    </section>
+    <section>
+        <h2>
+            Constraining beta
+        </h2>
+
+        <figure>
+            <img alt="Test Data" id="planck" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
+            <figcaption></figcaption>
 
             <script type="text/javascript">
-               
+
 
                 pager.link("#planck", {
-                   'Map Sim Num Digit1|digit1': simnums,
+                    'Map Sim Num Digit1|digit1': simnums,
                     'Digit2|digit2': simnums,
                     'Digit3|digit3': simnums,
-                    
-                    'Plot type|plottype2':[
+
+                    'Plot type|plottype2': [
                         'Best Fit EE|_bestfitEE',
                         'Best Fit EB|_bestfitEB',
                         'Best Fit BB|_bestfitBB',
@@ -321,28 +321,32 @@ Configuration options (<code>config9</code>):
                         'Chi squared|_chisqmap',
                         'Summary|_summary'
                     ],
-                    'Configuration|config4':[
+                    'Configuration|config4': [
                         'BK18 + planck with foregrounds|BK18lf_all_bin2-15_planck_dust',
-                      
+
                     ],
+                    'Angle Priors|priors': [
+                        '+- 5 degrees|',
+                        '+- 10 degrees|_wide'
+                    ]
 
                 },
-         
+
                     function (params) {
                         let dirbase = '/liuto';
                         let dirpath = dirbase + '/iso_val_chains/';
-                        
-                        
-                        
-                        let foldername =  params.config4 +  '/';
-                        
+
+
+
+                        let foldername = params.config4 + params.priors + '/';
+
                         let sim_id = 'test' + params.digit1 + params.digit2 + params.digit3;
-                        if(params.plottype2 == '_summary'){
+                        if (params.plottype2 == '_summary') {
                             sim_id = 'test1';
                         }
                         let file = sim_id + params.plottype2;
-                        let name = dirpath + foldername + file +  '.png';
-            
+                        let name = dirpath + foldername + file + '.png';
+
                         console.log(name);
                         return name;
                     });
@@ -353,11 +357,11 @@ Configuration options (<code>config9</code>):
                     'digit3': '1',
                     'plottype2': '_summary',
                     'test': 'zero',
-                     'config4': 'BK18lf_all_bin2-15_planck_dust',
+                    'config4': 'BK18lf_all_bin2-15_planck_dust',
                 });
             </script>
         </figure>
-        </section>
+    </section>
 </body>
 
 </html>
