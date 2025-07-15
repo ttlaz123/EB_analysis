@@ -94,7 +94,7 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_map, dl_theory, ou
 def get_plotted_values():
     fede=0.07
     FILE_PATHS = fp.set_file_paths('BK18lf', fede=fede)
-    used_map = 'BK18_B95e_BxBK18_B95e_E'
+    used_map = 'BK18_220_BxBK18_220_E'
     '''
     params_values = [
         {'alpha_CMB': -0.9},
@@ -109,9 +109,9 @@ def get_plotted_values():
     params_values = [
         {
         'alpha_CMB':-0.3,
-        'A_dust_EE': 6, 
+        'A_dust_EE': 0, 
         'A_dust_BB': 6, 
-        'A_dust_EB': 6, 
+        'A_dust_EB': 0, 
         'alpha_dust_EE': -0.5,
         'alpha_dust_BB': -0.5,
         'alpha_dust_EB': -0.5,
@@ -126,9 +126,9 @@ def get_plotted_values():
         },
         {
         'alpha_CMB':-0.3,
-        'A_dust_EE': 6, 
+        'A_dust_EE': 0, 
         'A_dust_BB': 6, 
-        'A_dust_EB': 6, 
+        'A_dust_EB': 0, 
         'alpha_dust_EE': -0.5,
         'alpha_dust_BB': -0.5,
         'alpha_dust_EB': -0.5,
@@ -145,7 +145,7 @@ def get_plotted_values():
         'alpha_CMB':-0.3,
         'A_dust_EE': 10, 
         'A_dust_BB': 6, 
-        'A_dust_EB': 6, 
+        'A_dust_EB': 0, 
         'alpha_dust_EE': -0.5,
         'alpha_dust_BB': -0.5,
         'alpha_dust_EB': -0.5,
@@ -162,7 +162,7 @@ def get_plotted_values():
         'alpha_CMB':-0.3,
         'A_dust_EE': 10, 
         'A_dust_BB': 6, 
-        'A_dust_EB': 6, 
+        'A_dust_EB': 0, 
         'alpha_dust_EE': -0.3,
         'alpha_dust_BB': -0.5,
         'alpha_dust_EB': -0.5,
