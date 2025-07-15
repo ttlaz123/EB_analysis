@@ -212,7 +212,7 @@ def get_plotted_values():
         'alpha_BK18_220':1,
         'alpha_CMB':-0.3,
         'A_dust_EE': 7, 
-        'A_dust_BB': 100 
+        'A_dust_BB': 100, 
         'A_dust_EB': 0, 
         'alpha_dust_EE': -0.5,
         'alpha_dust_BB': -0.5,
