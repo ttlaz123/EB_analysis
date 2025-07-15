@@ -1,6 +1,8 @@
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt 
+import matplotlib.colors as mcolors
+import matplotlib.cm as cm
 import argparse
 import numpy as np
 
@@ -13,11 +15,32 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def plot_param_values(params_values, eb_maps, dl_theory, used_map, outpath):
+    
+
     fig, ax = plt.subplots(1, len(eb_maps), figsize=(14, 6), sharey=True)
     titles = ['Cosmic Rotation with EDE, g=1', 'No EDE present']
+
+    # Sort parameters to align with colors
+    params_values_sorted = sorted(params_values, key=lambda p: p['alpha_CMB'])
+
+    # Custom colormaps
+    neg_cmap = cm.get_cmap('Blues')
+    pos_cmap = cm.get_cmap('Reds')
+    zero_color = 'gray'
+
+    neg_vals = [p['alpha_CMB'] for p in params_values_sorted if p['alpha_CMB'] < 0]
+    pos_vals = [p['alpha_CMB'] for p in params_values_sorted if p['alpha_CMB'] > 0]
+
+    # Normalize for colormap
+    if neg_vals:
+        norm_neg = mcolors.Normalize(vmin=min(neg_vals), vmax=0)
+    if pos_vals:
+        norm_pos = mcolors.Normalize(vmin=0, vmax=max(pos_vals))
+
     for i, eb_map in enumerate(eb_maps):
-        for params_value in params_values:
-            label = f"α_CMB = {params_value['alpha_CMB']}"
+        for params_value in params_values_sorted:
+            alpha = params_value['alpha_CMB']
+            label = f"α_CMB = {alpha}"
             post_rot_dict = ec.apply_cmb_rotation(
                 eb_map,
                 params_value,
@@ -25,14 +48,22 @@ def plot_param_values(params_values, eb_maps, dl_theory, used_map, outpath):
                 [used_map]
             )
             ell = np.arange(len(post_rot_dict[used_map]))
-            ax[i].plot(ell, post_rot_dict[used_map], label=label, linewidth=2)
+
+            # Assign color
+            if alpha < 0:
+                color = neg_cmap(norm_neg(alpha))
+            elif alpha > 0:
+                color = pos_cmap(norm_pos(alpha))
+            else:
+                color = zero_color
+
+            ax[i].plot(ell, post_rot_dict[used_map], label=label, linewidth=2, color=color)
 
         ax[i].set_xlim(0, 700)
         ax[i].set_xlabel(r'Multipole $\ell$', fontsize=14)
-        ax[i].set_title(f'EB Spectrum {i+1}', fontsize=15)
-        ax[i].grid(True, linestyle='--', alpha=0.6)
-        
         ax[i].set_title(titles[i], fontsize=15)
+        ax[i].grid(True, linestyle='--', alpha=0.6)
+
     ax[0].set_ylabel(r'$D_\ell^{EB}$ [$\mu$K$^2$]', fontsize=14)
     ax[1].legend(fontsize=12, loc='upper right')
     plt.tight_layout()
