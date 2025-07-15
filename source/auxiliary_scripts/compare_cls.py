@@ -57,7 +57,7 @@ def read_spectrum_file(filepath):
             cl_ee = data[ee_col]
             cl_bb = data[bb_col]
             cl_eb = data[eb_col] if eb_col else np.zeros_like(cl_ee)
-            scale_factor = 1e12
+            scale_factor = 1
 
     elif ext == '.dat':
         arr = np.loadtxt(filepath, comments='#')
@@ -68,7 +68,7 @@ def read_spectrum_file(filepath):
         cl_ee = arr[:, 2]
         cl_bb = arr[:, 4]
         cl_eb = arr[:, 5] if arr.shape[1] >= 6 else np.zeros_like(cl_ee)
-        scale_factor = 1e12  # Already dimensionless (l(l+1)/2pi) D_l
+        scale_factor = 0  # Already dimensionless (l(l+1)/2pi) D_l
 
     else:
         raise ValueError(f"Unsupported file type: {filepath}")
@@ -89,9 +89,12 @@ def plot_scaled_comparison(ell_dict, cl_dict, scale_dict, output_path=None):
         cl_ee = cl_dict[fname]['ee']
         cl_bb = cl_dict[fname]['bb']
         cl_eb = cl_dict[fname]['eb']
-        scale = scale_dict[fname]
-
-        factor = ell * (ell + 1) / (2 * np.pi)
+        scale = 1e12
+        coeff = scale_dict[fname]
+        if(coeff == 0):
+            factor = 1
+        elif(coeff == 1):
+            factor = ell * (ell + 1) / (2 * np.pi)
         dl_ee = factor * cl_ee * scale
         dl_bb = factor * cl_bb * scale
         dl_eb = factor * cl_eb * scale
