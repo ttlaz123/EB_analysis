@@ -112,7 +112,7 @@ def get_plotted_values():
     '''
     params_values = [
         {
-        'alpha_CMB':-0.3,
+        'alpha_BK18_220':-0.3,
         'alpha_220':1,
         'A_dust_EE': 0, 
         'A_dust_BB': 6, 
@@ -130,7 +130,7 @@ def get_plotted_values():
         'beta_sync':-3,
         },
         {
-        'alpha_220':1,
+        'alpha_BK18_220':1,
         'alpha_CMB':-0.3,
         'A_dust_EE': 0, 
         'A_dust_BB': 6, 
@@ -148,7 +148,7 @@ def get_plotted_values():
         'beta_sync':-3,
         },
         {
-        'alpha_220':1,
+        'alpha_BK18_220':1,
         'alpha_CMB':-0.3,
         'A_dust_EE': 10, 
         'A_dust_BB': 6, 
@@ -166,7 +166,7 @@ def get_plotted_values():
         'beta_sync':-3,
         },
         {
-        'alpha_220':1,
+        'alpha_BK18_220':1,
         'alpha_CMB':-0.3,
         'A_dust_EE': 100, 
         'A_dust_BB': 6, 
