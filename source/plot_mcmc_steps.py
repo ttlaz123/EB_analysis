@@ -73,8 +73,6 @@ def plot_rotation_values(params_values, eb_maps, dl_theory, used_map, outpath):
     plt.close()
 
 def plot_dust_values(eb_maps, params_values, bandpasses, used_map, dl_theory, outpath):
-    import matplotlib.pyplot as plt
-    import numpy as np
 
     eb_map = eb_maps[1]
 
