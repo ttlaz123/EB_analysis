@@ -89,8 +89,8 @@ def get_plotted_values():
         'beta_sync': -3,
     }
 
-    param_to_sweep = 'A_dust_BB'
-    sweep_values = [0, 5, 20, 100]
+    param_to_sweep = 'alpha_BK18_220'
+    sweep_values = [-1, -0.5, 0, 0.5, 1]
     params_values = sweep_param(base_params, param_to_sweep, sweep_values)
 
     dl_theory = ld.load_cmb_theory(FILE_PATHS['camb_lensing'])
