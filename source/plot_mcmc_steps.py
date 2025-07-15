@@ -83,7 +83,11 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_map, dl_theory, ou
                 [used_map]
             )
         post_dust_dict =  ec.apply_dust(post_rot_dict, bandpasses, param_values)
-        plt.plot(post_dust_dict[used_map], label=param_values)
+        post_detrot_dict = ec.apply_det_rotation(post_dust_dict,
+                                                 param_values,
+                                                 dl_theory,
+                                                 override_maps=[used_map])
+        plt.plot(post_detrot_dict[used_map], label=param_values)
     plt.xlim([0, 700])
     plt.legend()
     print('Saving:', outpath)
@@ -109,6 +113,7 @@ def get_plotted_values():
     params_values = [
         {
         'alpha_CMB':-0.3,
+        'alpha_220':1,
         'A_dust_EE': 0, 
         'A_dust_BB': 6, 
         'A_dust_EB': 0, 
@@ -125,6 +130,7 @@ def get_plotted_values():
         'beta_sync':-3,
         },
         {
+        'alpha_220':1,
         'alpha_CMB':-0.3,
         'A_dust_EE': 0, 
         'A_dust_BB': 6, 
@@ -142,6 +148,7 @@ def get_plotted_values():
         'beta_sync':-3,
         },
         {
+        'alpha_220':1,
         'alpha_CMB':-0.3,
         'A_dust_EE': 10, 
         'A_dust_BB': 6, 
@@ -159,6 +166,7 @@ def get_plotted_values():
         'beta_sync':-3,
         },
         {
+        'alpha_220':1,
         'alpha_CMB':-0.3,
         'A_dust_EE': 100, 
         'A_dust_BB': 6, 
