@@ -40,7 +40,7 @@ def plot_param_values(params_values, eb_maps, dl_theory, used_map, outpath):
     for i, eb_map in enumerate(eb_maps):
         for params_value in params_values_sorted:
             alpha = params_value['alpha_CMB']
-            label = f"α_CMB = {alpha}"
+            label = f"beta_CMB = {alpha}"
             post_rot_dict = ec.apply_cmb_rotation(
                 eb_map,
                 params_value,
