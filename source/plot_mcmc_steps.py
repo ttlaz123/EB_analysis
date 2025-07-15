@@ -84,7 +84,10 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_map, dl_theory, ou
             )
         post_dust_dict =  ec.apply_dust(post_rot_dict, bandpasses, param_values)
         plt.plot(post_dust_dict[used_map], label=param_values)
+    plt.xlim([0, 700])
+    plt.legend()
     print('Saving:', outpath)
+
     plt.savefig(outpath)
     plt.close()
 
