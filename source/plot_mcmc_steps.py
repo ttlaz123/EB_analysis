@@ -9,31 +9,38 @@ import eb_file_paths as fp
 import eb_calculations as ec
 
 
-def plot_param_values(params_values, eb_map, dl_theory, used_map, outpath):
-    plt.figure(figsize=(10, 6))
-    
-    for params_value in params_values:
-        label = f"α_CMB = {params_value['alpha_CMB']}"
-        post_rot_dict = ec.apply_cmb_rotation(
-            eb_map,
-            params_value,
-            dl_theory,
-            [used_map]
-        )
-        ell = np.arange(len(post_rot_dict[used_map]))
-        plt.plot(ell, post_rot_dict[used_map], label=label, linewidth=2)
+import matplotlib.pyplot as plt
+import numpy as np
 
-    plt.xlim(0, 700)
-    plt.xlabel(r'Multipole $\ell$', fontsize=14)
-    plt.ylabel(r'$D_\ell^{EB}$ [$\mu$K$^2$]', fontsize=14)
-    plt.title('EB Spectrum After CMB Rotation', fontsize=16)
-    plt.grid(True, linestyle='--', alpha=0.6)
-    plt.legend(fontsize=12)
+def plot_param_values(params_values, eb_maps, dl_theory, used_map, outpath):
+    fig, ax = plt.subplots(1, len(eb_maps), figsize=(14, 6), sharey=True)
+    titles = ['Cosmic Rotation with EDE, g=1', 'No EDE present']
+    for i, eb_map in enumerate(eb_maps):
+        for params_value in params_values:
+            label = f"α_CMB = {params_value['alpha_CMB']}"
+            post_rot_dict = ec.apply_cmb_rotation(
+                eb_map,
+                params_value,
+                dl_theory,
+                [used_map]
+            )
+            ell = np.arange(len(post_rot_dict[used_map]))
+            ax[i].plot(ell, post_rot_dict[used_map], label=label, linewidth=2)
+
+        ax[i].set_xlim(0, 700)
+        ax[i].set_xlabel(r'Multipole $\ell$', fontsize=14)
+        ax[i].set_title(f'EB Spectrum {i+1}', fontsize=15)
+        ax[i].grid(True, linestyle='--', alpha=0.6)
+        
+        ax[i].set_title(titles[i], fontsize=15)
+    ax[0].set_ylabel(r'$D_\ell^{EB}$ [$\mu$K$^2$]', fontsize=14)
+    ax[1].legend(fontsize=12, loc='upper right')
     plt.tight_layout()
     
     print('Saving:', outpath)
     plt.savefig(outpath)
     plt.close()
+
 
 
 def get_plotted_values(outpath):
@@ -49,10 +56,15 @@ def get_plotted_values(outpath):
 
     dl_theory = ld.load_cmb_theory(FILE_PATHS['camb_lensing'])
     dl_theory = ld.load_ede_spectra(FILE_PATHS['EDE_spectrum'], dl_theory)
-    eb_map = {
+    eb_maps = [{
         used_map: dl_theory['EB_EDE']
+    },
+    {
+        used_map: 0
     }
-    plot_param_values(params_values, eb_map, dl_theory, used_map, outpath)
+    ]
+
+    plot_param_values(params_values, eb_maps, dl_theory, used_map, outpath)
     
 def main():
     parser =argparse.ArgumentParser()
