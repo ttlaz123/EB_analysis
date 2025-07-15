@@ -8,7 +8,7 @@ import matplotlib.colors as mcolors
 from astropy.io import fits
 import argparse
 import os
-
+T_CMB_K = 2.7255
 def find_spectrum_columns(column_names):
     """
     Automatically find TT, EE, BB columns from FITS column names.
@@ -93,7 +93,7 @@ def plot_scaled_comparison(ell_dict, cl_dict, scale_dict, output_path=None):
         coeff = scale_dict[fname]
         if(coeff == 0):
             factor = 1
-            scale = 1e12 * np.pi**2
+            scale = 1e12 * np.square(T_CMB_K)
         elif(coeff == 1):
             factor = ell * (ell + 1) / (2 * np.pi)
             scale = 1e12
