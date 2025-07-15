@@ -89,12 +89,14 @@ def plot_scaled_comparison(ell_dict, cl_dict, scale_dict, output_path=None):
         cl_ee = cl_dict[fname]['ee']
         cl_bb = cl_dict[fname]['bb']
         cl_eb = cl_dict[fname]['eb']
-        scale = 1e12
+        
         coeff = scale_dict[fname]
         if(coeff == 0):
             factor = 1
+            scale = 1e12 * np.pi**2
         elif(coeff == 1):
             factor = ell * (ell + 1) / (2 * np.pi)
+            scale = 1e12
         dl_ee = factor * cl_ee * scale
         dl_bb = factor * cl_bb * scale
         dl_eb = factor * cl_eb * scale
