@@ -18,7 +18,7 @@ def plot_param_values(params_values, eb_maps, dl_theory, used_map, outpath):
     
 
     fig, ax = plt.subplots(1, len(eb_maps), figsize=(14, 6), sharey=True)
-    titles = ['Cosmic Rotation with EDE, g=1', 'No EDE present']
+    titles = ['Isotopic Rotation with Initial EB=0', 'Initial EB: fEDE=0.07, g=1']
 
     # Sort parameters to align with colors
     params_values_sorted = sorted(params_values, key=lambda p: p['alpha_CMB'])
@@ -90,12 +90,14 @@ def get_plotted_values(outpath):
 
     dl_theory = ld.load_cmb_theory(FILE_PATHS['camb_lensing'])
     dl_theory = ld.load_ede_spectra(FILE_PATHS['EDE_spectrum'], dl_theory)
-    eb_maps = [{
-        used_map: dl_theory['EB_EDE']
+    eb_maps = [
+        {
+        used_map: 0
     },
     {
-        used_map: 0
-    }
+        used_map: dl_theory['EB_EDE']
+    },
+    
     ]
 
     plot_param_values(params_values, eb_maps, dl_theory, used_map, outpath)
