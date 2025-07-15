@@ -138,8 +138,8 @@ def get_plotted_values():
     '''
     params_values = [
         {
-        'alpha_BK18_220':-0.3,
-        'alpha_220':1,
+        'alpha_BK18_220':1,
+        'alpha_CMB': -0.3,
         'A_dust_EE': 0, 
         'A_dust_BB': 6, 
         'A_dust_EB': 0, 
