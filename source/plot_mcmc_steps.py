@@ -2,6 +2,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt 
 import argparse
+import numpy as np
 
 import eb_load_data as ld
 import eb_file_paths as fp
@@ -9,16 +10,31 @@ import eb_calculations as ec
 
 
 def plot_param_values(params_values, eb_map, dl_theory, used_map, outpath):
-    plt.figure()
+    plt.figure(figsize=(10, 6))
+    
     for params_value in params_values:
-        post_rot_dict = ec.apply_cmb_rotation(eb_map,
-                                                    params_value,
-                                                    dl_theory,
-                                                    [used_map])
-        plt.plot(post_rot_dict[used_map], label=str(params_value))
-    print('Saving: ' + str(outpath))
+        label = f"α_CMB = {params_value['alpha_CMB']}"
+        post_rot_dict = ec.apply_cmb_rotation(
+            eb_map,
+            params_value,
+            dl_theory,
+            [used_map]
+        )
+        ell = np.arange(len(post_rot_dict[used_map]))
+        plt.plot(ell, post_rot_dict[used_map], label=label, linewidth=2)
+
+    plt.xlim(0, 700)
+    plt.xlabel(r'Multipole $\ell$', fontsize=14)
+    plt.ylabel(r'$D_\ell^{EB}$ [$\mu$K$^2$]', fontsize=14)
+    plt.title('EB Spectrum After CMB Rotation', fontsize=16)
+    plt.grid(True, linestyle='--', alpha=0.6)
+    plt.legend(fontsize=12)
+    plt.tight_layout()
+    
+    print('Saving:', outpath)
     plt.savefig(outpath)
-    plt.show()
+    plt.close()
+
 
 def get_plotted_values(outpath):
     fede=0.07
