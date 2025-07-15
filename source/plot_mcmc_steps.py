@@ -16,6 +16,7 @@ def plot_param_values(params_values, eb_map, dl_theory, used_map, outpath):
                                                     dl_theory,
                                                     [used_map])
         plt.plot(post_rot_dict[used_map], label=str(params_value))
+    print('Saving: ' + str(outpath))
     plt.savefig(outpath)
     plt.show()
 
