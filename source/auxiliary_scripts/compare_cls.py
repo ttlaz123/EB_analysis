@@ -111,7 +111,7 @@ def plot_scaled_comparison(ell_dict, cl_dict, scale_dict, output_path=None):
         if('EDE' in fname):
             for j, g in enumerate(g_vals):
                 shade = mcolors.to_rgba(base_color, alpha=0.4 + 0.15 * j)
-                axes[2].plot(ell, g * dl_eb, label=fr"$g={g:.1f}$ ({fname})", color=shade)
+                axes[2].plot(ell, -g * dl_eb, label=fr"$g={g:.1f}$ ({fname})", color=shade)
 
     for ax in axes:
         ax.set_xlim(0, 700)
