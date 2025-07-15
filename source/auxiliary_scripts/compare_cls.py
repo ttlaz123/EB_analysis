@@ -68,7 +68,7 @@ def read_spectrum_file(filepath):
         cl_ee = arr[:, 2]
         cl_bb = arr[:, 4]
         cl_eb = arr[:, 5] if arr.shape[1] >= 6 else np.zeros_like(cl_ee)
-        scale_factor = 1  # Already dimensionless (l(l+1)/2pi) D_l
+        scale_factor = 1e12  # Already dimensionless (l(l+1)/2pi) D_l
 
     else:
         raise ValueError(f"Unsupported file type: {filepath}")
