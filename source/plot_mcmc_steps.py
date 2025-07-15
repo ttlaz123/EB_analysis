@@ -89,7 +89,7 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_map, dl_theory, ou
     # Step 2: Prepare a dummy run to extract all map keys
     dummy_rot = ec.apply_cmb_rotation(eb_map, params_values[0], dl_theory, [used_map])
     dummy_dust = ec.apply_dust(dummy_rot, bandpasses, params_values[0])
-    dummy_detrot = ec.apply_det_rotation(dummy_dust, params_values[0], dl_theory, override_maps=[used_map])
+    dummy_detrot = ec.apply_det_rotation(dummy_dust, params_values[0], dl_theory)
     map_keys = list(dummy_detrot.keys())
 
     # Step 3: Set up subplots
