@@ -232,15 +232,15 @@ def get_plotted_values():
     dl_theory = ld.load_ede_spectra(FILE_PATHS['EDE_spectrum'], dl_theory)
     eb_maps = [
         {
-        used_map: 0
+        used_maps[0]: 0
     },
     {
-        used_map: dl_theory['EB_EDE']
+        used_maps[0]: dl_theory['EB_EDE']
     },
     
     ]
     bandpasses = ld.read_bandpasses(FILE_PATHS['bandpasses'])
-    return eb_maps, params_values, bandpasses, used_map, dl_theory
+    return eb_maps, params_values, bandpasses, used_maps, dl_theory
     
     
 def main():
