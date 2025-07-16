@@ -183,7 +183,7 @@ def get_plotted_values():
     bandpasses = ld.read_bandpasses(FILE_PATHS['bandpasses'])
     bpwf, map_reference_header = ld.load_bpwf(FILE_PATHS['bpwf'], 
                                             None, 
-                                            num_bins=range(14)+2)
+                                            num_bins=np.array(range(14))+2)
     
     return eb_maps, params_values, bandpasses, used_maps, dl_theory, bpwf, map_reference_header
 
