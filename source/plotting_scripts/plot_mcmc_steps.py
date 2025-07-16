@@ -129,12 +129,12 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
     for ax in axs[:-1]:
         ax.label_outer()
     axs[0].set_ylabel(r'$\beta(\ell)$ [deg]', fontsize=14)
-    axs[0].set_title('Stepwise Detector Rotation Angle', fontsize=15)
+    axs[0].set_title('Multipole Dependent Rotation Angle', fontsize=15)
     axs[0].grid(True, linestyle='--', alpha=0.6)
     
 
     axs[1].set_ylabel(r'$D_\ell^{EB}$ [$\mu$K$^2$]', fontsize=14)
-    axs[1].set_title('EB Spectrum Before Bandpower Window Function', fontsize=15)
+    axs[1].set_title('Rotated EB Spectrum', fontsize=15)
     axs[1].grid(True, linestyle='--', alpha=0.6)
     axs[1].legend(fontsize=10)
     axs[2].set_ylabel(r'$D_b^{EB}$ [$\mu$K$^2$]', fontsize=14)
@@ -154,6 +154,13 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
                     label.set_fontweight('bold')
             except ValueError:
                 pass
+    for line in ax.get_xgridlines():
+    if line.get_xdata()[0] in bold_ticks:  # choose tick locations
+        line.set_linewidth(1)
+        line.set_color('black')
+    else:
+        line.set_linewidth(0.5)
+        line.set_color('gray')
     plt.tight_layout()
     print("Saving:", outpath)
     plt.savefig(outpath)
