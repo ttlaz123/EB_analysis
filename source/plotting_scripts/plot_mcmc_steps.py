@@ -102,7 +102,7 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         # Angle step function
         angle_arr = np.full_like(ell, base_angle, dtype=float)
         angle_arr[l_break+1:] = base_angle + angle_diff
-        axs[0].plot(ell, angle_arr, label=f"Δα={angle_diff}", linewidth=2)
+        axs[0].plot(ell, angle_arr,  linewidth=2)
 
         # Apply rotation
         rotated_first = ec.apply_cmb_rotation(initial_eb_map, base_params, dl_theory, [used_eb_map])
@@ -122,24 +122,27 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         
         # Apply bpwf
         final = ec.apply_bpwf(header, combined, bpwf, [used_eb_map], do_cross=True)
-        axs[2].plot(L_BIN_CENTERS, final[used_eb_map], label=f"Δα={angle_diff}", 
+        axs[2].plot(L_BIN_CENTERS, final[used_eb_map],  
                     linewidth=2, marker='o', linestyle='none')
 
     # Formatting
+    axs[-1].set_xlim([0, 700])
+    for ax in axs[:-1]:
+        ax.label_outer()
     axs[0].set_ylabel(r'$\alpha_{\rm det}(\ell)$ [deg]', fontsize=14)
     axs[0].set_title('Stepwise Detector Rotation Angle', fontsize=15)
     axs[0].grid(True, linestyle='--', alpha=0.6)
-    axs[0].legend(fontsize=10)
+    
 
     axs[1].set_ylabel(r'$D_\ell^{EB}$ [$\mu$K$^2$]', fontsize=14)
     axs[1].set_title('EB Spectrum Before Bandpower Window Function', fontsize=15)
     axs[1].grid(True, linestyle='--', alpha=0.6)
-
+    axs[1].legend(fontsize=10)
     axs[2].set_ylabel(r'$D_b^{EB}$ [$\mu$K$^2$]', fontsize=14)
     axs[2].set_xlabel(r'Multipole $\ell$', fontsize=14)
     axs[2].set_title('EB Spectrum After Bandpower Window Function', fontsize=15)
-    axs[2].grid(True, linestyle='--', alpha=0.6)
-    axs[2].legend(fontsize=10)
+    axs[2].grid(True, linestyle='o-', alpha=0.6)
+  
 
     plt.tight_layout()
     print("Saving:", outpath)
