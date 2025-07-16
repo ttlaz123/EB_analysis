@@ -597,10 +597,16 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
                                         "latex":"A_{"+spec+",\mathrm{dust}}"}
             params_dict['alpha_dust_' + spec] = {**alpha_dust_priors,
                                         "latex":"\\alpha_{"+spec+",\mathrm{dust}}"}
-            params_dict['A_sync_' + spec] = {**A_sync_priors,
-                                        "latex":"A_{"+spec+",\mathrm{sync}}"}
-            params_dict['alpha_sync_' + spec] = {**alpha_sync_priors,
+            params_dict['A_sync_' + spec] = 0
+            '''
+            {**A_sync_priors,
+            "latex":"A_{"+spec+",\mathrm{sync}}"}
+            '''
+            params_dict['alpha_sync_' + spec] = 1
+            '''
+            {**alpha_sync_priors,
                                      "latex":"\\alpha_{"+spec+",\mathrm{sync}}"}
+            '''
         '''
         for spec in ['EB']:
 
@@ -615,10 +621,13 @@ def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
                                     "ref": {"dist":"norm", "loc":1.6, "scale":0.02},
                                     "proposal":0.02,
                                     "latex":"\\beta_{\mathrm{dust}}"}
-        params_dict['beta_sync'] = {"prior":{"min": -4, "max":0}, 
+        params_dict['beta_sync'] = -3
+        '''
+        {"prior":{"min": -4, "max":0}, 
                                     "ref": {"dist":"norm", "loc":-2, "scale":0.1},
                                     "proposal":0.1,
                                     "latex":"\\beta_{\mathrm{sync}}"}
+        '''
     else:
         raise ValueError("Not a properly defined theory:" + str(theory_comps))
 
@@ -974,6 +983,7 @@ def main():
             - planck: Planck-only maps
             - BK_good: Subset of cleaner BK18 frequencies [150, B95e]
             - BK_bad: Potentially contaminated BK18 maps [220, K95]
+            - BK_planck_min
             - <custom>: Specify a single map directly (e.g., BK18_150)
 
             Used to determine which `dust_model` and `bandpass` files are included for each frequency channel.

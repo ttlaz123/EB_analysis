@@ -52,6 +52,11 @@ def determine_map_freqs(mapset):
     elif(mapset == 'BK_bad'):
         calc_spectra = ['BK18_220',
                         'BK18_K95']  
+    elif(mapset == 'BK_planck_min'):
+        calc_spectra = ['BK18_220',
+                        'BK18_B95e',
+                        'BK18_150',
+                        'P353e'] 
     else:
         calc_spectra = [mapset]
     return calc_spectra
