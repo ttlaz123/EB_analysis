@@ -118,7 +118,7 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         # Right plot: after applying bpwf
         final = ec.apply_bpwf(header, combined, bpwf, [used_eb_map], do_cross=True)
         
-        axs[1].plot(ell, final[used_eb_map], label=f"angle_diff = {angle_diff}", linewidth=2)
+        axs[1].plot(L_BIN_CENTERS, final[used_eb_map], label=f"angle_diff = {angle_diff}", linewidth=2)
 
     for ax in axs:
         ax.axvline(l_break, color='red', linestyle=':', label=r'$\ell_{\rm break}$')
