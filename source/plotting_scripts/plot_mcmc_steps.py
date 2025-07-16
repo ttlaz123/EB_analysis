@@ -117,13 +117,12 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         }
 
         # Plot before bpwf
-        label = r"\alpha_\nu={base_angle}, \Delta_{\beta}={angle_diff}, \ell_b={l_break}"
+        label = fr"$\alpha_\nu={base_angle}$, $\Delta_\beta={angle_diff}$, $\ell_b={l_break}$"
         axs[1].plot(ell, combined[used_eb_map], label=label, linewidth=2)
         
         # Apply bpwf
         final = ec.apply_bpwf(header, combined, bpwf, [used_eb_map], do_cross=True)
-        axs[2].plot(L_BIN_CENTERS, final[used_eb_map],  
-                    linewidth=2, marker='o', linestyle='none')
+        axs[2].plot(L_BIN_CENTERS, final[used_eb_map], linewidth=2, marker='o', linestyle='-')
 
     # Formatting
     axs[-1].set_xlim([0, 700])
