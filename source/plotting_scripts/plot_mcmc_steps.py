@@ -103,11 +103,11 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         rotated_first = ec.apply_cmb_rotation(initial_eb_map,
                                               base_params,
                                               dl_theory, [used_eb_map])
-        print(rotated_first)
+        rotated_first[l_break+1:] = 0        
         rotated_second = ec.apply_cmb_rotation(initial_eb_map,
                                                new_params,
                                                dl_theory, [used_eb_map])
-        print(rotated_second)
+        rotated_second[:l_break+1] = 0
 
         # Combine both
         combined = {
