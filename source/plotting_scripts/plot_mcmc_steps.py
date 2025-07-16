@@ -155,12 +155,12 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
             except ValueError:
                 pass
     for line in ax.get_xgridlines():
-    if line.get_xdata()[0] in bold_ticks:  # choose tick locations
-        line.set_linewidth(1)
-        line.set_color('black')
-    else:
-        line.set_linewidth(0.5)
-        line.set_color('gray')
+        if line.get_xdata()[0] in bold_ticks:  # choose tick locations
+            line.set_linewidth(1)
+            line.set_color('black')
+        else:
+            line.set_linewidth(0.5)
+            line.set_color('gray')
     plt.tight_layout()
     print("Saving:", outpath)
     plt.savefig(outpath)
