@@ -128,7 +128,7 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
     axs[-1].set_xlim([0, 700])
     for ax in axs[:-1]:
         ax.label_outer()
-    axs[0].set_ylabel(r'$\alpha_{\rm det}(\ell)$ [deg]', fontsize=14)
+    axs[0].set_ylabel(r'$\beta(\ell)$ [deg]', fontsize=14)
     axs[0].set_title('Stepwise Detector Rotation Angle', fontsize=15)
     axs[0].grid(True, linestyle='--', alpha=0.6)
     
@@ -142,7 +142,9 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
     axs[2].set_title('EB Spectrum After Bandpower Window Function', fontsize=15)
     axs[2].grid(True, linestyle='dashdot', alpha=0.6)
   
-
+    xticks = np.arange(25, 701, 35)
+    for ax in axs:
+        ax.set_xticks(xticks)
     plt.tight_layout()
     print("Saving:", outpath)
     plt.savefig(outpath)
