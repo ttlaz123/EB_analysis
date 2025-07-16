@@ -5,6 +5,10 @@ import matplotlib.colors as mcolors
 import matplotlib.cm as cm
 import argparse
 import numpy as np
+import sys 
+import os 
+source_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(source_dir)
 
 import eb_load_data as ld
 import eb_file_paths as fp
