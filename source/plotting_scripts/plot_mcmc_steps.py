@@ -181,14 +181,23 @@ def get_plotted_values():
         {used_maps[0]: dl_theory['EB_EDE']},  # With EB from EDE
     ]
     bandpasses = ld.read_bandpasses(FILE_PATHS['bandpasses'])
-    return eb_maps, params_values, bandpasses, used_maps, dl_theory
+    bpwf, map_reference_header = ld.load_bpwf(FILE_PATHS['bpwf'], 
+                                            map_reference_header, 
+                                            num_bins=range(14)+2)
+    
+    return eb_maps, params_values, bandpasses, used_maps, dl_theory, bpwf, map_reference_header
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--outpath')
     args = parser.parse_args()
-    eb_maps, params_values, bandpasses, used_maps, dl_theory = get_plotted_values()
-    plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, args.outpath)
+    eb_maps, params_values, bandpasses, used_maps, dl_theory, bpwf, header= get_plotted_values()
+    initial_eb_map = eb_maps[0]
+    l_break = 405
+    angle_diffs = [0, 0.5, 1]
+    plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_maps[0], 
+                                  l_break, angle_diffs, args.outpath)
+    #plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, args.outpath)
 
 if __name__ == '__main__':
     main()

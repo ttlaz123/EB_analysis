@@ -9,7 +9,7 @@ print("Loading Local Modules")
 import eb_load_data as ld
 import eb_plot_data as epd
 import eb_calculations as ec
-import fisher_forecast_calc as fc
+import source.auxiliary_scripts.fisher_forecast_calc as fc
 
 print("Loading Cobaya Modules")
 from cobaya.run import run

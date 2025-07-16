@@ -6,7 +6,8 @@ import corner
 
 import camb
 
-from eb_mcmc_analysis import bin_spectrum
+from source.small_scripts.eb_mcmc_analysis import bin_spectrum
+
 def eskilt_tutorial():
     # Load the observed EB power spectrum
     c_l_EB_o_mean_std = np.load('HFI_f_sky_092_EB_o.npy')
