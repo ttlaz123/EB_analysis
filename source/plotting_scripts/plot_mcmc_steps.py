@@ -100,10 +100,10 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         # Apply rotation separately
         rotated_first = ec.apply_cmb_rotation(initial_eb_map,
                                               base_params,
-                                              dl_theory, used_eb_map)
+                                              dl_theory, [used_eb_map])
         rotated_second = ec.apply_cmb_rotation(initial_eb_map,
                                                new_params,
-                                               dl_theory, used_eb_map)
+                                               dl_theory, [used_eb_map])
 
         # Combine both
         combined = {
