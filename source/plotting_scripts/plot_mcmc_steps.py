@@ -125,7 +125,7 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         axs[2].plot(L_BIN_CENTERS, final[used_eb_map], linewidth=2, marker='o', linestyle='-')
 
     # Formatting
-    axs[-1].set_xlim([0, 700])
+    axs[-1].set_xlim([0, 600])
     for ax in axs[:-1]:
         ax.label_outer()
     axs[0].set_ylabel(r'$\beta(\ell)$ [deg]', fontsize=14)
@@ -142,7 +142,7 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
     axs[2].set_title('EB Spectrum After Bandpower Window Function', fontsize=15)
     axs[2].grid(True, linestyle='dashdot', alpha=0.6)
   
-    xticks = np.arange(20, 701, 35)
+    xticks = np.arange(20, 601, 35)
     for ax in axs:
         ax.set_xticks(xticks)
     bold_ticks = {265, 300, 335, 370, 405}
@@ -154,13 +154,13 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
                     label.set_fontweight('bold')
             except ValueError:
                 pass
-    for line in ax.get_xgridlines():
-        if line.get_xdata()[0] in bold_ticks:  # choose tick locations
-            line.set_linewidth(1)
-            line.set_color('black')
-        else:
-            line.set_linewidth(0.5)
-            line.set_color('gray')
+        for line in ax.get_xgridlines():
+            if line.get_xdata()[0] in bold_ticks:  # choose tick locations
+                line.set_linewidth(1)
+                line.set_color('black')
+            else:
+                line.set_linewidth(0.5)
+                line.set_color('gray')
     plt.tight_layout()
     print("Saving:", outpath)
     plt.savefig(outpath)
