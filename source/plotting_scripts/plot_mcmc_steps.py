@@ -69,6 +69,81 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
     plt.savefig(outpath)
     plt.close()
 
+def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_eb_map, l_break, angle_diffs, outpath):
+    """
+    Plot EB spectrum evolution under split detector rotation at l_break for multiple angle_diffs.
+
+    Two subplots side by side:
+      - Left: combined spectrum before bpwf
+      - Right: combined spectrum after bpwf
+
+    Parameters:
+        dl_theory: full theory spectra dict (e.g., from CAMB+EDE)
+        initial_eb_map: dict of EB spectra (typically EB=0)
+        bpwf: bandpower window function
+        header: FITS header used in bpwf
+        used_eb_map: string key for the EB spectrum (e.g. 'BK18_220_ExBK18_220_B')
+        l_break: scalar ℓ where rotation angle switches
+        angle_diffs: list of angle_diff values to sweep over
+        outpath: path to save the figure
+    """
+    ell = np.arange(len(dl_theory[used_eb_map]))
+    fig, axs = plt.subplots(1, 2, figsize=(14, 6), sharey=True)
+
+    for angle_diff in angle_diffs:
+        base_params = {'alpha_CMB': 0}
+        new_params = {'alpha_CMB': angle_diff}
+
+        # Split theory into two halves
+        theory_first = dl_theory[used_eb_map].copy()
+        theory_second = dl_theory[used_eb_map].copy()
+        theory_first[l_break+1:] = 0
+        theory_second[:l_break+1] = 0
+
+        initial_first = initial_eb_map[used_eb_map].copy()
+        initial_second = initial_eb_map[used_eb_map].copy()
+        initial_first[l_break+1:] = 0
+        initial_second[:l_break+1] = 0
+
+        # Apply rotation separately
+        rotated_first = ec.apply_cmb_rotation({used_eb_map: initial_first},
+                                              base_params,
+                                              dl_theory, used_eb_map)
+        rotated_second = ec.apply_cmb_rotation({used_eb_map: initial_second},
+                                               new_params,
+                                               dl_theory, used_eb_map)
+
+        # Combine both
+        combined = {
+            used_eb_map: rotated_first[used_eb_map] + rotated_second[used_eb_map]
+        }
+
+        # Left plot: before applying bpwf
+        axs[0].plot(ell, combined[used_eb_map], label=f"angle_diff = {angle_diff}", linewidth=2)
+
+        # Right plot: after applying bpwf
+        final = ec.apply_bpwf(header, combined, bpwf, [used_eb_map], do_cross=True)
+        axs[1].plot(ell, final[used_eb_map], label=f"angle_diff = {angle_diff}", linewidth=2)
+
+    for ax in axs:
+        ax.axvline(l_break, color='red', linestyle=':', label=r'$\ell_{\rm break}$')
+        ax.set_xlim(0, 700)
+        ax.set_xlabel(r'Multipole $\ell$', fontsize=14)
+        ax.grid(True, linestyle='--', alpha=0.6)
+
+    axs[0].set_ylabel(r'$D_\ell^{EB}$ [$\mu$K$^2$]', fontsize=14)
+    axs[0].set_title('Before Bandpower Window Function', fontsize=16)
+    axs[1].set_title('After Bandpower Window Function', fontsize=16)
+
+    # Put legend only once on the right plot
+    axs[1].legend(fontsize=12)
+
+    plt.tight_layout()
+    print("Saving:", outpath)
+    plt.savefig(outpath)
+    plt.close()
+
+
 def get_plotted_values():
     fede = 0.07
     FILE_PATHS = fp.set_file_paths('BK18lf', fede=fede)
