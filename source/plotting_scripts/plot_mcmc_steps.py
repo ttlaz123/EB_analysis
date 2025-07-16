@@ -70,83 +70,79 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
     plt.close()
 
 
-
-def plot_param_combo_spectra(
-    eb_maps, param_combos, bandpasses, dl_theory, bpwf, outpath
-):
+def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_eb_map, param_combos, outpath):
     """
-    Plot EB spectra after each processing step (rotation, dust, detector rotation, bpwf)
-    for different parameter combinations. Includes subplot for angle profile.
+    Plot EB spectrum evolution under split detector rotation for different (base_angle, angle_diff, l_break).
 
-    Parameters
-    ----------
-    eb_maps : dict
-        Dictionary of EB maps (indexed by int or string keys).
-    param_combos : list of tuples
-        List of (angle_base, angle_diffs, lbreaks) tuples.
-    bandpasses : list
-        Bandpasses used for dust modeling.
-    dl_theory : dict
-        Dictionary of theoretical Cl values for EB.
-    bpwf : 1D array
-        Beam and pixel window function.
-    outpath : str
-        Path to save the figure.
+    Three subplots (stacked vertically):
+      - Top: stepwise rotation angle vs. ℓ
+      - Middle: EB spectrum before bpwf
+      - Bottom: EB spectrum after bpwf (binned)
+
+    Parameters:
+        dl_theory: dict of theory spectra (e.g. from CAMB+EDE)
+        initial_eb_map: dict with only the EB spectrum, usually 0
+        bpwf: bandpower window function
+        header: FITS header used in bpwf
+        used_eb_map: string key like 'BK18_220_ExBK18_220_B'
+        param_combos: list of (base_angle, angle_diff, l_break)
+        outpath: where to save the figure
     """
-    ell = np.arange(len(dl_theory['EB']))
-    fig, axes = plt.subplots(3, 1, figsize=(10, 10), sharex=True)
+    ell = np.arange(len(dl_theory['EE']))
+    L_BIN_CENTERS = np.array([37.5, 72.5, 107.5, 142.5, 177.5, 
+                               212.5, 247.5, 282.5, 317.5, 352.5,
+                               387.5, 422.5, 457.5, 492.5])
 
-    for angle_base, angle_diffs, lbreaks in param_combos:
-        params = {
-            'angle_base': angle_base,
-            'angle_diffs': angle_diffs,
-            'lbreaks': lbreaks
+    fig, axs = plt.subplots(3, 1, figsize=(10, 12), sharex=True)
+
+    for base_angle, angle_diff, l_break in param_combos:
+        base_params = {'alpha_CMB': base_angle}
+        new_params = {'alpha_CMB': base_angle + angle_diff}
+
+        # Angle step function
+        angle_arr = np.full_like(ell, base_angle, dtype=float)
+        angle_arr[l_break+1:] = base_angle + angle_diff
+        axs[0].plot(ell, angle_arr, label=f"Δα={angle_diff}", linewidth=2)
+
+        # Apply rotation
+        rotated_first = ec.apply_cmb_rotation(initial_eb_map, base_params, dl_theory, [used_eb_map])
+        rotated_first[used_eb_map][l_break+1:] = 0
+
+        rotated_second = ec.apply_cmb_rotation(initial_eb_map, new_params, dl_theory, [used_eb_map])
+        rotated_second[used_eb_map][:l_break+1] = 0
+
+        # Combine
+        combined = {
+            used_eb_map: rotated_first[used_eb_map] + rotated_second[used_eb_map]
         }
 
-        # Step 1: Apply theory rotation (no dust/detector yet)
-        rotated_dict = ec.apply_cmb_rotation(eb_maps[1], params, dl_theory, list(eb_maps.keys()))
+        # Plot before bpwf
+        label = r"\alpha_\nu={base_angle}, \Delta_{\beta}={angle_diff}, \ell_b={l_break}"
+        axs[1].plot(ell, combined[used_eb_map], label=label, linewidth=2)
+        
+        # Apply bpwf
+        final = ec.apply_bpwf(header, combined, bpwf, [used_eb_map], do_cross=True)
+        axs[2].plot(L_BIN_CENTERS, final[used_eb_map], label=f"Δα={angle_diff}", 
+                    linewidth=2, marker='o', linestyle='none')
 
-        # Step 2: Dust
-        dusty_dict = ec.apply_dust(rotated_dict, bandpasses, params)
+    # Formatting
+    axs[0].set_ylabel(r'$\alpha_{\rm det}(\ell)$ [deg]', fontsize=14)
+    axs[0].set_title('Stepwise Detector Rotation Angle', fontsize=15)
+    axs[0].grid(True, linestyle='--', alpha=0.6)
+    axs[0].legend(fontsize=10)
 
-        # Step 3: Detector rotation
-        detrot_dict = ec.apply_det_rotation(dusty_dict, params, dl_theory, override_maps=list(eb_maps.keys()))
+    axs[1].set_ylabel(r'$D_\ell^{EB}$ [$\mu$K$^2$]', fontsize=14)
+    axs[1].set_title('EB Spectrum Before Bandpower Window Function', fontsize=15)
+    axs[1].grid(True, linestyle='--', alpha=0.6)
 
-        # Step 4: Bpwf multiplication
-        final_spectra = {k: v * bpwf for k, v in detrot_dict.items()}
+    axs[2].set_ylabel(r'$D_b^{EB}$ [$\mu$K$^2$]', fontsize=14)
+    axs[2].set_xlabel(r'Multipole $\ell$', fontsize=14)
+    axs[2].set_title('EB Spectrum After Bandpower Window Function', fontsize=15)
+    axs[2].grid(True, linestyle='--', alpha=0.6)
+    axs[2].legend(fontsize=10)
 
-        # Generate the angle profile
-        angle_profile = np.full_like(ell, angle_base, dtype=float)
-        for l0, da in zip(lbreaks, angle_diffs):
-            angle_profile[l0:] += da
-
-        label = f"base={angle_base}, diffs={angle_diffs}, breaks={lbreaks}"
-
-        # Plot angle profile
-        axes[0].plot(ell, angle_profile, label=label)
-
-        # Plot EB after rotation + dust + detrot
-        axes[1].plot(ell, detrot_dict[1], label=label)
-
-        # Plot EB after bpwf
-        axes[2].plot(ell, final_spectra[1], label=label)
-
-    axes[0].set_ylabel("Angle [deg]")
-    axes[0].set_title("Rotation Angle Profile")
-
-    axes[1].set_ylabel(r"$D_\ell^{EB}$ [$\mu$K$^2$]")
-    axes[1].set_title("EB After Dust + Detector Rotation")
-
-    axes[2].set_ylabel(r"$D_\ell^{EB}$ [$\mu$K$^2$] (with bpwf)")
-    axes[2].set_xlabel(r"Multipole $\ell$")
-    axes[2].set_title("Final EB Spectrum (with bpwf)")
-
-    for ax in axes:
-        ax.grid(True, linestyle='--', alpha=0.5)
-
-    axes[0].legend(fontsize=9, loc='upper right')
     plt.tight_layout()
-    print("Saving plot to:", outpath)
+    print("Saving:", outpath)
     plt.savefig(outpath)
     plt.close()
 
