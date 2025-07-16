@@ -318,11 +318,11 @@ def plot_betacmb_posteriors(chain_dirs: List[str], base_dir: str, output_dir: st
         "BK18lf_all_bin2-15_gdust_betacmb2": "EE+EB+BB with foregrounds",
         "BK18lf_eb_bin2-15_gdust_betacmb2": "EB with foregrounds",
         "BK18lf_eb_bin2-15_det_polrot_betacmb2": "EB no foregrounds",
-        "BK18lf_all_bin2-15_gdust_betacmb_planck": "EE+EB+BB with foregrounds and Planck"
+        "BK18lf_all_bin2-15_gdust_betacmb_planck3": "EE+EB+BB with foregrounds and Planck"
     }
 
     for chain_dir in chain_dirs:
-        if "betacmb2" not in chain_dir and "betacmb_planck" not in chain_dir:
+        if(os.path.basename(chain_dir) not in label_priority):
             continue
         print(chain_dir)
         chain_file = os.path.join(base_dir, chain_dir, "real")
