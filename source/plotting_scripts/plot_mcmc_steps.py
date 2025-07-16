@@ -95,16 +95,13 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         new_params = {'alpha_CMB': angle_diff}
 
 
-        initial_first = initial_eb_map[used_eb_map].copy()
-        initial_second = initial_eb_map[used_eb_map].copy()
-        initial_first[l_break+1:] = 0
-        initial_second[:l_break+1] = 0
+       
 
         # Apply rotation separately
-        rotated_first = ec.apply_cmb_rotation({used_eb_map: initial_first},
+        rotated_first = ec.apply_cmb_rotation(initial_eb_map,
                                               base_params,
                                               dl_theory, used_eb_map)
-        rotated_second = ec.apply_cmb_rotation({used_eb_map: initial_second},
+        rotated_second = ec.apply_cmb_rotation(initial_eb_map,
                                                new_params,
                                                dl_theory, used_eb_map)
 
