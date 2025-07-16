@@ -142,9 +142,18 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
     axs[2].set_title('EB Spectrum After Bandpower Window Function', fontsize=15)
     axs[2].grid(True, linestyle='dashdot', alpha=0.6)
   
-    xticks = np.arange(25, 701, 35)
+    xticks = np.arange(20, 701, 35)
     for ax in axs:
         ax.set_xticks(xticks)
+    bold_ticks = {265, 300, 335, 370, 405}
+    for ax in axs:
+        for label in ax.get_xticklabels():
+            try:
+                tick_val = int(label.get_text())
+                if tick_val in bold_ticks:
+                    label.set_fontweight('bold')
+            except ValueError:
+                pass
     plt.tight_layout()
     print("Saving:", outpath)
     plt.savefig(outpath)
@@ -201,7 +210,7 @@ def main():
     args = parser.parse_args()
     eb_maps, params_values, bandpasses, used_maps, dl_theory, bpwf, header= get_plotted_values()
     initial_eb_map = eb_maps[0]
-    l_break = 405
+   
     param_combos = [
         (-0.5, 1, 405),
         (0, 0.4, 300),
