@@ -91,7 +91,7 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
     ell = np.arange(len(dl_theory['EE']))
     L_BIN_CENTERS = np.array([37.5, 72.5, 107.5, 142.5, 177.5, 
                                212.5, 247.5, 282.5, 317.5, 352.5,
-                               387.5, 422.5, 457.5, 492.5])
+                               387.5, 422.5, 457.5, 492.5, 527.5000, 562.5000])
 
     fig, axs = plt.subplots(3, 1, figsize=(10, 12), sharex=True)
 
@@ -189,7 +189,7 @@ def get_plotted_values():
     bandpasses = ld.read_bandpasses(FILE_PATHS['bandpasses'])
     bpwf, map_reference_header = ld.load_bpwf(FILE_PATHS['bpwf'], 
                                             None, 
-                                            num_bins=np.array(range(14))+2)
+                                            num_bins=np.array(range(16))+2)
     
     return eb_maps, params_values, bandpasses, used_maps, dl_theory, bpwf, map_reference_header
 
@@ -202,9 +202,9 @@ def main():
     l_break = 405
     param_combos = [
         (-0.5, 1, 405),
-        (0, 0.3, 300),
+        (0, 0.4, 300),
         (1, -0.7, 265),
-        (0.3, 0.5, 370),
+        (0.2, 0.5, 370),
         (-0.7, -0.3, 335),
         ]
     plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_maps[0], 
