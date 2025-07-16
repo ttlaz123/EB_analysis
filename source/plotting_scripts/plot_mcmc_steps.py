@@ -141,7 +141,7 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
     axs[2].set_ylabel(r'$D_b^{EB}$ [$\mu$K$^2$]', fontsize=14)
     axs[2].set_xlabel(r'Multipole $\ell$', fontsize=14)
     axs[2].set_title('EB Spectrum After Bandpower Window Function', fontsize=15)
-    axs[2].grid(True, linestyle='o-', alpha=0.6)
+    axs[2].grid(True, linestyle='dashdot', alpha=0.6)
   
 
     plt.tight_layout()
