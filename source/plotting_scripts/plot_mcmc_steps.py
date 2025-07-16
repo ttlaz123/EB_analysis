@@ -117,7 +117,7 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         }
 
         # Plot before bpwf
-        label = fr"$\alpha_\nu={base_angle}$, $\Delta_\beta={angle_diff}$, $\ell_b={l_break}$"
+        label = fr"$\alpha_\nu={base_angle}$, $\Delta\beta={angle_diff}$, $\ell_b={l_break}$"
         axs[1].plot(ell, combined[used_eb_map], label=label, linewidth=2)
         
         # Apply bpwf
@@ -221,8 +221,8 @@ def main():
     param_combos = [
         (-0.5, 1, 405),
         (0, 0.4, 300),
-        (1, -0.7, 265),
-        (0.2, 0.5, 370),
+        (1, 0, 265),
+        (0.2, -1, 370),
         (-0.7, -0.3, 335),
         ]
     plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_maps[0], 
