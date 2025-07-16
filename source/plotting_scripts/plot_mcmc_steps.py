@@ -89,7 +89,9 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
     """
     ell = np.arange(len(dl_theory['EE']))
     fig, axs = plt.subplots(1, 2, figsize=(14, 6), sharey=True)
-
+    L_BIN_CENTERS = np.array([37.5000, 72.5000, 107.5000, 142.5000, 177.5000, 
+              212.5000, 247.5000, 282.5000, 317.5000, 352.5000, 387.5000, 
+              422.5000, 457.5000, 492.5000])
     for angle_diff in angle_diffs:
         base_params = {'alpha_CMB': 0}
         new_params = {'alpha_CMB': angle_diff}
@@ -115,6 +117,7 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
 
         # Right plot: after applying bpwf
         final = ec.apply_bpwf(header, combined, bpwf, [used_eb_map], do_cross=True)
+        
         axs[1].plot(ell, final[used_eb_map], label=f"angle_diff = {angle_diff}", linewidth=2)
 
     for ax in axs:
