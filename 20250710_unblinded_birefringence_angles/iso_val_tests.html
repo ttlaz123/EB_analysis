@@ -247,6 +247,11 @@
                         Fits all three spectra (EE, BB, EB) including foregrounds,
                         but using only one dataset at a time. We see slight constraining power in higher frequencies.
                     </li>
+                     <li><b>EE+BB+EB, with foregrounds, only one dataset, normalized</b> :
+                        Same as above, but the loglikelihood color scale 
+                        is set at min chi2 for the lower end, and minchi2 + 2 for the higher end.
+                        We see roughly what the contours for 2 sigma would be for each dataset.
+                    </li>
                 </ul>
             </figcaption>
 
@@ -267,7 +272,8 @@
                     'Configureation|config9': [
                         'All other angles fixed, BK18 + Planck Data|fixed_else',
                         'EB Only, no foregrounds, only one dataset|degen',
-                        'EE+BB+EB, with foregrounds, only one dataset|only_one'
+                        'EE+BB+EB, with foregrounds, only one dataset|only_one',
+                        'EE+BB+EB, with foregrounds, only one dataset, normalized|normalized'
                     ]
 
                 },
