@@ -480,7 +480,7 @@ def run_bk18_likelihood(params_dict, observation_file_path, input_args,
     updated_info, sampler = run(info, stop_at_error=True)
     return updated_info, sampler
 
-def define_priors(calc_spectra, theory_comps, angle_degree=10, spectra='all'):
+def define_priors(calc_spectra, theory_comps, angle_degree=20, spectra='all'):
     """
     Defines prior distributions for angle parameters, dust parameters, and EDE params.
 
