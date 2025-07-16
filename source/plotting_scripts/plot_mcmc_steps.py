@@ -206,7 +206,7 @@ def main():
         (-0.7, -0.3, 335),
         ]
     plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_maps[0], 
-                                  l_break, param_combos, args.outpath)
+                                  param_combos, args.outpath)
     #plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, args.outpath)
 
 if __name__ == '__main__':
