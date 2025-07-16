@@ -103,9 +103,11 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         rotated_first = ec.apply_cmb_rotation(initial_eb_map,
                                               base_params,
                                               dl_theory, [used_eb_map])
+        print(rotated_first)
         rotated_second = ec.apply_cmb_rotation(initial_eb_map,
                                                new_params,
                                                dl_theory, [used_eb_map])
+        print(rotated_second)
 
         # Combine both
         combined = {
@@ -118,7 +120,8 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         # Right plot: after applying bpwf
         final = ec.apply_bpwf(header, combined, bpwf, [used_eb_map], do_cross=True)
         
-        axs[1].plot(L_BIN_CENTERS, final[used_eb_map], label=f"angle_diff = {angle_diff}", linewidth=2)
+        axs[1].plot(L_BIN_CENTERS, final[used_eb_map], label=f"angle_diff = {angle_diff}", 
+                    linewidth=2, marker='o')
 
     for ax in axs:
         ax.axvline(l_break, color='red', linestyle=':', label=r'$\ell_{\rm break}$')
