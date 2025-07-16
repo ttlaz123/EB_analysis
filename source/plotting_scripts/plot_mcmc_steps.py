@@ -69,8 +69,7 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
     plt.savefig(outpath)
     plt.close()
 
-import matplotlib.pyplot as plt
-import numpy as np
+
 
 def plot_param_combo_spectra(
     eb_maps, param_combos, bandpasses, dl_theory, bpwf, outpath
