@@ -167,6 +167,55 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
     plt.close()
 
 
+def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf, header, used_map, outpath):
+    """
+    Plot EB spectra before and after BPWF for:
+        - pure rotation (using param_values)
+        - EDE-injected EB (from theory)
+    """
+    ell = np.arange(len(dl_theory['EE']))
+    L_BIN_CENTERS = np.array([37.5, 72.5, 107.5, 142.5, 177.5, 
+                               212.5, 247.5, 282.5, 317.5, 352.5,
+                               387.5, 422.5, 457.5, 492.5, 527.5, 562.5])
+    
+    fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+
+    # --- Plot 1: EB spectra before BPWF ---
+    for param_values in params_values:
+        rotated = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, [used_map])
+        label = f"Rotation: α={param_values['alpha_BK18_220']:.2f}"
+        axs[0].plot(ell, rotated[used_map], label=label)
+
+    # Add EB from EDE
+    axs[0].plot(ell, eb_maps[1][used_map], label="EDE EB", linestyle='--', color='black')
+
+    axs[0].set_title("EB Spectrum Before BPWF", fontsize=14)
+    axs[0].set_ylabel(r"$D_\ell^{EB}$ [$\mu$K$^2$]", fontsize=13)
+    axs[0].grid(True, linestyle='--', alpha=0.6)
+    axs[0].legend(fontsize=10)
+
+    # --- Plot 2: EB spectra after BPWF ---
+    for param_values in params_values:
+        rotated = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, [used_map])
+        binned = ec.apply_bpwf(header, rotated, bpwf, [used_map], do_cross=True)
+        axs[1].plot(L_BIN_CENTERS, binned[used_map], marker='o', label=f"Rotation: α={param_values['alpha_BK18_220']:.2f}")
+
+    ede_binned = ec.apply_bpwf(header, eb_maps[1], bpwf, [used_map], do_cross=True)
+    axs[1].plot(L_BIN_CENTERS, ede_binned[used_map], label="EDE EB", linestyle='--', color='black', marker='o')
+
+    axs[1].set_title("EB Spectrum After BPWF", fontsize=14)
+    axs[1].set_ylabel(r"$D_b^{EB}$ [$\mu$K$^2$]", fontsize=13)
+    axs[1].set_xlabel(r"Multipole $\ell$", fontsize=13)
+    axs[1].grid(True, linestyle='-.', alpha=0.6)
+    axs[1].legend(fontsize=10)
+
+    for ax in axs:
+        ax.set_xlim(0, 600)
+
+    plt.tight_layout()
+    print("Saving:", outpath)
+    plt.savefig(outpath)
+    plt.close()
 
 def get_plotted_values():
     fede = 0.07
@@ -225,9 +274,19 @@ def main():
         (0.2, -1, 370),
         (-0.7, -0.3, 335),
         ]
+    plot_eb_spectra_with_bpwf_comparison(
+            dl_theory=dl_theory,
+            eb_maps=eb_maps,
+            params_values=params_values,
+            bpwf=bpwf,
+            header=header,
+            used_map=used_maps[0],
+            outpath=args.outpath
+        )
+    '''
     plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_maps[0], 
                                   param_combos, args.outpath)
-    #plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, args.outpath)
-
+    plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, args.outpath)
+    '''
 if __name__ == '__main__':
     main()
