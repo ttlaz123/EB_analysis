@@ -87,18 +87,13 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         angle_diffs: list of angle_diff values to sweep over
         outpath: path to save the figure
     """
-    ell = np.arange(len(dl_theory[used_eb_map]))
+    ell = np.arange(len(dl_theory['EE']))
     fig, axs = plt.subplots(1, 2, figsize=(14, 6), sharey=True)
 
     for angle_diff in angle_diffs:
         base_params = {'alpha_CMB': 0}
         new_params = {'alpha_CMB': angle_diff}
 
-        # Split theory into two halves
-        theory_first = dl_theory[used_eb_map].copy()
-        theory_second = dl_theory[used_eb_map].copy()
-        theory_first[l_break+1:] = 0
-        theory_second[:l_break+1] = 0
 
         initial_first = initial_eb_map[used_eb_map].copy()
         initial_second = initial_eb_map[used_eb_map].copy()
