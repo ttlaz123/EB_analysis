@@ -255,7 +255,7 @@ def get_plotted_values():
     dl_theory = ld.load_ede_spectra(FILE_PATHS['EDE_spectrum'], dl_theory)
     eb_maps = [
         {used_maps[0]: 0},  # No EB
-        {used_maps[0]: 0.1*dl_theory['EB_EDE']},  # With EB from EDE
+        {used_maps[0]: 0.3*dl_theory['EB_EDE']},  # With EB from EDE
     ]
     bandpasses = ld.read_bandpasses(FILE_PATHS['bandpasses'])
     bpwf, map_reference_header = ld.load_bpwf(FILE_PATHS['bpwf'], 
