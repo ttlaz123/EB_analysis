@@ -205,7 +205,7 @@ def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf
         axs[1].plot(L_BIN_CENTERS, -binned[used_map], marker='o', label=f"Rotation: α={param_values['alpha_BK18_220']:.2f}")
 
     ede_binned = ec.apply_bpwf(header, eb_maps[1], bpwf, [used_map], do_cross=True)
-    axs[1].plot(L_BIN_CENTERS, ede_binned[used_map], label="EDE EB", linestyle='--', color='black', marker='o')
+    axs[1].plot(L_BIN_CENTERS, ede_binned[used_map], label="fEDE=0.07, g=0.1", linestyle='--', color='black', marker='o')
 
     axs[1].set_title("EB Spectrum After BPWF", fontsize=14)
     axs[1].set_ylabel(r"$D_b^{EB}$ [$\mu$K$^2$]", fontsize=13)
@@ -247,7 +247,7 @@ def get_plotted_values():
 
     # Choose which parameter to sweep here:
     param_to_sweep = 'alpha_BK18_220'
-    sweep_values = [1]
+    sweep_values = [0.1]
 
     params_values = sweep_param(base_params, param_to_sweep, sweep_values)
 
@@ -255,7 +255,7 @@ def get_plotted_values():
     dl_theory = ld.load_ede_spectra(FILE_PATHS['EDE_spectrum'], dl_theory)
     eb_maps = [
         {used_maps[0]: 0},  # No EB
-        {used_maps[0]: dl_theory['EB_EDE']},  # With EB from EDE
+        {used_maps[0]: 0.1*dl_theory['EB_EDE']},  # With EB from EDE
     ]
     bandpasses = ld.read_bandpasses(FILE_PATHS['bandpasses'])
     bpwf, map_reference_header = ld.load_bpwf(FILE_PATHS['bpwf'], 
