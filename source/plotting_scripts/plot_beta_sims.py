@@ -26,6 +26,14 @@ def plot_beta_histogram_stack(sim_folder, real_file, param="alpha_cmb", bins=50,
     sim_files = sorted(glob.glob(os.path.join(sim_folder, "*.txt")))
     sim_vals_all = []
     count = 0
+    # --- Plot real data ---
+    with open(real_file, 'r') as f:
+        header = f.readline().strip().replace('#', '').split()
+    df_real = pd.read_csv(real_file, delim_whitespace=True, comment='#', names=header)
+    real_vals = df_real[param].values
+    if param not in df_real.columns:
+        print(f"ERROR: '{param}' not found in real data file.")
+        return
     for f in sim_files:
         count += 1
         if(count %10 ==0):
@@ -37,25 +45,18 @@ def plot_beta_histogram_stack(sim_folder, real_file, param="alpha_cmb", bins=50,
             if param in df.columns:
                 sim_vals = df[param].values
                 sim_vals_all.append(sim_vals)
-                ax.hist(sim_vals, bins=bins, color='gray', alpha=0.25, density=True)
+                ax.hist(sim_vals, bins=bins, color='gray', alpha=0.25, density=True,
+                        fill=False, histtype='step', linewidth=1.0)
         except Exception as e:
             print(f"Error loading {f}: {e}")
 
     n_sims = len(sim_vals_all)
     print(f"Loaded {n_sims} simulation chains.")
 
-    # --- Plot real data ---
-    with open(real_file, 'r') as f:
-        header = f.readline().strip().replace('#', '').split()
-    df_real = pd.read_csv(real_file, delim_whitespace=True, comment='#', names=header)
 
-    if param not in df_real.columns:
-        print(f"ERROR: '{param}' not found in real data file.")
-        return
-
-    real_vals = df_real[param].values
-    ax.hist(real_vals, bins=bins, color='red', alpha=0.9, density=True, label="Real constraint")
-
+    
+    ax.hist(real_vals, bins=bins, color='red',alpha=1.0, density=True,
+            histtype='step', linewidth=2.0, label="Real constraint")
     # --- Final touches ---
     ax.set_xlabel(r"$\beta_{\rm CMB}$", fontsize=13)
     ax.set_ylabel("Density", fontsize=13)
