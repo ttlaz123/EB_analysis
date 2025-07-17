@@ -17,6 +17,7 @@ import eb_calculations as ec
 def sweep_param(base_params, param_name, values):
     return [{**base_params, param_name: v} for v in values]
 
+
 def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, outpath):
     # Step 1: Identify varying keys
     all_keys = params_values[0].keys()
@@ -220,6 +221,59 @@ def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf
     print("Saving:", outpath)
     plt.savefig(outpath)
     plt.close()
+def plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_map, outpath):
+    """
+    Plot EB dust-only spectra before and after BPWF, for each param_values set.
+    - Top panel: raw EB from dust (after all processing steps, but before BPWF)
+    - Bottom panel: same but after applying BPWF
+    """
+    ell = np.arange(len(dl_theory['EE']))
+    L_BIN_CENTERS = np.array([37.5, 72.5, 107.5, 142.5, 177.5, 
+                               212.5, 247.5, 282.5, 317.5, 352.5,
+                               387.5, 422.5, 457.5, 492.5, 527.5, 562.5])
+
+    fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+    maxlen = 700
+    ell = ell[:maxlen]
+
+    # --- Plot 1: Dust EB before BPWF ---
+    for param_values in params_values:
+        rot = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, [used_map])
+        dust = ec.apply_dust(rot, bandpasses, param_values)
+        detrot = ec.apply_det_rotation(dust, param_values, dl_theory)
+        spectrum = detrot[used_map][:maxlen]
+
+        label = f"Dust, α={param_values['alpha_CMB']:.2f}"
+        axs[0].plot(ell, spectrum, label=label)
+
+    axs[0].set_title("Dust EB Spectrum Before BPWF", fontsize=14)
+    axs[0].set_ylabel(r"$D_\ell^{EB}$ [$\mu$K$^2$]", fontsize=13)
+    axs[0].grid(True, linestyle='--', alpha=0.6)
+    axs[0].legend(fontsize=10)
+
+    # --- Plot 2: Dust EB after BPWF ---
+    for param_values in params_values:
+        rot = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, [used_map])
+        dust = ec.apply_dust(rot, bandpasses, param_values)
+        detrot = ec.apply_det_rotation(dust, param_values, dl_theory)
+        binned = ec.apply_bpwf(header, detrot, bpwf, [used_map], do_cross=True)
+
+        axs[1].plot(L_BIN_CENTERS, binned[used_map], marker='o',
+                    label=f"Dust, α={param_values['alpha_CMB']:.2f}")
+
+    axs[1].set_title("Dust EB Spectrum After BPWF", fontsize=14)
+    axs[1].set_ylabel(r"$D_b^{EB}$ [$\mu$K$^2$]", fontsize=13)
+    axs[1].set_xlabel(r"Multipole $\ell$", fontsize=13)
+    axs[1].grid(True, linestyle='-.', alpha=0.6)
+    axs[1].legend(fontsize=10)
+
+    for ax in axs:
+        ax.set_xlim(0, 600)
+
+    plt.tight_layout()
+    print("Saving:", outpath)
+    plt.savefig(outpath)
+    plt.close()
 
 def get_plotted_values():
     fede = 0.07
@@ -246,8 +300,8 @@ def get_plotted_values():
     }
 
     # Choose which parameter to sweep here:
-    param_to_sweep = 'alpha_CMB'
-    sweep_values = [0.1]
+    param_to_sweep = 'A_dust_EE'
+    sweep_values = [0, 5, 20, 100]
 
     params_values = sweep_param(base_params, param_to_sweep, sweep_values)
 
@@ -278,6 +332,8 @@ def main():
         (0.2, -1, 370),
         (-0.7, -0.3, 335),
         ]
+    plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps[0], args.outpath)
+    '''
     plot_eb_spectra_with_bpwf_comparison(
             dl_theory=dl_theory,
             eb_maps=eb_maps,
@@ -287,6 +343,7 @@ def main():
             used_map=used_maps[0],
             outpath=args.outpath
         )
+    '''
     '''
     plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_maps[0], 
                                   param_combos, args.outpath)
