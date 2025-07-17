@@ -221,7 +221,7 @@ def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf
     print("Saving:", outpath)
     plt.savefig(outpath)
     plt.close()
-def plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_map, outpath):
+def plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, outpath):
     """
     Plot EB dust-only spectra before and after BPWF, for each param_values set.
     - Top panel: raw EB from dust (after all processing steps, but before BPWF)
@@ -235,10 +235,10 @@ def plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, head
     fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
     maxlen = 700
     ell = ell[:maxlen]
-
+    used_map = used_maps[0]
     # --- Plot 1: Dust EB before BPWF ---
     for param_values in params_values:
-        rot = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, [used_map])
+        rot = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, used_maps)
         dust = ec.apply_dust(rot, bandpasses, param_values)
         detrot = ec.apply_det_rotation(dust, param_values, dl_theory)
         spectrum = detrot[used_map][:maxlen]
@@ -253,10 +253,10 @@ def plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, head
 
     # --- Plot 2: Dust EB after BPWF ---
     for param_values in params_values:
-        rot = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, [used_map])
+        rot = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, used_maps)
         dust = ec.apply_dust(rot, bandpasses, param_values)
         detrot = ec.apply_det_rotation(dust, param_values, dl_theory)
-        binned = ec.apply_bpwf(header, detrot, bpwf, [used_map], do_cross=True)
+        binned = ec.apply_bpwf(header, detrot, bpwf, used_maps, do_cross=True)
 
         axs[1].plot(L_BIN_CENTERS, binned[used_map], marker='o',
                     label=f"Dust Amplitude EE={param_values['A_dust_EE']:.2f}")
@@ -332,7 +332,7 @@ def main():
         (0.2, -1, 370),
         (-0.7, -0.3, 335),
         ]
-    plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps[0], args.outpath)
+    plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
     '''
     plot_eb_spectra_with_bpwf_comparison(
             dl_theory=dl_theory,
