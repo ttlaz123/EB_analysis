@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-def plot_beta_histogram_stack(sim_folder, real_file, param="alpha_cmb", bins=50, outpath="beta_histograms.png"):
+def plot_beta_histogram_stack(sim_folder, real_file, param="alpha_CMB", bins=50, outpath="beta_histograms.png"):
     """
     Plot 1D histograms of `alpha_cmb` (renamed to `beta_cmb`) from MCMC chains:
       - All sim chains in `sim_folder`: gray, semi-transparent
