@@ -27,6 +27,7 @@ def plot_beta_histogram_stack(sim_folder, real_file, param="alpha_cmb", bins=50,
     sim_vals_all = []
 
     for f in sim_files:
+        print('Loading:' + f)
         try:
             with open(f, 'r') as file:
                 header = file.readline().strip().replace('#', '').split()
