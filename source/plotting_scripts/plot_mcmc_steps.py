@@ -179,12 +179,16 @@ def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf
                                387.5, 422.5, 457.5, 492.5, 527.5, 562.5])
     
     fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
-    mask = ell <= 700
+    # Make sure ell and EB maps are truncated to the same length
+    maxlen = min(len(ell), len(eb_maps[0][used_map]), len(eb_maps[1][used_map]))
+    ell = ell[:maxlen]
+    mask = ell <= 700  # boolean mask after truncation
     # --- Plot 1: EB spectra before BPWF ---
     for param_values in params_values:
         rotated = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, [used_map])
+        spectrum = rotated[used_map][:maxlen]  # ensure same length
         label = f"Rotation: α={param_values['alpha_BK18_220']:.2f}"
-        axs[0].plot(ell[mask], rotated[used_map][mask], label=label)
+        axs[0].plot(ell[mask], spectrum[mask], label=label)
 
     # Add EB from EDE
     axs[0].plot(ell[mask], eb_maps[1][used_map][mask], label="EDE EB", linestyle='--', color='black')
