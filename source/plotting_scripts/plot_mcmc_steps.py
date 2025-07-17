@@ -247,7 +247,7 @@ def get_plotted_values():
 
     # Choose which parameter to sweep here:
     param_to_sweep = 'alpha_BK18_220'
-    sweep_values = [1, 0.5, 0, -0.5, -1]
+    sweep_values = [1]
 
     params_values = sweep_param(base_params, param_to_sweep, sweep_values)
 
