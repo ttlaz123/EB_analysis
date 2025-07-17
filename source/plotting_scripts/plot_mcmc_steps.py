@@ -242,8 +242,8 @@ def plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, head
         dust = ec.apply_dust(rot, bandpasses, param_values)
         detrot = ec.apply_det_rotation(dust, param_values, dl_theory)
         spectrum = detrot[used_map][:maxlen]
-
-        label = f"Dust, α={param_values['alpha_CMB']:.2f}"
+        print(spectrum)
+        label = f"Dust Amplitude EE={param_values['A_dust_EE']:.2f}"
         axs[0].plot(ell, spectrum, label=label)
 
     axs[0].set_title("Dust EB Spectrum Before BPWF", fontsize=14)
@@ -259,7 +259,7 @@ def plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, head
         binned = ec.apply_bpwf(header, detrot, bpwf, [used_map], do_cross=True)
 
         axs[1].plot(L_BIN_CENTERS, binned[used_map], marker='o',
-                    label=f"Dust, α={param_values['alpha_CMB']:.2f}")
+                    label=f"Dust Amplitude EE={param_values['A_dust_EE']:.2f}")
 
     axs[1].set_title("Dust EB Spectrum After BPWF", fontsize=14)
     axs[1].set_ylabel(r"$D_b^{EB}$ [$\mu$K$^2$]", fontsize=13)
