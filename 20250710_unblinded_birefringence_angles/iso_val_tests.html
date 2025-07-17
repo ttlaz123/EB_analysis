@@ -374,7 +374,8 @@
                 onerror="javascript:this.src='dne.png'" />
              <figcaption>
     Posterior distributions and diagnostics for isotropic birefringence analysis using real BK18 and Planck Data.
-
+    Dust parameters are free for EE, BB, and EB. The posteriors appear bounded by the priors.
+</figcaption>
             <script type="text/javascript">
                
 
@@ -391,7 +392,7 @@
                     'Mapset|mapset':[
                         'BK18lf + Planck|planck',
                     ],
-                    'Priors|theory':[
+                    'Priors|prior1':[
                         'alphas +-5|_prior5',
                         'alphas +-10|_prior10',
                     ],
@@ -401,8 +402,7 @@
                         let dirbase = '/liuto/home/GitHub/EB_analysis/';
                         let dirpath = dirbase + '/real_chains/';
                         let spectra = 'all';
-                        let theory = params.theory;
-                        let foldername = 'BK18lf_' + spectra + '_bin2-15_gdust_betacmb' + params.mapset + theory + '/';
+                        let foldername = 'BK18lf_' + spectra + '_bin2-15_gdust_betacmb_' + params.mapset + params.prior1 + '/';
                         let file = 'real'+params.plottype;
                         let name = dirpath + foldername + file +  '.png';
             
@@ -413,7 +413,8 @@
                 pager.setparams({
         
                     'plottype': '_triangle_plot',
-                    'theory': 'gdust_betacmb_planck',
+                    'mapset': 'planck',
+                    'prior1': '_prior5',
                 });
             </script>
         </figure>
@@ -423,7 +424,9 @@
                 onerror="javascript:this.src='dne.png'" />
              <figcaption>
     Posterior distributions and diagnostics for isotropic birefringence analysis using real BK18 and Planck Data.
-
+    Dust parameters for EE, BB, and EB can be chosen to be fixed or free. 
+    The posteriors appear bounded by the priors when EB dust is free.
+</figcaption>
             <script type="text/javascript">
                
 
@@ -437,14 +440,14 @@
                         'Triangle Plot|_triangle_plot',
                         'Chi squared|_chisqmap'
                     ],
-                    'Mapset|mapset':[
+                    'Mapset|mapset2':[
                         'B95lf, 150, 220, and P353e|planckmin',
                     ],
-                    'Priors|theory':[
+                    'Priors|prior2':[
                         'alphas +-20|_prior20',
                         'alphas +-40|_prior40',
                     ],
-                    'Dust config|dust':[
+                    'Dust config|dust2':[
                         'All free|gdust',
                         'Fixed EB dust|fixedEBdust',
                         'Fixed all dust|fixeddust'
@@ -455,8 +458,7 @@
                         let dirbase = '/liuto/home/GitHub/EB_analysis/';
                         let dirpath = dirbase + '/real_chains/';
                         let spectra = 'all';
-                        let theory = params.theory;
-                        let foldername = 'BK18lf_' + spectra + '_bin2-15_' +params.dust + '_betacmb_' + params.mapset + params.theory+ '/';
+                        let foldername = 'BK18lf_' + spectra + '_bin2-15_' +params.dust2 + '_betacmb_' + params.mapset2 + params.prior2+ '/';
                         let file = 'real'+params.plottype;
                         let name = dirpath + foldername + file +  '.png';
             
@@ -467,7 +469,9 @@
                 pager.setparams({
         
                     'plottype': '_triangle_plot',
-                    'theory': 'gdust_betacmb_planck',
+                    'mapset2': 'planckmin',
+                    'prior2': '_prior40',
+                    'dust2': 'fixeddust',
                 });
             </script>
         </figure>
@@ -477,7 +481,9 @@
                 onerror="javascript:this.src='dne.png'" />
              <figcaption>
     Posterior distributions and diagnostics for isotropic birefringence analysis using real BK18 and Planck Data.
-
+    Dust parameters for EE, BB are free, and EB dust is fixed. 
+    The posteriors are no longer bounded by priors.
+</figcaption>
             <script type="text/javascript">
                
 
@@ -491,13 +497,13 @@
                         'Triangle Plot|_triangle_plot',
                         'Chi squared|_chisqmap'
                     ],
-                    'Priors|prior':[
+                    'Priors|prior3':[
                         'alphas +- 15|_prior15',
                     ],
-                    'Dust|dust':[
+                    'Dust|dust3':[
                         'Fixed EB dust|fixedEBdust', 
                     ],
-                    'Mapset|mapset':[
+                    'Mapset|mapset3':[
                         'B220, B150, P353e|b220p353b150',
                         'B220, P353e|b220p353',
                         'B220, B95lf|b220b95',
@@ -510,7 +516,7 @@
                         let dirpath = dirbase + '/real_chains/';
                         let spectra = 'all';
                         let theory = params.theory;
-                        let foldername = 'BK18lf_' + spectra + '_bin2-15_' +params.dust + '_betacmb_' + params.mapset + params.prior+ '/';
+                        let foldername = 'BK18lf_' + spectra + '_bin2-15_' +params.dust3 + '_betacmb_' + params.mapset3 + params.prior3+ '/';
                         let file = 'real'+params.plottype;
                         let name = dirpath + foldername + file +  '.png';
             
@@ -521,7 +527,9 @@
                 pager.setparams({
         
                     'plottype': '_triangle_plot',
-                    'theory': 'gdust_betacmb_planck',
+                    'prior3': '_prior15',
+                    'dust3': 'fixedEBdust',
+                    'mapset3': 'b220p353b150',
                 });
             </script>
         </figure>
