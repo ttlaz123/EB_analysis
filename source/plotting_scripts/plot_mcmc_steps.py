@@ -187,7 +187,7 @@ def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf
         rotated = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, [used_map])
         spectrum = rotated[used_map][:maxlen]  # ensure same length
         label = f"Rotation: α={param_values['alpha_BK18_220']:.2f}"
-        axs[0].plot(ell, spectrum, label=label)
+        axs[0].plot(ell, -spectrum, label=label)
 
     # Add EB from EDE
     ede_spectrum = eb_maps[1][used_map][:maxlen]
@@ -202,7 +202,7 @@ def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf
     for param_values in params_values:
         rotated = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, [used_map])
         binned = ec.apply_bpwf(header, rotated, bpwf, [used_map], do_cross=True)
-        axs[1].plot(L_BIN_CENTERS, binned[used_map], marker='o', label=f"Rotation: α={param_values['alpha_BK18_220']:.2f}")
+        axs[1].plot(L_BIN_CENTERS, -binned[used_map], marker='o', label=f"Rotation: α={param_values['alpha_BK18_220']:.2f}")
 
     ede_binned = ec.apply_bpwf(header, eb_maps[1], bpwf, [used_map], do_cross=True)
     axs[1].plot(L_BIN_CENTERS, ede_binned[used_map], label="EDE EB", linestyle='--', color='black', marker='o')
