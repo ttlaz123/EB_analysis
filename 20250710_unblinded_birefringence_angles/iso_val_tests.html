@@ -436,7 +436,9 @@
         
         <figure>
             <img alt="Test Data" id="betahist" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
-            <figcaption></figcaption>
+            <figcaption>Beta_CMB histograms for B95lf, 150, 220, and P353e. 
+                Fixed EB dust, priors at +- 15 degrees for angles.
+            </figcaption>
 
             <script type="text/javascript">
 
@@ -453,7 +455,7 @@
                     function (params) {
                         let dirbase = '/liuto/home/GitHub/EB_analysis/';
                         let dirpath = dirbase + '/paper_plots/';
-                        let file = params.betahist;
+                        let file = params.plot;
                         let name = dirpath + file +  '.png';
             
                         console.log(name);
