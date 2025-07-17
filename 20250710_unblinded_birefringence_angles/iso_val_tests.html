@@ -306,7 +306,7 @@
         <h2>
             Constraining beta
         </h2>
-
+<h3>With Sims</h3>
         <figure>
             <img alt="Test Data" id="planck" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
             <figcaption></figcaption>
@@ -369,6 +369,70 @@
             </script>
         </figure>
 
+        <figure>
+            <img alt="Test Data" id="planck_fixedeb" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
+            <figcaption></figcaption>
+
+            <script type="text/javascript">
+
+
+                pager.link("#planck_fixedeb", {
+                    'Map Sim Num Digit1|digit1': simnums,
+                    'Digit2|digit2': simnums,
+                    'Digit3|digit3': simnums,
+
+                    'Plot type|plottype2': [
+                        'Best Fit EE|_bestfitEE',
+                        'Best Fit EB|_bestfitEB',
+                        'Best Fit BB|_bestfitBB',
+                        'Triangle Plot|_triangle_plot',
+                        'Chi squared|_chisqmap',
+                        'Summary|_summary'
+                    ],
+                    'Mapset|mapset2':[
+                        'B95lf, 150, 220, and P353e|planck',
+                    ],
+                    'Dust Configuration|dustconfig4': [
+                        'Fixed EB dust, free EE + BB dust|fixedEBdust',
+
+                    ],
+                    'Angle Priors|priors15': [
+                        '+- 15 degrees|_prior15'
+                    ]
+
+                },
+
+                    function (params) {
+                        let dirbase = '/liuto';
+                        let dirpath = dirbase + '/iso_val_chains/';
+
+
+
+                        let foldername = 'BK18lf_all_bin2-15_'+params.mapset2+'_' + params.dustconfig4 + params.priors15+'/';
+
+                        let sim_id = 'test' + params.digit1 + params.digit2 + params.digit3;
+                        if (params.plottype2 == '_summary') {
+                            sim_id = 'test1';
+                        }
+                        let file = sim_id + params.plottype2;
+                        let name = dirpath + foldername + file + '.png';
+
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+                    'digit1': '0',
+                    'digit2': '0',
+                    'digit3': '1',
+                    'plottype2': '_summary',
+                    'test': 'zero',
+                    'config4': 'BK18lf_all_bin2-15_planck_dust',
+                    'priors': '',
+                });
+            </script>
+        </figure>
+<h3>With Reals</h3>
         <figure>
             <img alt="Real Data" id="reals_planck" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
