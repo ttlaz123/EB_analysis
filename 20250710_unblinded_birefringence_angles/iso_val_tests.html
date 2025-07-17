@@ -432,6 +432,39 @@
                 });
             </script>
         </figure>
+
+        
+        <figure>
+            <img alt="Test Data" id="betahist" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
+            <figcaption></figcaption>
+
+            <script type="text/javascript">
+
+
+                pager.link("#betahist", {
+                    'Plot|plot': [
+                        'Stepped Histogram|betacmb_hist',
+                        'Smooth Histogram|betacmb_histsmooth'
+                    ],
+                   
+
+                },
+
+                    function (params) {
+                        let dirbase = '/liuto/home/GitHub/EB_analysis/';
+                        let dirpath = dirbase + '/paper_plots/';
+                        let file = params.betahist;
+                        let name = dirpath + file +  '.png';
+            
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+                    'plot': 'betacmb_histsmooth',
+                });
+            </script>
+        </figure>
 <h3>With Reals</h3>
         <figure>
             <img alt="Real Data" id="reals_planck" src="#" width="750" height="500"
