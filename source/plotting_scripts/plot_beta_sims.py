@@ -25,9 +25,11 @@ def plot_beta_histogram_stack(sim_folder, real_file, param="alpha_cmb", bins=50,
     # --- Plot simulations ---
     sim_files = sorted(glob.glob(os.path.join(sim_folder, "*.txt")))
     sim_vals_all = []
-
+    count = 0
     for f in sim_files:
-        print('Loading:' + f)
+        count += 1
+        if(count %10 ==0):
+            print('Loading:' + f)
         try:
             with open(f, 'r') as file:
                 header = file.readline().strip().replace('#', '').split()
