@@ -55,12 +55,13 @@ def plot_multiple_eb_ee(filenames, output='eb_ee_plot.png'):
         EB = -data[:, col_idx['EB']] * 1e12
 
         label_base = os.path.basename(filename)
+        label_base = label_base.split('_')[0]
         plt.plot(l, EB, label=f'EB ({label_base})', color=eb_colors[idx], lw=1.5)
         plt.plot(l, EE, label=f'EE/20 ({label_base})', color=ee_colors[idx], lw=1.5, linestyle='--')
-
-    plt.xlabel('Multipole moment ℓ')
+    plt.xlim([0,700])
+    plt.xlabel('Multipole ℓ')
     plt.ylabel(r'$D_\ell$ [$\mu K^2$]')
-    plt.title('EB and EE/20 vs ℓ')
+    plt.title('EE and EB spectra for various EDE parameters')
     plt.grid(True)
     plt.legend(fontsize='small')
     plt.tight_layout()
