@@ -29,8 +29,8 @@ def plot_ee_eb_arcsin(filename, scale_ee=1):
 
     # Plot
     fig, ax1 = plt.subplots(figsize=(10, 6))
-    ax1.plot(ell, scaled_cl_ee * 1e12, label=r'$\mathrm{EE}$', color='blue')
-    ax1.plot(ell, neg_cl_eb * 1e12, label=r'$-\mathrm{EB}$', color='green')
+    ax1.plot(ell, scaled_cl_ee * 1e12, label=r'Planck $\mathrm{EE}$', color='blue')
+    ax1.plot(ell, neg_cl_eb * 1e12, label=r'$EDE \mathrm{EB}$', color='green')
     ax1.set_yscale('log')
     ax1.set_xlim([0, 700])
     ax1.set_xlabel(r'Multipole $\ell$')
