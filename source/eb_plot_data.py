@@ -788,7 +788,7 @@ def plot_step_example(multicomp_class):
 
     # Get observed data + variance
     real_data = multicomp_class.binned_dl_observed_dict
-    used_map = multicomp_class.used_maps[2]
+    used_map = 'BK18_B95e_BxBK18_B95e_E' #multicomp_class.used_maps[
     map_index = multicomp_class.used_maps.index(used_map)
     num_bin = len(real_data[used_map])
     data_vals = real_data[used_map]
@@ -796,7 +796,7 @@ def plot_step_example(multicomp_class):
     covar_mat = multicomp_class.full_covmat
     var = np.diag(covar_mat)[map_index*num_bin : (map_index+1)*num_bin]
     data_err = np.sqrt(var)
-
+    print(data_err)
     # Plotting
     fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
 
