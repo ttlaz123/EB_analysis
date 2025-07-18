@@ -801,6 +801,7 @@ def multicomp_mcmc_driver(input_args):
                               range2=[-80,80],
                               fixed_params=fixed_dict
                               )
+            epd.plot_step_example(multicomp_class)
      
         param_names, means, mean_std_strs = epd.plot_triangle(input_args.output_path)
         
@@ -811,7 +812,7 @@ def multicomp_mcmc_driver(input_args):
                     param_names.append(key)
                     means.append(params_dict[key])
                     mean_std_strs.append(f"{key}: {params_dict[key]:.2f} ± 0")
-        epd.plot_step_example(multicomp_class)
+        
         epd.plot_eebbeb(multicomp_class, 
                         input_args.output_path, 
                         param_names, 
