@@ -765,7 +765,7 @@ def plot_step_example(multicomp_class):
     lbreak = 370
 
     # Get vec_flat from constant angle
-    params_values = {'alpha_BK18_B95e': angle_const}
+    params_values = {'A_lens': 1,'alpha_BK18_B95e': angle_const}
     vec_flat = multicomp_class.theory(params_values)
 
     # Get vec_diff from step function angle
