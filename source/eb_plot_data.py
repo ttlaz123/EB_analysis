@@ -762,7 +762,11 @@ def plot_step_example(multicomp_class):
     angle_b = 0.27
     angle_diff = 0.52
     lbreak = 370
-    ratio = np.clip(multicomp_class.dl_theory['EB_EDE'] / multicomp_class.dl_theory['EE'], 1, 1)
+    min_len = min(len(multicomp_class.dl_theory['EB_EDE']), len(multicomp_class.dl_theory['EE']))
+    eb = multicomp_class.dl_theory['EB_EDE'][:min_len]
+    ee = multicomp_class.dl_theory['EE'][:min_len]
+
+    ratio = np.clip(eb / ee, 1, 1)
     arcsin_ratio = np.arcsin(2 * ratio) / 4 * 180 / np.pi
     L_BIN_CENTERS = np.array([
         10.0000, 37.5000, 72.5000, 107.5000, 142.5000, 177.5000, 
