@@ -53,6 +53,7 @@ def set_file_paths(dataset, fede=0.07):
     # Consolidate file paths into a dictionary
     FILE_PATHS = {
         "camb_lensing": CAMB_BASE_PATH + 'camb_planck2013_r0_lensing.fits',
+        "camb_lensing2018": CAMB_BASE_PATH + 'camb_planck2018_r0_lensing.fits',
         "dust_models": {
             "BK18_B95e": CAMB_BASE_PATH + 'dust_B95_3p75.fits',
             "BK18_K95": CAMB_BASE_PATH + 'dust_95_3p75.fits',
