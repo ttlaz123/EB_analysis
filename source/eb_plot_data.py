@@ -758,9 +758,9 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     print(f"Saved to {outpath}")
 
 def plot_step_example(multicomp_class):
-    angle_const = 0.5
-    angle_b = 0.37
-    angle_diff = 0.34
+    angle_const = 0.37
+    angle_b = 0.14
+    angle_diff = 0.63
     lbreak = 370
 
     L_BIN_CENTERS = np.array([
