@@ -24,23 +24,24 @@ def plot_ee_eb_arcsin(filename, scale_ee=1):
     neg_cl_eb = -cl_eb
 
     ratio = np.clip(neg_cl_eb / cl_ee, -1, 1)
-    arcsin_ratio = np.arcsin(ratio)
+    arcsin_ratio = np.arcsin(2*ratio)/4
 
     fig, ax1 = plt.subplots(figsize=(10, 6))
-    ax1.plot(ell, scaled_cl_ee, label=f'EE', color='blue')
-    ax1.plot(ell, neg_cl_eb, label='EB', color='green')
+    ax1.plot(ell, scaled_cl_ee*1e12, label=f'EE', color='blue')
+    ax1.plot(ell, neg_cl_eb*1e12, label='EB', color='green')
     ax1.set_yscale('log')
+    ax1.set_xlim([0,700])
     ax1.set_xlabel(r'$\ell$')
     ax1.set_ylabel('EE and EB')
     ax1.grid(True)
     ax1.legend(loc='upper right')
 
     ax2 = ax1.twinx()
-    ax2.plot(ell, arcsin_ratio, label=r'$\arcsin(\mathrm{EB}/\mathrm{EE})$', color='red', linestyle='--')
-    ax2.set_ylabel(r'$\arcsin(\mathrm{EB}/\mathrm{EE})$ [rad]')
+    ax2.plot(ell, arcsin_ratio, label= r'Effective $\beta(\ell))$', color='red', linestyle='--')
+    ax2.set_ylabel(r'$\arcsin(2*\mathrm{EB}/(4\mathrm{EE}))$ [rad]')
     ax2.legend(loc='lower right')
 
-    plt.title('Scaled EE, −EB, and Rotation Angle Proxy')
+    plt.title('EE and EB for Best fit EDE')
     plt.tight_layout()
     plt.savefig('test.png')
 
