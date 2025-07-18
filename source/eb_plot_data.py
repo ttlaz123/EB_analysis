@@ -777,24 +777,24 @@ def plot_step_example(multicomp_class):
 
     # Get theory curves
     params_values = {'A_lens': 1, 'alpha_BK18_B95e': angle_const}
-    vec_flat = multicomp_class.theory(params_values)[1:15]
+    vec_flat = multicomp_class.theory(params_values)
 
     params_values = {
         'A_lens': 1,
         'alpha_BK18_B95e': angle_b,
         'angle_diff': angle_diff
     }
-    vec_diff = multicomp_class.theory_diff(params_values)[1:15]
+    vec_diff = multicomp_class.theory_diff(params_values)
 
     # Get observed data + variance
     real_data = multicomp_class.binned_dl_observed_dict
     used_map = multicomp_class.used_maps[2]
     map_index = multicomp_class.used_maps.index(used_map)
     num_bin = len(real_data[used_map])
-    data_vals = real_data[used_map][1:15]
+    data_vals = real_data[used_map]
     
     covar_mat = multicomp_class.full_covmat
-    var = np.diag(covar_mat)[map_index*num_bin : (map_index+1)*num_bin][1:15]
+    var = np.diag(covar_mat)[map_index*num_bin : (map_index+1)*num_bin]
     data_err = np.sqrt(var)
 
     # Plotting
