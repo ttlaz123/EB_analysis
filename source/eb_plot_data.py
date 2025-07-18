@@ -778,10 +778,8 @@ def plot_step_example(multicomp_class):
 
     # Get ell array (assuming same length as vec_flat)
     ell = np.arange(len(vec_flat))
-
-    # Create beta(l)
-    beta = np.full_like(ell, angle_b)
-    beta[ell >= float(lbreak)] += angle_diff
+    beta = np.full_like(ell, angle_b, dtype=float)  # Ensure beta is float
+    beta[ell >= lbreak] += angle_diff
 
     # Plotting
     fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
