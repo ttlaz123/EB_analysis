@@ -6,12 +6,13 @@ matplotlib.use('Agg')
 
 def plot_ee_eb_arcsin(filename, scale_ee=1):
     """
-    Plot EE/scale_ee, -EB, and arcsin(-EB/EE) from a CAMB-style Cl file.
+    Plot scaled EE, -EB, and arcsin(-2EB/EE)/4 from a CAMB-style Cl file.
 
     Parameters:
         filename (str): Path to the .dat file with Cls.
-        scale_ee (float): Factor to scale EE (default: 20).
+        scale_ee (float): Factor to scale EE for visual comparison (default: 20).
     """
+    # Load and clean data
     with open(filename, 'r') as f:
         lines = [line for line in f if not line.strip().startswith('#')]
     data = np.loadtxt(lines)
@@ -20,31 +21,33 @@ def plot_ee_eb_arcsin(filename, scale_ee=1):
     cl_ee = data[:, 2]
     cl_eb = data[:, 5]
 
+    # Transformations
     scaled_cl_ee = cl_ee / scale_ee
     neg_cl_eb = -cl_eb
-
     ratio = np.clip(neg_cl_eb / cl_ee, -1, 1)
-    arcsin_ratio = np.arcsin(2*ratio)/4 *180/np.pi
+    arcsin_ratio = np.arcsin(2 * ratio) / 4 * 180 / np.pi
 
+    # Plot
     fig, ax1 = plt.subplots(figsize=(10, 6))
-    ax1.plot(ell, scaled_cl_ee*1e12, label=f'EE', color='blue')
-    ax1.plot(ell, neg_cl_eb*1e12, label='EB', color='green')
+    ax1.plot(ell, scaled_cl_ee * 1e12, label=r'$\mathrm{EE}/{}$'.format(scale_ee), color='blue')
+    ax1.plot(ell, neg_cl_eb * 1e12, label=r'$-\mathrm{EB}$', color='green')
     ax1.set_yscale('log')
-    ax1.set_xlim([0,700])
-    ax1.set_xlabel(r'$\ell$')
-    ax1.set_ylabel('EE and EB')
+    ax1.set_xlim([0, 700])
+    ax1.set_xlabel(r'Multipole $\ell$')
+    ax1.set_ylabel(r'$D_\ell$ [$\mu\mathrm{K}^2$]')
     ax1.grid(True)
     ax1.legend(loc='upper right')
 
+    # Arcsin overlay
     ax2 = ax1.twinx()
-    ax2.plot(ell, arcsin_ratio, label= r'Effective $\beta(\ell))$', color='red', linestyle='--')
-    ax2.set_ylabel(r'$\arcsin(2\mathrm{EB}/\mathrm{EE})/4$ [deg]')
+    ax2.plot(ell, arcsin_ratio, label=r'$\frac{1}{4} \arcsin\left(\frac{2\,\mathrm{EB}}{\mathrm{EE}}\right)$', 
+             color='red', linestyle='--')
+    ax2.set_ylabel(r'Effective $\beta(\ell)$ [deg]')
     ax2.legend(loc='lower right')
 
-    plt.title('EE and EB for Best fit EDE')
+    plt.title('EE and EB for Best-fit EDE')
     plt.tight_layout()
     plt.savefig('test.png')
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot EE, -EB, and arcsin(-EB/EE) from CAMB Cl file.")
