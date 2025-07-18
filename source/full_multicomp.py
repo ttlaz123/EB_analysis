@@ -801,7 +801,7 @@ def multicomp_mcmc_driver(input_args):
                     param_names.append(key)
                     means.append(params_dict[key])
                     mean_std_strs.append(f"{key}: {params_dict[key]:.2f} ± 0")
-
+        epd.plot_step_example(multicomp_class)
         epd.plot_eebbeb(multicomp_class, 
                         input_args.output_path, 
                         param_names, 

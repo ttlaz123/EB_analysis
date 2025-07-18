@@ -761,7 +761,50 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     print(f"Saved to {outpath}")
 
 
+def plot_step_example(multicomp_class):
+    angle_const = 0.5
+    angle_b = 0.37
+    angle_diff = 0.34
+    lbreak = 370
 
+    # Get vec_flat from constant angle
+    params_values = {'alpha_BK18_B95e': angle_const}
+    vec_flat = multicomp_class.theory(params_values)
+
+    # Get vec_diff from step function angle
+    params_values = {
+        'alpha_BK18_B95e': angle_b,
+        'angle_diff': angle_diff
+    }
+    vec_diff = multicomp_class.theory_diff(params_values)
+
+    # Get ell array (assuming same length as vec_flat)
+    ell = np.arange(len(vec_flat))
+
+    # Create beta(l)
+    beta = np.full_like(ell, angle_b)
+    beta[ell >= lbreak] += angle_diff
+
+    # Plotting
+    fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+
+    # Top plot: vec_flat and vec_diff
+    axs[0].plot(ell, vec_flat, label='flat rotation')
+    axs[0].plot(ell, vec_diff, label='step rotation', linestyle='--')
+    axs[0].set_ylabel(r'$C_\ell$')
+    axs[0].legend()
+    axs[0].set_title('Theory curves: flat vs step birefringence')
+
+    # Bottom plot: beta(l)
+    axs[1].plot(ell, beta, color='purple')
+    axs[1].axvline(lbreak, color='gray', linestyle=':', label=f'$\ell_{{\mathrm{{break}}}} = {lbreak}$')
+    axs[1].set_ylabel(r'$\beta(\ell)$ [deg]')
+    axs[1].set_xlabel(r'Multipole $\ell$')
+    axs[1].set_title(r'Step function for $\beta(\ell)$')
+    axs[1].legend()
+
+    plt.tight_layout()
+    plt.savefig('test.png')
 
 def read_sampler(filepath):
     """
