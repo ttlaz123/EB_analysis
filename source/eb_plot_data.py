@@ -757,11 +757,6 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     plt.savefig(outpath, bbox_inches='tight')
     print(f"Saved to {outpath}")
 
-
-
-import numpy as np
-import matplotlib.pyplot as plt
-
 def plot_step_example(multicomp_class):
     angle_const = 0.5
     angle_b = 0.37
@@ -788,52 +783,50 @@ def plot_step_example(multicomp_class):
 
     # Get observed data + variance
     real_data = multicomp_class.binned_dl_observed_dict
-    used_map = 'BK18_B95e_BxBK18_B95e_E' #multicomp_class.used_maps[
+    used_map = 'BK18_B95e_BxBK18_B95e_E'
     map_index = multicomp_class.used_maps.index(used_map)
     num_bin = len(real_data[used_map])
     data_vals = real_data[used_map]
     
-    covar_mat = multicomp_class.full_covmat
-    var = np.diag(covar_mat)[map_index*num_bin : (map_index+1)*num_bin]
+    covar_mat = multicomp_class.covmat
+    var = np.diag(covar_mat)
     data_err = np.sqrt(var)
-    print(data_err)
+
     # Plotting
     fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
 
     # Define matching colors
-    flat_color = '#1f77b4'  # blue
-    step_color = '#d62728'  # red
+    flat_color = '#1f77b4'  # blue (flat)
+    step_color = '#d62728'  # red (step)
 
     # --- Top plot: theory + real data ---
-    axs[0].plot(ell, vec_flat, '-', color=flat_color, label='flat rotation')
+    axs[0].plot(ell, vec_flat, '--', color=flat_color, label='flat rotation')
     axs[0].plot(ell, vec_flat, 'o', color=flat_color)
-    axs[0].plot(ell, vec_diff, '--', color=step_color, label='step rotation')
+    axs[0].plot(ell, vec_diff, '-', color=step_color, label='step rotation')
     axs[0].plot(ell, vec_diff, 'o', color=step_color)
     axs[0].errorbar(ell, data_vals, yerr=data_err, fmt='-o', color='black', label='observed data')
 
     axs[0].set_ylabel(r'$D_\ell^{EB}$ [$\mu\mathrm{K}^2$]')
     axs[0].legend()
-    axs[0].set_title('Theory curves and data: flat vs step birefringence')
+    axs[0].set_title(r'Single Realization Comparing Flat vs $\beta(\ell)$ Step Function')
 
     # --- Bottom plot: beta(ell) step function ---
-    axs[1].hlines(angle_b, ell[0], lbreak, colors=step_color, label=r'$\beta(\ell) = \alpha$', linewidth=2)
+    axs[1].hlines(angle_b, ell[0], lbreak, colors=step_color, linewidth=2, label=r'step: $\beta(\ell)=\alpha$')
     axs[1].hlines(angle_b + angle_diff, lbreak, ell[-1], colors=step_color, linewidth=2)
     axs[1].axvline(lbreak, color='gray', linestyle=':', label=f'$\ell_{{\\mathrm{{break}}}} = {lbreak}$')
 
-    # Flat reference line
+    # Flat reference line (blue, dashed)
     axs[1].hlines(angle_const, ell[0], ell[-1], colors=flat_color, linestyle='--', alpha=0.6, label='flat angle')
 
     axs[1].set_ylabel(r'$\beta(\ell)$ [deg]')
     axs[1].set_xlabel(r'Multipole $\ell$')
-    axs[1].set_title(r'Step function for $\beta(\ell)$')
+    axs[1].set_title(r'Step Function for $\beta(\ell)$')
     axs[1].legend()
 
     plt.tight_layout()
     filename = 'test.png'
     print('Saving:', filename)
     plt.savefig(filename)
-
-
 def read_sampler(filepath):
     """
     Reads MCMC sampler data from a file and returns it as a DataFrame.
