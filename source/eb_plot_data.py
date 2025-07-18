@@ -762,7 +762,7 @@ def plot_step_example(multicomp_class):
     angle_b = 0.27
     angle_diff = 0.52
     lbreak = 370
-    min_len = min(len(multicomp_class.dl_theory['EB_EDE']), len(multicomp_class.dl_theory['EE']))
+    min_len = 500
     eb = multicomp_class.dl_theory['EB_EDE'][:min_len]
     ee = multicomp_class.dl_theory['EE'][:min_len]
 
