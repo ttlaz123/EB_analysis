@@ -4,7 +4,7 @@ import argparse
 import matplotlib
 matplotlib.use('Agg')
 
-def plot_ee_eb_arcsin(filename, scale_ee=20):
+def plot_ee_eb_arcsin(filename, scale_ee=1):
     """
     Plot EE/scale_ee, -EB, and arcsin(-EB/EE) from a CAMB-style Cl file.
 
