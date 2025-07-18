@@ -788,7 +788,7 @@ def plot_step_example(multicomp_class):
     num_bin = len(real_data[used_map])
     data_vals = real_data[used_map]
     
-    covar_mat = multicomp_class.covmat
+    covar_mat = multicomp_class.sim_common_data['covmat']
     var = np.diag(covar_mat)
     data_err = np.sqrt(var)
 
