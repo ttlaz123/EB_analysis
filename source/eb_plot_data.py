@@ -763,7 +763,11 @@ def plot_step_example(multicomp_class):
     angle_b = 0.37
     angle_diff = 0.34
     lbreak = 370
-
+    L_BIN_CENTERS = np.array([
+    10.0000, 37.5000, 72.5000, 107.5000, 142.5000, 177.5000, 
+    212.5000, 247.5000, 282.5000, 317.5000, 352.5000, 387.5000, 
+        422.5000, 457.5000, 492.5000, 527.5000, 562.5000
+    ])
     # Get vec_flat from constant angle
     params_values = {'A_lens': 1,'alpha_BK18_B95e': angle_const}
     vec_flat = multicomp_class.theory(params_values)
@@ -777,7 +781,7 @@ def plot_step_example(multicomp_class):
     vec_diff = multicomp_class.theory_diff(params_values)
 
     # Get ell array (assuming same length as vec_flat)
-    ell = np.arange(len(vec_flat))
+    ell = L_BIN_CENTERS[1:15]
     beta = np.full_like(ell, angle_b, dtype=float)  # Ensure beta is float
     beta[ell >= lbreak] += angle_diff
 
