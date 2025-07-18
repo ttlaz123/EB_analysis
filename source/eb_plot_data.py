@@ -769,7 +769,7 @@ def plot_step_example(multicomp_class):
         422.5000, 457.5000, 492.5000, 527.5000, 562.5000
     ])
     ell = L_BIN_CENTERS[1:15]
-
+    betaell = []
     # Get theory curves
     params_values = {'A_lens': 1, 'alpha_BK18_B95e': angle_const}
     vec_flat = multicomp_class.theory(params_values)
@@ -800,28 +800,28 @@ def plot_step_example(multicomp_class):
     step_color = '#d62728'  # red (step)
 
     # --- Top plot: theory + real data ---
-    axs[0].plot(ell, vec_flat, '--', color=flat_color, label='flat rotation')
-    axs[0].plot(ell, vec_flat, 'o', color=flat_color)
-    axs[0].plot(ell, vec_diff, '-', color=step_color, label='step rotation')
-    axs[0].plot(ell, vec_diff, 'o', color=step_color)
-    axs[0].errorbar(ell, data_vals, yerr=data_err, fmt='-o', color='black', label='observed data')
+    axs[1].plot(ell, vec_flat, '--', color=flat_color, label='flat rotation')
+    axs[1].plot(ell, vec_flat, 'o', color=flat_color)
+    axs[1].plot(ell, vec_diff, '-', color=step_color, label='step rotation')
+    axs[1].plot(ell, vec_diff, 'o', color=step_color)
+    axs[1].errorbar(ell, data_vals, yerr=data_err, fmt='-o', color='black', label='observed data')
 
-    axs[0].set_ylabel(r'$D_\ell^{EB}$ [$\mu\mathrm{K}^2$]')
-    axs[0].legend()
-    axs[0].set_title(r'Single Realization Comparing Flat vs $\beta(\ell)$ Step Function')
+    axs[1].set_ylabel(r'$D_\ell^{EB}$ [$\mu\mathrm{K}^2$]')
+    axs[1].legend()
+    axs[1].set_title(r'Single Realization Comparing Flat vs $\beta(\ell)$ Step Function')
 
     # --- Bottom plot: beta(ell) step function ---
-    axs[1].hlines(angle_b, ell[0], lbreak, colors=step_color, linewidth=2, label=r'step: $\beta(\ell)=\alpha$')
-    axs[1].hlines(angle_b + angle_diff, lbreak, ell[-1], colors=step_color, linewidth=2)
-    axs[1].axvline(lbreak, color='gray', linestyle=':', label=f'$\ell_{{\\mathrm{{break}}}} = {lbreak}$')
-
+    axs[0].hlines(angle_b, ell[0], lbreak, colors=step_color, linewidth=2, label=r'step: $\beta(\ell)=\alpha$')
+    axs[0].hlines(angle_b + angle_diff, lbreak, ell[-1], colors=step_color, linewidth=2)
+    axs[0].axvline(lbreak, color='gray', linestyle=':', label=f'$\ell_{{\\mathrm{{break}}}} = {lbreak}$')
+    axs[0].plot(betaell)
     # Flat reference line (blue, dashed)
-    axs[1].hlines(angle_const, ell[0], ell[-1], colors=flat_color, linestyle='--', alpha=0.6, label='flat angle')
+    axs[0].hlines(angle_const, ell[0], ell[-1], colors=flat_color, linestyle='--', alpha=0.6, label='flat angle')
 
-    axs[1].set_ylabel(r'$\beta(\ell)$ [deg]')
-    axs[1].set_xlabel(r'Multipole $\ell$')
-    axs[1].set_title(r'Step Function for $\beta(\ell)$')
-    axs[1].legend()
+    axs[0].set_ylabel(r'$\beta(\ell)$ [deg]')
+    axs[0].set_xlabel(r'Multipole $\ell$')
+    axs[0].set_title(r'Step Function for $\beta(\ell)$')
+    axs[0].legend()
 
     plt.tight_layout()
     filename = 'test.png'

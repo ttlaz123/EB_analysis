@@ -66,7 +66,7 @@ def plot_multiple_eb_ee(filenames, output='eb_ee_plot.png'):
     plt.legend(fontsize='small')
     plt.tight_layout()
     plt.savefig(output)
-    print(f"✅ Plot saved to: {output}")
+    print(f"Plot saved to: {output}")
 
 def main():
     parser = argparse.ArgumentParser(description='Plot EB and EE/20 vs ℓ from CAMB-style output files.')

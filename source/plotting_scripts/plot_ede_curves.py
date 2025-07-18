@@ -26,7 +26,7 @@ def plot_ee_eb_arcsin(filename, scale_ee=1):
     neg_cl_eb = -cl_eb
     ratio = np.clip(neg_cl_eb / cl_ee, -1, 1)
     arcsin_ratio = np.arcsin(2 * ratio) / 4 * 180 / np.pi
-
+    print(arcsin_ratio[:700])
     # Plot
     fig, ax1 = plt.subplots(figsize=(10, 6))
     ax1.plot(ell, scaled_cl_ee * 1e12, label=r'Planck $\mathrm{EE}$', color='blue')
