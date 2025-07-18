@@ -816,12 +816,13 @@ def plot_step_example(multicomp_class):
     axs[1].set_title(r'Single Realization Comparing Flat vs $\beta(\ell)$ Step Function')
 
     # --- Bottom plot: beta(ell) step function ---
-    axs[0].hlines(angle_b, ell[0], lbreak, colors=step_color, linewidth=2, label=r'step: $\beta(\ell)=\alpha$')
+    axs[0].hlines(angle_b, ell[0], lbreak, colors=step_color, linewidth=2, label=r'Step function $\beta(\ell)$')
     axs[0].hlines(angle_b + angle_diff, lbreak, ell[-1], colors=step_color, linewidth=2)
     axs[0].axvline(lbreak, color='gray', linestyle=':', label=f'$\ell_{{\\mathrm{{break}}}} = {lbreak}$')
-    axs[0].plot(arcsin_ratio, label=r'True effective $\beta(\ell)$')
+    print(arcsin_ratio)
+    axs[0].plot(arcsin_ratio, label=r'True effective $\beta(\ell)$', color='black')
     # Flat reference line (blue, dashed)
-    axs[0].hlines(angle_const, ell[0], ell[-1], colors=flat_color, linestyle='--', alpha=0.6, label='flat angle')
+    axs[0].hlines(angle_const, ell[0], ell[-1], colors=flat_color, linestyle='--', alpha=0.6, label='Flat rotation')
 
     axs[0].set_ylabel(r'$\beta(\ell)$ [deg]')
     axs[0].set_xlabel(r'Multipole $\ell$')
