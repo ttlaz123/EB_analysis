@@ -801,7 +801,9 @@ def plot_step_example(multicomp_class):
     axs[1].legend()
 
     plt.tight_layout()
-    plt.savefig('test.png')
+    filename = 'test.png'
+    print('Saving: ' + filename)
+    plt.savefig(filename)
 
 def read_sampler(filepath):
     """
