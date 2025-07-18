@@ -762,14 +762,15 @@ def plot_step_example(multicomp_class):
     angle_b = 0.27
     angle_diff = 0.52
     lbreak = 370
-
+    ratio = np.clip(multicomp_class.dl_theory['EB_EDE'] / multicomp_class.dl_theory['EE'], 1, 1)
+    arcsin_ratio = np.arcsin(2 * ratio) / 4 * 180 / np.pi
     L_BIN_CENTERS = np.array([
         10.0000, 37.5000, 72.5000, 107.5000, 142.5000, 177.5000, 
         212.5000, 247.5000, 282.5000, 317.5000, 352.5000, 387.5000, 
         422.5000, 457.5000, 492.5000, 527.5000, 562.5000
     ])
     ell = L_BIN_CENTERS[1:15]
-    betaell = []
+    
     # Get theory curves
     params_values = {'A_lens': 1, 'alpha_BK18_B95e': angle_const}
     vec_flat = multicomp_class.theory(params_values)
@@ -814,7 +815,7 @@ def plot_step_example(multicomp_class):
     axs[0].hlines(angle_b, ell[0], lbreak, colors=step_color, linewidth=2, label=r'step: $\beta(\ell)=\alpha$')
     axs[0].hlines(angle_b + angle_diff, lbreak, ell[-1], colors=step_color, linewidth=2)
     axs[0].axvline(lbreak, color='gray', linestyle=':', label=f'$\ell_{{\\mathrm{{break}}}} = {lbreak}$')
-    axs[0].plot(betaell)
+    axs[0].plot(arcsin_ratio, label=r'True effective $\beta(\ell)$')
     # Flat reference line (blue, dashed)
     axs[0].hlines(angle_const, ell[0], ell[-1], colors=flat_color, linestyle='--', alpha=0.6, label='flat angle')
 
