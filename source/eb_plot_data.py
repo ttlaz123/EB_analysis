@@ -758,46 +758,66 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     print(f"Saved to {outpath}")
 
 
+
 def plot_step_example(multicomp_class):
     angle_const = 0.5
     angle_b = 0.37
     angle_diff = 0.34
     lbreak = 370
+
     L_BIN_CENTERS = np.array([
-    10.0000, 37.5000, 72.5000, 107.5000, 142.5000, 177.5000, 
-    212.5000, 247.5000, 282.5000, 317.5000, 352.5000, 387.5000, 
+        10.0000, 37.5000, 72.5000, 107.5000, 142.5000, 177.5000, 
+        212.5000, 247.5000, 282.5000, 317.5000, 352.5000, 387.5000, 
         422.5000, 457.5000, 492.5000, 527.5000, 562.5000
     ])
-    # Get vec_flat from constant angle
-    params_values = {'A_lens': 1,'alpha_BK18_B95e': angle_const}
-    vec_flat = multicomp_class.theory(params_values)
 
-    # Get vec_diff from step function angle
+    ell = L_BIN_CENTERS[1:15]
+
+    # Get theory curves
+    params_values = {'A_lens': 1, 'alpha_BK18_B95e': angle_const}
+    vec_flat = multicomp_class.theory(params_values)[1:15]
+
     params_values = {
         'A_lens': 1,
         'alpha_BK18_B95e': angle_b,
         'angle_diff': angle_diff
     }
-    vec_diff = multicomp_class.theory_diff(params_values)
+    vec_diff = multicomp_class.theory_diff(params_values)[1:15]
 
-    # Get ell array (assuming same length as vec_flat)
-    ell = L_BIN_CENTERS[1:15]
-    beta = np.full_like(ell, angle_b, dtype=float)  # Ensure beta is float
-    beta[ell >= lbreak] += angle_diff
+    # Get observed data + variance
+    real_data = multicomp_class.binned_dl_observed_dict
+    used_map = multicomp_class.used_maps[0]
+    map_index = multicomp_class.used_maps.index(used_map)
+    num_bin = len(real_data[used_map])
+    data_vals = real_data[used_map][1:15]
+    
+    covar_mat = multicomp_class.full_covmat
+    var = np.diag(covar_mat)[map_index*num_bin : (map_index+1)*num_bin][1:15]
+    data_err = np.sqrt(var)
+
+    # Construct beta(ell) with a hard step at lbreak
+    beta_left = np.full(ell[ell < lbreak].shape, angle_b)
+    beta_right = np.full(ell[ell >= lbreak].shape, angle_b + angle_diff)
 
     # Plotting
     fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
 
-    # Top plot: vec_flat and vec_diff
+    # --- Top plot: theory + real data ---
     axs[0].plot(ell, vec_flat, label='flat rotation')
     axs[0].plot(ell, vec_diff, label='step rotation', linestyle='--')
-    axs[0].set_ylabel(r'$C_\ell$')
+    axs[0].errorbar(ell, data_vals, yerr=data_err, fmt='o', color='black', label='observed data')
+    axs[0].set_ylabel(r'$D_\ell$')
     axs[0].legend()
-    axs[0].set_title('Theory curves: flat vs step birefringence')
+    axs[0].set_title('Theory curves and data: flat vs step birefringence')
 
-    # Bottom plot: beta(l)
-    axs[1].plot(ell, beta, color='purple')
+    # --- Bottom plot: beta(ell) step function ---
+    axs[1].hlines(angle_b, ell[0], lbreak, colors='purple', label=r'$\beta(\ell) = \alpha$', linewidth=2)
+    axs[1].hlines(angle_b + angle_diff, lbreak, ell[-1], colors='purple', linewidth=2)
     axs[1].axvline(lbreak, color='gray', linestyle=':', label=f'$\ell_{{\mathrm{{break}}}} = {lbreak}$')
+
+    # Optional: base line for visual reference
+    axs[1].hlines(angle_b, ell[0], ell[-1], colors='gray', linestyle='--', alpha=0.4, label='base angle')
+
     axs[1].set_ylabel(r'$\beta(\ell)$ [deg]')
     axs[1].set_xlabel(r'Multipole $\ell$')
     axs[1].set_title(r'Step function for $\beta(\ell)$')
@@ -805,8 +825,9 @@ def plot_step_example(multicomp_class):
 
     plt.tight_layout()
     filename = 'test.png'
-    print('Saving: ' + filename)
+    print('Saving:', filename)
     plt.savefig(filename)
+
 
 def read_sampler(filepath):
     """
