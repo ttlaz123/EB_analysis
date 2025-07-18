@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
+import matplotlib
+matplotlib.use('Agg')
 
 def plot_ee_eb_arcsin(filename, scale_ee=20):
     """
