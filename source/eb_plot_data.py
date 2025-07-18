@@ -5,10 +5,7 @@ import corner
 
 import matplotlib
 import os
-if "SLURM_JOB_ID" in os.environ:
-    matplotlib.use('Agg')  # headless mode
-else:
-    matplotlib.use('TkAgg')  # if running with GUI (e.g., locally)
+matplotlib.use('Agg')  # headless mode
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from matplotlib.colors import BoundaryNorm

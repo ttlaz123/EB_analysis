@@ -56,7 +56,8 @@ def determine_map_freqs(mapset):
         calc_spectra = ['BK18_220',
                         'BK18_B95e',
                         'BK18_150',
-                        'P353e'] 
+                        'P353e'
+                        ] 
     else:
         calc_spectra = [mapset]
     return calc_spectra

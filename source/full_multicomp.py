@@ -390,7 +390,7 @@ def load_shared_data(input_args):
     SHARED_DATA_DICT['bpwf'], map_reference_header = ld.load_bpwf(FILE_PATHS['bpwf'], 
                                             map_reference_header, 
                                             num_bins=input_args.bin_num)
-    SHARED_DATA_DICT['theory_spectra'] = ld.load_cmb_theory(FILE_PATHS['camb_lensing'])
+    SHARED_DATA_DICT['theory_spectra'] = ld.load_cmb_theory(FILE_PATHS['camb_lensing2018'])
                                                              #FILE_PATHS['dust_models'],
                                                              #input_args.theory_comps)
     if(not input_args.fede is None):
@@ -431,7 +431,7 @@ def load_shared_data(input_args):
         bin_starts, raw_cl, SHARED_DATA_DICT['eskilt'] = ld.load_eskilt_data(ede_path=FILE_PATHS['EDE_spectrum'])
 
 def run_bk18_likelihood(params_dict, observation_file_path, input_args, 
-                        rstop = 0.03, max_tries=10000):
+                        rstop = 0.01, max_tries=10000):
     """
     Runs the Cobaya MCMC likelihood using BK18_full_multicomp likelihood class.
 
@@ -480,7 +480,7 @@ def run_bk18_likelihood(params_dict, observation_file_path, input_args,
     updated_info, sampler = run(info, stop_at_error=True)
     return updated_info, sampler
 
-def define_priors(calc_spectra, theory_comps, angle_degree=20, spectra='all'):
+def define_priors(calc_spectra, theory_comps, angle_degree=5, spectra='all'):
     """
     Defines prior distributions for angle parameters, dust parameters, and EDE params.
 
@@ -494,7 +494,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=20, spectra='all'):
     """
     # define angles based on mapopts
     anglecmb_priors = {"prior": {"min": -angle_degree, "max": angle_degree}, 
-                       "ref": -0}
+                       "ref": -0, "proposal": angle_degree/10}
     angledef_priors = {
         "prior": {
             "dist": "norm",    # valid scipy.stats distribution name
@@ -573,8 +573,8 @@ def define_priors(calc_spectra, theory_comps, angle_degree=20, spectra='all'):
         params_dict['alpha_CMB'] = anglecmb_priors
         params_dict['gMpl'] = {"prior": {"min": -10, "max": 10}, "ref": 0}
     elif(theory_comps == 'det_polrot'):
-        params_dict['alpha_CMB'] = anglecmb_priors
-        params_dict['alpha_CMB']['ref']=3
+        #params_dict['alpha_CMB'] = anglecmb_priors
+        #params_dict['alpha_CMB']['ref']=3
         #params_dict['alpha_BK18_B95e'] = 1
         #params_dict['alpha_BK18_150']=1
         #params_dict['alpha_BK18_220'] = 1
@@ -628,6 +628,16 @@ def define_priors(calc_spectra, theory_comps, angle_degree=20, spectra='all'):
                                     "proposal":0.1,
                                     "latex":"\\beta_{\mathrm{sync}}"}
         '''
+        #fixed dust to nominal values
+        if(True):
+            #params_dict['beta_dust'] = 1.7
+            params_dict['A_dust_EB'] = 0
+            #params_dict['A_dust_BB'] = 5
+            #params_dict['A_dust_EE'] = 8
+            params_dict['alpha_dust_EB'] = 0
+            #params_dict['alpha_dust_BB'] = -0.4
+            #params_dict['alpha_dust_EE'] = -0.2
+
     else:
         raise ValueError("Not a properly defined theory:" + str(theory_comps))
 
