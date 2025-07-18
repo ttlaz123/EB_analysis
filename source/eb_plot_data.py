@@ -770,6 +770,7 @@ def plot_step_example(multicomp_class):
 
     # Get vec_diff from step function angle
     params_values = {
+        'A_lens': 1,
         'alpha_BK18_B95e': angle_b,
         'angle_diff': angle_diff
     }
