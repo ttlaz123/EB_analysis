@@ -781,7 +781,7 @@ def plot_step_example(multicomp_class):
 
     # Create beta(l)
     beta = np.full_like(ell, angle_b)
-    beta[ell >= lbreak] += angle_diff
+    beta[ell >= float(lbreak)] += angle_diff
 
     # Plotting
     fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
