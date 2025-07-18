@@ -42,7 +42,7 @@ def plot_ee_eb_arcsin(filename, scale_ee=20):
 
     plt.title('Scaled EE, −EB, and Rotation Angle Proxy')
     plt.tight_layout()
-    plt.show()
+    plt.savefig('test.png')
 
 
 if __name__ == "__main__":
