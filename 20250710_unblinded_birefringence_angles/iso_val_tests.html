@@ -247,8 +247,8 @@
                         Fits all three spectra (EE, BB, EB) including foregrounds,
                         but using only one dataset at a time. We see slight constraining power in higher frequencies.
                     </li>
-                     <li><b>EE+BB+EB, with foregrounds, only one dataset, normalized</b> :
-                        Same as above, but the loglikelihood color scale 
+                    <li><b>EE+BB+EB, with foregrounds, only one dataset, normalized</b> :
+                        Same as above, but the loglikelihood color scale
                         is set at min chi2 for the lower end, and minchi2 + 2 for the higher end.
                         We see roughly what the contours for 2 sigma would be for each dataset.
                     </li>
@@ -306,7 +306,7 @@
         <h2>
             Constraining beta
         </h2>
-<h3>With Sims</h3>
+        <h3>With Sims</h3>
         <figure>
             <img alt="Test Data" id="planck" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
             <figcaption></figcaption>
@@ -370,7 +370,8 @@
         </figure>
 
         <figure>
-            <img alt="Test Data" id="planck_fixedeb" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
+            <img alt="Test Data" id="planck_fixedeb" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
             <figcaption></figcaption>
 
             <script type="text/javascript">
@@ -389,7 +390,7 @@
                         'Chi squared|_chisqmap',
                         'Summary|_summary'
                     ],
-                    'Mapset|mapsetp':[
+                    'Mapset|mapsetp': [
                         'B95lf, 150, 220, and P353e|planck',
                     ],
                     'Dust Configuration|dustconfig4': [
@@ -408,7 +409,7 @@
 
 
 
-                        let foldername = 'BK18lf_all_bin2-15_'+params.mapsetp+'_' + params.dustconfig4 + params.priors15+'/';
+                        let foldername = 'BK18lf_all_bin2-15_' + params.mapsetp + '_' + params.dustconfig4 + params.priors15 + '/';
 
                         let sim_id = 'test' + params.digit1 + params.digit2 + params.digit3;
                         if (params.plottype2 == '_summary') {
@@ -433,10 +434,11 @@
             </script>
         </figure>
 
-        
+
         <figure>
-            <img alt="Test Data" id="betahist" src="#" width="750" height="500" onerror="javascript:this.src='dne.png'" />
-            <figcaption>Beta_CMB histograms for B95lf, 150, 220, and P353e. 
+            <img alt="Test Data" id="betahist" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+            <figcaption>Beta_CMB histograms for B95lf, 150, 220, and P353e.
                 Fixed EB dust, priors at +- 15 degrees for angles.
             </figcaption>
 
@@ -448,7 +450,7 @@
                         'Stepped Histogram|betacmb_hist',
                         'Smooth Histogram|betacmb_histsmooth'
                     ],
-                   
+
 
                 },
 
@@ -456,8 +458,8 @@
                         let dirbase = '/liuto/home/GitHub/EB_analysis/';
                         let dirpath = dirbase + '/paper_plots/';
                         let file = params.plot;
-                        let name = dirpath + file +  '.png';
-            
+                        let name = dirpath + file + '.png';
+
                         console.log(name);
                         return name;
                     });
@@ -467,50 +469,51 @@
                 });
             </script>
         </figure>
-<h3>With Reals</h3>
+        <h3>With Reals</h3>
         <figure>
             <img alt="Real Data" id="reals_planck" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
-             <figcaption>
-    Posterior distributions and diagnostics for isotropic birefringence analysis using real BK18 and Planck Data.
-    Dust parameters are free for EE, BB, and EB. The posteriors appear bounded by the priors.
-</figcaption>
+            <figcaption>
+                Posterior distributions and diagnostics for isotropic birefringence analysis using real BK18 and Planck
+                Data.
+                Dust parameters are free for EE, BB, and EB. The posteriors appear bounded by the priors.
+            </figcaption>
             <script type="text/javascript">
-               
+
 
                 pager.link("#reals_planck", {
-                   
-                    
-                    'Plot type|plottype':[
+
+
+                    'Plot type|plottype': [
                         'Best Fit EE|_bestfitEE',
                         'Best Fit EB|_bestfitEB',
                         'Best Fit BB|_bestfitBB',
                         'Triangle Plot|_triangle_plot',
                         'Chi squared|_chisqmap'
                     ],
-                    'Mapset|mapset':[
+                    'Mapset|mapset': [
                         'BK18lf + Planck|planck',
                     ],
-                    'Priors|prior1':[
+                    'Priors|prior1': [
                         'alphas +-5|_prior5',
                         'alphas +-10|_prior10',
                     ],
                 },
-         
+
                     function (params) {
                         let dirbase = '/liuto/home/GitHub/EB_analysis/';
                         let dirpath = dirbase + '/real_chains/';
                         let spectra = 'all';
                         let foldername = 'BK18lf_' + spectra + '_bin2-15_gdust_betacmb_' + params.mapset + params.prior1 + '/';
-                        let file = 'real'+params.plottype;
-                        let name = dirpath + foldername + file +  '.png';
-            
+                        let file = 'real' + params.plottype;
+                        let name = dirpath + foldername + file + '.png';
+
                         console.log(name);
                         return name;
                     });
 
                 pager.setparams({
-        
+
                     'plottype': '_triangle_plot',
                     'mapset': 'planck',
                     'prior1': '_prior5',
@@ -521,52 +524,53 @@
         <figure>
             <img alt="Real Data" id="reals_planckmin" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
-             <figcaption>
-    Posterior distributions and diagnostics for isotropic birefringence analysis using real BK18 and Planck Data.
-    Dust parameters for EE, BB, and EB can be chosen to be fixed or free. 
-    The posteriors appear bounded by the priors when EB dust is free.
-</figcaption>
+            <figcaption>
+                Posterior distributions and diagnostics for isotropic birefringence analysis using real BK18 and Planck
+                Data.
+                Dust parameters for EE, BB, and EB can be chosen to be fixed or free.
+                The posteriors appear bounded by the priors when EB dust is free.
+            </figcaption>
             <script type="text/javascript">
-               
+
 
                 pager.link("#reals_planckmin", {
-                   
-                    
-                    'Plot type|plottype':[
+
+
+                    'Plot type|plottype': [
                         'Best Fit EE|_bestfitEE',
                         'Best Fit EB|_bestfitEB',
                         'Best Fit BB|_bestfitBB',
                         'Triangle Plot|_triangle_plot',
                         'Chi squared|_chisqmap'
                     ],
-                    'Mapset|mapset2':[
+                    'Mapset|mapset2': [
                         'B95lf, 150, 220, and P353e|planckmin',
                     ],
-                    'Priors|prior2':[
+                    'Priors|prior2': [
                         'alphas +-20|_prior20',
                         'alphas +-40|_prior40',
                     ],
-                    'Dust config|dust2':[
+                    'Dust config|dust2': [
                         'All free|gdust',
                         'Fixed EB dust|fixedEBdust',
                         'Fixed all dust|fixeddust'
                     ]
                 },
-         
+
                     function (params) {
                         let dirbase = '/liuto/home/GitHub/EB_analysis/';
                         let dirpath = dirbase + '/real_chains/';
                         let spectra = 'all';
-                        let foldername = 'BK18lf_' + spectra + '_bin2-15_' +params.dust2 + '_betacmb_' + params.mapset2 + params.prior2+ '/';
-                        let file = 'real'+params.plottype;
-                        let name = dirpath + foldername + file +  '.png';
-            
+                        let foldername = 'BK18lf_' + spectra + '_bin2-15_' + params.dust2 + '_betacmb_' + params.mapset2 + params.prior2 + '/';
+                        let file = 'real' + params.plottype;
+                        let name = dirpath + foldername + file + '.png';
+
                         console.log(name);
                         return name;
                     });
 
                 pager.setparams({
-        
+
                     'plottype': '_triangle_plot',
                     'mapset2': 'planckmin',
                     'prior2': '_prior40',
@@ -574,35 +578,36 @@
                 });
             </script>
         </figure>
-        
+
         <figure>
             <img alt="Real Data" id="reals_planck_subset" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
-             <figcaption>
-    Posterior distributions and diagnostics for isotropic birefringence analysis using real BK18 and Planck Data.
-    Dust parameters for EE, BB are free, and EB dust is fixed. 
-    The posteriors are no longer bounded by priors.
-</figcaption>
+            <figcaption>
+                Posterior distributions and diagnostics for isotropic birefringence analysis using real BK18 and Planck
+                Data.
+                Dust parameters for EE, BB are free, and EB dust is fixed.
+                The posteriors are no longer bounded by priors.
+            </figcaption>
             <script type="text/javascript">
-               
+
 
                 pager.link("#reals_planck_subset", {
-                   
-                    
-                    'Plot type|plottype':[
+
+
+                    'Plot type|plottype': [
                         'Best Fit EE|_bestfitEE',
                         'Best Fit EB|_bestfitEB',
                         'Best Fit BB|_bestfitBB',
                         'Triangle Plot|_triangle_plot',
                         'Chi squared|_chisqmap'
                     ],
-                    'Priors|prior3':[
+                    'Priors|prior3': [
                         'alphas +- 15|_prior15',
                     ],
-                    'Dust|dust3':[
-                        'Fixed EB dust|fixedEBdust', 
+                    'Dust|dust3': [
+                        'Fixed EB dust|fixedEBdust',
                     ],
-                    'Mapset|mapset3':[
+                    'Mapset|mapset3': [
                         'B220, B150, P353e|b220p353b150',
                         'B220, P353e|b220p353',
                         'B220, B95lf|b220b95',
@@ -610,22 +615,22 @@
                         'BK18lf + all planck|planck',
                     ]
                 },
-         
+
                     function (params) {
                         let dirbase = '/liuto/home/GitHub/EB_analysis/';
                         let dirpath = dirbase + '/real_chains/';
                         let spectra = 'all';
                         let theory = params.theory;
-                        let foldername = 'BK18lf_' + spectra + '_bin2-15_' +params.dust3 + '_betacmb_' + params.mapset3 + params.prior3+ '/';
-                        let file = 'real'+params.plottype;
-                        let name = dirpath + foldername + file +  '.png';
-            
+                        let foldername = 'BK18lf_' + spectra + '_bin2-15_' + params.dust3 + '_betacmb_' + params.mapset3 + params.prior3 + '/';
+                        let file = 'real' + params.plottype;
+                        let name = dirpath + foldername + file + '.png';
+
                         console.log(name);
                         return name;
                     });
 
                 pager.setparams({
-        
+
                     'plottype': '_triangle_plot',
                     'prior3': '_prior15',
                     'dust3': 'fixedEBdust',
@@ -634,6 +639,60 @@
             </script>
         </figure>
 
+    </section>
+    <section>
+        <h2>Some tests with Planck 2018</h2>
+        <figure>
+            <img alt="Test Data" id="planck_2018" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+            <figcaption></figcaption>
+
+            <script type="text/javascript">
+
+
+                pager.link("#planck_2018", {
+                    'Map Sim Num Digit1|digit1': simnums,
+                    'Digit2|digit2': simnums,
+                    'Digit3|digit3': simnums,
+
+                    'Plot type|plottype2': [
+                        'Best Fit EE|_bestfitEE',
+                        'Best Fit EB|_bestfitEB',
+                        'Best Fit BB|_bestfitBB',
+                        'Triangle Plot|_triangle_plot',
+                        'Chi squared|_chisqmap',
+                        'Summary|_summary'
+                    ],
+
+                },
+
+                    function (params) {
+                        let dirbase = '/liuto';
+                        let dirpath = dirbase + '/chain_store/ede_chains/';
+
+
+
+                        let foldername = 'BK18lf_all_bin2-15_planck_2018_all_ebfede0.07/';
+
+                        let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
+                        if (params.plottype2 == '_summary') {
+                            sim_id = 'sim1';
+                        }
+                        let file = sim_id + params.plottype2;
+                        let name = dirpath + foldername + file + '.png';
+
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+                    'digit1': '0',
+                    'digit2': '0',
+                    'digit3': '1',
+                    'plottype2': '_summary',
+                });
+            </script>
+        </figure>
     </section>
 </body>
 
