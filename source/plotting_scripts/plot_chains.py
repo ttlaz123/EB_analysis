@@ -105,8 +105,8 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
         g.settings.alpha_filled_add = 0.4
 
         # Set Times New Roman and larger font sizes globally for this plot
-        g.settings.legend_fontsize = 14      # legend text size
-        g.settings.axes_fontsize = 14        # tick label font size
+        g.settings.legend_fontsize = 16      # legend text size
+        g.settings.axes_fontsize = 16        # tick label font size
 
         legend_labels = []
         for (_, samples, label, color, lw) in plot_data:
@@ -120,13 +120,13 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
         # Axis label and limits
         g.subplots[0, 0].set_xlim(-1.5, 1.5)
         g.subplots[0, 0].axvline(0, color='gray', linestyle='--', linewidth=1)
-        g.subplots[0, 0].set_xlabel(r"$g / M_\mathrm{pl}^{-1}$", fontsize=16, fontname='Liberation Serif')
+        g.subplots[0, 0].set_xlabel(r"$g / M_\mathrm{pl}^{-1}$", fontsize=18, fontname='Times')
 
         # Legend with custom font
         custom_lines = [Line2D([0], [0], color=color, lw=lw) for (_, _, _, color, lw) in plot_data]
-        legend = g.subplots[0, 0].legend(custom_lines, legend_labels, loc='upper left', fontsize=14)
+        legend = g.subplots[0, 0].legend(custom_lines, legend_labels, loc='upper left', fontsize=16)
         for text in legend.get_texts():
-            text.set_fontname('Liberation Serif')
+            text.set_fontname('Times')
 
         # Save figure
         filename = f"{fede_key}.png"
