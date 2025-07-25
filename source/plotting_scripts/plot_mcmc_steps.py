@@ -293,19 +293,28 @@ def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, ba
     maxlen = 650
     ell = ell[:maxlen]
     used_map = used_maps[0]
+    base_colors = ['tab:blue', 'tab:red']
+    
     for param_values in params_values:
+
+        if(param_values['alpha_CMB'] > 0):
+            base_color=base_colors[0]
+        else:
+            base_color=base_colors[1]
+
+        shade = mcolors.to_rgba(base_color, alpha=0.4 + 0.15 * abs(param_values['alpha_CMB']))
         rot = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, used_maps)
-        label = r"$\beta_{\mathrm{CMB}}={param_values['alpha_cmb']:.2f}$"
+        label = r"$\beta_{\mathrm{CMB}}={param_values['alpha_CMB']:.2f}$"
         spectrum = rot[used_map][:maxlen]
-        axs[0].plot(ell, spectrum, label=label)
+        axs[0].plot(ell, spectrum, label=label, color=shade)
 
         rot = ec.apply_cmb_rotation(eb_maps[1], param_values, dl_theory, used_maps)
-        label = r"$\beta_{\mathrm{CMB}}={param_values['alpha_cmb']:.2f}$"
+        label = r"$\beta_{\mathrm{CMB}}={param_values['alpha_CMB']:.2f}$"
         spectrum = rot[used_map][:maxlen]
-        axs[1].plot(ell, spectrum, label=label)
-
+        axs[1].plot(ell, spectrum, label=label, color=shade)
+    
     axs[0].set_title(r"Input EB with $g = 0$", fontsize=24)
-    axs[0].set_ylabel(r"$D_\ell^{EB}$ [$\mu$K$^2$]", fontsize=24)
+    axs[0].set_ylabel(r"$\tilde{D}_\ell^{EB,\mathrm{rot}}$ [$\mu$K$^2$]", fontsize=24)
     axs[0].set_xlabel(r"Multipole $\ell$", fontsize=24)
     axs[0].grid(True, linestyle='--', alpha=0.6)
     axs[0].legend(fontsize=24)
