@@ -99,6 +99,11 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
 
         # Sort by (group_priority, subgroup_priority)
         plot_data.sort(key=lambda x: x[0])
+        plt.rcParams.update({
+            "text.usetex": True,
+            "font.family": "monospace",  # or 'Times New Roman' if installed
+            "font.size": 18
+        })
 
         g = plots.getSubplotPlotter(width_inch=10)
         g.settings.num_plot_contours = 1
@@ -119,7 +124,7 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
 
         # Axis label and limits
         g.subplots[0, 0].set_xlim(-1.5, 1.5)
-        g.subplots[0, 0].set_ylim(0, 1)
+        g.subplots[0, 0].set_ylim(0, 1.5)
         g.subplots[0, 0].axvline(0, color='gray', linestyle='--', linewidth=1)
         g.subplots[0, 0].set_xlabel(r"$g / M_\mathrm{pl}^{-1}$", fontsize=18, fontname='monospace')
 
