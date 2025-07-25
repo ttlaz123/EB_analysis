@@ -15,7 +15,7 @@ def find_spectrum_columns(column_names):
     Uses case-insensitive substring matching.
     """
     col_lower = [c.lower() for c in column_names]
-
+    print(col_lower)
     def find_col(key_variants):
         for variant in key_variants:
             for col, col_l in zip(column_names, col_lower):
@@ -76,7 +76,7 @@ def read_spectrum_file(filepath):
     return ell, cl_ee, cl_bb, cl_eb, scale_factor
 
 def plot_scaled_comparison(ell_dict, cl_dict, scale_dict, output_path=None):
-    a_lens_vals = np.arange(0.9, 1.21, 0.1)
+    a_lens_vals = np.arange(1, 1.21, 0.05)
     g_vals = np.arange(0.0, 1.0, 0.3)
 
     files = list(cl_dict.keys())
@@ -92,6 +92,7 @@ def plot_scaled_comparison(ell_dict, cl_dict, scale_dict, output_path=None):
     fig, axes = plt.subplots(3, 1, figsize=(9, 12), sharex=False)
 
     for i, fname in enumerate(files):
+    
         ell = ell_dict[fname]
         cl_ee = cl_dict[fname]['ee']
         cl_bb = cl_dict[fname]['bb']
