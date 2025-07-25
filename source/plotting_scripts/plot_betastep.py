@@ -1,4 +1,7 @@
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+
 import numpy as np
 
 # Bandpower breaks and Delta beta values with uncertainties
@@ -27,5 +30,4 @@ ax.grid(True, linestyle=':', alpha=0.7)
 plt.tight_layout()
 
 # Save or show
-plt.savefig("delta_beta_plot.png", dpi=300)  # optional
-plt.show()
+plt.savefig("delta_beta_plot.png", dpi=300)  
