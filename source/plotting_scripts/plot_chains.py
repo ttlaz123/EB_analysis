@@ -318,7 +318,7 @@ def plot_betacmb_posteriors(chain_dirs: List[str], base_dir: str, output_dir: st
         "BK18lf_all_bin2-15_gdust_betacmb2": "EE+EB+BB with foregrounds",
         "BK18lf_eb_bin2-15_gdust_betacmb2": "EB with foregrounds",
         "BK18lf_eb_bin2-15_det_polrot_betacmb2": "EB no foregrounds",
-        "BK18lf_all_bin2-15_gdust_betacmb_planck3": "EE+EB+BB with foregrounds and Planck"
+        "BK18lf_all_bin2-15_gdust_betacmb_planck4": "EE+EB+BB with foregrounds and Planck"
     }
 
     for chain_dir in chain_dirs:
