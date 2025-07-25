@@ -129,9 +129,9 @@ def plot_scaled_comparison(ell_dict, cl_dict, scale_dict, output_path=None):
         ax.legend()
         ax.grid(True)
 
-    axes[0].set_ylabel(r"$D_\ell^{EE}$ [$\mu K^2$]", fontname='Computer Modern')
-    axes[1].set_ylabel(r"$D_\ell^{BB}$ [$\mu K^2$]", fontname='Computer Modern')
-    axes[2].set_ylabel(r"$D_\ell^{EB}$ [$\mu K^2$]", fontname='Computer Modern')
+    axes[0].set_ylabel(r"$D_\ell^{EE\mathrm{CMB}}$ [$\mu K^2$]", fontname='Computer Modern')
+    axes[1].set_ylabel(r"$D_\ell^{BB,\mathrm{CMB}}$ [$\mu K^2$]", fontname='Computer Modern')
+    axes[2].set_ylabel(r"$D_\ell^{EB,\mathrm{CMB}}$ [$\mu K^2$]", fontname='Computer Modern')
     axes[2].set_xlabel(r"Multipole $\ell$", fontname='Computer Modern')
 
     #plt.suptitle("EE, BB (scaled), EB (scaled) Spectra Comparison")
