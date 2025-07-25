@@ -81,7 +81,14 @@ def plot_scaled_comparison(ell_dict, cl_dict, scale_dict, output_path=None):
 
     files = list(cl_dict.keys())
     base_colors = ['tab:blue', 'tab:red']
-
+    plt.rcParams.update({
+        'font.size': 20,
+        'axes.titlesize': 22,
+        'axes.labelsize': 22,
+        'xtick.labelsize': 18,
+        'ytick.labelsize': 18,
+        'legend.fontsize': 18
+    })
     fig, axes = plt.subplots(3, 1, figsize=(9, 12), sharex=False)
 
     for i, fname in enumerate(files):
@@ -103,15 +110,15 @@ def plot_scaled_comparison(ell_dict, cl_dict, scale_dict, output_path=None):
 
         base_color = base_colors[i]
         if('camb' in fname):
-            axes[0].plot(ell, dl_ee, label=f"EE ({fname})", color=base_color)
+            axes[0].plot(ell, dl_ee, color=base_color)
         if('camb' in fname):
             for j, a in enumerate(a_lens_vals):
                 shade = mcolors.to_rgba(base_color, alpha=0.4 + 0.15 * j)
-                axes[1].plot(ell, a * dl_bb, label=fr"$A_\mathrm{{lens}}={a:.1f}$ ({fname})", color=shade)
+                axes[1].plot(ell, a * dl_bb, label=fr"$A_\mathrm{{lens}}={a:.1f}$", color=shade)
         if('EDE' in fname):
             for j, g in enumerate(g_vals):
                 shade = mcolors.to_rgba(base_color, alpha=0.4 + 0.15 * j)
-                axes[2].plot(ell, -g * dl_eb, label=fr"$g={g:.1f}$ ({fname})", color=shade)
+                axes[2].plot(ell, -g * dl_eb, label=fr"$g={g:.1f}$", color=shade)
 
     for ax in axes:
         ax.set_xlim(0, 700)
@@ -123,7 +130,7 @@ def plot_scaled_comparison(ell_dict, cl_dict, scale_dict, output_path=None):
     axes[2].set_ylabel(r"$D_\ell^{EB}$ [$\mu K^2$]")
     axes[2].set_xlabel(r"Multipole $\ell$")
 
-    plt.suptitle("EE, BB (scaled), EB (scaled) Spectra Comparison")
+    #plt.suptitle("EE, BB (scaled), EB (scaled) Spectra Comparison")
     plt.tight_layout()
     plt.subplots_adjust(top=0.92)
 
