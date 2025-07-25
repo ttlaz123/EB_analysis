@@ -288,7 +288,8 @@ def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, ba
         'ytick.labelsize': 18,
         'legend.fontsize': 18
     })
-    fig, axs = plt.subplots(1, 2, figsize=(9, 12), sharex=True)
+    print('plotting iso rotations')
+    fig, axs = plt.subplots(1, 2, figsize=(16, 10), sharex=True)
     maxlen = 700
     ell = ell[:maxlen]
     used_map = used_maps[0]
@@ -303,16 +304,15 @@ def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, ba
         spectrum = rot[used_map][:maxlen]
         axs[1].plot(ell, spectrum, label=label)
 
-    axs[0].set_title("Dust EB Spectrum Before BPWF", fontsize=14)
-    axs[0].set_ylabel(r"$D_\ell^{EB}$ [$\mu$K$^2$]", fontsize=13)
-    axs[1].set_xlabel(r"Multipole $\ell$", fontsize=13)
+    axs[0].set_title("Input EB with g = 0", fontsize=24)
+    axs[0].set_ylabel(r"$D_\ell^{EB}$ [$\mu$K$^2$]", fontsize=24)
+    axs[1].set_xlabel(r"Multipole $\ell$", fontsize=24)
     axs[0].grid(True, linestyle='--', alpha=0.6)
-    axs[0].legend(fontsize=10)
-    axs[1].set_title("Dust EB Spectrum After BPWF", fontsize=14)
-    axs[1].set_ylabel(r"$D_b^{EB}$ [$\mu$K$^2$]", fontsize=13)
-    axs[1].set_xlabel(r"Multipole $\ell$", fontsize=13)
+    axs[0].legend(fontsize=24)
+    axs[1].set_title("Input EB with g = 1", fontsize=24)
+    axs[1].set_xlabel(r"Multipole $\ell$", fontsize=24)
     axs[1].grid(True, linestyle='-.', alpha=0.6)
-    axs[1].legend(fontsize=10)
+    axs[1].legend(fontsize=24)
     plt.tight_layout()
     print("Saving:", outpath)
     plt.savefig(outpath)
