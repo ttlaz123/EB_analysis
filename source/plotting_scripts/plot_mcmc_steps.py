@@ -325,6 +325,19 @@ def get_plotted_values():
     FILE_PATHS = fp.set_file_paths('BK18lf', fede=fede)
     used_maps = ['BK18_220_BxBK18_220_E', 'BK18_220_BxBK18_220_B', 'BK18_220_ExBK18_220_E']
 
+    
+
+    dl_theory = ld.load_cmb_theory(FILE_PATHS['camb_lensing'])
+    dl_theory = ld.load_ede_spectra(FILE_PATHS['EDE_spectrum'], dl_theory)
+    eb_maps = [
+        {used_maps[0]: 0},  # No EB
+        {used_maps[0]: 0.3*dl_theory['EB_EDE']},  # With EB from EDE
+    ]
+    bandpasses = ld.read_bandpasses(FILE_PATHS['bandpasses'])
+    bpwf, map_reference_header = ld.load_bpwf(FILE_PATHS['bpwf'], 
+                                            None, 
+                                            num_bins=np.array(range(16))+2)
+    
     base_params = {
         'alpha_BK18_220': 1,
         'alpha_CMB': -0.3,
@@ -343,25 +356,7 @@ def get_plotted_values():
         'alpha_sync_EB': -0.5,
         'beta_sync': -3,
     }
-
-    # Choose which parameter to sweep here:
-    param_to_sweep = 'A_dust_EE'
-    sweep_values = [0, 5, 20, 100]
-
-    params_values = sweep_param(base_params, param_to_sweep, sweep_values)
-
-    dl_theory = ld.load_cmb_theory(FILE_PATHS['camb_lensing'])
-    dl_theory = ld.load_ede_spectra(FILE_PATHS['EDE_spectrum'], dl_theory)
-    eb_maps = [
-        {used_maps[0]: 0},  # No EB
-        {used_maps[0]: 0.3*dl_theory['EB_EDE']},  # With EB from EDE
-    ]
-    bandpasses = ld.read_bandpasses(FILE_PATHS['bandpasses'])
-    bpwf, map_reference_header = ld.load_bpwf(FILE_PATHS['bpwf'], 
-                                            None, 
-                                            num_bins=np.array(range(16))+2)
-    print(params_values) 
-    return eb_maps, params_values, bandpasses, used_maps, dl_theory, bpwf, map_reference_header
+    return eb_maps, base_params, bandpasses, used_maps, dl_theory, bpwf, map_reference_header
 
 def main():
     parser = argparse.ArgumentParser()
@@ -370,22 +365,32 @@ def main():
     parser.add_argument('-b', '--dust_step', action='store_true')
     parser.add_argument('-c', '--miscal_step', action='store_true')
     parser.add_argument('-d', '--bpwf_step', action='store_true')
+    parser.add_argument('-e', '--step_function', action='store_true')
 
     args = parser.parse_args()
-    eb_maps, params_values, bandpasses, used_maps, dl_theory, bpwf, header= get_plotted_values()
+    eb_maps, base_params, bandpasses, used_maps, dl_theory, bpwf, header= get_plotted_values()
     initial_eb_map = eb_maps[0]
    
-    param_combos = [
+    
+    if(args.rotate_step):
+        
+
+    # Choose which parameter to sweep here:
+
+        param_to_sweep = 'alpha_cmb'
+        sweep_values = [-0.9,-0.6,-0.3,0,0.3,0.6,0.9]
+        params_values = sweep_param(base_params, param_to_sweep, sweep_values)
+        plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
+    if(args.dust_step):
+        plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
+    if(args.step_function):
+        param_combos = [
         (-0.5, 1, 405),
         (0, 0.4, 300),
         (1, 0, 265),
         (0.2, -1, 370),
         (-0.7, -0.3, 335),
         ]
-    if(args.rotate_step):
-        plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
-    if(args.dust_step):
-        plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
     '''
     plot_eb_spectra_with_bpwf_comparison(
             dl_theory=dl_theory,
