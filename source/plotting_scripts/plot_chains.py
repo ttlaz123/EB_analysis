@@ -105,13 +105,8 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
         g.settings.alpha_filled_add = 0.4
 
         # Set Times New Roman and larger font sizes globally for this plot
-        g.settings.lab_fontsize = 16
-        g.settings.legend_fontsize = 14
-        g.settings.axis_label_fontsize = 16
-        g.settings.axes_fontsize = 14
-        g.settings.title_fontsize = 16
-        g.settings.axis_tick_fontsize = 13
-        g.settings.font_family = 'Times New Roman'
+        g.settings.legend_fontsize = 14      # legend text size
+        g.settings.axes_fontsize = 14        # tick label font size
 
         legend_labels = []
         for (_, samples, label, color, lw) in plot_data:
