@@ -119,14 +119,15 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
 
         # Axis label and limits
         g.subplots[0, 0].set_xlim(-1.5, 1.5)
+        g.subplots[0, 0].set_ylim(0, 1)
         g.subplots[0, 0].axvline(0, color='gray', linestyle='--', linewidth=1)
-        g.subplots[0, 0].set_xlabel(r"$g / M_\mathrm{pl}^{-1}$", fontsize=18, fontname='Times')
+        g.subplots[0, 0].set_xlabel(r"$g / M_\mathrm{pl}^{-1}$", fontsize=18, fontname='monospace')
 
         # Legend with custom font
         custom_lines = [Line2D([0], [0], color=color, lw=lw) for (_, _, _, color, lw) in plot_data]
         legend = g.subplots[0, 0].legend(custom_lines, legend_labels, loc='upper left', fontsize=16)
         for text in legend.get_texts():
-            text.set_fontname('Times')
+            text.set_fontname('monospace')
 
         # Save figure
         filename = f"{fede_key}.png"
