@@ -14,7 +14,7 @@ plt.rcParams.update({
     "text.usetex": True,
     "mathtext.fontset": "dejavuserif", 
     "font.family": "serif",  # or 'Times New Roman' if installed
-    "font.size": 24
+    "font.size": 20
 })
 
 # Create the plot
@@ -23,7 +23,7 @@ fig, ax = plt.subplots(figsize=(8, 5))
 # Plot red dots with error bars
 ax.errorbar(
     ell_b, delta_beta, yerr=delta_beta_err,
-    fmt='o', markersize=8,
+    fmt='o', markersize=10,
     markerfacecolor='red', markeredgecolor='red',
     ecolor='black', capsize=4
 )
