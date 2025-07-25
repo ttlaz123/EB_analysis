@@ -294,12 +294,12 @@ def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, ba
     used_map = used_maps[0]
     for param_values in params_values:
         rot = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, used_maps)
-        label = r"$\beta_{\mathrm{CMB}}=$" + f'{param_values['beta_cmb']:.2f}'
+        label = r"$\beta_{\mathrm{CMB}}=$" + f"{param_values['alpha_cmb']:.2f}"
         spectrum = rot[used_map][:maxlen]
         axs[0].plot(ell, spectrum, label=label)
 
         rot = ec.apply_cmb_rotation(eb_maps[1], param_values, dl_theory, used_maps)
-        label = r"$\beta_{\mathrm{CMB}}=$" + f'{param_values['beta_cmb']:.2f}'
+        label = r"$\beta_{\mathrm{CMB}}=$" + f"{param_values['alpha_cmb']:.2f}"
         spectrum = rot[used_map][:maxlen]
         axs[1].plot(ell, spectrum, label=label)
 
