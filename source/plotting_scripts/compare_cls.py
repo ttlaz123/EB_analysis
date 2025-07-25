@@ -82,7 +82,10 @@ def plot_scaled_comparison(ell_dict, cl_dict, scale_dict, output_path=None):
     files = list(cl_dict.keys())
     base_colors = ['tab:blue', 'tab:red']
     plt.rcParams.update({
+        "text.usetex": True,
         'font.size': 20,
+        "font.family": "serif", 
+        "font.serif": 'Computer Modern',
         'axes.titlesize': 22,
         'axes.labelsize': 22,
         'xtick.labelsize': 18,
@@ -126,10 +129,10 @@ def plot_scaled_comparison(ell_dict, cl_dict, scale_dict, output_path=None):
         ax.legend()
         ax.grid(True)
 
-    axes[0].set_ylabel(r"$D_\ell^{EE}$ [$\mu K^2$]")
-    axes[1].set_ylabel(r"$D_\ell^{BB}$ [$\mu K^2$]")
-    axes[2].set_ylabel(r"$D_\ell^{EB}$ [$\mu K^2$]")
-    axes[2].set_xlabel(r"Multipole $\ell$")
+    axes[0].set_ylabel(r"$D_\ell^{EE}$ [$\mu K^2$]", fontname='Computer Modern')
+    axes[1].set_ylabel(r"$D_\ell^{BB}$ [$\mu K^2$]", fontname='Computer Modern')
+    axes[2].set_ylabel(r"$D_\ell^{EB}$ [$\mu K^2$]", fontname='Computer Modern')
+    axes[2].set_xlabel(r"Multipole $\ell$", fontname='Computer Modern')
 
     #plt.suptitle("EE, BB (scaled), EB (scaled) Spectra Comparison")
     plt.tight_layout()
