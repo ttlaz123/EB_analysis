@@ -103,7 +103,7 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
             "text.usetex": True,
             "mathtext.fontset": "dejavuserif", 
             "font.family": "serif",  # or 'Times New Roman' if installed
-            "font.serif": 'cmr10',
+            "font.serif": 'Computer Modern',
             "font.size": 24
         })
 
@@ -128,13 +128,13 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
         g.subplots[0, 0].set_xlim(-1.5, 1.5)
         g.subplots[0, 0].set_ylim(0, 1.5)
         g.subplots[0, 0].axvline(0, color='gray', linestyle='--', linewidth=1)
-        g.subplots[0, 0].set_xlabel(r"$g / M_\mathrm{pl}^{-1}$", fontsize=24, fontname='monospace')
+        g.subplots[0, 0].set_xlabel(r"$g / M_\mathrm{pl}^{-1}$", fontsize=24, fontname='Computer Modern')
 
         # Legend with custom font
         custom_lines = [Line2D([0], [0], color=color, lw=lw) for (_, _, _, color, lw) in plot_data]
         legend = g.subplots[0, 0].legend(custom_lines, legend_labels, loc='upper left', fontsize=24)
         for text in legend.get_texts():
-            text.set_fontname('monospace')
+            text.set_fontname('Computer Modern')
 
         # Save figure
         filename = f"{fede_key}.png"
