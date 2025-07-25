@@ -76,7 +76,7 @@ def read_spectrum_file(filepath):
     return ell, cl_ee, cl_bb, cl_eb, scale_factor
 
 def plot_scaled_comparison(ell_dict, cl_dict, scale_dict, output_path=None):
-    a_lens_vals = np.arange(1, 1.21, 0.05)
+    a_lens_vals = np.arange(0.9, 1.21, 0.1)
     g_vals = np.arange(0.0, 1.0, 0.3)
 
     files = list(cl_dict.keys())
