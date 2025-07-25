@@ -103,7 +103,7 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
             "text.usetex": True,
             "mathtext.fontset": "dejavuserif", 
             "font.family": "serif",  # or 'Times New Roman' if installed
-            "font.size": 18
+            "font.size": 24
         })
 
         g = plots.getSubplotPlotter(width_inch=10)
@@ -111,8 +111,8 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
         g.settings.alpha_filled_add = 0.4
 
         # Set Times New Roman and larger font sizes globally for this plot
-        g.settings.legend_fontsize = 16      # legend text size
-        g.settings.axes_fontsize = 16        # tick label font size
+        g.settings.legend_fontsize = 24      # legend text size
+        g.settings.axes_fontsize = 24       # tick label font size
 
         legend_labels = []
         for (_, samples, label, color, lw) in plot_data:
@@ -127,11 +127,11 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
         g.subplots[0, 0].set_xlim(-1.5, 1.5)
         g.subplots[0, 0].set_ylim(0, 1.3)
         g.subplots[0, 0].axvline(0, color='gray', linestyle='--', linewidth=1)
-        g.subplots[0, 0].set_xlabel(r"$g / M_\mathrm{pl}^{-1}$", fontsize=18, fontname='monospace')
+        g.subplots[0, 0].set_xlabel(r"$g / M_\mathrm{pl}^{-1}$", fontsize=24, fontname='monospace')
 
         # Legend with custom font
         custom_lines = [Line2D([0], [0], color=color, lw=lw) for (_, _, _, color, lw) in plot_data]
-        legend = g.subplots[0, 0].legend(custom_lines, legend_labels, loc='upper left', fontsize=16)
+        legend = g.subplots[0, 0].legend(custom_lines, legend_labels, loc='upper left', fontsize=24)
         for text in legend.get_texts():
             text.set_fontname('monospace')
 
