@@ -11,9 +11,10 @@ delta_beta_err = np.array([0.15, 0.14, 0.13, 0.13, 0.15])
 
 
 plt.rcParams.update({
-    "font.family": "serif",
-    "mathtext.fontset": "cm",  # Computer Modern math font
-    "font.serif": ["Times New Roman", "CMU Serif", "Computer Modern Roman", "serif"]
+    "text.usetex": True,
+    "mathtext.fontset": "dejavuserif", 
+    "font.family": "serif",  # or 'Times New Roman' if installed
+    "font.size": 24
 })
 
 # Create the plot
