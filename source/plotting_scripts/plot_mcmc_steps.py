@@ -340,7 +340,7 @@ def plot_bpwf(bpwf, map_reference_header, outpath):
         'ytick.labelsize': 18,
         'legend.fontsize': 18
     })
-    plt.figure((12, 9))
+    plt.figure(figsize=(12, 9))
     print('Plotting bpwf:')
     max_ell = 650
     ell = range(max_ell)
@@ -351,7 +351,7 @@ def plot_bpwf(bpwf, map_reference_header, outpath):
     
     plt.xlabel(r"Multipole $\ell$", fontsize=24)
     plt.ylabel("Weight")
-    plt.title("Band Power Window Function for " + map_reference_header[cross_spec])
+    plt.title("Band Power Window Function for EB at 95GHz")
     #plt.legend()
     print("Saving fig to " + outpath)
     plt.savefig(outpath)
