@@ -328,6 +328,7 @@ def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, ba
     return 
 def plot_bpwf(bpwf, map_reference_header, outpath):
     cross_spec = 29
+    
     plt.rcParams.update({
         "text.usetex": True,
         'font.size': 20,
@@ -339,6 +340,7 @@ def plot_bpwf(bpwf, map_reference_header, outpath):
         'ytick.labelsize': 18,
         'legend.fontsize': 18
     })
+    plt.figure(12, 9)
     print('Plotting bpwf:')
     max_ell = 650
     ell = range(max_ell)
@@ -350,7 +352,7 @@ def plot_bpwf(bpwf, map_reference_header, outpath):
     plt.xlabel(r"Multipole $\ell$", fontsize=24)
     plt.ylabel("Suppression Factor")
     plt.title("Band Power Window Function for " + map_reference_header[cross_spec])
-    plt.legend()
+    #plt.legend()
     print("Saving fig to " + outpath)
     plt.savefig(outpath)
     
