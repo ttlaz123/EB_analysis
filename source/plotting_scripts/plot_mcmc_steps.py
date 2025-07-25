@@ -277,23 +277,35 @@ def plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, head
 
 def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, outpath):
     ell = np.arange(len(dl_theory['EE']))
-    fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+    plt.rcParams.update({
+        "text.usetex": True,
+        'font.size': 20,
+        "font.family": "serif", 
+        "font.serif": 'Computer Modern',
+        'axes.titlesize': 22,
+        'axes.labelsize': 22,
+        'xtick.labelsize': 18,
+        'ytick.labelsize': 18,
+        'legend.fontsize': 18
+    })
+    fig, axs = plt.subplots(1, 2, figsize=(9, 12), sharex=True)
     maxlen = 700
     ell = ell[:maxlen]
     used_map = used_maps[0]
     for param_values in params_values:
         rot = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, used_maps)
-        label = r"$\beta_{\mathrm{CMB}}={param_values['beta_cmb']}$"
+        label = r"$\beta_{\mathrm{CMB}}={param_values['beta_cmb']:.2f}}$"
         spectrum = rot[used_map][:maxlen]
         axs[0].plot(ell, spectrum, label=label)
 
         rot = ec.apply_cmb_rotation(eb_maps[1], param_values, dl_theory, used_maps)
-        label = r"$\beta_{\mathrm{CMB}}={param_values['beta_cmb']}$"
+        label = r"$\beta_{\mathrm{CMB}}={param_values['beta_cmb']:.2f}$"
         spectrum = rot[used_map][:maxlen]
         axs[1].plot(ell, spectrum, label=label)
 
     axs[0].set_title("Dust EB Spectrum Before BPWF", fontsize=14)
     axs[0].set_ylabel(r"$D_\ell^{EB}$ [$\mu$K$^2$]", fontsize=13)
+    axs[1].set_xlabel(r"Multipole $\ell$", fontsize=13)
     axs[0].grid(True, linestyle='--', alpha=0.6)
     axs[0].legend(fontsize=10)
     axs[1].set_title("Dust EB Spectrum After BPWF", fontsize=14)
