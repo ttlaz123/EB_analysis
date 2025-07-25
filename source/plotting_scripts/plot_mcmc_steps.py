@@ -289,7 +289,7 @@ def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, ba
         'legend.fontsize': 18
     })
     print('plotting iso rotations')
-    fig, axs = plt.subplots(1, 2, figsize=(16, 10), sharex=True)
+    fig, axs = plt.subplots(1, 2, figsize=(16, 10), sharey=True)
     maxlen = 650
     ell = ell[:maxlen]
     used_map = used_maps[0]
