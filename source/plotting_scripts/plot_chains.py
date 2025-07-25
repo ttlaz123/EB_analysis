@@ -101,7 +101,8 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
         plot_data.sort(key=lambda x: x[0])
         plt.rcParams.update({
             "text.usetex": True,
-            "font.family": "monospace",  # or 'Times New Roman' if installed
+            "mathtext.fontset": "dejavuserif", 
+            "font.family": "serif",  # or 'Times New Roman' if installed
             "font.size": 18
         })
 
@@ -124,7 +125,7 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
 
         # Axis label and limits
         g.subplots[0, 0].set_xlim(-1.5, 1.5)
-        g.subplots[0, 0].set_ylim(0, 1.5)
+        g.subplots[0, 0].set_ylim(0, 1.3)
         g.subplots[0, 0].axvline(0, color='gray', linestyle='--', linewidth=1)
         g.subplots[0, 0].set_xlabel(r"$g / M_\mathrm{pl}^{-1}$", fontsize=18, fontname='monospace')
 
