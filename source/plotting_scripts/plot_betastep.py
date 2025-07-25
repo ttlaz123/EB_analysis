@@ -14,7 +14,7 @@ plt.rcParams.update({
     "text.usetex": True,
     "mathtext.fontset": "dejavuserif", 
     "font.family": "serif", 
-    "font.serif": 'cmr10',
+    "font.serif": 'Computer Modern',
     "font.size": 20
 })
 
