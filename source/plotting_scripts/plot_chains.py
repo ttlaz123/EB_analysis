@@ -103,6 +103,7 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
             "text.usetex": True,
             "mathtext.fontset": "dejavuserif", 
             "font.family": "serif",  # or 'Times New Roman' if installed
+            "font.serif": 'cmr10',
             "font.size": 24
         })
 

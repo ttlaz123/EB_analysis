@@ -13,7 +13,8 @@ delta_beta_err = np.array([0.15, 0.14, 0.13, 0.13, 0.15])
 plt.rcParams.update({
     "text.usetex": True,
     "mathtext.fontset": "dejavuserif", 
-    "font.family": "serif",  # or 'Times New Roman' if installed
+    "font.family": "serif", 
+    "font.serif": 'cmr10',
     "font.size": 20
 })
 
