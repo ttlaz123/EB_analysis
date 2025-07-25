@@ -326,7 +326,8 @@ def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, ba
     plt.savefig(outpath)
     plt.close()
     return 
-def plot_bpwf(bpwf, outpath):
+def plot_bpwf(bpwf, map_reference_header, outpath):
+    cross_spec = 29
     plt.rcParams.update({
         "text.usetex": True,
         'font.size': 20,
@@ -344,11 +345,12 @@ def plot_bpwf(bpwf, outpath):
     print(bpwf.shape)
     for bin in range(2,17):
         print(bin)
-        plt.plot(ell, bpwf[bin-2,:max_ell], label='Bin ' + str(bin))
+        plt.plot(ell, bpwf[bin-2,:max_ell, cross_spec], label='Bin ' + str(bin))
     
     plt.xlabel(r"Multipole $\ell$", fontsize=24)
     plt.ylabel("Suppression Factor")
-    #plt.legend()
+    plt.title("Band Power Window Function for " + map_reference_header[cross_spec])
+    plt.legend()
     print("Saving fig to " + outpath)
     plt.savefig(outpath)
     
@@ -418,7 +420,7 @@ def main():
     if(args.dust_step):
         plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
     if(args.bpwf_step):
-        plot_bpwf(bpwf, args.outpath)
+        plot_bpwf(bpwf, header, args.outpath)
     if(args.step_function):
         param_combos = [
         (-0.5, 1, 405),
