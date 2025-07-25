@@ -290,26 +290,26 @@ def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, ba
     })
     print('plotting iso rotations')
     fig, axs = plt.subplots(1, 2, figsize=(16, 10), sharex=True)
-    maxlen = 700
+    maxlen = 650
     ell = ell[:maxlen]
     used_map = used_maps[0]
     for param_values in params_values:
         rot = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, used_maps)
-        label = r"$\beta_{\mathrm{CMB}}=$" + f"{param_values['alpha_cmb']:.2f}"
+        label = r"$\beta_{\mathrm{CMB}}={param_values['alpha_cmb']:.2f}$"
         spectrum = rot[used_map][:maxlen]
         axs[0].plot(ell, spectrum, label=label)
 
         rot = ec.apply_cmb_rotation(eb_maps[1], param_values, dl_theory, used_maps)
-        label = r"$\beta_{\mathrm{CMB}}=$" + f"{param_values['alpha_cmb']:.2f}"
+        label = r"$\beta_{\mathrm{CMB}}={param_values['alpha_cmb']:.2f}$"
         spectrum = rot[used_map][:maxlen]
         axs[1].plot(ell, spectrum, label=label)
 
-    axs[0].set_title("Input EB with g = 0", fontsize=24)
+    axs[0].set_title(r"Input EB with $g = 0$", fontsize=24)
     axs[0].set_ylabel(r"$D_\ell^{EB}$ [$\mu$K$^2$]", fontsize=24)
-    axs[1].set_xlabel(r"Multipole $\ell$", fontsize=24)
+    axs[0].set_xlabel(r"Multipole $\ell$", fontsize=24)
     axs[0].grid(True, linestyle='--', alpha=0.6)
     axs[0].legend(fontsize=24)
-    axs[1].set_title("Input EB with g = 1", fontsize=24)
+    axs[1].set_title(r"Input EB with $g = 1$", fontsize=24)
     axs[1].set_xlabel(r"Multipole $\ell$", fontsize=24)
     axs[1].grid(True, linestyle='-.', alpha=0.6)
     axs[1].legend(fontsize=24)
@@ -331,7 +331,7 @@ def get_plotted_values():
     dl_theory = ld.load_ede_spectra(FILE_PATHS['EDE_spectrum'], dl_theory)
     eb_maps = [
         {used_maps[0]: 0},  # No EB
-        {used_maps[0]: 0.3*dl_theory['EB_EDE']},  # With EB from EDE
+        {used_maps[0]: dl_theory['EB_EDE']},  # With EB from EDE
     ]
     bandpasses = ld.read_bandpasses(FILE_PATHS['bandpasses'])
     bpwf, map_reference_header = ld.load_bpwf(FILE_PATHS['bpwf'], 
@@ -377,7 +377,7 @@ def main():
 
     # Choose which parameter to sweep here:
 
-        param_to_sweep = 'alpha_cmb'
+        param_to_sweep = 'alpha_CMB'
         sweep_values = [-0.9,-0.6,-0.3,0,0.3,0.6,0.9]
         params_values = sweep_param(base_params, param_to_sweep, sweep_values)
         plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
