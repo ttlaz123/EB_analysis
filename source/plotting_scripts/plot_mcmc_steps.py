@@ -326,11 +326,26 @@ def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, ba
     plt.savefig(outpath)
     plt.close()
     return 
-def plot_bpwf(bpwf_dict, outpath):
+def plot_bpwf(bpwf, outpath):
+    plt.rcParams.update({
+        "text.usetex": True,
+        'font.size': 20,
+        "font.family": "serif", 
+        "font.serif": 'Computer Modern',
+        'axes.titlesize': 22,
+        'axes.labelsize': 22,
+        'xtick.labelsize': 18,
+        'ytick.labelsize': 18,
+        'legend.fontsize': 18
+    })
     print('Plotting bpwf:')
-    for bpwf in bpwf_dict:
-        plt.plot(bpwf)
+    for bin in range(2,17):
+        plt.plot(bpwf[bin,:], label='Bin ' + str(bin))
+    plt.xlabel(r"Multipole $\ell$", fontsize=24)
+    plt.ylabel("Suppression Factor")
+    plt.legend()
     plt.savefig(outpath)
+    
     return 
 
 def get_plotted_values():
