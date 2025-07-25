@@ -38,7 +38,7 @@ ax.set_ylabel(r"Step Size $\Delta \beta_{\ell_b}$ [deg.]", fontsize=24)
 ax.set_xticks(ell_b)
 
 # Grid and layout
-ax.grid(True, linestyle=':', alpha=0.7)
+ax.grid(True, linestyle=':', alpha=0.5)
 plt.tight_layout()
 
 # Save or show
