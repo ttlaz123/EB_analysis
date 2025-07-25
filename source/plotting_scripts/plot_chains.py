@@ -125,7 +125,7 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
 
         # Axis label and limits
         g.subplots[0, 0].set_xlim(-1.5, 1.5)
-        g.subplots[0, 0].set_ylim(0, 1.3)
+        g.subplots[0, 0].set_ylim(0, 1.5)
         g.subplots[0, 0].axvline(0, color='gray', linestyle='--', linewidth=1)
         g.subplots[0, 0].set_xlabel(r"$g / M_\mathrm{pl}^{-1}$", fontsize=24, fontname='monospace')
 
