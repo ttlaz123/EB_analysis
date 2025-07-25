@@ -301,7 +301,10 @@ def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, ba
     axs[1].set_xlabel(r"Multipole $\ell$", fontsize=13)
     axs[1].grid(True, linestyle='-.', alpha=0.6)
     axs[1].legend(fontsize=10)
-
+    plt.tight_layout()
+    print("Saving:", outpath)
+    plt.savefig(outpath)
+    plt.close()
     return 
 
 
@@ -368,7 +371,7 @@ def main():
         (-0.7, -0.3, 335),
         ]
     if(args.rotate_step):
-        plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, outpath):
+        plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
     if(args.dust_step):
         plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
     '''
