@@ -341,6 +341,7 @@ def plot_bpwf(bpwf, outpath):
     print('Plotting bpwf:')
     max_ell = 650
     ell = range(max_ell)
+    print(bpwf.shape)
     for bin in range(2,17):
         print(bin)
         plt.plot(ell, bpwf[bin-2,:max_ell], label='Bin ' + str(bin))
