@@ -347,7 +347,7 @@ def plot_bpwf(bpwf, outpath):
     
     plt.xlabel(r"Multipole $\ell$", fontsize=24)
     plt.ylabel("Suppression Factor")
-    plt.legend()
+    #plt.legend()
     print("Saving fig to " + outpath)
     plt.savefig(outpath)
     
