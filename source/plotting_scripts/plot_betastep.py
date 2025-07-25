@@ -31,8 +31,8 @@ ax.errorbar(
 ax.axhline(0, color='gray', linestyle='--', linewidth=1)
 
 # Labeling
-ax.set_xlabel(r"Bandpower Break $\ell_b$", fontsize=24)
-ax.set_ylabel(r"$\Delta \beta_{\ell_b}$ (deg)", fontsize=24)
+ax.set_xlabel(r"Multipole Breakpoint $\ell_b$", fontsize=24)
+ax.set_ylabel(r"Step Size $\Delta \beta_{\ell_b}$ (deg)", fontsize=24)
 
 # Make x-ticks exactly the data points
 ax.set_xticks(ell_b)
