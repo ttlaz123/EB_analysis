@@ -293,25 +293,24 @@ def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, ba
     maxlen = 650
     ell = ell[:maxlen]
     used_map = used_maps[0]
-    base_colors = ['tab:blue', 'tab:red']
+    max_abs = max(abs(p['alpha_CMB']) for p in params_values)
+    cmap = cm.get_cmap('coolwarm')
+    norm = mcolors.TwoSlopeNorm(vmin=-max_abs, vcenter=0.0, vmax=+max_abs)
+   
     
     for param_values in params_values:
+        alpha_val = param_values['alpha_CMB']
+        color = cmap(norm(alpha_val))
 
-        if(param_values['alpha_CMB'] > 0):
-            base_color=base_colors[0]
-        else:
-            base_color=base_colors[1]
-
-        shade = mcolors.to_rgba(base_color, alpha=0.4 + abs(param_values['alpha_CMB']))
         rot = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, used_maps)
         label = fr"$\beta_{{\mathrm{{CMB}}}}={param_values['alpha_CMB']:.2f}$"
         spectrum = rot[used_map][:maxlen]
-        axs[0].plot(ell, spectrum, label=label, color=shade)
+        axs[0].plot(ell, spectrum, label=label, color=color)
 
         rot = ec.apply_cmb_rotation(eb_maps[1], param_values, dl_theory, used_maps)
         label = fr"$\beta_{{\mathrm{{CMB}}}}={param_values['alpha_CMB']:.2f}$"
         spectrum = rot[used_map][:maxlen]
-        axs[1].plot(ell, spectrum, label=label, color=shade)
+        axs[1].plot(ell, spectrum, label=label, color=color)
     
     axs[0].set_title(r"Input EB with $g = 0$", fontsize=24)
     axs[0].set_ylabel(r"$\tilde{D}_\ell^{EB,\mathrm{rot}}$ [$\mu$K$^2$]", fontsize=24)
