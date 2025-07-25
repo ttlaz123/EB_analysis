@@ -344,9 +344,11 @@ def plot_bpwf(bpwf, outpath):
     for bin in range(2,17):
         print(bin)
         plt.plot(ell, bpwf[bin-2,:max_ell], label='Bin ' + str(bin))
+    
     plt.xlabel(r"Multipole $\ell$", fontsize=24)
     plt.ylabel("Suppression Factor")
     plt.legend()
+    print("Saving fig to " + outpath)
     plt.savefig(outpath)
     
     return 
