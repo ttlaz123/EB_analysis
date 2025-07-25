@@ -328,7 +328,9 @@ def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, ba
     return 
 def plot_bpwf(bpwf, map_reference_header, outpath):
     cross_spec = 29
-    
+    L_BIN_CENTERS = np.array([37.5, 72.5, 107.5, 142.5, 177.5, 
+                               212.5, 247.5, 282.5, 317.5, 352.5,
+                               387.5, 422.5, 457.5, 492.5, 527.5, 562.5])
     plt.rcParams.update({
         "text.usetex": True,
         'font.size': 20,
@@ -348,7 +350,8 @@ def plot_bpwf(bpwf, map_reference_header, outpath):
     for bin in range(2,17):
         print(bin)
         plt.plot(ell, bpwf[bin-2,:max_ell, cross_spec], label='Bin ' + str(bin))
-    
+    for center in L_BIN_CENTERS:
+        plt.axvline(x=center, color='gray', linestyle='--', linewidth=1)
     plt.xlabel(r"Multipole $\ell$", fontsize=24)
     plt.ylabel("Weight")
     plt.title("Band Power Window Function for EB at 95GHz")
