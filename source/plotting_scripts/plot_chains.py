@@ -48,7 +48,9 @@ def group_samples_by_fede(chain_dirs: List[str], base_dir: str) -> Dict[str, Lis
 
     for chain_dir in chain_dirs:
         chain_file = os.path.join(base_dir, chain_dir, "real")
-
+        if('fede0' not in chain_file):
+            print('Skipping ' + chain_file)
+            continue 
         samples = get_samples(chain_file)
         if not samples:
             continue
