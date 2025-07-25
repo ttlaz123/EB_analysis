@@ -326,9 +326,11 @@ def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, ba
     plt.savefig(outpath)
     plt.close()
     return 
-def plot_bpwf(bpwf_dict):
+def plot_bpwf(bpwf_dict, outpath):
+    print('Plotting bpwf:')
     for bpwf in bpwf_dict:
         plt.plot(bpwf)
+    plt.savefig(outpath)
     return 
 
 def get_plotted_values():
@@ -395,7 +397,7 @@ def main():
     if(args.dust_step):
         plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
     if(args.bpwf_step):
-        plot_bpwf(bpwf)
+        plot_bpwf(bpwf, args.outpath)
     if(args.step_function):
         param_combos = [
         (-0.5, 1, 405),
