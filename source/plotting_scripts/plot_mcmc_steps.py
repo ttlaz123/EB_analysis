@@ -275,6 +275,36 @@ def plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, head
     plt.savefig(outpath)
     plt.close()
 
+def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, outpath):
+    ell = np.arange(len(dl_theory['EE']))
+    fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+    maxlen = 700
+    ell = ell[:maxlen]
+    used_map = used_maps[0]
+    for param_values in params_values:
+        rot = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, used_maps)
+        label = r"$\beta_{\mathrm{CMB}}={param_values['beta_cmb']}$"
+        spectrum = rot[used_map][:maxlen]
+        axs[0].plot(ell, spectrum, label=label)
+
+        rot = ec.apply_cmb_rotation(eb_maps[1], param_values, dl_theory, used_maps)
+        label = r"$\beta_{\mathrm{CMB}}={param_values['beta_cmb']}$"
+        spectrum = rot[used_map][:maxlen]
+        axs[1].plot(ell, spectrum, label=label)
+
+    axs[0].set_title("Dust EB Spectrum Before BPWF", fontsize=14)
+    axs[0].set_ylabel(r"$D_\ell^{EB}$ [$\mu$K$^2$]", fontsize=13)
+    axs[0].grid(True, linestyle='--', alpha=0.6)
+    axs[0].legend(fontsize=10)
+    axs[1].set_title("Dust EB Spectrum After BPWF", fontsize=14)
+    axs[1].set_ylabel(r"$D_b^{EB}$ [$\mu$K$^2$]", fontsize=13)
+    axs[1].set_xlabel(r"Multipole $\ell$", fontsize=13)
+    axs[1].grid(True, linestyle='-.', alpha=0.6)
+    axs[1].legend(fontsize=10)
+
+    return 
+
+
 def get_plotted_values():
     fede = 0.07
     FILE_PATHS = fp.set_file_paths('BK18lf', fede=fede)
@@ -321,6 +351,11 @@ def get_plotted_values():
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--outpath')
+    parser.add_argument('-a', '--rotate_step', action='store_true')
+    parser.add_argument('-b', '--dust_step', action='store_true')
+    parser.add_argument('-c', '--miscal_step', action='store_true')
+    parser.add_argument('-d', '--bpwf_step', action='store_true')
+
     args = parser.parse_args()
     eb_maps, params_values, bandpasses, used_maps, dl_theory, bpwf, header= get_plotted_values()
     initial_eb_map = eb_maps[0]
@@ -332,7 +367,10 @@ def main():
         (0.2, -1, 370),
         (-0.7, -0.3, 335),
         ]
-    plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
+    if(args.rotate_step):
+        plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, outpath):
+    if(args.dust_step):
+        plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
     '''
     plot_eb_spectra_with_bpwf_comparison(
             dl_theory=dl_theory,
