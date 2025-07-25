@@ -126,7 +126,7 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
         custom_lines = [Line2D([0], [0], color=color, lw=lw) for (_, _, _, color, lw) in plot_data]
         legend = g.subplots[0, 0].legend(custom_lines, legend_labels, loc='upper left', fontsize=14)
         for text in legend.get_texts():
-            text.set_fontname('Times New Roman')
+            text.set_fontname('Liberation Serif')
 
         # Save figure
         filename = f"{fede_key}.png"
