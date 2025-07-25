@@ -302,14 +302,14 @@ def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, ba
         else:
             base_color=base_colors[1]
 
-        shade = mcolors.to_rgba(base_color, alpha=0.4 + 0.15 * abs(param_values['alpha_CMB']))
+        shade = mcolors.to_rgba(base_color, alpha=0.4 + abs(param_values['alpha_CMB']))
         rot = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, used_maps)
-        label = r"$\beta_{\mathrm{CMB}}={param_values['alpha_CMB']:.2f}$"
+        label = fr"$\beta_{{\mathrm{{CMB}}}}={param_values['alpha_CMB']:.2f}$"
         spectrum = rot[used_map][:maxlen]
         axs[0].plot(ell, spectrum, label=label, color=shade)
 
         rot = ec.apply_cmb_rotation(eb_maps[1], param_values, dl_theory, used_maps)
-        label = r"$\beta_{\mathrm{CMB}}={param_values['alpha_CMB']:.2f}$"
+        label = fr"$\beta_{{\mathrm{{CMB}}}}={param_values['alpha_CMB']:.2f}$"
         spectrum = rot[used_map][:maxlen]
         axs[1].plot(ell, spectrum, label=label, color=shade)
     
