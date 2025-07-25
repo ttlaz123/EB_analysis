@@ -68,7 +68,6 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
     os.makedirs(output_dir, exist_ok=True)
 
     group_order = {"with_fg": 0, "no_fg": 1, "eskilt": 2, "combined": 3}
-
     for fede_key, entries in fede_groups.items():
         print('Plotting:', fede_key)
         if fede_key == 'no_fede_tag':
@@ -88,7 +87,7 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
                 continue
 
             group, subgroup_priority, label, color, lw = model_config[match]
-            if(group == 'combined'):
+            if group == 'combined':
                 print('Skipping: ' + label)
                 continue
             mean = samples.mean(param_name)
@@ -96,34 +95,43 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
             full_label = f"{label}: {mean:.2f} ± {std:.2f}"
             plot_data.append(((group_order[group], subgroup_priority), samples, full_label, color, lw))
 
-        # Sort by (group group_priority, subgroup_priority)
+        # Sort by (group_priority, subgroup_priority)
         plot_data.sort(key=lambda x: x[0])
 
         g = plots.getSubplotPlotter(width_inch=10)
         g.settings.num_plot_contours = 1
         g.settings.alpha_filled_add = 0.4
 
+        # Set Times New Roman and larger font sizes globally for this plot
+        g.settings.lab_fontsize = 16
+        g.settings.legend_fontsize = 14
+        g.settings.axis_label_fontsize = 16
+        g.settings.axes_fontsize = 14
+        g.settings.title_fontsize = 16
+        g.settings.axis_tick_fontsize = 13
+        g.settings.font_family = 'Times New Roman'
+
         legend_labels = []
         for (_, samples, label, color, lw) in plot_data:
             g.plot_1d(samples, param_name)
-            # Fix color and line width manually
             line = g.subplots[0, 0].get_lines()[-1]
             line.set_color(color)
             line.set_linewidth(lw)
             legend_labels.append(label)
-            print(label )
-        # Axis range and vertical line at 0
+            print(label)
+
+        # Axis label and limits
         g.subplots[0, 0].set_xlim(-1.5, 1.5)
         g.subplots[0, 0].axvline(0, color='gray', linestyle='--', linewidth=1)
-        g.subplots[0, 0].set_xlabel(r"$g / M_\mathrm{pl}^{-1}$", fontsize=12)
-        
+        g.subplots[0, 0].set_xlabel(r"$g / M_\mathrm{pl}^{-1}$", fontsize=16, fontname='Times New Roman')
 
-        custom_lines = [
-            Line2D([0], [0], color=color, lw=lw)
-            for (_, _, _, color, lw) in plot_data
-        ]
-        g.subplots[0, 0].legend(custom_lines, legend_labels, loc='upper left', fontsize=10)
+        # Legend with custom font
+        custom_lines = [Line2D([0], [0], color=color, lw=lw) for (_, _, _, color, lw) in plot_data]
+        legend = g.subplots[0, 0].legend(custom_lines, legend_labels, loc='upper left', fontsize=14)
+        for text in legend.get_texts():
+            text.set_fontname('Times New Roman')
 
+        # Save figure
         filename = f"{fede_key}.png"
         g.export(os.path.join(output_dir, filename))
 
