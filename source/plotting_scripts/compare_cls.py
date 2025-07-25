@@ -114,7 +114,7 @@ def plot_scaled_comparison(ell_dict, cl_dict, scale_dict, output_path=None):
 
         base_color = base_colors[i]
         if('camb' in fname):
-            axes[0].plot(ell, dl_ee, color=base_color)
+            axes[0].plot(ell, dl_ee, color=base_color, label='EE Spectrum')
         if('camb' in fname):
             for j, a in enumerate(a_lens_vals):
                 shade = mcolors.to_rgba(base_color, alpha=0.4 + 0.15 * j)
