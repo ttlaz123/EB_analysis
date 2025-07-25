@@ -94,7 +94,7 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
                 continue
             mean = samples.mean(param_name)
             std = samples.std(param_name)
-            full_label = f"{label}: {mean:.2f} ± {std:.2f}"
+            full_label = f"{label}"
             plot_data.append(((group_order[group], subgroup_priority), samples, full_label, color, lw))
 
         # Sort by (group_priority, subgroup_priority)
@@ -120,7 +120,7 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
         # Axis label and limits
         g.subplots[0, 0].set_xlim(-1.5, 1.5)
         g.subplots[0, 0].axvline(0, color='gray', linestyle='--', linewidth=1)
-        g.subplots[0, 0].set_xlabel(r"$g / M_\mathrm{pl}^{-1}$", fontsize=16, fontname='Times New Roman')
+        g.subplots[0, 0].set_xlabel(r"$g / M_\mathrm{pl}^{-1}$", fontsize=16, fontname='Liberation Serif')
 
         # Legend with custom font
         custom_lines = [Line2D([0], [0], color=color, lw=lw) for (_, _, _, color, lw) in plot_data]
