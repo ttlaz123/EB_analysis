@@ -9,18 +9,29 @@ ell_b = np.array([265, 300, 335, 370, 405])
 delta_beta = np.array([-0.15, -0.01, 0.05, 0.11, 0.09])
 delta_beta_err = np.array([0.15, 0.14, 0.13, 0.13, 0.15])
 
+
+plt.rcParams.update({
+    "font.family": "serif",
+    "mathtext.fontset": "cm",  # Computer Modern math font
+    "font.serif": ["Times New Roman", "CMU Serif", "Computer Modern Roman", "serif"]
+})
+
 # Create the plot
 fig, ax = plt.subplots(figsize=(8, 5))
 
 # Plot red dots with error bars
-ax.errorbar(ell_b, delta_beta, yerr=delta_beta_err, fmt='o', color='red', markersize=8, capsize=4)
-
+ax.errorbar(
+    ell_b, delta_beta, yerr=delta_beta_err,
+    fmt='o', markersize=8,
+    markerfacecolor='red', markeredgecolor='red',
+    ecolor='black', capsize=4
+)
 # Horizontal dashed line at 0
 ax.axhline(0, color='gray', linestyle='--', linewidth=1)
 
 # Labeling
-ax.set_xlabel(r"Bandpower Break $\ell_b$", fontsize=14)
-ax.set_ylabel(r"$\Delta \beta_{\ell_b}$ (deg)", fontsize=14)
+ax.set_xlabel(r"Bandpower Break $\ell_b$", fontsize=24)
+ax.set_ylabel(r"$\Delta \beta_{\ell_b}$ (deg)", fontsize=24)
 
 # Make x-ticks exactly the data points
 ax.set_xticks(ell_b)
