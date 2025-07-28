@@ -103,7 +103,7 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
                 ax.set_xlabel(r'Multipole $\ell$', fontsize=18)
     axs[0,0].set_title(titles[0], fontsize=24)
     axs[0,1].set_title(titles[1], fontsize=24)
-    axs[0, -1].legend(fontsize=9, loc='upper left')
+    axs[0, -1].legend(fontsize=18, loc='upper left')
     plt.tight_layout()
     print("Saving:", outpath)
     plt.savefig(outpath)
