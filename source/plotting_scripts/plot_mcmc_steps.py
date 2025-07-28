@@ -70,8 +70,14 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
 
     for row_idx, key in enumerate(map_keys):
         mapname = key.split('x')
-        spectrum = mapname[0].split('_')[-1] + mapname[1].split('_')[-1]
+        spectrum = mapname[1].split('_')[-1] + mapname[0].split('_')[-1]
         freqs = [mapname[0].split('_')[1], mapname[1].split('_')[1]]
+        if(spectrum == 'EE'):
+            row_idx = 0
+        if(spectrum == 'BB'):
+            row_idx = 1
+        if(spectrum == 'EB'):
+            row_idx = 2  
         for col_idx in range(n_maps):
             ax = axs[row_idx, col_idx]
             ax.set_xlim(0, 700)
