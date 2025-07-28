@@ -30,12 +30,16 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
         'ytick.labelsize': 18,
         'legend.fontsize': 24
     })
+    
 
     # Step 1: Identify varying keys
     all_keys = params_values[0].keys()
     varying_keys = [k for k in all_keys if any(p[k] != params_values[0][k] for p in params_values)]
     print("Varying parameters used in legend:", varying_keys)
-
+    varying_params = [p[varying_keys[0]] for p in  params_values]
+    max_abs = np.max(np.abs(varying_params))
+    cmap = cm.get_cmap('coolwarm')
+    norm = mcolors.TwoSlopeNorm(vmin=-max_abs, vcenter=0.0, vmax=max_abs)
     # Step 2: Run a dummy pass to get all map keys
     dummy_rot = ec.apply_cmb_rotation(eb_maps[0], params_values[0], dl_theory, used_maps)
     dummy_dust = ec.apply_dust(dummy_rot, bandpasses, params_values[0])
@@ -79,7 +83,9 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
                 if(spectrum == 'EB'):
                     row_idx = 2  
                 ell = np.arange(len(post_detrot[key]))
-                axs[row_idx, col_idx].plot(ell, post_detrot[key], label=label)
+                vary_value = param_values[key]
+                color = cmap(norm(vary_value))
+                axs[row_idx, col_idx].plot(ell, post_detrot[key], label=label, color=color)
 
     for row_idx, key in enumerate(map_keys):
         mapname = key.split('x')
@@ -464,6 +470,8 @@ def main():
     if(args.dust_step):
         param_to_sweep = 'A_dust_EE'
         sweep_values = [0, 5, 20, 100]
+        param_to_sweep = 'alpha_BK18_220'
+        sweep_values = [-1, -0.5, 0, 0.5, 1]
         params_values = sweep_param(base_params, param_to_sweep, sweep_values)
         plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, args.outpath)
         
