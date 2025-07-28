@@ -423,8 +423,13 @@ def main():
         params_values = sweep_param(base_params, param_to_sweep, sweep_values)
         plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
     if(args.dust_step):
-        plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
+        param_to_sweep = 'A_dust_EE'
+        sweep_values = [0, 5, 20, 100]
+        params_values = sweep_param(base_params, param_to_sweep, sweep_values)
+        plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, args.outpath)
+        
     if(args.bpwf_step):
+        plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
         plot_bpwf(bpwf, header, args.outpath)
     if(args.step_function):
         param_combos = [
@@ -448,7 +453,6 @@ def main():
     '''
     plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_maps[0], 
                                   param_combos, args.outpath)
-    plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, args.outpath)
     '''
 if __name__ == '__main__':
     main()
