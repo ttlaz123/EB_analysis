@@ -82,7 +82,7 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
                     row_idx = 1
                 if(spectrum == 'EB'):
                     row_idx = 2  
-                ell = np.arange(len(post_detrot[key]))
+                ell = np.arange(len(post_detrot[varying_params[0]]))
                 vary_value = param_values[key]
                 color = cmap(norm(vary_value))
                 axs[row_idx, col_idx].plot(ell, post_detrot[key], label=label, color=color)
