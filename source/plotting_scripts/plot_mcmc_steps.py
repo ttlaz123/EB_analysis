@@ -428,7 +428,7 @@ def get_plotted_values():
         'alpha_BK18_220': 1,
         'alpha_CMB': 0,
         'A_dust_EE': 7,
-        'A_dust_BB': 0,
+        'A_dust_BB': 4,
         'A_dust_EB': 0,
         'alpha_dust_EE': -0.5,
         'alpha_dust_BB': -0.5,
@@ -470,8 +470,8 @@ def main():
     if(args.dust_step):
         param_to_sweep = 'A_dust_EE'
         sweep_values = [0, 5, 20, 100]
-        param_to_sweep = 'alpha_BK18_220'
-        sweep_values = [-1, -0.5, 0, 0.5, 1]
+        #param_to_sweep = 'alpha_BK18_220'
+        #sweep_values = [-1, -0.5, 0, 0.5, 1]
         params_values = sweep_param(base_params, param_to_sweep, sweep_values)
         plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, args.outpath)
         
