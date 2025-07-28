@@ -46,11 +46,13 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
     # Step 3: Set up subplot grid (rows = keys, cols = eb_maps)
     n_keys, n_maps = len(map_keys), len(eb_maps)
     fig, axs = plt.subplots(n_keys, n_maps, figsize=(6 * n_maps, 3.5 * n_keys), 
-                            sharex=True, sharey=True)
+                            sharex=True)
 
     if n_keys == 1: axs = np.expand_dims(axs, 0)
     if n_maps == 1: axs = np.expand_dims(axs, 1)
-
+    for row in axs:
+        for ax in row[1:]:
+            ax.sharey(row[0])
     titles = [r'Initial EB: $g = 0$', r'Initial EB: $g = 1$']
     
     for col_idx, eb_map in enumerate(eb_maps):
@@ -76,7 +78,8 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
             
             ax.grid(True, linestyle='--', alpha=0.6)
             if col_idx == 0:
-                ax.set_ylabel(f"$D_\\ell^{spectrum}({freqs[0]}GHz, {freqs[1]}GHz)$ [$\\mu$K$^2$]", fontsize=18)
+                ax.set_ylabel(r"$D_\ell^{%s}(%s\,\mathrm{GHz},\,%s\,\mathrm{GHz})\ [\mu\mathrm{K}^2]$" % 
+                        (spectrum, freqs[0], freqs[1]), fontsize=18)
             if row_idx == n_keys - 1:
                 ax.set_xlabel(r'Multipole $\ell$', fontsize=18)
     axs[0,0].set_title(titles[0], fontsize=24)
