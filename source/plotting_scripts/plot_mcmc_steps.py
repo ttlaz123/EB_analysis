@@ -415,7 +415,7 @@ def get_plotted_values():
     
     base_params = {
         'alpha_BK18_220': 1,
-        'alpha_CMB': -0.3,
+        'alpha_CMB': 0,
         'A_dust_EE': 7,
         'A_dust_BB': 0,
         'A_dust_EB': 0,
