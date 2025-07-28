@@ -19,6 +19,18 @@ def sweep_param(base_params, param_name, values):
 
 
 def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, outpath):
+    plt.rcParams.update({
+        "text.usetex": True,
+        'font.size': 20,
+        "font.family": "serif", 
+        "font.serif": 'Computer Modern',
+        'axes.titlesize': 22,
+        'axes.labelsize': 22,
+        'xtick.labelsize': 18,
+        'ytick.labelsize': 18,
+        'legend.fontsize': 18
+    })
+
     # Step 1: Identify varying keys
     all_keys = params_values[0].keys()
     varying_keys = [k for k in all_keys if any(p[k] != params_values[0][k] for p in params_values)]
@@ -33,13 +45,14 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
 
     # Step 3: Set up subplot grid (rows = keys, cols = eb_maps)
     n_keys, n_maps = len(map_keys), len(eb_maps)
-    fig, axs = plt.subplots(n_keys, n_maps, figsize=(6 * n_maps, 3.5 * n_keys), sharex=True)
+    fig, axs = plt.subplots(n_keys, n_maps, figsize=(6 * n_maps, 3.5 * n_keys), 
+                            sharex=True, sharey=True)
 
     if n_keys == 1: axs = np.expand_dims(axs, 0)
     if n_maps == 1: axs = np.expand_dims(axs, 1)
 
-    titles = ['Initial EB = 0', 'Initial EB = EB_EDE']
-
+    titles = [r'Initial EB: $g = 0$', r'Initial EB: $g = 1$']
+    
     for col_idx, eb_map in enumerate(eb_maps):
         for param_values in params_values:
             # Label just the varying parts
@@ -54,17 +67,21 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
                 axs[row_idx, col_idx].plot(ell, post_detrot[key], label=label)
 
     for row_idx, key in enumerate(map_keys):
+        mapname = key.split('x')
+        spectrum = mapname[0].split('_')[-1] + mapname[1].split('_')[-1]
+        freqs = [mapname[0].split('_')[1], mapname[1].split('_')[1]]
         for col_idx in range(n_maps):
             ax = axs[row_idx, col_idx]
             ax.set_xlim(0, 700)
-            ax.set_title(titles[col_idx], fontsize=14)
+            
             ax.grid(True, linestyle='--', alpha=0.6)
             if col_idx == 0:
-                ax.set_ylabel(f"{key.replace('_', ' ')}\n$D_\\ell$ [$\\mu$K$^2$]", fontsize=12)
+            ax.set_ylabel(f"$D_\\ell^{spectrum}({freqs[0]}GHz, {freqs[1]}GHz)$ [$\\mu$K$^2$]", fontsize=18)
             if row_idx == n_keys - 1:
-                ax.set_xlabel(r'Multipole $\ell$', fontsize=12)
-
-    axs[0, -1].legend(fontsize=9, loc='upper right')
+                ax.set_xlabel(r'Multipole $\ell$', fontsize=18)
+    axs[0,0].set_title(titles[0], fontsize=24)
+    axs[0,1].set_title(titles[1], fontsize=24)
+    axs[0, -1].legend(fontsize=9, loc='upper left')
     plt.tight_layout()
     print("Saving:", outpath)
     plt.savefig(outpath)
