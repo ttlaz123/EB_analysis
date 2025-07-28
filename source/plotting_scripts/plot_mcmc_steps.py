@@ -28,7 +28,7 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
         'axes.labelsize': 22,
         'xtick.labelsize': 18,
         'ytick.labelsize': 18,
-        'legend.fontsize': 18
+        'legend.fontsize': 24
     })
 
     # Step 1: Identify varying keys
@@ -54,11 +54,12 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
         for ax in row[1:]:
             ax.sharey(row[0])
     titles = [r'Initial EB: $g = 0$', r'Initial EB: $g = 1$']
-    
+    lat = {'A_dust_EE': r'A_{dust}^{EE}',
+           'alpha_BK18_220':r'\alpha_{220}'}
     for col_idx, eb_map in enumerate(eb_maps):
         for param_values in params_values:
             # Label just the varying parts
-            label = ", ".join(f"{k}={param_values[k]}" for k in varying_keys)
+            label = ", ".join(f"{lat[k]}={param_values[k]}" for k in varying_keys)
 
             post_rot = ec.apply_cmb_rotation(eb_map, param_values, dl_theory, used_maps)
             post_dust = ec.apply_dust(post_rot, bandpasses, param_values)
