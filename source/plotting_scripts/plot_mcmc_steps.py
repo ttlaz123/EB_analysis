@@ -79,7 +79,7 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
             ax.grid(True, linestyle='--', alpha=0.6)
             if col_idx == 0:
                 ax.set_ylabel(r"$\bar{D}_\ell^{%s}(%s\,\mathrm{GHz})\ [\mu\mathrm{K}^2]$" % 
-                        (spectrum, freqs[0], freqs[1]), fontsize=18)
+                        (spectrum, freqs[0]), fontsize=18)
             if row_idx == n_keys - 1:
                 ax.set_xlabel(r'Multipole $\ell$', fontsize=18)
     axs[0,0].set_title(titles[0], fontsize=24)
