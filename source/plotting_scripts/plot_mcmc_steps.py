@@ -65,6 +65,14 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
             post_detrot = ec.apply_det_rotation(post_dust, param_values, dl_theory)
 
             for row_idx, key in enumerate(map_keys):
+                mapname = key.split('x')
+                spectrum = mapname[1].split('_')[-1] + mapname[0].split('_')[-1]
+                if(spectrum == 'EE'):
+                    row_idx = 0
+                if(spectrum == 'BB'):
+                    row_idx = 1
+                if(spectrum == 'EB'):
+                    row_idx = 2  
                 ell = np.arange(len(post_detrot[key]))
                 axs[row_idx, col_idx].plot(ell, post_detrot[key], label=label)
 
