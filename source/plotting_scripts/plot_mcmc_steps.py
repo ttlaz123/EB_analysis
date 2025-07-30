@@ -444,11 +444,7 @@ def get_plotted_values():
     DATASET_DIRNAME = 'BK18lf_fede01'
     BK18_BASE_PATH = DATA_BASE_PATH + DATASET_DIRNAME + '/'
     observe_filepath = BK18_BASE_PATH + DATASET_DIRNAME + '_cl_hat_sim079.dat'
-    binned_dl_observed_dict, map_reference_header = ld.load_observed_spectra(
-                                                            observe_filepath,
-                                                            used_maps,
-                                                            map_reference_header,
-                                                            num_bins = np.array(range(16))+2)
+    
     fede = 0.07
     FILE_PATHS = fp.set_file_paths('BK18lf', fede=fede)
     
@@ -463,7 +459,11 @@ def get_plotted_values():
     bpwf, map_reference_header = ld.load_bpwf(FILE_PATHS['bpwf'], 
                                             None, 
                                             num_bins=np.array(range(16))+2)
-    
+    binned_dl_observed_dict, map_reference_header = ld.load_observed_spectra(
+                                                            observe_filepath,
+                                                            used_maps,
+                                                            map_reference_header,
+                                                            num_bins = np.array(range(16))+2)
     base_params = {
         'alpha_BK18_220': 1,
         'alpha_CMB': 0,
