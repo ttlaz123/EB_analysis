@@ -438,6 +438,8 @@ def plot_bpwf(bpwf, map_reference_header, outpath):
     return 
 
 def get_plotted_values():
+    used_maps = ['BK18_220_BxBK18_220_E', 'BK18_220_BxBK18_220_B', 'BK18_220_ExBK18_220_E']
+
     DATA_BASE_PATH = '/n/home08/liuto/cosmo_package/data/bicep_keck_2018/BK18_cosmomc/data/'
     DATASET_DIRNAME = 'BK18lf_fede01'
     BK18_BASE_PATH = DATA_BASE_PATH + DATASET_DIRNAME + '/'
@@ -449,8 +451,6 @@ def get_plotted_values():
                                                             num_bins = np.array(range(16))+2)
     fede = 0.07
     FILE_PATHS = fp.set_file_paths('BK18lf', fede=fede)
-    used_maps = ['BK18_220_BxBK18_220_E', 'BK18_220_BxBK18_220_B', 'BK18_220_ExBK18_220_E']
-
     
 
     dl_theory = ld.load_cmb_theory(FILE_PATHS['camb_lensing'])
