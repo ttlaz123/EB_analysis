@@ -85,7 +85,7 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
                 ell = np.arange(len(post_detrot[key]))
                 vary_value = param_values[varying_keys[0]]
                 color = cmap(norm(vary_value))
-                axs[row_idx, col_idx].plot(ell, post_detrot[key], label=label, color=color)
+                axs[row_idx, col_idx].plot(ell, post_detrot[key], label=label)#, color=color)
 
     for row_idx, key in enumerate(map_keys):
         mapname = key.split('x')
