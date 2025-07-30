@@ -248,7 +248,7 @@ def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf
 
     # Add EB from EDE
     ede_spectrum = eb_maps[1][used_map][:maxlen]
-    axs[0].plot(ell, ede_spectrum, r"$g=1$, $\beta_{\mathrm{CMB}} = 0^\circ$", linestyle='--', color='black')
+    axs[0].plot(ell, ede_spectrum, label=r"$g=1$, $\beta_{\mathrm{CMB}} = 0^\circ$", linestyle='--', color='black')
 
     axs[0].set_title("EB Spectrum Before BPWF", fontsize=24)
     axs[0].set_ylabel(r"$D_\ell^{EB,\mathrm{CMB}}$ [$\mu$K$^2$]", fontsize=24)
