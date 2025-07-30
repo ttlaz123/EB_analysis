@@ -173,7 +173,7 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         min_len = 1000
         eb = dl_theory['EB_EDE'][:min_len]
         ee = dl_theory['EE'][:min_len]
-
+        ell = ell[:min_len]
         ratio = eb / ee
         axs[0].plot(ell, np.arcsin(2 * ratio) / 4 * 180 / np.pi,  linewidth=2)
         axs[1].plot(ell, dl_theory['EB_EDE'], label=label, linewidth=2)
