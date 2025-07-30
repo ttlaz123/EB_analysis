@@ -288,7 +288,7 @@ def plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, head
         dust = ec.apply_dust(rot, bandpasses, param_values)
         detrot = ec.apply_det_rotation(dust, param_values, dl_theory)
         spectrum = detrot[used_map][:maxlen]
-        print(spectrum)
+        #print(spectrum)
         label = f"Dust Amplitude EE={param_values['A_dust_EE']:.2f}"
         axs[0].plot(ell, spectrum, label=label)
 
