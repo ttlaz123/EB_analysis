@@ -116,7 +116,7 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
     plt.close()
 
 
-def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_eb_map, param_combos, outpath):
+def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_eb_map, param_combos, outpath, real_file=None):
     """
     Plot EB spectrum evolution under split detector rotation for different (base_angle, angle_diff, l_break).
 
@@ -169,7 +169,10 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         # Apply bpwf
         final = ec.apply_bpwf(header, combined, bpwf, [used_eb_map], do_cross=True)
         axs[2].plot(L_BIN_CENTERS, final[used_eb_map], linewidth=2, marker='o', linestyle='-')
-
+    if(not real_file is None):
+        #axs[0].plot(ell, angle_arr,  linewidth=2)
+        #axs[1].plot(ell, combined[used_eb_map], label=label, linewidth=2)
+        axs[2].plot(L_BIN_CENTERS, real_file[used_eb_map], linewidth=2, marker='o', linestyle='-')
     # Formatting
     axs[-1].set_xlim([0, 600])
     for ax in axs[:-1]:
@@ -435,6 +438,15 @@ def plot_bpwf(bpwf, map_reference_header, outpath):
     return 
 
 def get_plotted_values():
+    DATA_BASE_PATH = '/n/home08/liuto/cosmo_package/data/bicep_keck_2018/BK18_cosmomc/data/'
+    DATASET_DIRNAME = 'BK18lf_fede01'
+    BK18_BASE_PATH = DATA_BASE_PATH + DATASET_DIRNAME + '/'
+    observe_filepath = BK18_BASE_PATH + DATASET_DIRNAME + '_cl_hat_sim079.dat'
+    binned_dl_observed_dict, map_reference_header = ld.load_observed_spectra(
+                                                            observe_filepath,
+                                                            used_maps,
+                                                            map_reference_header,
+                                                            num_bins = np.array(range(16))+2)
     fede = 0.07
     FILE_PATHS = fp.set_file_paths('BK18lf', fede=fede)
     used_maps = ['BK18_220_BxBK18_220_E', 'BK18_220_BxBK18_220_B', 'BK18_220_ExBK18_220_E']
@@ -470,7 +482,7 @@ def get_plotted_values():
         'alpha_sync_EB': -0.5,
         'beta_sync': -3,
     }
-    return eb_maps, base_params, bandpasses, used_maps, dl_theory, bpwf, map_reference_header
+    return eb_maps, base_params, bandpasses, used_maps, dl_theory, bpwf, map_reference_header, binned_dl_observed_dict
 
 def main():
     parser = argparse.ArgumentParser()
@@ -482,7 +494,7 @@ def main():
     parser.add_argument('-e', '--step_function', action='store_true')
 
     args = parser.parse_args()
-    eb_maps, base_params, bandpasses, used_maps, dl_theory, bpwf, header= get_plotted_values()
+    eb_maps, base_params, bandpasses, used_maps, dl_theory, bpwf, header, binned_dl_observed_dict= get_plotted_values()
     initial_eb_map = eb_maps[0]
    
     
@@ -527,20 +539,16 @@ def main():
         (0.2, -1, 370),
         (-0.7, -0.3, 335),
         ]
-    '''
-    plot_eb_spectra_with_bpwf_comparison(
-            dl_theory=dl_theory,
-            eb_maps=eb_maps,
-            params_values=params_values,
-            bpwf=bpwf,
-            header=header,
-            used_map=used_maps[0],
-            outpath=args.outpath
-        )
-    '''
-    '''
-    plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_maps[0], 
+
+        plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_maps[0], 
                                   param_combos, args.outpath)
-    '''
+        
+        param_combos = [
+        (0.46, 0.5, 370),
+        (0.7, 0, 300)
+        ]
+        plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_maps[0], 
+                                  param_combos, args.outpath, binned_dl_observed_dict)
+   
 if __name__ == '__main__':
     main()
