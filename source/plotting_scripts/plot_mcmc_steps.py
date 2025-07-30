@@ -541,14 +541,14 @@ def main():
         ]
 
         plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_maps[0], 
-                                  param_combos, args.outpath)
+                                  param_combos, args.outpath + '_ldiffmodel.png')
         
         param_combos = [
         (0.46, 0.5, 370),
         (0.7, 0, 300)
         ]
         plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_maps[0], 
-                                  param_combos, args.outpath, binned_dl_observed_dict)
+                                  param_combos, args.outpath + '_ldiffsim.png', binned_dl_observed_dict)
    
 if __name__ == '__main__':
     main()
