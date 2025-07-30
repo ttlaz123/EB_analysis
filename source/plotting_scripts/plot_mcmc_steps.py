@@ -245,7 +245,7 @@ def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf
         spectrum = rotated[used_map][:maxlen]  # ensure same length
         label = fr"$g=0$, $\beta_{{\mathrm{{CMB}}}} = {param_values['alpha_CMB']}^\circ$"
         axs[0].plot(ell, spectrum, label=label)
-
+    plt.savefig(outpath + '_eb.png')
     # Add EB from EDE
     ede_spectrum = eb_maps[1][used_map][:maxlen]
     axs[0].plot(ell, ede_spectrum, label=r"$g=1$, $\beta_{\mathrm{CMB}} = 0^\circ$", linestyle='--', color='black')
@@ -254,7 +254,7 @@ def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf
     axs[0].set_ylabel(r"$D_\ell^{EB,\mathrm{CMB}}$ [$\mu$K$^2$]", fontsize=24)
     axs[0].grid(True, linestyle='--', alpha=0.6)
     axs[0].legend(fontsize=18)
-
+    plt.savefig(outpath + '_eb.png')
     # --- Plot 2: EB spectra after BPWF ---
     for param_values in params_values:
         rotated = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, [used_map])
