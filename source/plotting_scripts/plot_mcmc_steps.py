@@ -263,9 +263,10 @@ def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf
         ax.set_xlim(0, 600)
 
     plt.tight_layout()
-    print("Saving:", outpath)
-    plt.savefig(outpath)
+    print("Saving:", outpath + '_eb.png')
+    plt.savefig(outpath + '_eb.png')
     plt.close()
+
 def plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, outpath):
     """
     Plot EB dust-only spectra before and after BPWF, for each param_values set.
@@ -316,8 +317,8 @@ def plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, head
         ax.set_xlim(0, 600)
 
     plt.tight_layout()
-    print("Saving:", outpath)
-    plt.savefig(outpath)
+    print("Saving:", outpath + '_dust.png')
+    plt.savefig(outpath + '_dust.png')
     plt.close()
 
 def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, outpath):
@@ -476,8 +477,9 @@ def main():
         plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, args.outpath)
         
     if(args.bpwf_step):
+        plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf, header, used_maps[0], args.outpath)
         plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
-        plot_bpwf(bpwf, header, args.outpath)
+        #plot_bpwf(bpwf, header, args.outpath)
     if(args.step_function):
         param_combos = [
         (-0.5, 1, 405),
