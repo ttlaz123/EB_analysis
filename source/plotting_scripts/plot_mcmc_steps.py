@@ -170,8 +170,13 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         final = ec.apply_bpwf(header, combined, bpwf, [used_eb_map], do_cross=True)
         axs[2].plot(L_BIN_CENTERS, final[used_eb_map], linewidth=2, marker='o', linestyle='-')
     if(not real_file is None):
-        #axs[0].plot(ell, angle_arr,  linewidth=2)
-        #axs[1].plot(ell, combined[used_eb_map], label=label, linewidth=2)
+        min_len = 1000
+        eb = dl_theory['EB_EDE'][:min_len]
+        ee = dl_theory['EE'][:min_len]
+
+        ratio = eb / ee
+        axs[0].plot(ell, arcsin_ratio = np.arcsin(2 * ratio) / 4 * 180 / np.pi,  linewidth=2)
+        axs[1].plot(ell, dl_theory['EB_EDE'], label=label, linewidth=2)
         axs[2].plot(L_BIN_CENTERS, real_file[used_eb_map], linewidth=2, marker='o', linestyle='-')
     # Formatting
     axs[-1].set_xlim([0, 600])
