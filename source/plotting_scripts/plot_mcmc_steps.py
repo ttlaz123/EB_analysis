@@ -439,6 +439,7 @@ def plot_bpwf(bpwf, map_reference_header, outpath):
 
 def get_plotted_values():
     used_maps = ['BK18_220_BxBK18_220_E', 'BK18_220_BxBK18_220_B', 'BK18_220_ExBK18_220_E']
+    used_maps = ['BK18_B95e_BxBK18_B95e_E', 'BK18_B95e_BxBK18_B95e_B', 'BK18_B95e_ExBK18_B95e_E']
 
     DATA_BASE_PATH = '/n/home08/liuto/cosmo_package/data/bicep_keck_2018/BK18_cosmomc/data/'
     DATASET_DIRNAME = 'BK18lf_fede01'
@@ -466,6 +467,7 @@ def get_plotted_values():
                                                             num_bins = np.array(range(16))+2)
     base_params = {
         'alpha_BK18_220': 1,
+        'alpha_BK18_B95e': 1,
         'alpha_CMB': 0,
         'A_dust_EE': 7,
         'A_dust_BB': 4,
