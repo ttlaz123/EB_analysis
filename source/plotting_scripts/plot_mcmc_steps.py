@@ -334,7 +334,7 @@ def plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, head
                     label=label)
 
     axs[1].set_title("EB Spectrum After BPWF", fontsize=24)
-    axs[1].set_ylabel(r"$\bar{D}_\ell^{%s}(%s\,\mathrm{GHz})\ [\mu\mathrm{K}^2]$" % 
+    axs[1].set_ylabel(r"$D_b^{%s}(%s\,\mathrm{GHz})\ [\mu\mathrm{K}^2]$" % 
                         (specname, freqs[0]), fontsize=18)
     axs[1].set_xlabel(r"Multipole $\ell$", fontsize=18)
     axs[1].grid(True, linestyle='-.', alpha=0.6)
