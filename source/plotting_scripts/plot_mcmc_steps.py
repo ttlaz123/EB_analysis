@@ -477,7 +477,19 @@ def main():
         plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, args.outpath)
         
     if(args.bpwf_step):
+        param_to_sweep = 'alpha_CMB'
+        sweep_values = [0.3]
+        #param_to_sweep = 'alpha_BK18_220'
+        #sweep_values = [-1, -0.5, 0, 0.5, 1]
+        params_values = sweep_param(base_params, param_to_sweep, sweep_values)
+        
         plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf, header, used_maps[0], args.outpath)
+        param_to_sweep = 'A_dust_EE'
+        sweep_values = [0, 5, 20, 100]
+        #param_to_sweep = 'alpha_BK18_220'
+        #sweep_values = [-1, -0.5, 0, 0.5, 1]
+        params_values = sweep_param(base_params, param_to_sweep, sweep_values)
+        
         plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
         #plot_bpwf(bpwf, header, args.outpath)
     if(args.step_function):
