@@ -259,10 +259,11 @@ def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf
     for param_values in params_values:
         rotated = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, [used_map])
         binned = ec.apply_bpwf(header, rotated, bpwf, [used_map], do_cross=True)
-        axs[1].plot(L_BIN_CENTERS, binned[used_map], marker='o', label=f"Rotation: α={param_values['alpha_CMB']:.2f}")
+        label = fr"$g=0$, $\beta_{{\mathrm{{CMB}}}} = {param_values['alpha_CMB']}^\circ$"
+        axs[1].plot(L_BIN_CENTERS, binned[used_map], marker='o', label=label)
 
     ede_binned = ec.apply_bpwf(header, eb_maps[1], bpwf, [used_map], do_cross=True)
-    axs[1].plot(L_BIN_CENTERS, ede_binned[used_map], label="fEDE=0.07, g=0.3", linestyle='--', color='black', marker='o')
+    axs[1].plot(L_BIN_CENTERS, ede_binned[used_map], label=r"$g=1$, $\beta_{\mathrm{CMB}} = 0^\circ$", linestyle='--', color='black', marker='o')
 
     axs[1].set_title("EB Spectrum After BPWF", fontsize=24)
     
