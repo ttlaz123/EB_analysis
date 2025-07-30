@@ -273,7 +273,7 @@ def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf
     for ax in axs:
         ax.set_xlim(0, 600)
 
-    #plt.tight_layout()
+    plt.tight_layout()
     print("Saving:", outpath + '_eb.png')
     plt.savefig(outpath + '_eb.png')
     plt.close()
