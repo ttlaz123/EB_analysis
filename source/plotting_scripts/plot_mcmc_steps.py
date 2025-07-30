@@ -245,16 +245,14 @@ def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf
         spectrum = rotated[used_map][:maxlen]  # ensure same length
         label = fr"$g=0$, $\beta_{{\mathrm{{CMB}}}} = {param_values['alpha_CMB']}^\circ$"
         axs[0].plot(ell, spectrum, label=label)
-    plt.savefig(outpath + '_eb.png')
     # Add EB from EDE
     ede_spectrum = eb_maps[1][used_map][:maxlen]
     axs[0].plot(ell, ede_spectrum, label=r"$g=1$, $\beta_{\mathrm{CMB}} = 0^\circ$", linestyle='--', color='black')
 
     axs[0].set_title("EB Spectrum Before BPWF", fontsize=24)
-    axs[0].set_ylabel(r"$D_\ell^{EB,\mathrm{CMB}}$ [$\mu$K$^2$]", fontsize=24)
+    axs[0].set_ylabel(r"$D_\ell^{EB,\mathrm{rot}}$ [$\mu$K$^2$]", fontsize=24)
     axs[0].grid(True, linestyle='--', alpha=0.6)
-    axs[0].legend(fontsize=18)
-    plt.savefig(outpath + '_eb.png')
+    axs[0].legend(fontsize=18, loc='upper left')
     # --- Plot 2: EB spectra after BPWF ---
     for param_values in params_values:
         rotated = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, [used_map])
@@ -270,7 +268,7 @@ def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf
     axs[1].set_ylabel(r"$D_b^{EB}(\mathrm{220\,GHz})$ [$\mu$K$^2$]", fontsize=24)
     axs[1].set_xlabel(r"Multipole $\ell$", fontsize=24)
     axs[1].grid(True, linestyle='-.', alpha=0.6)
-    axs[1].legend(fontsize=18)
+    axs[1].legend(fontsize=18, loc='upper left')
 
     for ax in axs:
         ax.set_xlim(0, 600)
@@ -296,35 +294,50 @@ def plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, head
     ell = ell[:maxlen]
     used_map = used_maps[0]
     # --- Plot 1: Dust EB before BPWF ---
+    lat = {
+        'A_dust_EE': r'$A_{\mathrm{dust}}^{EE}$',
+        'alpha_BK18_220': r'$\alpha_{220}$',
+    }
+    all_keys = params_values[0].keys()
+    varying_keys = [k for k in all_keys if any(p[k] != params_values[0][k] for p in params_values)]
     for param_values in params_values:
+        label = ", ".join(
+                f"{lat[k]} = {param_values[k]}" for k in varying_keys
+            )
         rot = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, used_maps)
         dust = ec.apply_dust(rot, bandpasses, param_values)
         detrot = ec.apply_det_rotation(dust, param_values, dl_theory)
         spectrum = detrot[used_map][:maxlen]
         #print(spectrum)
-        label = f"Dust Amplitude EE={param_values['A_dust_EE']:.2f}"
         axs[0].plot(ell, spectrum, label=label)
-
-    axs[0].set_title("Dust EB Spectrum Before BPWF", fontsize=14)
-    axs[0].set_ylabel(r"$D_\ell^{EB}$ [$\mu$K$^2$]", fontsize=13)
+    mapname = used_map.split('x')
+    specname = mapname[1].split('_')[-1] + mapname[0].split('_')[-1]
+    freqs = [mapname[0].split('_')[1], mapname[1].split('_')[1]]
+    
+    axs[0].set_title("EB Spectrum Before BPWF", fontsize=14)
+    axs[0].set_ylabel(r"$\bar{D}_\ell^{%s}(%s\,\mathrm{GHz})\ [\mu\mathrm{K}^2]$" % 
+                        (specname, freqs[0]), fontsize=18)
     axs[0].grid(True, linestyle='--', alpha=0.6)
-    axs[0].legend(fontsize=10)
+    axs[0].legend(fontsize=18, loc='upper left')
 
     # --- Plot 2: Dust EB after BPWF ---
     for param_values in params_values:
+        label = ", ".join(
+                f"{lat[k]} = {param_values[k]}" for k in varying_keys
+            )
         rot = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, used_maps)
         dust = ec.apply_dust(rot, bandpasses, param_values)
         detrot = ec.apply_det_rotation(dust, param_values, dl_theory)
         binned = ec.apply_bpwf(header, detrot, bpwf, used_maps, do_cross=True)
 
         axs[1].plot(L_BIN_CENTERS, binned[used_map], marker='o',
-                    label=f"Dust Amplitude EE={param_values['A_dust_EE']:.2f}")
+                    label=label)
 
     axs[1].set_title("Dust EB Spectrum After BPWF", fontsize=14)
     axs[1].set_ylabel(r"$D_b^{EB}$ [$\mu$K$^2$]", fontsize=13)
     axs[1].set_xlabel(r"Multipole $\ell$", fontsize=13)
     axs[1].grid(True, linestyle='-.', alpha=0.6)
-    axs[1].legend(fontsize=10)
+    axs[1].legend(fontsize=18, loc='upper left')
 
     for ax in axs:
         ax.set_xlim(0, 600)
@@ -386,7 +399,7 @@ def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, ba
     plt.close()
     return 
 def plot_bpwf(bpwf, map_reference_header, outpath):
-    cross_spec = 29
+    cross_spec = 27
     L_BIN_CENTERS = np.array([37.5, 72.5, 107.5, 142.5, 177.5, 
                                212.5, 247.5, 282.5, 317.5, 352.5,
                                387.5, 422.5, 457.5, 492.5, 527.5, 562.5])
@@ -413,10 +426,10 @@ def plot_bpwf(bpwf, map_reference_header, outpath):
         plt.axvline(x=center, color='gray', linestyle='--', linewidth=1)
     plt.xlabel(r"Multipole $\ell$", fontsize=24)
     plt.ylabel("Weight")
-    plt.title("Band Power Window Function for EB at 95GHz")
+    plt.title("Band Power Window Function for EB at 220GHz")
     #plt.legend()
-    print("Saving fig to " + outpath)
-    plt.savefig(outpath)
+    print("Saving fig to " + outpath + '_bpwf.png')
+    plt.savefig(outpath+ '_bpwf.png')
     
     return 
 
@@ -504,7 +517,7 @@ def main():
         params_values = sweep_param(base_params, param_to_sweep, sweep_values)
         
         plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
-        #plot_bpwf(bpwf, header, args.outpath)
+        plot_bpwf(bpwf, header, args.outpath)
     if(args.step_function):
         param_combos = [
         (-0.5, 1, 405),
