@@ -219,6 +219,17 @@ def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf
         - pure rotation (using param_values)
         - EDE-injected EB (from theory)
     """
+    plt.rcParams.update({
+        "text.usetex": True,
+        'font.size': 20,
+        "font.family": "serif", 
+        "font.serif": 'Computer Modern',
+        'axes.titlesize': 22,
+        'axes.labelsize': 22,
+        'xtick.labelsize': 18,
+        'ytick.labelsize': 18,
+        'legend.fontsize': 18
+    })
     ell = np.arange(len(dl_theory['EE']))
     L_BIN_CENTERS = np.array([37.5, 72.5, 107.5, 142.5, 177.5, 
                                212.5, 247.5, 282.5, 317.5, 352.5,
@@ -232,17 +243,17 @@ def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf
     for param_values in params_values:
         rotated = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, [used_map])
         spectrum = rotated[used_map][:maxlen]  # ensure same length
-        label = f"Rotation: α={param_values['alpha_CMB']:.2f}"
+        label = rf"$g=0$, $\beta_{{\mathrm{{CMB}}}} = {param_values['alpha_CMB']:.2f}^\circ$"
         axs[0].plot(ell, spectrum, label=label)
 
     # Add EB from EDE
     ede_spectrum = eb_maps[1][used_map][:maxlen]
-    axs[0].plot(ell, ede_spectrum, label="EDE EB", linestyle='--', color='black')
+    axs[0].plot(ell, ede_spectrum, r"$g=1$, $\beta_{\mathrm{CMB}} = 0^\circ$", linestyle='--', color='black')
 
-    axs[0].set_title("EB Spectrum Before BPWF", fontsize=14)
-    axs[0].set_ylabel(r"$D_\ell^{EB}$ [$\mu$K$^2$]", fontsize=13)
+    axs[0].set_title("EB Spectrum Before BPWF", fontsize=24)
+    axs[0].set_ylabel(r"$D_\ell^{EB,\mathrm{CMB}}$ [$\mu$K$^2$]", fontsize=24)
     axs[0].grid(True, linestyle='--', alpha=0.6)
-    axs[0].legend(fontsize=10)
+    axs[0].legend(fontsize=18)
 
     # --- Plot 2: EB spectra after BPWF ---
     for param_values in params_values:
@@ -253,11 +264,12 @@ def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf
     ede_binned = ec.apply_bpwf(header, eb_maps[1], bpwf, [used_map], do_cross=True)
     axs[1].plot(L_BIN_CENTERS, ede_binned[used_map], label="fEDE=0.07, g=0.3", linestyle='--', color='black', marker='o')
 
-    axs[1].set_title("EB Spectrum After BPWF", fontsize=14)
-    axs[1].set_ylabel(r"$D_b^{EB}$ [$\mu$K$^2$]", fontsize=13)
-    axs[1].set_xlabel(r"Multipole $\ell$", fontsize=13)
+    axs[1].set_title("EB Spectrum After BPWF", fontsize=24)
+    
+    axs[1].set_ylabel(r"$D_b^{EB}(\mathrm{220\,GHz})$ [$\mu$K$^2$]", fontsize=24)
+    axs[1].set_xlabel(r"Multipole $\ell$", fontsize=24)
     axs[1].grid(True, linestyle='-.', alpha=0.6)
-    axs[1].legend(fontsize=10)
+    axs[1].legend(fontsize=18)
 
     for ax in axs:
         ax.set_xlim(0, 600)
