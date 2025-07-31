@@ -199,20 +199,20 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
     axs[-1].set_xlim([0, 600])
     for ax in axs[:-1]:
         ax.label_outer()
-    axs[0].set_ylabel(r'$\beta(\ell)$ [deg]', fontsize=14)
+    axs[0].set_ylabel(r'$\beta(\ell)$ [deg]', fontsize=24)
     axs[0].set_title('Multipole Dependent Rotation Angle', fontsize=24)
     axs[0].grid(True, linestyle='--', alpha=0.6)
     
-
+    axs[1].set_ylim([-1,2])
+    axs[0].set_ylim([-1,1])
+    axs[2].set_ylim([-0.12,0.12])
     axs[1].set_ylabel(r'$D_\ell^{EB, \mathrm{rot}}$ [$\mu$K$^2$]', fontsize=24)
     axs[1].set_title('Rotated EB Spectrum', fontsize=15)
     axs[1].grid(True, linestyle='--', alpha=0.6)
-    axs[1].legend(fontsize=18, loc= 'upper left')
-    axs[1].legend(fontsize=18, loc= 'upper left')
-    axs[1].legend(fontsize=18, loc= 'upper left')
+    axs[1].legend(fontsize=16, loc= 'upper left')
     axs[2].set_ylabel(r'$D_b^{EB}(220\mathrm{GHz})$ [$\mu$K$^2$]', fontsize=24)
     axs[2].set_xlabel(r'Multipole $\ell$', fontsize=24)
-    axs[2].set_title('EB Spectrum After Bandpower Window Function', fontsize=15)
+    axs[2].set_title('EB Spectrum After Bandpower Window Function', fontsize=24)
     axs[2].grid(True, linestyle='dashdot', alpha=0.6)
   
     xticks = np.arange(20, 601, 35)
@@ -560,6 +560,7 @@ def main():
     if(args.step_function):
         full_covmat = ld.load_covariance_matrix(FILE_PATHS['covariance_matrix'],
                                             header)
+        print('Filtering covmat')
         filtered_covmat = ec.filter_matrix(header, 
                                         full_covmat, 
                                         [used_maps[0]],
@@ -580,7 +581,7 @@ def main():
         (0.47, 0, 300)
         ]
         plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_maps[0], 
-                                  param_combos, args.outpath + '_ldiffsim.png', binned_dl_observed_dict, covmat=covmat)
+                                  param_combos, args.outpath + '_ldiffsim.png', binned_dl_observed_dict, covmat=filtered_covmat)
    
 if __name__ == '__main__':
     main()
