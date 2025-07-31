@@ -116,7 +116,7 @@ def plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, o
     plt.close()
 
 
-def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_eb_map, param_combos, outpath, real_file=None):
+def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_eb_map, param_combos, outpath, real_file=None, covmat=None):
     """
     Plot EB spectrum evolution under split detector rotation for different (base_angle, angle_diff, l_break).
 
@@ -134,6 +134,18 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         param_combos: list of (base_angle, angle_diff, l_break)
         outpath: where to save the figure
     """
+    plt.rcParams.update({
+        "text.usetex": True,
+        'font.size': 20,
+        "font.family": "serif", 
+        "font.serif": 'Computer Modern',
+        'axes.titlesize': 22,
+        'axes.labelsize': 22,
+        'xtick.labelsize': 18,
+        'ytick.labelsize': 18,
+        'legend.fontsize': 24
+    })
+    
     ell = np.arange(len(dl_theory['EE']))
     L_BIN_CENTERS = np.array([37.5, 72.5, 107.5, 142.5, 177.5, 
                                212.5, 247.5, 282.5, 317.5, 352.5,
@@ -168,31 +180,38 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         
         # Apply bpwf
         final = ec.apply_bpwf(header, combined, bpwf, [used_eb_map], do_cross=True)
-        axs[2].plot(L_BIN_CENTERS, final[used_eb_map], linewidth=2, marker='o', linestyle='-')
+        axs[2].plot(L_BIN_CENTERS, final[used_eb_map],  label=label,linewidth=2, marker='o', linestyle='-')
     if(not real_file is None):
         min_len = 1000
+        
+        var = np.diag(covmat)
+        data_err = np.sqrt(var)
         eb = dl_theory['EB_EDE'][:min_len]
         ee = dl_theory['EE'][:min_len]
         ell = ell[:min_len]
         ratio = eb / ee
-        axs[0].plot(ell, np.arcsin(2 * ratio) / 4 * 180 / np.pi,  linewidth=2)
-        axs[1].plot(ell, eb, label=label, linewidth=2)
-        axs[2].plot(L_BIN_CENTERS, real_file[used_eb_map], linewidth=2, marker='o', linestyle='-')
+        axs[0].plot(ell, np.arcsin(2 * ratio) / 4 * 180 / np.pi,  label='True EDE Rotation',linewidth=2,  color='black',)
+        axs[1].plot(ell, eb, label='True EDE Rotation', linewidth=2,  color='black',)
+        #axs[2].plot(L_BIN_CENTERS, real_file[used_eb_map],label='True EDE Rotation', linewidth=2, marker='o', linestyle='-')
+        axs[2].errorbar(L_BIN_CENTERS, real_file[used_eb_map], yerr=data_err, linewidth=2, marker='o', linestyle='-', color='black', label='True EDE Rotation')
+
     # Formatting
     axs[-1].set_xlim([0, 600])
     for ax in axs[:-1]:
         ax.label_outer()
     axs[0].set_ylabel(r'$\beta(\ell)$ [deg]', fontsize=14)
-    axs[0].set_title('Multipole Dependent Rotation Angle', fontsize=15)
+    axs[0].set_title('Multipole Dependent Rotation Angle', fontsize=24)
     axs[0].grid(True, linestyle='--', alpha=0.6)
     
 
-    axs[1].set_ylabel(r'$D_\ell^{EB}$ [$\mu$K$^2$]', fontsize=14)
+    axs[1].set_ylabel(r'$D_\ell^{EB, \mathrm{rot}}$ [$\mu$K$^2$]', fontsize=24)
     axs[1].set_title('Rotated EB Spectrum', fontsize=15)
     axs[1].grid(True, linestyle='--', alpha=0.6)
-    axs[1].legend(fontsize=10)
-    axs[2].set_ylabel(r'$D_b^{EB}$ [$\mu$K$^2$]', fontsize=14)
-    axs[2].set_xlabel(r'Multipole $\ell$', fontsize=14)
+    axs[1].legend(fontsize=18, loc= 'upper left')
+    axs[1].legend(fontsize=18, loc= 'upper left')
+    axs[1].legend(fontsize=18, loc= 'upper left')
+    axs[2].set_ylabel(r'$D_b^{EB}(220\mathrm{GHz})$ [$\mu$K$^2$]', fontsize=24)
+    axs[2].set_xlabel(r'Multipole $\ell$', fontsize=24)
     axs[2].set_title('EB Spectrum After Bandpower Window Function', fontsize=15)
     axs[2].grid(True, linestyle='dashdot', alpha=0.6)
   
@@ -489,7 +508,7 @@ def get_plotted_values():
         'alpha_sync_EB': -0.5,
         'beta_sync': -3,
     }
-    return eb_maps, base_params, bandpasses, used_maps, dl_theory, bpwf, map_reference_header, binned_dl_observed_dict
+    return eb_maps, base_params, bandpasses, used_maps, dl_theory, bpwf, map_reference_header, binned_dl_observed_dict, FILE_PATHS
 
 def main():
     parser = argparse.ArgumentParser()
@@ -501,7 +520,7 @@ def main():
     parser.add_argument('-e', '--step_function', action='store_true')
 
     args = parser.parse_args()
-    eb_maps, base_params, bandpasses, used_maps, dl_theory, bpwf, header, binned_dl_observed_dict= get_plotted_values()
+    eb_maps, base_params, bandpasses, used_maps, dl_theory, bpwf, header, binned_dl_observed_dict, FILE_PATHS= get_plotted_values()
     initial_eb_map = eb_maps[0]
    
     
@@ -539,6 +558,11 @@ def main():
         plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
         plot_bpwf(bpwf, header, args.outpath)
     if(args.step_function):
+        full_covmat = ld.load_covariance_matrix(FILE_PATHS['covariance_matrix'],
+                                            header)
+        filtered_covmat = ec.filter_matrix(header, 
+                                        full_covmat, 
+                                        [used_maps[0]])
         param_combos = [
         (-0.5, 1, 405),
         (0, 0.4, 300),
@@ -555,7 +579,7 @@ def main():
         (0.47, 0, 300)
         ]
         plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_maps[0], 
-                                  param_combos, args.outpath + '_ldiffsim.png', binned_dl_observed_dict)
+                                  param_combos, args.outpath + '_ldiffsim.png', binned_dl_observed_dict, covmat=covmat)
    
 if __name__ == '__main__':
     main()
