@@ -562,7 +562,8 @@ def main():
                                             header)
         filtered_covmat = ec.filter_matrix(header, 
                                         full_covmat, 
-                                        [used_maps[0]])
+                                        [used_maps[0]],
+                                        num_bins=range(2,18))
         param_combos = [
         (-0.5, 1, 405),
         (0, 0.4, 300),
