@@ -213,11 +213,24 @@ def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class
     Saves:
         A PNG file `{outpath}_bestfit{spectra_type}.png`.
     """
+    plt.rcParams.update({
+        "text.usetex": True,
+        'font.family':'serif',
+        'font.serif':'Computer Modern',
+        'font.size': 20,
+        'axes.titlesize': 22,
+        'axes.labelsize': 22,
+        'xtick.labelsize': 18,
+        'ytick.labelsize': 18,
+        'legend.fontsize': 14
+    })
+
     num_columns = len(maps_B)  # Unique maps for columns
     num_rows = len(maps_E)      # Unique maps for rows
     # Create subplots
     fig, axes = plt.subplots(num_rows, num_columns, 
-                    figsize=(num_columns * 4, num_rows * 4))
+                    figsize=(num_columns * 4, num_rows * 4),
+                    sharex=True, sharey=True)
 
     try:
         axes = axes.flatten()  # Flatten axes array for easy indexing
@@ -226,6 +239,8 @@ def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class
         axes = [axes]
     keys = list(theory_dict.keys())
     # Plot each spectrum
+    bins = multicomp_class.bin_num 
+    muls = bdc.L_BIN_CENTERS[[b-1 for b in bins]]
     for idx, key in enumerate(keys):
         observed_data = observed_datas[key]
         best_fit_data = theory_dict[key]
@@ -234,6 +249,13 @@ def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class
         # Split key to find row and column indices
         spec_type = determine_spectrum_type(key)
         parts = key.split('x')
+        mapname1 = parts[0].split('_')
+        mapname2 = parts[1].split('_')
+        if(mapname1[1] == 'B95e'):
+            mapname1[1] = 'B95'
+        if(mapname2[1] == 'B95e'):
+            mapname2[1] = 'B95'
+        label = rf"{mapname1[1]} $\times$ {mapname2[1]} {spec_type}"
         if(spectra_type in ['EB', 'BE']):
             if(spec_type in ['EE', 'BB']):
                 continue
@@ -256,17 +278,20 @@ def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class
         # Plotting observed data
         axes_index = row_idx * num_columns + col_idx
         #print(observed_data)
-        
+         
         axes[axes_index].errorbar(
-                            x = range(len(observed_data)),
+                            x = muls, #range(len(observed_data)),
                             y=(observed_data), 
                             yerr = np.sqrt(var),
-                            label='Observed', color='blue')
+                            linestyle='-', marker='o',
+                            label=label, color='black')
         # Plotting best fit data
-        axes[axes_index].plot(best_fit_data, label='Best Fit', color='red')
+        axes[axes_index].plot(muls, best_fit_data, color='blue', 
+                            linestyle='-')#, marker='o')
 
-        axes[axes_index].set_title(key)
-        axes[axes_index].legend()
+        #axes[axes_index].set_title(key)
+        axes[axes_index].legend(loc='upper left', fontsize=20)
+    '''
     for row_idx, map_E in enumerate(maps_E):
         angle = f"alpha_{map_E}"
         axes[row_idx].text(
@@ -276,6 +301,12 @@ def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class
             fontsize=10, color='black',
             verticalalignment='top'
         )
+    '''
+    for ax in axes:
+        ax.label_outer()
+        ax.set_ylim([-0.02, 0.15])
+        ax.axhline(0, color='gray', linestyle='--', linewidth=1)
+    '''
     fig.text(
         x=0.5,  # Centered horizontally
         y=0.95,  # Just above bottom edge
@@ -285,7 +316,10 @@ def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class
         ha='center',
         va='bottom'
     )
-    plt.tight_layout(pad=2)
+    '''
+    fig.supxlabel(r"Multipole $\ell$", fontsize=24)
+    fig.supylabel(r"$D_b^{EB}(\nu_1\times\nu_2)$ [$\mu K^2$]", fontsize=24)
+    plt.tight_layout(pad=1)
     print("Saving: " +outpath + '_bestfit'+ spectra_type +'.png')
     plt.savefig(outpath + '_bestfit' + spectra_type + '.png')
     
@@ -347,6 +381,7 @@ def plot_eebbeb(multicomp_class, outpath, param_names, param_bestfit, param_stat
     residuals = multicomp_class.binned_dl_observed_vec - theory_vec
     # Calculate the Mahalanobis distance using the inverse covariance matrix
     chi_squared = residuals.T @ multicomp_class.sim_common_data['full_inv_covmat'] @ residuals
+    print('Chi Squared: ' + str(chi_squared))
     theory_dict = multicomp_class.final_detection_dict
     maps_B = set()
     maps_E = set()
@@ -370,7 +405,7 @@ def plot_eebbeb(multicomp_class, outpath, param_names, param_bestfit, param_stat
                     final_detection_dict=multicomp_class.final_detection_dict,
                     num_bins=len(multicomp_class.bin_num),
                     outpath = outpath)
-    for spectra_type in ['EE', 'EB', 'BB']:
+    for spectra_type in ['EB', 'EE', 'BB']:
         plot_spectra_type(spectra_type, 
                       maps_E, 
                       maps_B, 
@@ -486,49 +521,92 @@ def plot_triangle(root, replace_dict={}):
     samples = loadMCSamples(root)
     print([name.name for name in samples.getParamNames().names])
     
-    param_names = [name.name for name in samples.getParamNames().names
+    param_names_all = [name.name for name in samples.getParamNames().names
                    if ('chi2' not in name.name and
                        'weight' not in name.name and
                        'minuslogprior' not in name.name)]
-    
-    # Get the mean and std of the parameters for titles
+    label_dict={
+        'gMpl':  r'$g/M_\mathrm{pl}^{-1}$',
+        'alpha_BK18_220': r'$\alpha_\mathrm{220}$',
+        'alpha_BK18_B95e': r'$\alpha_\mathrm{B95}$',
+        'alpha_BK18_K95': r'$\alpha_\mathrm{K95}$',
+        'alpha_BK18_150': r'$\alpha_\mathrm{150}$',
+    }
+    plt.rcParams.update({
+    "text.usetex": True,
+    "font.family": "serif",
+    'font.size':18,
+    'axes.labelsize':24,
+    "font.serif": ["Computer Modern Roman"],
+    "axes.unicode_minus": False,
+    })
+    include_params = ['gMpl', 'alpha_BK18_220', 
+                    'alpha_BK18_B95e', 'alpha_BK18_K95',
+                    'alpha_BK18_150']
+    param_names = [p for p in param_names_all if p in include_params]
+
+    # Compute mean, std, chi2, and prepare labels
     mean_std_strings = []
     means = []
-    count = 0
     for param in param_names:
-        
         mean = samples.mean(param)
-        if(param in replace_dict):
+        if param in replace_dict:
             mean = replace_dict[param]
-        chisq = samples.mean('chi2')
         std = samples.std(param)
-        if(count == 0):
-            mean_std_strings.append(f"{param}: {mean:.2f} ± {std:.2f} chisq={chisq:.2f}")
-            count += 1
-        else:
-            mean_std_strings.append(f"{param}: {mean:.2f} ± {std:.2f}")
-
+        chisq = samples.mean('chi2')
+        mean_std_strings.append(rf"${param}$: ${mean:.2f} \pm {std:.2f}$")
         means.append(mean)
-    #plot_ranges = get_safe_ranges([samples])
-    # Create a triangle plot with all variables
+
+    # Apply parameter labels
+    for name in samples.getParamNames().names:
+        if name.name in label_dict:
+            name.label = label_dict[name.name]
+
+    # Create the triangle plot
     fig = plt.figure()
     g = plots.get_subplot_plotter()
+    g.settings.axes_fontsize = 16
+    g.settings.lab_fontsize = 20
+    g.settings.title_limit_fontsize = 16
+    g.settings.legend_fontsize = 14
+    g.settings.tight_layout = True
+
     g.triangle_plot(samples, param_names, filled=True)
-                    #param_limits=plot_ranges)
-    # Add the mean and std to the plot title
-    plt.suptitle("\n".join(mean_std_strings), fontsize=10)
-    plt.tight_layout()
-    # Save the plot
-    plt.savefig(f"{root}_triangle_plot.png")
+
+    # Get the best-fit (min chi²) point
+    chi2_vals = samples.samples[:, samples.paramNames.list().index('chi2')]
+    best_fit_index = np.argmin(chi2_vals)
+    best_fit_point = samples.samples[best_fit_index, :]
+
+    # Add red mean dots and green best-fit dot
+    for i, pi in enumerate(param_names):
+        for j, pj in enumerate(param_names):
+            if j > i:
+                ax = g.subplots[j, i]
+                # Red dot: parameter means
+                ax.plot(means[i], means[j], 'o', color='red', markersize=6, label='Mean of Posteriors')
+                # Green dot: min chi² point
+                x_idx = samples.paramNames.list().index(pi)
+                y_idx = samples.paramNames.list().index(pj)
+                ax.plot(best_fit_point[x_idx], best_fit_point[y_idx], 'o', color='lime', markersize=6, label='Min $\chi^2$ Point in CHain')
+    ax_for_legend = g.subplots[1, 0]  # or any subplot where you have the dots
+    handles, labels = ax_for_legend.get_legend_handles_labels()
+    fig.legend(handles, labels, loc='upper right', bbox_to_anchor=(1.15, 0.9), fontsize=12, frameon=False)
+
+    # Adjust layout to make room for the legend on the right
+    plt.subplots_adjust(right=0.85)  # leave 15% space on right for legend
+
+    # Add LaTeX-formatted title in top-right
+    title_ax = g.subplots[0, len(param_names) - 1]
+    title_text = "\n".join(mean_std_strings)
+    #title_ax.text(1.05, 1.05, title_text, transform=title_ax.transAxes,
+    #              ha='left', va='top', fontsize=14, family='serif', usetex=True)
+    # Save and show
+    plt.savefig(f"{root}_triangle_plot.png", bbox_inches='tight')
     print(f"Triangle plot saved as {root}_triangle_plot.png")
-    #plt.show()
+    plt.show()
     plt.close(fig)
-    return param_names, means, mean_std_strings
-
-
-
-
-
+    return param_means_all, means, mean_std_strs
 
 
 

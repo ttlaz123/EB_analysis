@@ -32,11 +32,24 @@ def extract_column_indices(header_lines):
     raise ValueError("Failed to find column index definitions for l, EE, and EB in header.")
 
 def plot_multiple_eb_ee(filenames, output='eb_ee_plot.png'):
+    plt.rcParams.update({
+        "text.usetex": True,
+        'font.size': 20,
+        "font.family": "serif", 
+        "font.serif": 'Computer Modern',
+        'axes.titlesize': 22,
+        'axes.labelsize': 22,
+        'xtick.labelsize': 18,
+        'ytick.labelsize': 18,
+        'legend.fontsize': 24
+    })
+
     plt.figure(figsize=(10, 6))
     eb_colors = plt.cm.Blues(np.linspace(0.4, 0.9, len(filenames)))
     ee_colors = plt.cm.Oranges(np.linspace(0.4, 0.9, len(filenames)))
 
     for idx, filename in enumerate(filenames):
+        print('Opening ' + filename)
         with open(filename, 'r') as f:
             header_lines = []
             while True:
@@ -56,14 +69,26 @@ def plot_multiple_eb_ee(filenames, output='eb_ee_plot.png'):
 
         label_base = os.path.basename(filename)
         label_base = label_base.split('_')[0]
-        plt.plot(l, EB, label=f'EB ({label_base})', color=eb_colors[idx], lw=1.5)
-        plt.plot(l, EE, label=f'EE/20 ({label_base})', color=ee_colors[idx], lw=1.5, linestyle='--')
+        fede_num = float('0.' + label_base.split('.')[-1])
+        label_eb = fr"$D_\ell^{{EB}}$, $f_{{\mathrm{{EDE}}}} = {fede_num}$"
+        label_ee = fr"$\frac{{D_\ell^{{EE}}}}{{20}}$, $f_{{\mathrm{{EDE}}}} = {fede_num}$"
+        plt.plot(l, EB, label=label_eb, color=eb_colors[idx], lw=1.5)
+        plt.plot(l, EE, label=label_ee, color=ee_colors[idx], lw=1.5, linestyle='--')
+    # After all plotting is done, before plt.legend():
+    handles, labels = plt.gca().get_legend_handles_labels()
+
+    # Separate EE and EB
+    ee_items = [(h, l) for h, l in zip(handles, labels) if "EE" in l]
+    eb_items = [(h, l) for h, l in zip(handles, labels) if "EB" in l]
+    ordered_items = ee_items + eb_items
+    ordered_handles, ordered_labels = zip(*ordered_items)
+    plt.legend(ordered_handles, ordered_labels, fontsize=18)
+    
     plt.xlim([0,700])
-    plt.xlabel('Multipole ℓ')
-    plt.ylabel(r'$D_\ell$ [$\mu K^2$]')
-    plt.title('EE and EB spectra for various EDE parameters')
+    plt.xlabel(r'Multipole $\ell$', fontsize=24)
+    plt.ylabel(r'$D_\ell^{\mathrm{CMB}}$ [$\mu K^2$]', fontsize=24)
+    plt.title('Scaled EE and EB spectra for various EDE parameters', fontsize=24)
     plt.grid(True)
-    plt.legend(fontsize='small')
     plt.tight_layout()
     plt.savefig(output)
     print(f"Plot saved to: {output}")

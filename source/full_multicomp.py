@@ -431,7 +431,7 @@ def load_shared_data(input_args):
         bin_starts, raw_cl, SHARED_DATA_DICT['eskilt'] = ld.load_eskilt_data(ede_path=FILE_PATHS['EDE_spectrum'])
 
 def run_bk18_likelihood(params_dict, observation_file_path, input_args, 
-                        rstop = 0.01, max_tries=10000):
+                        rstop = 0.03, max_tries=10000):
     """
     Runs the Cobaya MCMC likelihood using BK18_full_multicomp likelihood class.
 
@@ -807,11 +807,17 @@ def multicomp_mcmc_driver(input_args):
         
         for key in params_dict:
                 if key not in param_names:
-                    print('Adding fixed value: ' + str(key) + ':' 
-                            + str(params_dict[key]))
+                    
                     param_names.append(key)
-                    means.append(params_dict[key])
-                    mean_std_strs.append(f"{key}: {params_dict[key]:.2f} ± 0")
+                    if(isinstance(params_dict[key], dict)):
+                        
+                        val = (params_dict[key]['ref']['loc'])
+                    else:
+                        val = (params_dict[key])
+                    print('Adding fixed value: ' + str(key) + ':' 
+                            + str(val))
+                    means.append(val)          
+                    mean_std_strs.append(f"{key}: {params_dict[key]} +- 0")
         
         epd.plot_eebbeb(multicomp_class, 
                         input_args.output_path, 
