@@ -202,12 +202,17 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
     axs[0].set_ylabel(r'$\beta(\ell)$ [deg]', fontsize=24)
     axs[0].set_title('Multipole Dependent Rotation Angle', fontsize=24)
     axs[0].grid(True, linestyle='--', alpha=0.6)
-    
+    axs[0].axhline(y=0, color='gray', linestyle='--', 
+                linewidth=1)
+    axs[1].axhline(y=0, color='gray', linestyle='--', 
+                linewidth=1)
+    axs[2].axhline(y=0, color='gray', linestyle='--', 
+                linewidth=1)
     axs[1].set_ylim([-1,2])
-    axs[0].set_ylim([-1,1])
+    axs[0].set_ylim([-1.1,1.1])
     axs[2].set_ylim([-0.12,0.12])
-    axs[1].set_ylabel(r'$D_\ell^{EB, \mathrm{rot}}$ [$\mu$K$^2$]', fontsize=24)
-    axs[1].set_title('Rotated EB Spectrum', fontsize=15)
+    axs[1].set_ylabel(r'$\tilde{D}_\ell^{EB, \mathrm{rot}}$ [$\mu$K$^2$]', fontsize=24)
+    axs[1].set_title('Rotated EB Spectrum', fontsize=24)
     axs[1].grid(True, linestyle='--', alpha=0.6)
     axs[1].legend(fontsize=16, loc= 'upper left')
     axs[2].set_ylabel(r'$D_b^{EB}(220\mathrm{GHz})$ [$\mu$K$^2$]', fontsize=24)
