@@ -77,7 +77,7 @@ def plot_beta_histogram_stack(sim_folder, real_file, param="alpha_CMB", bins=50,
         "legend.fontsize": 18,
     })
 
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fig, ax = plt.subplots(figsize=(12, 12))
 
     # Plot simulation KDEs
     count = 0
@@ -93,19 +93,20 @@ def plot_beta_histogram_stack(sim_folder, real_file, param="alpha_CMB", bins=50,
     kde_real = gaussian_kde(real_vals)
     x_real = np.linspace(min(real_vals), max(real_vals), 200)
     ax.plot(x_real, kde_real(x_real), color='red', linewidth=2.0,
-            label=f"Real: peak = {np.mean(real_vals):.4g}, std = {np.std(real_vals):.4g}")
+            label=f"Sim 79: peak = {np.mean(real_vals):.4g}, std = {np.std(real_vals):.4g}")
 
     # Vertical line at beta = 0
     ax.axvline(0.0, color='black', linestyle='--', linewidth=1.2, label=r"$\beta = 0$")
 
     # Add invisible line for sim stats
-    if sim_peaks:
+    if False and sim_peaks:
         sim_mean = np.mean(sim_peaks)
         sim_std = np.std(sim_peaks)
         ax.plot([], [], color='gray', alpha=0.25, linewidth=1.0,
                 label=f"Sims: mean peak = {sim_mean:.4g}, spread = {sim_std:.4g}")
 
     # Final touches
+    ax.set_ylim([-0.01, 0.4])
     ax.set_xlabel(r"$\beta_{\rm CMB}$")
     ax.set_ylabel("Density")
     #ax.set_title(f"Histogram of β_CMB across {len(sim_vals_all)} simulations and real data")
