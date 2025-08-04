@@ -776,6 +776,18 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
         which should return appropriate DataFrames and titles for corner plot.
     """
     means_df, stds_df, minchisq_df, param_names = load_summary_csv(chains_path)
+
+    selected_params = None
+    if(True): 
+        selected_params = [
+            'alpha_P353e',
+            'alpha_BK18220',
+            'alpha_CMB',
+            'A_dust_EE'
+        ]
+    if selected_params is not None:
+        param_names = [p for p in param_names if p in selected_params]
+
     ranges = compute_corner_ranges(means_df, param_names, percentile_clip)
 
     titles = make_titles(means_df, stds_df, minchisq_df, param_names)
