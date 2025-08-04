@@ -802,7 +802,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     latex_labels = {
         # Polarization angles / rotation parameters
         'alpha_BK18_B95e':       r'$\alpha_{\mathrm{B95}}$',
-        'alpha_P353':        r'$\alpha_{\mathrm{P353}}$',
+        'alpha_P353e':        r'$\alpha_{\mathrm{P353}}$',
         'alpha_BK18_220':    r'$\alpha_{\mathrm{220}}$',
         'alpha_BK18_150':    r'$\alpha_{\mathrm{150}}$',
         'alpha_BK18_K95':    r'$\alpha_{\mathrm{K95}}$',
