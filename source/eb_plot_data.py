@@ -821,7 +821,8 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
                         title_kwargs={"fontsize": 9, "multialignment": "center"},
                         hist_kwargs={'color': 'red', 'density': True},
                         contour_kwargs={'colors': 'red'},
-                        range=ranges)
+                        range=ranges, 
+                        return_fig=True)
     draw_zero_lines_on_corner(fig.axes, param_names)
     # Overlay minchi2 (green)
     if(False):
