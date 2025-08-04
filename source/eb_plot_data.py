@@ -886,6 +886,8 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
                       show_titles=False,
                       hist_kwargs={'color': 'blue', 'density': True},
                       contour_kwargs={'colors': 'blue'},
+                      truths = df_chain.mean(),
+                      truth_color='red',
                       fig=fig)
     except Exception as e:
         print(f"Could not overlay single sim: {e}")
