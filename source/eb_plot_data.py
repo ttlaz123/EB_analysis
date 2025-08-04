@@ -781,10 +781,18 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     if(True): 
         selected_params = [
             'alpha_P353e',
-            'alpha_BK18220',
+            'alpha_BK18_220',
             'alpha_CMB',
             'A_dust_EE'
         ]
+    latex_labels = {
+        'alpha_P353e': r'$\alpha_{\mathrm{P353e}}$',
+        'alpha_BK18_220': r'$\alpha_{\mathrm{BK18,\,220}}$',
+        'alpha_CMB': r'$\alpha_{\mathrm{CMB}}$',
+        'A_dust_EE': r'$A_\mathrm{dust}^{EE}$',
+    }
+    labels = [latex_labels.get(p, p) for p in param_names]
+
     if selected_params is not None:
         param_names = [p for p in param_names if p in selected_params]
 
@@ -794,7 +802,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
 
     # Plot means (red)
     fig = corner.corner(means_df[param_names],
-                        labels=param_names,
+                        labels=labels,
                         show_titles=True,
                         titles=titles,
                         title_kwargs={"fontsize": 9, "multialignment": "center"},
@@ -831,7 +839,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
         df_chain.columns = param_header
         df_chain = df_chain[param_names]  # keep only params
         corner.corner(df_chain,
-                      labels=param_names,
+                      labels=labels,
                       show_titles=False,
                       hist_kwargs={'color': 'blue', 'density': True},
                       contour_kwargs={'colors': 'blue'},
