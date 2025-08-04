@@ -792,7 +792,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     
     if(True): 
         selected_params = [
-            'angle_diff',
+            'gMpl',
             'alpha_BK18_B95e',
             'alpha_BK18_220',
         ]
