@@ -795,7 +795,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
             'gMpl',
             'alpha_BK18_B95e',
             'alpha_BK18_220',
-            'alens'
+            'A_lens'
         ]
     if selected_params is not None:
         param_names = [p for p in param_names if p in selected_params]
