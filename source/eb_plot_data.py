@@ -829,6 +829,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
 
         # Multiplicative parameters
         'gMpl':              r'$g / M_\mathrm{pl}^{-1}$',
+        'A_lens':            r'$A_{\mathrm{lens}}$',
         'angle_diff':        r'$\Delta\beta_{\ell_b}$',
         'log10_fede':        r'$\log_{10}(f_{\mathrm{EDE}})$',
         'log10z_c':          r'$\log_{10}(z_c)$',
