@@ -106,7 +106,7 @@ def plot_beta_histogram_stack(sim_folder, real_file, param="alpha_CMB", bins=50,
                 label=f"Sims: mean peak = {sim_mean:.4g}, spread = {sim_std:.4g}")
 
     # Final touches
-    ax.set_ylim([-0.01, 0.4])
+    ax.set_ylim([-0.01, 0.3])
     ax.set_xlabel(r"$\beta_{\rm CMB}$")
     ax.set_ylabel("Density")
     #ax.set_title(f"Histogram of β_CMB across {len(sim_vals_all)} simulations and real data")
