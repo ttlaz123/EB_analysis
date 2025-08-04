@@ -895,16 +895,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
         draw_zero_lines_on_corner(fig.axes, param_names, df_chain.mean(), color='red')
     except Exception as e:
         print(f"Could not overlay single sim: {e}")
-    mean_values = df_chain.mean()
-    ndim = len(param_names)
-    axes = np.array(fig.axes).reshape((ndim, ndim))
 
-    for i in range(1, ndim):
-        for j in range(i):
-            ax = axes[i, j]
-            x = mean_values[param_names[j]]
-            y = mean_values[param_names[i]]
-        ax.plot(x, y, 'o', color='red', markersize=4, zorder=10)
     # Save and show
     outpath = chains_path.split("XXX")[0] + f"{single_sim}_summary.png"
     n_chains = len(means_df)
@@ -925,8 +916,8 @@ def draw_zero_lines_on_corner(flat_axes, param_names, truth_vals, color):
             if i == j:
                 ax.axvline(line_valx, color=color, lw=0.5, ls='--')
             else:
-                ax.axvline(line_valx, color=color, lw=0.5, ls='--')
-                ax.axhline(line_valy, color=color, lw=0.5, ls='--')
+                ax.axvline(line_valy, color=color, lw=0.5, ls='--')
+                ax.axhline(line_valx, color=color, lw=0.5, ls='--')
             
 
 def plot_step_example(multicomp_class):
