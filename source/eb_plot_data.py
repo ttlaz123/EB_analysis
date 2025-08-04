@@ -800,8 +800,8 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     if selected_params is not None:
         param_names = [p for p in param_names if p in selected_params]
     latex_labels = {
-        'alpha_P353e': r'$\alpha_{\mathrm{P353e}}$',
-        'alpha_BK18_220': r'$\alpha_{\mathrm{BK18,\,220}}$',
+        'alpha_P353e': r'$\alpha_{\mathrm{P353}}$',
+        'alpha_BK18_220': r'$\alpha_{\mathrm{220}}$',
         'alpha_CMB': r'$\alpha_{\mathrm{CMB}}$',
         'A_dust_EE': r'$A_\mathrm{dust}^{EE}$',
     }
@@ -863,7 +863,8 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     # Save and show
     outpath = chains_path.split("XXX")[0] + f"{single_sim}_summary.png"
     n_chains = len(means_df)
-    plt.suptitle(f"(N={n_chains} sims) Contour means (red), minchi2 peaks (green), Single chain (blue)")
+    title =  f"(N={n_chains} sims) Sim peaks (red) and Sim {single_sim} single chain (blue)"
+    plt.suptitle(title)
     plt.savefig(outpath, bbox_inches='tight')
     print(f"Saved to {outpath}")
 
