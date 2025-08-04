@@ -869,16 +869,16 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     plt.savefig(outpath, bbox_inches='tight')
     print(f"Saved to {outpath}")
 
-def draw_zero_lines_on_corner(fig_axes, param_names):
+def draw_zero_lines_on_corner(flat_axes, param_names):
     ndim = len(param_names)
+    axes = np.array(flat_axes).reshape((ndim, ndim))
+    
     for i in range(ndim):
-        for j in range(i+1):
-            ax = fig_axes[i, j]
+        for j in range(i + 1):
+            ax = axes[i, j]
             if i == j:
-                # 1D histogram: vertical line at 0
                 ax.axvline(0, color='gray', lw=0.5, ls='--')
             else:
-                # 2D contour: vertical and horizontal at 0
                 ax.axvline(0, color='gray', lw=0.5, ls='--')
                 ax.axhline(0, color='gray', lw=0.5, ls='--')
 
