@@ -26,18 +26,18 @@ def plot_sims():
 
     # Create the plot
     fig, ax = plt.subplots(figsize=(8, 5))
-
+    dx = 5
     # Plot ΛCDM (red dots)
     ax.errorbar(
-        ell_b, delta_beta_LCDM, yerr=delta_beta_LCDM_err,
+        ell_b-dx, delta_beta_LCDM, yerr=delta_beta_LCDM_err,
         fmt='o', markersize=8,
-        markerfacecolor='red', markeredgecolor='red',
+        markerfacecolor='orange', markeredgecolor='red',
         ecolor='gray', capsize=4, label=r"\texttt{$\Lambda$CDM} ($g = 0$)"
     )
 
     # Plot EDE (blue dots)
     ax.errorbar(
-        ell_b, delta_beta_EDE, yerr=delta_beta_EDE_err,
+        ell_b+dx, delta_beta_EDE, yerr=delta_beta_EDE_err,
         fmt='s', markersize=8,
         markerfacecolor='blue', markeredgecolor='blue',
         ecolor='gray', capsize=4, label=r"\texttt{EDE} ($g = 1$)"
@@ -58,6 +58,7 @@ def plot_sims():
     ax.legend(fontsize=16)
 
     plt.tight_layout()
+    print('Saving: ' + "delta_beta_dual_plot.png")
     plt.savefig("delta_beta_dual_plot.png", dpi=300)
 
 
