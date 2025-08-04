@@ -604,9 +604,8 @@ def plot_triangle(root, replace_dict={}):
     # Save and show
     plt.savefig(f"{root}_triangle_plot.png", bbox_inches='tight')
     print(f"Triangle plot saved as {root}_triangle_plot.png")
-    plt.show()
     plt.close(fig)
-    return param_means_all, means, mean_std_strs
+    return param_names_all, means, mean_std_strs
 
 
 
