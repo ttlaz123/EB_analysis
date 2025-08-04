@@ -469,7 +469,7 @@ def plot_bpwf(bpwf, map_reference_header, outpath):
     for cross_spec, label in cross_specs.items():
         cmap = base_cmaps[cross_spec]
         for bin in range(2, 18):  # bins 2 through 17 inclusive
-            color = cmap((bin - 2) / 32) + 0.5  # normalize between 0.5 and 1
+            color = cmap(0.5+(bin - 2) / 32)   # normalize between 0.5 and 1
             plt.plot(ell, bpwf[bin - 2, :max_ell, cross_spec], 
                      color=color, 
                      label=f"Bin {bin} ({label})")
@@ -477,9 +477,9 @@ def plot_bpwf(bpwf, map_reference_header, outpath):
     for center in L_BIN_CENTERS:
         plt.axvline(x=center, color='gray', linestyle='--', linewidth=1)
     custom_lines = [
-    plt.plot([0], [0], color='blue', marker='o', linestyle='None', label=r'220 $\times$ 220'),
-    plt.plot([0], [0], color='red', marker='o', linestyle='None', label=r'B95 $\times$ B95'),
-]
+        plt.plot([0], [0], color='blue', marker='o', linestyle='None', label=r'220 $\times$ 220'),
+        plt.plot([0], [0], color='red', marker='o', linestyle='None', label=r'B95 $\times$ B95'),
+    ]
 
     plt.xlabel(r"Multipole $\ell$")
     plt.ylabel("Weight")
