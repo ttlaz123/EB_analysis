@@ -80,7 +80,11 @@ def plot_beta_histogram_stack(sim_folder, real_file, param="alpha_CMB", bins=50,
     fig, ax = plt.subplots(figsize=(8, 5))
 
     # Plot simulation KDEs
+    count = 0
     for sim_vals in sim_vals_all:
+        count +=1
+        if(count %10==0):
+            print("Plotting: " + str(count))
         kde = gaussian_kde(sim_vals)
         x_vals = np.linspace(min(sim_vals), max(sim_vals), 200)
         ax.plot(x_vals, kde(x_vals), color='gray', alpha=0.25, linewidth=1.0)
@@ -104,7 +108,7 @@ def plot_beta_histogram_stack(sim_folder, real_file, param="alpha_CMB", bins=50,
     # Final touches
     ax.set_xlabel(r"$\beta_{\rm CMB}$")
     ax.set_ylabel("Density")
-    ax.set_title(f"Histogram of β_CMB across {len(sim_vals_all)} simulations and real data")
+    #ax.set_title(f"Histogram of β_CMB across {len(sim_vals_all)} simulations and real data")
     ax.legend()
     ax.grid(True, linestyle="--", alpha=0.5)
 
