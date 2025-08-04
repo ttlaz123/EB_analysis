@@ -26,7 +26,7 @@ def plot_sims():
 
     # Create the plot
     fig, ax = plt.subplots(figsize=(8, 5))
-    dx = 2
+    dx = 1
     # Plot ΛCDM (red dots)
     ax.errorbar(
         ell_b-dx, delta_beta_LCDM, yerr=delta_beta_LCDM_err,
@@ -40,7 +40,7 @@ def plot_sims():
         ell_b+dx, delta_beta_EDE, yerr=delta_beta_EDE_err,
         fmt='s', markersize=8,
         markerfacecolor='blue', markeredgecolor='blue',
-        ecolor='gray', capsize=4, label=r"\texttt{EDE} ($g = 1, f_{EDE}=0.07$)"
+        ecolor='gray', capsize=4, label=r"\texttt{EDE} ($g = 1, f_{\mathrm{EDE}}=0.07$)"
     )
 
     # Horizontal line at 0
