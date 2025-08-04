@@ -816,15 +816,16 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     # Plot means (red)
     fig = corner.corner(means_df[param_names],
                         labels=labels,
-                        show_titles=True,
+                        show_titles=False,
                         titles=titles,
                         title_kwargs={"fontsize": 9, "multialignment": "center"},
                         hist_kwargs={'color': 'red', 'density': True},
                         contour_kwargs={'colors': 'red'},
                         range=ranges)
-
+    draw_zero_lines_on_corner(fig.axes, param_names)
     # Overlay minchi2 (green)
-    corner.corner(minchisq_df[param_names],
+    if(False):
+        corner.corner(minchisq_df[param_names],
                   labels=param_names,
                   show_titles=False,
                   hist_kwargs={'color': 'green', 'density': True},
@@ -864,9 +865,22 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     outpath = chains_path.split("XXX")[0] + f"{single_sim}_summary.png"
     n_chains = len(means_df)
     title =  f"(N={n_chains} sims) Sim peaks (red) and Sim {single_sim} single chain (blue)"
-    plt.suptitle(title)
+    #plt.suptitle(title)
     plt.savefig(outpath, bbox_inches='tight')
     print(f"Saved to {outpath}")
+
+def draw_zero_lines_on_corner(fig_axes, param_names):
+    ndim = len(param_names)
+    for i in range(ndim):
+        for j in range(i+1):
+            ax = fig_axes[i, j]
+            if i == j:
+                # 1D histogram: vertical line at 0
+                ax.axvline(0, color='gray', lw=0.5, ls='--')
+            else:
+                # 2D contour: vertical and horizontal at 0
+                ax.axvline(0, color='gray', lw=0.5, ls='--')
+                ax.axhline(0, color='gray', lw=0.5, ls='--')
 
 def plot_step_example(multicomp_class):
     angle_const = 0.39
