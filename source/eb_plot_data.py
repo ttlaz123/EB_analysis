@@ -795,6 +795,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
             'gMpl',
             'alpha_BK18_B95e',
             'alpha_BK18_220',
+            'alens'
         ]
     if selected_params is not None:
         param_names = [p for p in param_names if p in selected_params]
@@ -851,7 +852,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
                         contour_kwargs={'colors': 'red'},
                         range=ranges, 
                         return_fig=True)
-    truth_vals = [0,0,0,7.5]
+    truth_vals = [0,0,0,1, 1]
     #draw_zero_lines_on_corner(fig.axes, param_names,  truth_vals, color='black')
     # Overlay minchi2 (green)
     if(False):
