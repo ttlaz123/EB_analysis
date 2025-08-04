@@ -792,10 +792,8 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     
     if(True): 
         selected_params = [
-            'alpha_P353e',
-            'alpha_BK18_220',
-            'alpha_CMB',
-            'A_dust_EE'
+            'angle_diff',
+            'alpha_BK18_B95e',
         ]
     if selected_params is not None:
         param_names = [p for p in param_names if p in selected_params]
@@ -829,6 +827,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
 
         # Multiplicative parameters
         'gMpl':              r'$g / M_\mathrm{pl}^{-1}$',
+        'angle_diff':        r'$\Delta\beta_{\ell_b}$',
         'log10_fede':        r'$\log_{10}(f_{\mathrm{EDE}})$',
         'log10z_c':          r'$\log_{10}(z_c)$',
         'theta_i':           r'$\theta_i$',
