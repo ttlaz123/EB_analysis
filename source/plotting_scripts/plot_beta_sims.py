@@ -21,7 +21,16 @@ def plot_beta_histogram_stack(sim_folder, real_file, param="alpha_CMB", bins=50,
         bins (int): Number of histogram bins.
         outpath (str): Path to save the plot.
     """
-  
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.size": 24,
+        "font.family": "serif",
+        "font.serif": ["Computer Modern"],
+        "axes.labelsize": 24,
+        "xtick.labelsize": 18,
+        "ytick.labelsize": 18,
+        "legend.fontsize": 18,
+    })
     fig, ax = plt.subplots(figsize=(8, 5))
 
     sim_files = sorted(glob.glob(os.path.join(sim_folder, "*.txt")))
