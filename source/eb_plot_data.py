@@ -889,7 +889,16 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
                       fig=fig)
     except Exception as e:
         print(f"Could not overlay single sim: {e}")
+    mean_values = df_chain.mean()
+    ndim = len(param_names)
+    axes = np.array(fig.axes).reshape((ndim, ndim))
 
+    for i in range(1, ndim):
+        for j in range(i):
+            ax = axes[i, j]
+            x = mean_values[param_names[j]]
+            y = mean_values[param_names[i]]
+        ax.plot(x, y, 'o', color='red', markersize=4, zorder=10)
     # Save and show
     outpath = chains_path.split("XXX")[0] + f"{single_sim}_summary.png"
     n_chains = len(means_df)
