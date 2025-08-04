@@ -812,6 +812,9 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
         'A_dust_EE':         r'$A_\mathrm{dust}^{EE}$',
         'A_dust_BB':         r'$A_\mathrm{dust}^{BB}$',
         'A_dust_EB':         r'$A_\mathrm{dust}^{EB}$',
+        'alpha_dust_EE':         r'$\alpha_\mathrm{dust}^{EE}$',
+        'alpha_dust_BB':         r'$\alpha_\mathrm{dust}^{BB}$',
+        'alpha_dust_EB':         r'$\alpha_\mathrm{dust}^{EB}$',
 
         # Dust spectral indices
         'beta_dust':         r'$\beta_\mathrm{dust}$',
