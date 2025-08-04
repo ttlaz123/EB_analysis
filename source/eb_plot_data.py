@@ -800,10 +800,35 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     if selected_params is not None:
         param_names = [p for p in param_names if p in selected_params]
     latex_labels = {
-        'alpha_P353e': r'$\alpha_{\mathrm{P353}}$',
-        'alpha_BK18_220': r'$\alpha_{\mathrm{220}}$',
-        'alpha_CMB': r'$\alpha_{\mathrm{CMB}}$',
-        'A_dust_EE': r'$A_\mathrm{dust}^{EE}$',
+        # Polarization angles / rotation parameters
+        'alpha_BK18_B95e':       r'$\alpha_{\mathrm{B95}}$',
+        'alpha_P353':        r'$\alpha_{\mathrm{P353}}$',
+        'alpha_BK18_220':    r'$\alpha_{\mathrm{220}}$',
+        'alpha_BK18_150':    r'$\alpha_{\mathrm{150}}$',
+        'alpha_BK18_K95':    r'$\alpha_{\mathrm{K95}}$',
+        'alpha_CMB':         r'$\beta_{\mathrm{CMB}}$',  # CMB-frame rotation angle
+
+        # Dust amplitudes
+        'A_dust_EE':         r'$A_\mathrm{dust}^{EE}$',
+        'A_dust_BB':         r'$A_\mathrm{dust}^{BB}$',
+        'A_dust_EB':         r'$A_\mathrm{dust}^{EB}$',
+
+        # Dust spectral indices
+        'beta_dust':         r'$\beta_\mathrm{dust}$',
+
+        # Synchrotron amplitudes
+        'A_sync_EE':         r'$A_\mathrm{sync}^{EE}$',
+        'A_sync_BB':         r'$A_\mathrm{sync}^{BB}$',
+        'A_sync_EB':         r'$A_\mathrm{sync}^{EB}$',
+
+        # Synchrotron spectral indices
+        'beta_sync':         r'$\beta_\mathrm{sync}$',
+
+        # Multiplicative parameters
+        'gMpl':              r'$g / M_\mathrm{pl}^{-1}$',
+        'log10_fede':        r'$\log_{10}(f_{\mathrm{EDE}})$',
+        'log10z_c':          r'$\log_{10}(z_c)$',
+        'theta_i':           r'$\theta_i$',
     }
     labels = [latex_labels.get(p, p) for p in param_names]
 
@@ -883,7 +908,7 @@ def draw_zero_lines_on_corner(flat_axes, param_names):
             if i == j:
                 ax.axvline(line_val, color='gray', lw=0.5, ls='--')
             else:
-                ax.axvline(line_val, color='gray', lw=0.5, ls='--')
+                ax.axvline(0, color='gray', lw=0.5, ls='--')
                 ax.axhline(line_val, color='gray', lw=0.5, ls='--')
             
 
