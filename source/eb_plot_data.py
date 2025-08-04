@@ -852,7 +852,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
                         range=ranges, 
                         truths = truth_values,
                         truth_color='black',
-                        truth_kwargs={'linewidth': 0.5, 'ls':'--'},
+                        truth_kwargs={'lw': 0.5, 'ls':'--', 'alpha':0.5},
                         return_fig=True)
     # Overlay minchi2 (green)
     if(False):
