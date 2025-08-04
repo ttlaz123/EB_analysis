@@ -432,10 +432,17 @@ def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, ba
     plt.close()
     return 
 def plot_bpwf(bpwf, map_reference_header, outpath):
-    cross_spec = 27
-    L_BIN_CENTERS = np.array([37.5, 72.5, 107.5, 142.5, 177.5, 
-                               212.5, 247.5, 282.5, 317.5, 352.5,
-                               387.5, 422.5, 457.5, 492.5, 527.5, 562.5])
+    cross_specs = {
+        27: '220 GHz',
+        29: '150 GHz'
+    }
+    
+    L_BIN_CENTERS = np.array([
+        37.5, 72.5, 107.5, 142.5, 177.5, 
+        212.5, 247.5, 282.5, 317.5, 352.5,
+        387.5, 422.5, 457.5, 492.5, 527.5, 562.5
+    ])
+    
     plt.rcParams.update({
         "text.usetex": True,
         'font.size': 20,
@@ -445,26 +452,40 @@ def plot_bpwf(bpwf, map_reference_header, outpath):
         'axes.labelsize': 22,
         'xtick.labelsize': 18,
         'ytick.labelsize': 18,
-        'legend.fontsize': 18
+        'legend.fontsize': 14
     })
+
     plt.figure(figsize=(12, 9))
     print('Plotting bpwf:')
     max_ell = 650
-    ell = range(max_ell)
-    print(bpwf.shape)
-    for bin in range(2,17):
-        print(bin)
-        plt.plot(ell, bpwf[bin-2,:max_ell, cross_spec], label='Bin ' + str(bin))
+    ell = np.arange(max_ell)
+    
+    # Colormaps for each cross_spec
+    base_cmaps = {
+        27: cm.Blues,
+        29: cm.Reds
+    }
+    
+    for cross_spec, label in cross_specs.items():
+        cmap = base_cmaps[cross_spec]
+        for bin in range(2, 18):  # bins 2 through 17 inclusive
+            color = cmap((bin - 2) / 16)  # normalize between 0 and 1
+            plt.plot(ell, bpwf[bin - 2, :max_ell, cross_spec], 
+                     color=color, 
+                     label=f"Bin {bin} ({label})")
+
     for center in L_BIN_CENTERS:
         plt.axvline(x=center, color='gray', linestyle='--', linewidth=1)
-    plt.xlabel(r"Multipole $\ell$", fontsize=24)
+        
+    plt.xlabel(r"Multipole $\ell$")
     plt.ylabel("Weight")
-    plt.title("Band Power Window Function for EB at 220GHz")
-    #plt.legend()
-    print("Saving fig to " + outpath + '_bpwf.png')
-    plt.savefig(outpath+ '_bpwf.png')
+    plt.title("Band Power Window Functions for EB")
+    plt.legend(ncol=2, loc='upper right', fontsize=14)
     
-    return 
+    print("Saving fig to " + outpath + '_bpwf.png')
+    plt.savefig(outpath + '_bpwf.png')
+    plt.close()
+    raise TimeoutError
 
 def get_plotted_values():
     used_maps = ['BK18_220_BxBK18_220_E', 'BK18_220_BxBK18_220_B', 'BK18_220_ExBK18_220_E']
@@ -547,6 +568,7 @@ def main():
         plot_dust_values(eb_maps, params_values, bandpasses, used_maps, dl_theory, args.outpath)
         
     if(args.bpwf_step):
+        plot_bpwf(bpwf, header, args.outpath)
         param_to_sweep = 'alpha_CMB'
         sweep_values = [0.3]
         #param_to_sweep = 'alpha_BK18_220'
@@ -561,7 +583,7 @@ def main():
         params_values = sweep_param(base_params, param_to_sweep, sweep_values)
         
         plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, args.outpath)
-        plot_bpwf(bpwf, header, args.outpath)
+        
     if(args.step_function):
         full_covmat = ld.load_covariance_matrix(FILE_PATHS['covariance_matrix'],
                                             header)
