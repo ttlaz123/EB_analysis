@@ -477,8 +477,8 @@ def plot_bpwf(bpwf, map_reference_header, outpath):
     for center in L_BIN_CENTERS:
         plt.axvline(x=center, color='gray', linestyle='--', linewidth=1)
     custom_lines = [
-        plt.plot([0], [0], color='blue', marker='-', linestyle='None', label=r'220 $\times$ 220'),
-        plt.plot([0], [0], color='red', marker='-', linestyle='None', label=r'B95 $\times$ B95'),
+        plt.plot([0], [0], color='blue', linestyle='-', label=r'220 $\times$ 220'),
+        plt.plot([0], [0], color='red', linestyle='-', label=r'B95 $\times$ B95'),
     ]
 
     plt.xlabel(r"Multipole $\ell$")
