@@ -96,7 +96,7 @@ def plot_beta_histogram_stack(sim_folder, real_file, param="alpha_CMB", bins=50,
             label=f"Sim 79: peak = {np.mean(real_vals):.4g}, std = {np.std(real_vals):.4g}")
 
     # Vertical line at beta = 0
-    ax.axvline(0.0, color='black', linestyle='--', linewidth=1.2, label=r"$\beta = 0$")
+    ax.axvline(0.0, color='black', linestyle='--', linewidth=1.2)#, label=r"$\beta = 0$")
 
     # Add invisible line for sim stats
     if False and sim_peaks:
