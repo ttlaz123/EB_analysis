@@ -877,11 +877,15 @@ def draw_zero_lines_on_corner(flat_axes, param_names):
     for i in range(ndim):
         for j in range(i + 1):
             ax = axes[i, j]
+            line_val = 0
+            if(i == ndim-1):
+                line_val = 7.5
             if i == j:
-                ax.axvline(0, color='gray', lw=0.5, ls='--')
+                ax.axvline(line_val, color='gray', lw=0.5, ls='--')
             else:
-                ax.axvline(0, color='gray', lw=0.5, ls='--')
-                ax.axhline(0, color='gray', lw=0.5, ls='--')
+                ax.axvline(line_val, color='gray', lw=0.5, ls='--')
+                ax.axhline(line_val, color='gray', lw=0.5, ls='--')
+            
 
 def plot_step_example(multicomp_class):
     angle_const = 0.39
