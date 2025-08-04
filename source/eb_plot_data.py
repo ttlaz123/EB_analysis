@@ -840,7 +840,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     ranges = compute_corner_ranges(means_df, param_names, percentile_clip)
 
     titles = make_titles(means_df, stds_df, minchisq_df, param_names)
-    truth_values = [0, 0, 0, 7.5]
+
     # Plot means (red)
     fig = corner.corner(means_df[param_names],
                         labels=labels,
@@ -850,10 +850,9 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
                         hist_kwargs={'color': 'red', 'density': True},
                         contour_kwargs={'colors': 'red'},
                         range=ranges, 
-                        truths = truth_values,
-                        truth_color='black',
-                        truth_kwargs={'lw': 0.5, 'ls':'--', 'alpha':0.5},
                         return_fig=True)
+    truth_vals = [0,0,0,7.5]
+    draw_zero_lines_on_corner(fig.axes, param_names,  truth_vals, color='black')
     # Overlay minchi2 (green)
     if(False):
         corner.corner(minchisq_df[param_names],
@@ -883,15 +882,17 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
         df_chain = pd.read_csv(single_chain_path, delim_whitespace=True, comment='#')
         df_chain.columns = param_header
         df_chain = df_chain[param_names]  # keep only params
-        corner.corner(df_chain,
+        fig = corner.corner(df_chain,
                       labels=labels,
                       show_titles=False,
                       hist_kwargs={'color': 'blue', 'density': True},
                       contour_kwargs={'colors': 'blue'},
-                      truths = df_chain.mean(),
-                      truth_color='red',
-                      truth_kwargs={'linewidth': 0.5, 'ls':'--'},
-                      fig=fig)
+                      #truths = df_chain.mean(),
+                      #truth_color='red',
+                      #truth_kwargs={'linewidth': 0.5, 'ls':'--'},
+                      fig=fig,
+                      return_fig=True)
+        draw_zero_lines_on_corner(fig.axes, param_names, df_chain.mean(), color='red')
     except Exception as e:
         print(f"Could not overlay single sim: {e}")
     mean_values = df_chain.mean()
@@ -911,6 +912,21 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     #plt.suptitle(title)
     plt.savefig(outpath, bbox_inches='tight')
     print(f"Saved to {outpath}")
+
+def draw_zero_lines_on_corner(flat_axes, param_names, truth_vals, color):
+    ndim = len(param_names)
+    axes = np.array(flat_axes).reshape((ndim, ndim))
+    
+    for i in range(ndim):
+        for j in range(i + 1):
+            ax = axes[i, j]
+            line_valx = truth_vals[i]
+            line_valy = truth_vals[j]
+            if i == j:
+                ax.axvline(line_valx, color=color, lw=0.5, ls='--')
+            else:
+                ax.axvline(line_valx, color=color, lw=0.5, ls='--')
+                ax.axhline(line_valy, color=color, lw=0.5, ls='--')
             
 
 def plot_step_example(multicomp_class):
