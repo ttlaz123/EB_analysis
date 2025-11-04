@@ -13,6 +13,7 @@ import eb_load_data as ld
 import eb_file_paths as fp
 import eb_calculations as ec
 import eb_plot_data as epd
+import systematics_test as st
 #import BK18_full_multicomp
 #import matplotlib
 #matplotlib.use('TkAgg')
@@ -73,13 +74,21 @@ class BK18_full_multicomp(Likelihood):
                                                             self.used_maps,
                                                             self.map_reference_header,
                                                             num_bins = self.bin_num)
+        
         if(len(self.injected_signal) > 1):
-            self.binned_dl_observed_dict = ec.inject_signal_prebin(self.used_maps,
+            if('eps' in self.injected_signal):
+                self.binned_dl_observed_dict = st.scale_dl_beams(self.used_maps,
+                                                                 self.binned_dl_observed_dict,
+                                                                 self.injected_signal)
+                raise NotImplementedError()
+            else:
+                self.binned_dl_observed_dict = ec.inject_signal_prebin(self.used_maps,
                                                         self.injected_signal, 
                                                         self.dl_theory,
                                                         self.binned_dl_observed_dict,
                                                         self.bpwf,
                                                         self.map_reference_header)
+        
         self.initial_theory_dict = ec.apply_initial_conditions(self.dl_theory, self.used_maps)
         self.binned_dl_observed_vec = self.dict_to_vec(self.binned_dl_observed_dict, 
                                                     self.used_maps)
@@ -696,7 +705,14 @@ def generate_cross_spectra(calc_spectra, do_crosses, spectra_type):
     return  cross_spectra 
 
 def get_injected_signal(calc_spectra, signal_type):
+    
+
     injected_signal = {}
+    if('eps' in signal_type):
+        eps_value = float(signal_type.replace('eps', ''))
+        injected_signal['eps'] = eps_value
+        return injected_signal 
+    
     num_spectra = len(calc_spectra)
     count = 0
     for spec in calc_spectra:
