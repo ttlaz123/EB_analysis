@@ -101,7 +101,7 @@ def plot_scaled_beams(scaled_beams_dict, output_dir="."):
                 color = cmap(idx - 1)
                 plt.plot(ell, beam, color=color, linewidth=1, label=f"ε = {eps:+.2f}")
 
-        plt.title(f"{mapname} Beam Variants\n(Scaling Error)")
+        plt.title(f"{mapname} Beam from {BK18_FILENAMES[mapname]} \n(Scaling Error)")
         plt.xlabel("ell")
         plt.ylabel("B(ell*(1+eps))")
         plt.xlim([0, 500])
