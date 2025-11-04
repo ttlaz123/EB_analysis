@@ -13,7 +13,7 @@ BK18_FILENAMES = {
     'BK18_150': 'beamfile_20130222_sum.fits',
     'BK18_K95': 'beamfile_20150101_sum_220.fits',
     'BK18_220': 'beamfile_20150321_sum_100.fits',
-    'BK18_95e': 'beamfile_20180206_polycorr_sum_100.fits',
+    'BK18_B95e': 'beamfile_20180206_polycorr_sum_100.fits',
 }
 
 def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, output_dir='.',
