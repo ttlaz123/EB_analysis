@@ -70,10 +70,10 @@ def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, ou
         print(f"{used_map}: scaling factors at selected bins for eps={eps_val} -> {scale_factor}")
 
         # Original and scaled binned_dl
-        dl_orig = binned_dl_dict[used_map][bin_nums].copy()
+        dl_orig = binned_dl_dict[used_map].copy()
         dl_scaled = dl_orig * scale_factor
         # Update the binned_dl_dict only for the selected bins
-        binned_dl_dict[used_map][bin_nums] = dl_scaled
+        binned_dl_dict[used_map] = dl_scaled
 
         # Plot original vs scaled
         plt.figure(figsize=(10,6))
