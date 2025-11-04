@@ -711,6 +711,7 @@ def get_injected_signal(calc_spectra, signal_type):
     if('eps' in signal_type):
         eps_value = float(signal_type.replace('eps', ''))
         injected_signal['eps'] = eps_value
+        print('Injected signal: ' + str(injected_signal))
         return injected_signal 
     
     num_spectra = len(calc_spectra)
