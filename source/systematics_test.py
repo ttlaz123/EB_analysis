@@ -51,7 +51,7 @@ def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, ou
             print(f"Warning: One of the maps in {used_map} not found in scaled beams.")
             continue
 
-        dl_orig = binned_dl_dict[used_map][bin_nums].copy()
+        dl_orig = binned_dl_dict[used_map].copy()
         scaled_dl_all[used_map] = {}
 
         # Set up colormap
