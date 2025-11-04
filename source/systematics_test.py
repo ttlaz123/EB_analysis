@@ -83,6 +83,8 @@ def plot_scaled_beams(scaled_beams_dict, output_dir="."):
         scaled_beams_dict (dict): {mapname: {epsilon: B_scaled_array}}
         output_dir (str): directory to save plots
     """
+    if(not os.path.exists(output_dir)):
+        os.mkdir(output_dir)
     for mapname, eps_dict in scaled_beams_dict.items():
         plt.figure(figsize=(10, 6))
         
