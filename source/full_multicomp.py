@@ -74,8 +74,8 @@ class BK18_full_multicomp(Likelihood):
                                                             self.used_maps,
                                                             self.map_reference_header,
                                                             num_bins = self.bin_num)
-        print(self.injected_signal)
-        if(len(self.injected_signal) > 1):
+        
+        if(len(self.injected_signal) >= 1):
             if('eps' in self.injected_signal):
                 self.binned_dl_observed_dict = st.scale_dl_beams(self.used_maps,
                                                                  self.binned_dl_observed_dict,
