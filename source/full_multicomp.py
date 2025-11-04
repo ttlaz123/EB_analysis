@@ -819,12 +819,15 @@ def multicomp_mcmc_driver(input_args):
                     means.append(val)          
                     mean_std_strs.append(f"{key}: {params_dict[key]} +- 0")
         
-        epd.plot_eebbeb(multicomp_class, 
+        try:
+            epd.plot_eebbeb(multicomp_class, 
                         input_args.output_path, 
                         param_names, 
                         means, 
                         mean_std_strs,
                         override_maps = used_maps)
+        except ValueError:
+            print("Cannot make best fit plot")
     # plot mcmc results
     replace_dict ={}# {"alpha_BK18_220":0.6}
     print(input_args.output_path)
@@ -876,12 +879,15 @@ def run_simulation(sim_num, params_dict,input_args):
                     #"sim_common_data":SHARED_DATA_DICT,
                     observe_filepath= observation_file_path,
                     sim_common_dat = SHARED_DATA_DICT)
-    epd.plot_eebbeb(multicomp_class, 
+    try:
+        epd.plot_eebbeb(multicomp_class, 
                     input_args.output_path, 
                     param_names, 
                     means, 
                     mean_std_strs,
                     override_maps = used_maps)
+    except ValueError:
+        print("Cannot make best fit plot for sim: " + str(sim_num))
     del updated_info, sampler, param_names, means, mean_std_strs, multicomp_class
 
 # Parallel execution with cancellation support
@@ -898,7 +904,7 @@ def parallel_simulation(input_args, params_dict):
     """
     sim_indices = range(input_args.sim_start, input_args.sim_start + input_args.sim_num)
     try:
-        maxworkers = 50 
+        maxworkers = 1
         with ProcessPoolExecutor(max_workers=maxworkers) as executor:
             # Submit all tasks to the executor
             future_to_sim = {
