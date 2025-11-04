@@ -112,7 +112,7 @@ def plot_scaled_beams(scaled_beams_dict, output_dir="."):
         print(f"Saved plot for {mapname} to {output_filename}")
 # --- Main Logic ---
 
-def main(file_pattern):
+def main():
     parser = argparse.ArgumentParser( )
     parser.add_argument(
         '-p', '--pattern', type=str, 
@@ -123,6 +123,7 @@ def main(file_pattern):
     args = parser.parse_args()
     scaled_beams = load_scaled_beams(args.file_pattern)
     plot_scaled_beams(scaled_beams, output_dir="beam_plots")
+
 if __name__ == '__main__':
     main()
 
