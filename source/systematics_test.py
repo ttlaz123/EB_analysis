@@ -16,7 +16,15 @@ BK18_FILENAMES = {
     'BK18_95e': 'beamfile_20180206_polycorr_sum_100.fits',
 }
 
-def load_scaled_beams(file_pattern, eps_range=0.05, n_eps=11):
+def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict):
+    print(binned_dl_dict.keys())
+    print(used_maps)
+    print(injected_signal_dict)
+    return binned_dl_dict
+
+
+def load_scaled_beams(file_pattern= '/n/home08/liuto/bicep2_analysis/aux_data/beams/beamfile_*.fits', 
+                      eps_range=0.05, n_eps=11):
     """
     Reads FITS files from the given pattern and returns a dict of scaled beams.
     
