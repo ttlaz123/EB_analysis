@@ -1113,10 +1113,9 @@ def main():
     parser.add_argument(
         '-i', "--injected_signal",
         type=str,
-        choices=['none', 'pos', 'neg', 'bal'],
         default="none",
         help=(
-            "What kind of signal to inject (none, positive, negative, balanced)"
+            "What kind of signal to inject (none, positive, negative, balanced, epsn.nn)"
             "Default: 'all'."
         ),
     )
