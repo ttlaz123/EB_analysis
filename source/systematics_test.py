@@ -16,7 +16,7 @@ BK18_FILENAMES = {
     'BK18_95e': 'beamfile_20180206_polycorr_sum_100.fits',
 }
 
-def scale_dl_beams_with_bins(used_maps, binned_dl_dict, injected_signal_dict, output_dir='.'):
+def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, output_dir='.'):
     """
     Scales the binned_dl_dict values using the ratio of scaled beams
     interpolated at the binned ell centers.
