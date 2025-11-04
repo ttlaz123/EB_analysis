@@ -79,7 +79,8 @@ class BK18_full_multicomp(Likelihood):
             if('eps' in self.injected_signal):
                 self.binned_dl_observed_dict = st.scale_dl_beams(self.used_maps,
                                                                  self.binned_dl_observed_dict,
-                                                                 self.injected_signal)
+                                                                 self.injected_signal,
+                                                                 output_dir = 'beam_scale_plots')
                 raise NotImplementedError()
             else:
                 self.binned_dl_observed_dict = ec.inject_signal_prebin(self.used_maps,

@@ -8,7 +8,7 @@ from astropy.io import fits
 import numpy as np
 import os
 import sys
-
+import bicep_data_consts as bdc
 BK18_FILENAMES = {
     'BK18_150': 'beamfile_20130222_sum.fits',
     'BK18_K95': 'beamfile_20150101_sum_220.fits',
@@ -16,10 +16,77 @@ BK18_FILENAMES = {
     'BK18_95e': 'beamfile_20180206_polycorr_sum_100.fits',
 }
 
-def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict):
-    print(binned_dl_dict.keys())
-    print(used_maps)
-    print(injected_signal_dict)
+def scale_dl_beams_with_bins(used_maps, binned_dl_dict, injected_signal_dict, output_dir='.'):
+    """
+    Scales the binned_dl_dict values using the ratio of scaled beams
+    interpolated at the binned ell centers.
+    
+    Args:
+        used_maps (list): e.g., ["BK18_150_ExBK18_K95_B"]
+        binned_dl_dict (dict): {used_map: array of dl values}
+        injected_signal_dict (dict): {'eps': float}
+        scaled_beams_dict (dict): {mapname: {eps: B_array}}
+    
+    Returns:
+        Updated binned_dl_dict with scaled values.
+    """
+    scaled_beams_dict = load_scaled_beams()
+    eps_val = injected_signal_dict.get('eps', 0.0)
+    ell_bins = bdc.L_BIN_CENTERS
+    if(not os.path.exists(output_dir)):
+        os.mkdir(output_dir)
+    for used_map in used_maps:
+        # Split map pair and strip trailing _E or _B
+        map1_full, map2_full = used_map.split('x')
+        map1 = map1_full[:-2] if map1_full.endswith(('_E','_B')) else map1_full
+        map2 = map2_full[:-2] if map2_full.endswith(('_E','_B')) else map2_full
+
+        if map1 not in scaled_beams_dict or map2 not in scaled_beams_dict:
+            print(f"Warning: One of the maps in {used_map} not found in scaled beams.")
+            continue
+
+        # Original and scaled beams
+        B1_0 = scaled_beams_dict[map1][0.0]
+        B2_0 = scaled_beams_dict[map2][0.0]
+        B1_eps = scaled_beams_dict[map1].get(eps_val)
+        B2_eps = scaled_beams_dict[map2].get(eps_val)
+
+        if B1_eps is None or B2_eps is None:
+            print(f"Warning: epsilon {eps_val} not found for {used_map}. Skipping.")
+            continue
+
+        # Interpolate to the binned ell centers
+        B1_0_interp = np.interp(ell_bins, np.arange(len(B1_0)), B1_0, left=np.nan, right=np.nan)
+        B2_0_interp = np.interp(ell_bins, np.arange(len(B2_0)), B2_0, left=np.nan, right=np.nan)
+        B1_eps_interp = np.interp(ell_bins, np.arange(len(B1_eps)), B1_eps, left=np.nan, right=np.nan)
+        B2_eps_interp = np.interp(ell_bins, np.arange(len(B2_eps)), B2_eps, left=np.nan, right=np.nan)
+
+        # Compute scaling factor
+        scale_factor = np.sqrt((B1_eps_interp / B1_0_interp) * (B2_eps_interp / B2_0_interp))
+        print(f"{used_map}: scaling factors at bins for eps={eps_val} -> {scale_factor}")
+
+        # Original binned_dl
+        dl_orig = binned_dl_dict[used_map].copy()
+        # Scaled binned_dl
+        dl_scaled = dl_orig * scale_factor
+        binned_dl_dict[used_map] = dl_scaled
+
+        # Plot original vs scaled
+        plt.figure(figsize=(10,6))
+        plt.plot(ell_bins, dl_orig, 'o-', color='black', linewidth=2, label='Original')
+        plt.plot(ell_bins, dl_scaled, 's-', color='red', linewidth=2, label=f'Scaled (eps={eps_val:+.2f})')
+        plt.title(f"{used_map} binned D_l: Original vs Scaled")
+        plt.xlabel("ell")
+        plt.ylabel("D_l")
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+
+        output_file = os.path.join(output_dir, f"{used_map}_binned_scaled.png")
+        plt.savefig(output_file)
+        plt.close()
+        print(f"Saved binned D_l plot for {used_map} to {output_file}")
+
     return binned_dl_dict
 
 
