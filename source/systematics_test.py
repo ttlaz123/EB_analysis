@@ -121,7 +121,7 @@ def main():
     )
 
     args = parser.parse_args()
-    scaled_beams = load_scaled_beams(args.file_pattern)
+    scaled_beams = load_scaled_beams(args.pattern)
     plot_scaled_beams(scaled_beams, output_dir="beam_plots")
 
 if __name__ == '__main__':
