@@ -80,6 +80,7 @@ class BK18_full_multicomp(Likelihood):
                 self.binned_dl_observed_dict = st.scale_dl_beams(self.used_maps,
                                                                  self.binned_dl_observed_dict,
                                                                  self.injected_signal,
+                                                                 self.bin_num,
                                                                  output_dir = 'beam_scale_plots')
                 raise NotImplementedError()
             else:
