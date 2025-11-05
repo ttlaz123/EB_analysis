@@ -59,6 +59,9 @@ def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, ou
 
         fig, axes = plt.subplots(1, 2, figsize=(14, 6), sharex=True)
 
+        cmap_total = cm.get_cmap('viridis', len(epsilons))
+        cmap_map1 = cm.get_cmap('plasma', len(epsilons))
+        cmap_map2 = cm.get_cmap('cividis', len(epsilons))
         for idx, eps_val in enumerate(epsilons):
             B1_0 = scaled_beams_dict[map1][0.0]
             B2_0 = scaled_beams_dict[map2][0.0]
@@ -76,7 +79,7 @@ def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, ou
 
             fac1 = B1_eps_interp / B1_0_interp
             fac2 = B2_eps_interp / B2_0_interp
-            scale_factor = np.sqrt(fac1 * fac2)
+            scale_factor = fac1 * fac2
             dl_scaled = dl_orig * scale_factor
 
             scaled_dl_all[used_map][eps_val] = dl_scaled
@@ -94,9 +97,9 @@ def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, ou
             axes[0].plot(ell_bins, dl_scaled, '-', color=color, linewidth=lw, label=label)
 
             # Right plot: scaling factors and contributions
-            axes[1].plot(ell_bins, scale_factor, '-', color=color, linewidth=lw)
-            axes[1].plot(ell_bins, np.sqrt(fac1), '--', color=color, linewidth=lw * 0.8)
-            axes[1].plot(ell_bins, np.sqrt(fac2), ':', color=color, linewidth=lw * 0.8)
+            axes[1].plot(ell_bins, scale_factor, '-', color=cmap_total(idx), linewidth=2, label=f"Total (eps={eps_val:+.2f})" if idx == 0 else "")
+            axes[1].plot(ell_bins, fac1, '--', color=cmap_map1(idx), linewidth=1.5, label=f"{map1} scaling (eps={eps_val:+.2f})" if idx == 0 else "")
+            axes[1].plot(ell_bins, fac2, ':', color=cmap_map2(idx), linewidth=1.5, label=f"{map2} scaling (eps={eps_val:+.2f})" if idx == 0 else "")
 
         # Finalize plots
         axes[0].set_title(f"{used_map} binned D_l: Scaled for all eps")
