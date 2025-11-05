@@ -59,9 +59,9 @@ def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, ou
 
         fig, axes = plt.subplots(1, 2, figsize=(14, 6), sharex=True)
 
-        cmap_total = cm.get_cmap('viridis', len(epsilons))
-        cmap_map1 = cm.get_cmap('plasma', len(epsilons))
-        cmap_map2 = cm.get_cmap('cividis', len(epsilons))
+        cmap_total = cm.get_cmap('PiYG', len(epsilons))
+        cmap_map1 = cm.get_cmap('PuOr', len(epsilons))
+        cmap_map2 = cm.get_cmap('bwr', len(epsilons))
         for idx, eps_val in enumerate(epsilons):
             B1_0 = scaled_beams_dict[map1][0.0]
             B2_0 = scaled_beams_dict[map2][0.0]
@@ -77,8 +77,8 @@ def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, ou
             B1_eps_interp = np.interp(ell_bins_full, np.arange(len(B1_eps)), B1_eps)[bin_nums]
             B2_eps_interp = np.interp(ell_bins_full, np.arange(len(B2_eps)), B2_eps)[bin_nums]
 
-            fac1 = B1_eps_interp / B1_0_interp
-            fac2 = B2_eps_interp / B2_0_interp
+            fac1 =  B1_0_interp/B1_eps_interp
+            fac2 =  B2_0_interp/B2_eps_interp
             scale_factor = fac1 * fac2
             dl_scaled = dl_orig * scale_factor
 
