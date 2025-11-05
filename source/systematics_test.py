@@ -77,7 +77,7 @@ def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, ou
             B1_eps_interp = np.interp(ell_bins_full, np.arange(len(B1_eps)), B1_eps)[bin_nums]
             B2_eps_interp = np.interp(ell_bins_full, np.arange(len(B2_eps)), B2_eps)[bin_nums]
 
-            fac1 =  B1_eps_interp/B2_0_interp
+            fac1 =  B1_eps_interp/B1_0_interp
             fac2 =  B2_eps_interp/B2_0_interp
             scale_factor = fac1 * fac2
             dl_scaled = dl_orig * scale_factor
