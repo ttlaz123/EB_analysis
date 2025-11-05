@@ -57,7 +57,7 @@ def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, ou
         # Set up colormap
         cmap = cm.get_cmap('coolwarm', num_eps-1)
 
-        plt.figure(figsize=(10,6))
+        fig, axes = plt.subplots(1, 2, figsize=(14, 6), sharex=True)
 
         for idx, eps_val in enumerate(epsilons):
             B1_0 = scaled_beams_dict[map1][0.0]
@@ -74,31 +74,50 @@ def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, ou
             B1_eps_interp = np.interp(ell_bins_full, np.arange(len(B1_eps)), B1_eps)[bin_nums]
             B2_eps_interp = np.interp(ell_bins_full, np.arange(len(B2_eps)), B2_eps)[bin_nums]
 
-            scale_factor = np.sqrt((B1_eps_interp / B1_0_interp) * (B2_eps_interp / B2_0_interp))
+            fac1 = B1_eps_interp / B1_0_interp
+            fac2 = B2_eps_interp / B2_0_interp
+            scale_factor = np.sqrt(fac1 * fac2)
             dl_scaled = dl_orig * scale_factor
+
             scaled_dl_all[used_map][eps_val] = dl_scaled
 
-            # Plot
+            # Plot color and label
             label = f"eps={eps_val:+.2f}"
             if eps_val == 0.0:
-                plt.plot(ell_bins, dl_scaled, 'o-', color='black', linewidth=2.5, label=label)
+                color = 'black'
+                lw = 2.5
             else:
                 color = cmap(idx-1)
-                plt.plot(ell_bins, dl_scaled, '-', color=color, linewidth=1, label=label)
+                lw = 1
 
-        plt.title(f"{used_map} binned D_l: Original vs Scaled for all eps")
-        plt.xlabel("ell")
-        plt.ylabel("D_l")
-        plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=8)
-        plt.grid(True, alpha=0.3)
-        plt.tight_layout()
+            # Left plot: scaled D_l
+            axes[0].plot(ell_bins, dl_scaled, '-', color=color, linewidth=lw, label=label)
 
-        output_file = os.path.join(output_dir, f"{used_map}_binned_scaled_all_eps.png")
+            # Right plot: scaling factors and contributions
+            axes[1].plot(ell_bins, scale_factor, '-', color=color, linewidth=lw)
+            axes[1].plot(ell_bins, np.sqrt(fac1), '--', color=color, linewidth=lw * 0.8)
+            axes[1].plot(ell_bins, np.sqrt(fac2), ':', color=color, linewidth=lw * 0.8)
+
+        # Finalize plots
+        axes[0].set_title(f"{used_map} binned D_l: Scaled for all eps")
+        axes[0].set_xlabel("ell")
+        axes[0].set_ylabel("D_l")
+        axes[0].grid(alpha=0.3)
+        axes[0].legend(fontsize=8, loc='best')
+
+        axes[1].set_title(f"{used_map} Scaling Factors (Total, Map1, Map2)")
+        axes[1].set_xlabel("ell")
+        axes[1].set_ylabel("Scale Factor")
+        axes[1].grid(alpha=0.3)
+
+        fig.tight_layout()
+
+        output_file = os.path.join(output_dir, f"{used_map}_binned_dualplot_all_eps.png")
         plt.savefig(output_file)
         plt.close()
-        print(f"Saved binned D_l plot for {used_map} to {output_file}")
+        print(f"Saved dual plot for {used_map} to {output_file}")
 
-    return binned_dl_dict
+    return scaled_dl_all
 
 
 def load_scaled_beams(file_pattern= '/n/home08/liuto/bicep2_analysis/aux_data/beams/beamfile_*.fits', 
