@@ -112,7 +112,7 @@ def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, ou
         axes[1].set_xlabel("ell")
         axes[1].set_ylabel("Scale Factor")
         axes[1].grid(alpha=0.3)
-
+        axes[1].legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=8)
         fig.tight_layout()
 
         output_file = os.path.join(output_dir, f"{used_map}_binned_dualplot_all_eps.png")
