@@ -66,7 +66,7 @@
                 if (params.ptype === 'beam_scale_plots') {
                     filename = params.freq + 'x' + params.freq2 + '_binned_dualplot_all_eps';
                 } else if (params.ptype === 'beam_plots') {
-                    filename = params.freq + '_scaled_beam_plots';
+                    filename = params.freq + '_scaled_beam_plot';
                 }
                 filepath = dirpath + params.ptype + '/' + filename + '.png';
                 console.log(filepath)
@@ -163,7 +163,7 @@
                         '-0.03|eps-0.03',
                         '-0.02|eps-0.02',
                         '-0.01|eps-0.01',
-                        '0.00|eps0.00',
+                        '0.00|eps-0.00',
                         '0.01|eps0.01',
                         '0.02|eps0.02',
                         '0.03|eps0.03',
