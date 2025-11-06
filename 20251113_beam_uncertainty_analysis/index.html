@@ -49,47 +49,73 @@
     <section>
         <h2>Beam Uncertainty Pager</h2>
         <figure>
-            <img alt="Beam Scaling" id="beam_scaling" src="#" width="750" height="500"
-                onerror="javascript:this.src='dne.png'" />
-            <figcaption>
-            </figcaption>
-                    <script type="text/javascript">
-                        pager.link("#beam_scaling", {
-                            'Plot Type|ptype': [
-                                'Beam (l)|beam_plots',
-                                'Scaling Impact|beam_scale_plots',
-                            ],
-                            'Map Frequency|freq': [
-                                'BK18_K95|BK18_K95',
-                                'BK18_B95lf|BK18_B95e',
-                                'BK18_150|BK18_150',
-                                'BK18_220|BK18_220',
-                            ],
-                            'Map Frequency 2|freq2': [
-                                'BK18_K95|BK18_K95',
-                                'BK18_B95lf|BK18_B95e',
-                                'BK18_150|BK18_150',
-                                'BK18_220|BK18_220',
-                            ],
-                        }, function (params) {
-                            let dirbase = '/liuto/home/GitHub/EB_analysis/';
-                            let dirpath = dirbase + '/source/';
-                            if(params.ptype == 'beam_scale_plots'){
-                                filename = params.freq + 'x' + params.freq2 + '_binned_dualplot_all_eps';
-                            }
-                            if(params.ptype == 'beam_plots'){
-                                filename = params.freq + '_scaled_beam_plots';
-                            }
-                            filepath = dirpath + params.ptype + '/' + filename;
-                            return filepath  + '.png';
-                        });
+<img alt="Beam Scaling" id="beam_scaling" src="#" width="750" height="500"
+            onerror="swapFreqAndRetry(this)" />
+        <figcaption></figcaption>
 
-                        pager.setparams({ 'ptype': 'beam_plots',
-                                           'freq': 'BK18_B95e',
-                                            'freq2': 'BK18_B95e',
-                        });
-                    </script>
+        <script type="text/javascript">
+            function buildFilepath(params) {
+                const dirbase = '/liuto/home/GitHub/EB_analysis/';
+                const dirpath = dirbase + '/source/';
+                let filename = '';
 
+                if (params.ptype === 'beam_scale_plots') {
+                    filename = params.freq + 'x' + params.freq2 + '_binned_dualplot_all_eps';
+                } else if (params.ptype === 'beam_plots') {
+                    filename = params.freq + '_scaled_beam_plots';
+                }
+
+                return dirpath + params.ptype + '/' + filename + '.png';
+            }
+
+            function swapFreqAndRetry(imgElement) {
+                const params = pager.getparams(); // Get current pager parameters
+
+                // Only swap if freq and freq2 are different
+                if (params.freq !== params.freq2) {
+                    const temp = params.freq;
+                    params.freq = params.freq2;
+                    params.freq2 = temp;
+
+                    // Update pager state
+                    pager.setparams(params);
+
+                    // Rebuild path and retry loading
+                    const newSrc = buildFilepath(params);
+                    imgElement.src = newSrc;
+                } else {
+                    // If swapping doesn't help, set to fallback image
+                    imgElement.src = 'dne.png';
+                }
+            }
+
+            pager.link("#beam_scaling", {
+                'Plot Type|ptype': [
+                    'Beam (l)|beam_plots',
+                    'Scaling Impact|beam_scale_plots',
+                ],
+                'Map Frequency|freq': [
+                    'BK18_K95|BK18_K95',
+                    'BK18_B95lf|BK18_B95e',
+                    'BK18_150|BK18_150',
+                    'BK18_220|BK18_220',
+                ],
+                'Map Frequency 2|freq2': [
+                    'BK18_K95|BK18_K95',
+                    'BK18_B95lf|BK18_B95e',
+                    'BK18_150|BK18_150',
+                    'BK18_220|BK18_220',
+                ],
+            }, function (params) {
+                return buildFilepath(params);
+            });
+
+            pager.setparams({
+                'ptype': 'beam_plots',
+                'freq': 'BK18_B95e',
+                'freq2': 'BK18_B95e',
+            });
+        </script>
         </figure>
 
         <figure>
@@ -99,6 +125,19 @@
             </figcaption>
 
             <script type="text/javascript">
+
+                function pad(num, size) {
+                    num = num.toString();
+                    while (num.length < size) num = "0" + num;
+                    return num;
+                }
+                const simnums = [];
+                for (let i = 0; i < 10; i++) {
+                    s = pad(i, 1);
+
+                    simnums[i] = s.concat('|', s);
+
+                }
 
                 pager.link("#beamimpact", {
                     'Map Sim Num Digit1|digit1': simnums,
