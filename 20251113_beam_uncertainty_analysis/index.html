@@ -68,8 +68,9 @@
                 } else if (params.ptype === 'beam_plots') {
                     filename = params.freq + '_scaled_beam_plots';
                 }
-
-                return dirpath + params.ptype + '/' + filename + '.png';
+                filepath = dirpath + params.ptype + '/' + filename + '.png';
+                consol.log(filepath)
+                return filepath;
             }
 
             function swapFreqAndRetry(imgElement) {
@@ -179,12 +180,12 @@
                 },
                     function (params) {
                         let dirbase2 = '/liuto'
-                        let dirpath = dirbase2 + '/ede_chains/';
-                        let mcmc_folder = params.ede1 + params.bin_num15 + '_fixeddust' + params.spectra + '_sig' + params.inj_sig + '_eb_fede0.07/';
+                        let dirpath2 = dirbase2 + '/ede_chains/';
+                        let mcmc_folder = params.ede1 + params.bin_num15 + '_fixeddust' + params.spectra + '_sig' + params.inj_sig + '_ebfede0.07/';
                         let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
-                        let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
+                        let name = dirpath2 + mcmc_folder + sim_id + params.m_map_type + '.png';
                         if (params.m_map_type == 'sim1_summary' || params.m_map_type == 'simchisq_hist') {
-                            name = dirpath + mcmc_folder + params.m_map_type + '.png'
+                            name = dirpath2 + mcmc_folder + params.m_map_type + '.png'
                         }
                         console.log(name);
                         return name;
