@@ -49,12 +49,16 @@
     <section>
         <h2>Beam Uncertainty Pager</h2>
         <figure>
-<img alt="Beam Scaling" id="beam_scaling" src="#" width="750" height="500"
+        <img alt="Beam Scaling" id="beam_scaling" src="#" width="750" height="500"
             onerror="swapFreqAndRetry(this)" />
         <figcaption></figcaption>
 
         <script type="text/javascript">
+            let currentParams = {};  // Store parameters manually
+
             function buildFilepath(params) {
+                currentParams = { ...params }; // Keep a copy of the current parameters
+
                 const dirbase = '/liuto/home/GitHub/EB_analysis/';
                 const dirpath = dirbase + '/source/';
                 let filename = '';
@@ -69,7 +73,7 @@
             }
 
             function swapFreqAndRetry(imgElement) {
-                const params = pager.getparams(); // Get current pager parameters
+                const params = { ...currentParams }; // Get the stored parameters
 
                 // Only swap if freq and freq2 are different
                 if (params.freq !== params.freq2) {
@@ -116,8 +120,7 @@
                 'freq2': 'BK18_B95e',
             });
         </script>
-        </figure>
-
+    </figure>
         <figure>
             <img alt="Beam Uncertainties impact" id="beamimpact" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
@@ -151,7 +154,7 @@
                         'Chi Squared histogram|simchisq_hist'
                     ],
                     'Bins Used|bin_num15': [
-                        '2-15|_bin15',
+                        '2-15|_bin2-15',
                     ],
                     'Beam Uncertainty|inj_sig': [
                         '-0.05|eps-0.05',
@@ -177,7 +180,7 @@
                     function (params) {
                         let dirbase2 = '/liuto'
                         let dirpath = dirbase2 + '/ede_chains/';
-                        let mcmc_folder = params.ede1 + params.bin_num15 + '_fixeddust' + params.spectra + '_sig' + params.inj_sig + 'eb_fede0.07/';
+                        let mcmc_folder = params.ede1 + params.bin_num15 + '_fixeddust' + params.spectra + '_sig' + params.inj_sig + '_eb_fede0.07/';
                         let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
                         let name = dirpath + mcmc_folder + sim_id + params.m_map_type + '.png';
                         if (params.m_map_type == 'sim1_summary' || params.m_map_type == 'simchisq_hist') {
@@ -191,11 +194,11 @@
                     'digit1': '0',
                     'digit2': '0',
                     'digit3': '1',
-                    'm_map_type': '_bestfitEB',
-                    'bin_num15': '_bin15',
+                    'm_map_type': '_triangle_plot',
+                    'bin_num15': '_bin2-15',
                     'ede1': 'fede01',
-                    'spectra': '_all',
-                    'inj_sig': '_sigpos',
+                    'spectra': '_eb',
+                    'inj_sig': 'eps0.00',
                 });
             </script>
         </figure>
