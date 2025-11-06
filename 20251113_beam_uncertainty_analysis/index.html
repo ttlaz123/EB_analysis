@@ -154,6 +154,10 @@
                         'Summary Plot (Peaks histogram)|sim1_summary',
                         'Chi Squared histogram|simchisq_hist'
                     ],
+                    'Maps used|used_maps':[
+                        'BK18 all 4 maps|',
+                        'BK18_B95lf only|_B95e',
+                    ],
                     'Bins Used|bin_num15': [
                         '2-15|_bin2-15',
                     ],
@@ -181,7 +185,7 @@
                     function (params) {
                         let dirbase2 = '/liuto'
                         let dirpath2 = dirbase2 + '/ede_chains/';
-                        let mcmc_folder = params.ede1 + params.bin_num15 + '_fixeddust' + params.spectra + '_sig' + params.inj_sig + '_ebfede0.07/';
+                        let mcmc_folder = params.ede1 + params.bin_num15 + '_fixeddust' + params.used_maps + params.spectra + '_sig' + params.inj_sig + '_ebfede0.07/';
                         let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
                         let name = dirpath2 + mcmc_folder + sim_id + params.m_map_type + '.png';
                         if (params.m_map_type == 'sim1_summary' || params.m_map_type == 'simchisq_hist') {
@@ -199,7 +203,7 @@
                     'bin_num15': '_bin2-15',
                     'ede1': 'fede01',
                     'spectra': '_eb',
-                    'inj_sig': 'eps0.00',
+                    'inj_sig': 'eps-0.00',
                 });
             </script>
         </figure>
