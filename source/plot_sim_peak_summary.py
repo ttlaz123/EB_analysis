@@ -59,7 +59,10 @@ def plot_sim_summary(dirpath, params_to_plot=None):
 
                 plt.xlabel("epsilon", fontsize=12)
                 plt.ylabel(param, fontsize=12)
-                plt.ylim([-2, 3])
+                if(param == 'gMpl'):
+                    plt.ylim([-2, 3])
+                else:
+                    plt.ylim([-0.6, 0.6])
                 plt.grid(alpha=0.3)
                 plt.legend(title="Map", fontsize=9)
                 plt.tight_layout()
