@@ -19,7 +19,8 @@ def plot_sim_summary(dirpath, params_to_plot=None):
     m_list = ['BK18', 'BK18_B95e']
 
     if params_to_plot is None:
-        params_to_plot = ['alpha_B95e', 'alpha_K95', 'alpha_150', 'alpha_220', 'gMpl']
+        params_to_plot = ['alpha_BK18_B95e', 'alpha_BK18_K95', 
+                          'alpha_BK18_150', 'alpha_BK18_220', 'gMpl']
 
     # Loop through parameters
     for param in params_to_plot:
@@ -39,16 +40,13 @@ def plot_sim_summary(dirpath, params_to_plot=None):
                         folder = f"{dirpath}/{g}_{b}_fixeddust_{m}_eb_sig{eps_tag}_ebfede0.07"
                         chains_path = os.path.join(folder, "sim")
 
-                        try:
-                            mean_params_dict, std_params_dict = epd.plot_sim_peaks(
-                                chains_path, single_sim=1, overwrite=False, do_plots=False
-                            )
-                            mean_vals.append(mean_params_dict.get(param, np.nan))
-                            std_vals.append(std_params_dict.get(param, np.nan))
-                        except Exception as e:
-                            print(f"Warning: failed for {folder}: {e}")
-                            mean_vals.append(np.nan)
-                            std_vals.append(np.nan)
+                       
+                        mean_params_dict, std_params_dict = epd.plot_sim_peaks(
+                            chains_path, single_sim=1, overwrite=False, do_plots=False
+                        )
+                        mean_vals.append(mean_params_dict.get(param))
+                        std_vals.append(std_params_dict.get(param))
+                    
 
                     # Plot means with error bars
                     plt.errorbar(
