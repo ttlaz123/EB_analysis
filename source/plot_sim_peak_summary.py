@@ -37,7 +37,7 @@ def plot_sim_summary(dirpath, params_to_plot=None):
                         chains_path = os.path.join(folder, "sim1.1.txt")
 
                         # Call your function that returns parameter means/stds
-                        mean_params_dict, std_params_dict = epd.plot_sim_peaks(chains_path, single_sim=1)
+                        mean_params_dict, std_params_dict = epd.plot_sim_peaks(chains_path, single_sim=1, overwrite=False)
 
                         mean_vals.append(mean_params_dict.get(param, np.nan))
                         std_vals.append(std_params_dict.get(param, np.nan))
