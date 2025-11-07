@@ -52,7 +52,7 @@ def plot_sim_summary(dirpath, params_to_plot=None):
                                     alpha=0.2)
 
                 ax.set_title(f"{g}, {b}")
-                ax.set_xlabel("ε (Beam Uncertainty)")
+                ax.set_xlabel("epsilon")
                 ax.set_ylabel(f"{param}")
                 ax.grid(True, alpha=0.3)
                 ax.legend(fontsize=8)
