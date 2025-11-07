@@ -52,9 +52,10 @@ def plot_sim_summary(dirpath, params_to_plot=None):
 
 
                     # Plot means with error bars
-                    plt.errorbar(
-                        eps_values, mean_vals, yerr=std_vals, fmt='-o', label=f"{m}", capsize=4
-                    )
+                    if(len(mean_vals) > 0):
+                        plt.errorbar(
+                            eps_values, mean_vals, yerr=std_vals, fmt='-o', label=f"{m}", capsize=4
+                        )
 
                 plt.xlabel("epsilon", fontsize=12)
                 plt.ylabel(param, fontsize=12)
