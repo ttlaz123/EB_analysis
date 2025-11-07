@@ -110,9 +110,9 @@
             <p>For a cross-map \(\nu_1 \times \nu_2\):</p>
 
             <p>
-                If the original power spectrum, \(D_{\ell}^{\nu_1 \times \nu_2}_{\text{orig}}\), 
+                If the original power spectrum, \(D^{\nu_1 \times \nu_2}_{\text{orig}(\ell)}\), 
                 was incorrectly calibrated due to the beam uncertainty, 
-                the new **corrected power spectrum** becomes:
+                the new corrected power spectrum becomes:
             </p>
             <div>
                 <p>\[ \text{supfac}^{\nu_1 \times \nu_2}(\ell) = A_\ell \times B_\ell^{\nu_1} B_\ell^{\nu_2} \]</p>
@@ -125,7 +125,7 @@
             </p>
 
             <div class="math-container">
-                <p>\[ D_{\ell}^{\nu_1 \times \nu_2}_{\text{corr}} = D_{\ell}^{\nu_1 \times \nu_2}_{\text{orig}} \times \left( \frac{B^{\nu_1}_{\text{orig}}(\ell(1+\epsilon))}{B^{\nu_1}_{\text{orig}}(\ell)} \right) \times \left( \frac{B^{\nu_2}_{\text{orig}}(\ell(1+\epsilon))}{B^{\nu_2}_{\text{orig}}(\ell)} \right) \]</p>
+                <p>\[ D^{\nu_1 \times \nu_2}_{\text{corr}}(\ell) = D^{\nu_1 \times \nu_2}_{\text{orig}}(\ell) \times \left( \frac{B^{\nu_1}_{\text{orig}}(\ell(1+\epsilon))}{B^{\nu_1}_{\text{orig}}(\ell)} \right) \times \left( \frac{B^{\nu_2}_{\text{orig}}(\ell(1+\epsilon))}{B^{\nu_2}_{\text{orig}}(\ell)} \right) \]</p>
             </div>
             <p>
                 The corrected power spectrum is obtained by applying the beam scaling factor for each frequency component, \(\nu_1\) and \(\nu_2\), of the cross-spectrum map.
