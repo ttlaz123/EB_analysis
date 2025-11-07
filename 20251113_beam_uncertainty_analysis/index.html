@@ -48,6 +48,79 @@
     </section>
     <section>
         <h2>Beam Uncertainty Pager</h2>
+        <section">
+            <p >
+                We first read in the original beam window functions (\(B_{\ell}\)'s) from the files listed in
+                <a href="../20210922_ffbm_cmb_reanalysis/">Tyler's posting</a>, 
+                which gives the following beam types for each respective map frequency:
+            </p>
+            <ul >
+                <li>K95: Kuber100rev1</li>
+                <li>150: B2bbns</li>
+                <li>220: Kuber220</li>
+                <li>B95lf: B3polycorr</li>
+            </ul>
+       
+            <p>
+                We plot the beam window functions (\(B_{\ell}\)'s) below, as well as the potential errors on 
+                those \(B_{\ell}\)'s
+                up to 5% beam broadening as specified in section 3.3 of
+                <a href="../20230711_IPR9_beams/">IPR9</a>.
+            </p>
+
+            <p>
+                We consider a new beam \(B^{\text{new}}(\ell)\) that is a slightly broadened version of the 
+                original beam \(B^{\text{old}}(\ell)\):
+            </p>
+            
+            <div>
+                <p>\[B^{\text{new}}(\ell) = B^{\text{old}}(\ell(1+\epsilon))\]</p>
+            </div>
+
+            <p >
+                Here, \(\epsilon\) ranges from \(-0.05\) to \(0.05\), 
+                representing a beam broadening of up to 5 percent.
+            </p>
+     
+            <h3>Effect on Power Spectra</h3>
+
+            <p">
+                This beam broadening has a scaling effect on the power spectra bandpowers. 
+                We define the scaling factor for a map at frequency \(\nu\) as:
+            </p>
+            
+           
+            <p>\[ \text{scaling}(\nu) = \frac{B^{\text{new}}(\ell)}{B^{\text{old}}(\ell)} = \frac{B^{\text{old}}(\ell(1+\epsilon))}{B^{\text{old}}(\ell)} \]</p>
+            
+
+            <p>
+                This factor simulates the effect if the power spectra were originally multiplied by the old beam, 
+                so to correct the spectra, we need to multiply by this scaling factor.
+            </p>
+            
+            <p>For a cross-map $\nu_1 \times \nu_2$:</p>
+
+            <p>
+                The scaling factor bcomes:
+            </p>
+            <div>
+                <p>\[ \text{supfac}_\ell(\nu_1 \times \nu_2) = A_\ell \times B_\ell^{\nu_1} B_\ell^{\nu_2} \]</p>
+            </div>
+
+            <p>
+                If the original power spectrum, \(D_{\ell, \text{old}}^{\nu_1 \times \nu_2}\), 
+                was incorrectly calibrated due to the beam uncertainty, 
+                the new "corrected" power spectrum becomes:
+            </p>
+
+            <div>
+                <p>\[ D_{\ell, \text{new}}^{\nu_1 \times \nu_2} = D_{\ell, \text{old}}^{\nu_1 \times \nu_2} \times \left( \frac{B^{\text{old}}(\ell(1+\epsilon))}{B^{\text{old}}(\ell)} \right)_{\nu_1} \times \left( \frac{B^{\text{old}}(\ell(1+\epsilon))}{B^{\text{old}}(\ell)} \right)_{\nu_2} \]</p>
+            </div>
+            <p>
+                The last equation applies the scaling factor for each frequency component of 
+                the cross-spectrum product.
+            </p>
+        </section>
         <figure>
         <img alt="Beam Scaling" id="beam_scaling" src="#" width="750" height="500"
             onerror="swapFreqAndRetry(this)" />
