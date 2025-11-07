@@ -324,27 +324,14 @@
        <figure>
         <img alt="Beam Scaling summary" id="scale_summary" src="#" width="750" height="500"
             onerror="swapFreqAndRetry(this)" />
-        <figcaption> The beam window function and its scaling impact. 
-            When <b>Beam (l)</b> is selected, the plot shows the beam window function \( B^{\nu}(\ell) \) 
-            for a given map frequency \(\nu\). 
-            When <b>“Scaling Impact”</b> is selected, 
-            the left panel shows an example simulated power spectrum \( D(\ell) \), 
-            with the original spectrum in black and the beam-corrected 
-            versions in red and blue corresponding to
-             different beam scaling parameters \( \epsilon \). 
-             The right panel shows the ratio \( B_{\mathrm{corr}} / B_{\mathrm{orig}} \) 
-             for each frequency \( \nu_1 \), \( \nu_2 \), and their product, 
-             illustrating the ell-dependent scaling applied to obtain the corrected 
-             \( D(\ell) \). </figcaption>
+        <figcaption> We plot the mean and std of 500 sims as a function of epsilon.
+            We have the full BK18 results plotted in blue, and the 
+        results with only BICEP3 data (B95lf) plotted in orange.</figcaption>
 
         <script type="text/javascript">
             
 
             pager.link("#scale_summary", {
-                'Maps used|used_maps':[
-                        'BK18 all 4 maps|_BK18',
-                        'BK18_B95lf only|_BK18_B95e',
-                    ],
                 'Parameter|angle': [
                     'BK18_K95|alpha_BK18_K95',
                     'BK18_B95lf|alpha_BK18_B95e',
@@ -376,13 +363,27 @@
 
             pager.setparams({
                     'bin_num15': '_bin2-15',
-                    'used_maps': '_BK18',
                     'ede1': 'fede01',
                     'angle': 'gMpl'
                 });
         </script>
     </figure>
-      
+    <p>
+      We first notice that when the bins used are restricted to 2-10, then the 
+      uncertainty on every parameter more than doubles, especially for the \(g\) paramter. 
+      </p>
+<p>
+      Since the beam broadening effect is multiplicative, when we test the \(g=0\) dataset, 
+      changing epsilon has little impact on the resulting uncertainty. However, for the 
+      \(g=1\) dataset, there is a visible dependence on epsilon. The effect is larger 
+      when using BICEP3 data only vs all 4 maps, demonstrating the importance of the 
+      multicomponent analysis. 
+</p>
+      <p>
+        We note that the bias is approximately 20% for an epsilon of 0.05, which is 
+        still less than 1 sigma for an injected g of 1, and will be even less 
+        significant for the expected g, which is less than 0.2.
+      </p>
     </section>
     <section>
         <h2>Appendix</h2>
