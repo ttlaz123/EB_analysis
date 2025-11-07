@@ -37,10 +37,10 @@ def plot_sim_summary(dirpath, params_to_plot=None):
                         if eps_tag == "eps0.00":
                             eps_tag = "eps-0.00" 
                         folder = f"{dirpath}/{g}_{b}_fixeddust_{m}_eb_sig{eps_tag}_ebfede0.07"
-                        chains_path = os.path.join(folder, "sim001.1.txt")
+                        chains_path = os.path.join(folder, "sim")
 
                         # Call your function that returns parameter means/stds
-                        mean_params_dict, std_params_dict = epd.plot_sim_peaks(chains_path, single_sim=1, overwrite=False)
+                        mean_params_dict, std_params_dict = epd.plot_sim_peaks(chains_path, single_sim=1, overwrite=False, do_plots=False)
 
                         mean_vals.append(mean_params_dict.get(param, np.nan))
                         std_vals.append(std_params_dict.get(param, np.nan))
