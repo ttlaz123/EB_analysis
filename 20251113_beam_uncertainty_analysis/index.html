@@ -132,7 +132,7 @@
         <img alt="Beam Scaling" id="beam_scaling" src="#" width="750" height="500"
             onerror="swapFreqAndRetry(this)" />
         <figcaption> The beam window function and its scaling impact. 
-            When <b>Beam (l)</b> is selected, the plot shows the beam window function \( B^\(\nu)(\ell) \) 
+            When <b>Beam (l)</b> is selected, the plot shows the beam window function \( B^{\nu}(\ell) \) 
             for a given map frequency \(\nu\). 
             When <b>“Scaling Impact”</b> is selected, 
             the left panel shows an example simulated power spectrum \( D(\ell) \), 
@@ -213,11 +213,24 @@
             });
         </script>
     </figure>
+    <h3>Impact on g</h3>
+    We run the MCMC pipeline for the EB only spectra, varying epsilon and seeing its impact 
+    on the recovered g. We also check the effect of only using BICEP3 data (B95lf), as 
+    well as the impact of changing the number of bins used.
         <figure>
             <img alt="Beam Uncertainties impact" id="beamimpact" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
             <figcaption>
-            </figcaption>
+            <ul> 
+                <li><b>Beam Uncertainty (epsilon):</b> 
+                The injected fractional beam scaling applied in the simulation.</li> 
+                <li><b>Maps Used:</b>
+                     Full BK18 dataset or BICEP3-only (B95lf) data.</li> 
+                <li><b>Bins Used:</b> Multipole range used in the MCMC fit.</li> 
+                <li><b>Injected EDE Signal:</b>With and without an injected EDE birefringence signal.</li> 
+                <li><b>Map Type:</b> Triangle plots, best-fit spectra, or histograms of recovered parameters and chi squared values.</li> 
+            </ul> 
+            Each combination corresponds to one MCMC test assessing how beam scaling impacts the recovered \( g \). </figcaption>
 
             <script type="text/javascript">
 
