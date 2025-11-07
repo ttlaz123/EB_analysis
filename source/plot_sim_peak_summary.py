@@ -30,7 +30,9 @@ def plot_sim_summary(dirpath, params_to_plot=None):
                     mean_vals, std_vals = [], []
 
                     for eps in eps_values:
-                        eps_tag = f"eps{eps:+.2f}".replace('.', 'p')  # e.g. eps-0p05
+                        eps_tag = f"eps{eps:+.2f}"  
+                        if eps_tag == "eps0.00":
+                            eps_tag = "eps-0.00" 
                         folder = f"{dirpath}/{g}_{b}_fixeddust_{m}_eb_sig{eps_tag}_ebfede0.07"
                         chains_path = os.path.join(folder, "sim1.1.txt")
 
