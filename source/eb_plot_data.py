@@ -464,7 +464,7 @@ def plot_chisq_blocks(multicomp_class, used_maps, observed_datas, final_detectio
     cbar = fig.colorbar(im, ax=ax, pad=0.02)
     cbar.ax.tick_params(labelsize=8)  # Adjust colorbar tick size if needed
     
-    # Adjust layout to prevent cutting off labels
+    # Adjust layout to prevent cutting off labelsreal_chains/BK18lf_eb_bin2-15_fixed_dust_fede0.09/real_triangle_plot.png
     plt.title("Chisq: " + str(chisq_sum))
     plt.tight_layout(pad=2.0)  # Increase padding around plot
     fig.subplots_adjust(bottom=0.25, left=0.25)  # Adjust these values based on label length
@@ -599,17 +599,17 @@ def plot_triangle(root, replace_dict={}):
     # Add LaTeX-formatted title in top-right
     title_ax = g.subplots[0, len(param_names) - 1]
     title_text = "\n".join(mean_std_strings)
-    #title_ax.text(1.05, 1.05, title_text, transform=title_ax.transAxes,
-    #              ha='left', va='top', fontsize=14, family='serif', usetex=True)
+    print('Saving: ' + title_text)
     # Save and show
+    plt.suptitle(title_text)
     plt.savefig(f"{root}_triangle_plot.png", bbox_inches='tight')
     print(f"Triangle plot saved as {root}_triangle_plot.png")
     plt.close(fig)
-    return param_names_all, means, mean_std_strs
+    return param_names_all, means, mean_std_strings
 
 
 
-def load_summary_csv(chains_path):
+def load_summary_csv(chains_path, overwrite=True):
     """
     Loads or regenerates a summary CSV of MCMC stats (mean, std, minchi2).
 
@@ -625,7 +625,7 @@ def load_summary_csv(chains_path):
     base_name = os.path.basename(base_dir)
     csv_file = os.path.join(base_dir, base_name + "_summary.csv")
 
-    if not os.path.exists(csv_file):
+    if not os.path.exists(csv_file) or overwrite:
         ms.process_single_directory(base_dir)
 
     df = pd.read_csv(csv_file)
@@ -745,7 +745,7 @@ def plot_logp_surface(model, param1, param2, range1, range2,
     plt.show()
 
 def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None, 
-                   percentile_clip=(0, 100)):
+                   percentile_clip=(0, 100), overwrite=True, show_titles=True):
     """
     Create a corner plot visualizing simulation parameter distributions.
 
@@ -786,11 +786,11 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
         "legend.fontsize": 18,
     })
 
-    means_df, stds_df, minchisq_df, param_names = load_summary_csv(chains_path)
-    selected_params = None
+    means_df, stds_df, minchisq_df, param_names = load_summary_csv(chains_path, overwrite=overwrite)
+    selected_params = [p for p in param_names if 'chi2' not in p]
     
     
-    if(True): 
+    if(False): 
         selected_params = [
             'gMpl',
             'alpha_BK18_B95e',
@@ -846,7 +846,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     # Plot means (red)
     fig = corner.corner(means_df[param_names],
                         labels=labels,
-                        show_titles=False,
+                        show_titles=show_titles,
                         titles=titles,
                         title_kwargs={"fontsize": 9, "multialignment": "center"},
                         hist_kwargs={'color': 'red', 'density': True},
