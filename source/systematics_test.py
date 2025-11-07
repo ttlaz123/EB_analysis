@@ -11,13 +11,13 @@ import sys
 import bicep_data_consts as bdc
 BK18_FILENAMES = {
     'BK18_150': 'beamfile_20130222_sum.fits',
-    'BK18_K95': 'beamfile_20150101_sum_220.fits',
-    'BK18_220': 'beamfile_20150321_sum_100.fits',
+    'BK18_220': 'beamfile_20150101_sum_220.fits',
+    'BK18_K95': 'beamfile_20150321_sum_100.fits',
     'BK18_B95e': 'beamfile_20180206_polycorr_sum_100.fits',
 }
 
 def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, output_dir='.',
-                   eps_range=0.05, num_eps=11):
+                   eps_range=0.05, num_eps=11, plot=False):
     """
     Scales the binned_dl_dict values using the ratio of scaled beams
     interpolated at the binned ell centers, restricted to specified bins.
@@ -32,7 +32,7 @@ def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, ou
     Returns:
         Updated binned_dl_dict with scaled values.
     """
-    scaled_beams_dict = load_scaled_beams()  # make sure this function exists
+    scaled_beams_dict = load_scaled_beams() 
     eps_val = injected_signal_dict.get('eps', 0.0)
     ell_bins_full = bdc.L_BIN_CENTERS
     bin_nums = [b-1 for b in bin_nums]
@@ -54,6 +54,30 @@ def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, ou
         dl_orig = binned_dl_dict[used_map].copy()
         scaled_dl_all[used_map] = {}
 
+        if(not plot):
+            B1_0 = scaled_beams_dict[map1][0.0]
+            B2_0 = scaled_beams_dict[map2][0.0]
+            B1_eps = scaled_beams_dict[map1].get(eps_val)
+            B2_eps = scaled_beams_dict[map2].get(eps_val)
+
+            if B1_eps is None or B2_eps is None:
+                print(f"Warning: epsilon {eps_val} not found for {used_map}. Skipping.")
+                print(scaled_beams_dict)
+                raise KeyError()
+
+            B1_0_interp = np.interp(ell_bins_full, np.arange(len(B1_0)), B1_0)[bin_nums]
+            B2_0_interp = np.interp(ell_bins_full, np.arange(len(B2_0)), B2_0)[bin_nums]
+            B1_eps_interp = np.interp(ell_bins_full, np.arange(len(B1_eps)), B1_eps)[bin_nums]
+            B2_eps_interp = np.interp(ell_bins_full, np.arange(len(B2_eps)), B2_eps)[bin_nums]
+
+            fac1 =  B1_eps_interp/B1_0_interp
+            fac2 =  B2_eps_interp/B2_0_interp
+            scale_factor = fac1 * fac2
+            dl_scaled = dl_orig * scale_factor
+
+            scaled_dl_all[used_map] = dl_scaled
+            continue
+
         # Set up colormap
         cmap = cm.get_cmap('coolwarm', num_eps-1)
 
@@ -63,6 +87,7 @@ def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, ou
         cmap_map1 = cm.get_cmap('PuOr', len(epsilons))
         cmap_map2 = cm.get_cmap('bwr', len(epsilons))
         for idx, eps_val in enumerate(epsilons):
+            eps_val = np.round(eps_val, 4)
             B1_0 = scaled_beams_dict[map1][0.0]
             B2_0 = scaled_beams_dict[map2][0.0]
             B1_eps = scaled_beams_dict[map1].get(eps_val)
@@ -102,6 +127,7 @@ def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, ou
             axes[1].plot(ell_bins, fac2, ':', color=cmap_map2(idx), linewidth=1.5, label=f"{map2} scaling (eps={eps_val:+.2f})" if idx == 0 else "")
 
         # Finalize plots
+        used_map = map1 + 'x' + map2
         axes[0].set_title(f"{used_map} binned D_l: Scaled for all eps")
         axes[0].set_xlabel("ell")
         axes[0].set_ylabel("D_l")
@@ -150,6 +176,7 @@ def load_scaled_beams(file_pattern= '/n/home08/liuto/bicep2_analysis/aux_data/be
 
     results = {}
     epsilons = np.linspace(-eps_range, eps_range, n_eps)
+    epsilons = np.round(epsilons, 4)
 
     for mapname, file_path in filtered_files.items():
         try:

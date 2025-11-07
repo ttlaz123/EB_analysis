@@ -81,8 +81,8 @@ class BK18_full_multicomp(Likelihood):
                                                                  self.binned_dl_observed_dict,
                                                                  self.injected_signal,
                                                                  self.bin_num,
-                                                                 output_dir = 'beam_scale_plots')
-                raise NotImplementedError()
+                                                                 output_dir = 'beam_scale_plots',
+                                                                 plot = False)
             else:
                 self.binned_dl_observed_dict = ec.inject_signal_prebin(self.used_maps,
                                                         self.injected_signal, 
@@ -923,7 +923,7 @@ def parallel_simulation(input_args, params_dict):
     """
     sim_indices = range(input_args.sim_start, input_args.sim_start + input_args.sim_num)
     try:
-        maxworkers = 1
+        maxworkers = 50
         with ProcessPoolExecutor(max_workers=maxworkers) as executor:
             # Submit all tasks to the executor
             future_to_sim = {
@@ -954,7 +954,7 @@ def do_plotting(input_args):
             continue
     '''
     chains_path = input_args.output_path + "XXX.1.txt"
-    epd.plot_sim_peaks(chains_path, input_args.sim_start, input_args.sim_num)
+    epd.plot_sim_peaks(chains_path, input_args.sim_start, input_args.sim_num, overwrite=False)
 
 def parse_bin_range(s):
     """
