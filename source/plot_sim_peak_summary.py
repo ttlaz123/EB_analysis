@@ -1,5 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
+
 import os
 import eb_plot_data as epd
 
@@ -21,7 +24,7 @@ def plot_sim_summary(dirpath, params_to_plot=None):
     # Loop through parameters
     for param in params_to_plot:
         fig, axs = plt.subplots(len(g_list), len(b_list), figsize=(10, 6), sharex=True, sharey=True)
-        fig.suptitle(f"{param} vs Beam Uncertainty ε", fontsize=14)
+        fig.suptitle(f"{param} beam scaling", fontsize=14)
 
         for i, g in enumerate(g_list):
             for j, b in enumerate(b_list):
@@ -30,7 +33,7 @@ def plot_sim_summary(dirpath, params_to_plot=None):
                     mean_vals, std_vals = [], []
 
                     for eps in eps_values:
-                        eps_tag = f"eps{eps:+.2f}"  
+                        eps_tag = f"eps{eps:.2f}"  
                         if eps_tag == "eps0.00":
                             eps_tag = "eps-0.00" 
                         folder = f"{dirpath}/{g}_{b}_fixeddust_{m}_eb_sig{eps_tag}_ebfede0.07"
@@ -55,7 +58,7 @@ def plot_sim_summary(dirpath, params_to_plot=None):
                 ax.legend(fontsize=8)
 
         plt.tight_layout(rect=[0, 0, 1, 0.96])
-        plt.show()
+        plt.savefig('summaryplot.png')
 
 if __name__=='__main__':
     dirpath = '/n/holylfs04/LABS/kovac_lab/users/liuto/ede_chains/'
