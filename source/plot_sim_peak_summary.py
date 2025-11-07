@@ -44,8 +44,11 @@ def plot_sim_summary(dirpath, params_to_plot=None):
                         mean_params_dict, std_params_dict = epd.plot_sim_peaks(
                             chains_path, single_sim=1, overwrite=False, do_plots=False
                         )
-                        mean_vals.append(mean_params_dict[param])
-                        std_vals.append(std_params_dict[param])
+                        try:
+                            mean_vals.append(mean_params_dict[param])
+                            std_vals.append(std_params_dict[param])
+                        except KeyError:
+                            continue
 
 
                     # Plot means with error bars
