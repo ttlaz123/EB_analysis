@@ -44,9 +44,9 @@ def plot_sim_summary(dirpath, params_to_plot=None):
                         mean_params_dict, std_params_dict = epd.plot_sim_peaks(
                             chains_path, single_sim=1, overwrite=False, do_plots=False
                         )
-                        mean_vals.append(mean_params_dict.get(param))
-                        std_vals.append(std_params_dict.get(param))
-                    
+                        mean_vals.append(mean_params_dict[param])
+                        std_vals.append(std_params_dict[param])
+
 
                     # Plot means with error bars
                     plt.errorbar(
@@ -55,6 +55,7 @@ def plot_sim_summary(dirpath, params_to_plot=None):
 
                 plt.xlabel("epsilon", fontsize=12)
                 plt.ylabel(param, fontsize=12)
+                plt.ylim([-2, 3])
                 plt.grid(alpha=0.3)
                 plt.legend(title="Map", fontsize=9)
                 plt.tight_layout()
