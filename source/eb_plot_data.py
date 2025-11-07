@@ -745,7 +745,8 @@ def plot_logp_surface(model, param1, param2, range1, range2,
     plt.show()
 
 def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None, 
-                   percentile_clip=(0, 100), overwrite=True, show_titles=True):
+                   percentile_clip=(0, 100), overwrite=True, show_titles=True,
+                   do_plots=True):
     """
     Create a corner plot visualizing simulation parameter distributions.
 
@@ -789,7 +790,18 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     means_df, stds_df, minchisq_df, param_names = load_summary_csv(chains_path, overwrite=overwrite)
     selected_params = [p for p in param_names if 'chi2' not in p]
     
-    
+    mean_params = means_df[param_names].mean().to_dict()
+    std_params = stds_df[param_names].mean().to_dict()
+    if(not do_plots):
+        return mean_params, std_params
+    print("Mean of parameter peaks (across all simulations):")
+    for k, v in mean_params.items():
+        print(f"  {k}: {v:.4g}")
+
+    print("\nSpread (std) of parameter peaks (across all simulations):")
+    for k, v in std_params.items():
+        print(f"  {k}: {v:.4g}")
+
     if(False): 
         selected_params = [
             'gMpl',
@@ -864,16 +876,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
                   contour_kwargs={'colors': 'green'},
                   fig=fig)
 
-    mean_params = means_df[param_names].mean().to_dict()
-    std_params = stds_df[param_names].mean().to_dict()
-
-    print("Mean of parameter peaks (across all simulations):")
-    for k, v in mean_params.items():
-        print(f"  {k}: {v:.4g}")
-
-    print("\nSpread (std) of parameter peaks (across all simulations):")
-    for k, v in std_params.items():
-        print(f"  {k}: {v:.4g}")
+    
 
     # Overlay single chain (blue)
     single_chain_path = single_path or chains_path.replace("XXX", f"{single_sim:03d}")
