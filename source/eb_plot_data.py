@@ -905,6 +905,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     #plt.suptitle(title)
     plt.savefig(outpath, bbox_inches='tight')
     print(f"Saved to {outpath}")
+    return mean_params, std_params
 
 def draw_zero_lines_on_corner(flat_axes, param_names, truth_vals, color):
     ndim = len(param_names)
