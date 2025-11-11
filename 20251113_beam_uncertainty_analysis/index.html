@@ -387,6 +387,7 @@
     </section>
     <section>
         <h2>Only Scaling a Single Map Frequency</h2>
+        We perform the same test, but only scaling a single map rather than all 4 of the BK18 maps at the same time. 
         <figure>
             <img alt="Beam Uncertainties impact" id="beamimpact_solo" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
@@ -394,8 +395,8 @@
             <ul> 
                 <li><b>Beam Uncertainty (epsilon):</b> 
                 The injected fractional beam scaling applied in the simulation.</li> 
-                <li><b>Maps Used:</b>
-                     Full BK18 dataset or BICEP3-only (B95lf) data.</li> 
+                <li><b>Maps scaled:</b>
+                     Denotes the specific maps that had beam scaling. The other maps stay the same</li> 
                 <li><b>Bins Used:</b> Multipole range used in the MCMC fit.</li> 
                 <li><b>Injected EDE Signal:</b>With and without an injected EDE birefringence signal.</li> 
                 <li><b>Map Type:</b> Triangle plots, best-fit spectra, or histograms of recovered parameters and chi squared values.</li> 
@@ -480,8 +481,7 @@
         <img alt="Beam Scaling summary" id="single_scale_summary" src="#" width="750" height="500"
             onerror="swapFreqAndRetry(this)" />
         <figcaption> We plot the mean and std of 500 sims as a function of epsilon.
-            We have the full BK18 results plotted in blue, and the 
-        results with only BICEP3 data (B95lf) plotted in orange.</figcaption>
+            We plot the effect of scaling each map in a different color.</figcaption>
 
         <script type="text/javascript">
             
@@ -526,6 +526,7 @@
     </section>
     <section>
         <h2>Effect on Angle Difference</h2>
+        We perform the same test for the Delta Beta parameter with an ell break at bin 12. 
         <figure>
             <img alt="Beam Uncertainties impact" id="beamimpact_ldiff" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
@@ -533,8 +534,6 @@
             <ul> 
                 <li><b>Beam Uncertainty (epsilon):</b> 
                 The injected fractional beam scaling applied in the simulation.</li> 
-                <li><b>Maps Used:</b>
-                     Full BK18 dataset or BICEP3-only (B95lf) data.</li> 
                 <li><b>Bins Used:</b> Multipole range used in the MCMC fit.</li> 
                 <li><b>Injected EDE Signal:</b>With and without an injected EDE birefringence signal.</li> 
                 <li><b>Map Type:</b> Triangle plots, best-fit spectra, or histograms of recovered parameters and chi squared values.</li> 
@@ -611,8 +610,7 @@
         <img alt="Beam Scaling summary" id="single_scale_summary_ldiff" src="#" width="750" height="500"
             onerror="swapFreqAndRetry(this)" />
         <figcaption> We plot the mean and std of 500 sims as a function of epsilon.
-            We have the full BK18 results plotted in blue, and the 
-        results with only BICEP3 data (B95lf) plotted in orange.</figcaption>
+          </figcaption>
 
         <script type="text/javascript">
             
