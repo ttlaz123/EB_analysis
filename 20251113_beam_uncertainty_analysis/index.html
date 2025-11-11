@@ -390,6 +390,144 @@
       </p>
     </section>
     <section>
+        <figure>
+            <img alt="Beam Uncertainties impact" id="beamimpact_solo" src="#" width="750" height="500"
+                onerror="javascript:this.src='dne.png'" />
+            <figcaption>
+            <ul> 
+                <li><b>Beam Uncertainty (epsilon):</b> 
+                The injected fractional beam scaling applied in the simulation.</li> 
+                <li><b>Maps Used:</b>
+                     Full BK18 dataset or BICEP3-only (B95lf) data.</li> 
+                <li><b>Bins Used:</b> Multipole range used in the MCMC fit.</li> 
+                <li><b>Injected EDE Signal:</b>With and without an injected EDE birefringence signal.</li> 
+                <li><b>Map Type:</b> Triangle plots, best-fit spectra, or histograms of recovered parameters and chi squared values.</li> 
+            </ul> 
+            Each combination corresponds to one MCMC test assessing how beam scaling impacts the recovered \( g \). </figcaption>
+
+            <script type="text/javascript">
+
+                pager.link("#beamimpact_solo", {
+                    'Map Sim Num Digit1|digit1': simnums,
+                    'Digit2|digit2': simnums,
+                    'Digit3|digit3': simnums,
+
+                    'Map Type|m_map_type': [
+                        'Best Fit EB|_bestfitEB',
+                        'Triangle Plot|_triangle_plot',
+                        'Summary Plot (Peaks histogram)|sim1_summary',
+                        'Chi Squared histogram|simchisq_hist'
+                    ],
+                    'Maps scaled|scaled_maps':[
+                        'BK18 all 4 maps|_BK18',
+                        'BK18_B95lf|_BK18_B95e',
+                        'BK18_K95|_BK18_K95',
+                        'BK18_220|_BK18_150',
+                        'BK18_150|_BK18_220',
+                    ],
+                    'Beam Uncertainty|inj_sig1': [
+                        '-0.05|-0.05',
+                        '-0.04|-0.04',
+                        '-0.03|-0.03',
+                        '-0.02|-0.02',
+                        '-0.01|-0.01',
+                        '0.00|-0.00',
+                        '0.01|0.01',
+                        '0.02|0.02',
+                        '0.03|0.03',
+                        '0.04|0.04',
+                        '0.05|0.05',
+                    ],
+                    'Spectra|spectra': [
+                        'EB Only|_eb',
+                    ],
+                    'Injected EDE Signal|ede1': [
+                        'g = 1, fede=0.07|fede01',
+                        'g = 0|zeroeb'
+                    ],
+                    'Bins Used|bin_num15': [
+                        '2-15|_bin2-15',
+                        '2-10|_bin2-10',
+
+                    ],
+                },
+                    function (params) {
+                        let dirbase2 = '/liuto'
+                        let dirpath2 = dirbase2 + '/ede_chains/';
+                        let mcmc_folder = params.ede1 + params.bin_num15 + '_fixeddust_BK18_eb_sigeps' + params.scaled_maps + params.inj_sig1 + '_ebfede0.07/';
+                        let sim_id = 'sim' + params.digit1 + params.digit2 + params.digit3;
+                        let name = dirpath2 + mcmc_folder + sim_id + params.m_map_type + '.png';
+                        if (params.m_map_type == 'sim1_summary' || params.m_map_type == 'simchisq_hist') {
+                            name = dirpath2 + mcmc_folder + params.m_map_type + '.png'
+                        }
+                        console.log(name);
+                        return name;
+                    });
+
+                pager.setparams({
+                    'digit1': '0',
+                    'digit2': '0',
+                    'digit3': '1',
+                    'm_map_type': '_triangle_plot',
+                    'bin_num15': '_bin2-15',
+                    'used_maps': '_BK18',
+                    'ede1': 'fede01',
+                    'spectra': '_eb',
+                    'inj_sig': 'eps-0.00',
+                });
+            </script>
+        </figure>
+        We summarize the results in the pager below:
+
+       <figure>
+        <img alt="Beam Scaling summary" id="scale_summary" src="#" width="750" height="500"
+            onerror="swapFreqAndRetry(this)" />
+        <figcaption> We plot the mean and std of 500 sims as a function of epsilon.
+            We have the full BK18 results plotted in blue, and the 
+        results with only BICEP3 data (B95lf) plotted in orange.</figcaption>
+
+        <script type="text/javascript">
+            
+
+            pager.link("#scale_summary", {
+                'Parameter|angle': [
+                    'BK18_K95|alpha_BK18_K95',
+                    'BK18_B95lf|alpha_BK18_B95e',
+                    'BK18_150|alpha_BK18_150',
+                    'BK18_220|alpha_BK18_220',
+                    'gMpl|gMpl'
+                ],
+                'Injected EDE Signal|ede1': [
+                        'g = 1, fede=0.07|fede01',
+                        'g = 0|zeroeb'
+                ],
+                'Bins Used|bin_num15': [
+                        '2-15|_bin2-15',
+                        '2-10|_bin2-10',
+
+                    ],
+            }, function (params) {
+                const dirbase = '/liuto/home/GitHub/EB_analysis/';
+                const dirpath = dirbase + '/source/beam_scale_plots/';
+                
+
+                filename = 'summary_' + params.angle +'_' + params.ede1 + 
+                              params.bin_num15;
+               
+                filepath = dirpath + '/' + filename + '.png';
+                console.log(filepath)
+                return filepath;
+            });
+
+            pager.setparams({
+                    'bin_num15': '_bin2-15',
+                    'ede1': 'fede01',
+                    'angle': 'gMpl'
+                });
+        </script>
+    </figure>
+    </section>
+    <section>
         <h2>Appendix</h2>
         <p>All chains and plots are available at:
             <code>/n/holylfs04/LABS/kovac_lab/Users/liuto/ede_chains</code>
