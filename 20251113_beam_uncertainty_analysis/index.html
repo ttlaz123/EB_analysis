@@ -524,6 +524,15 @@
                 });
         </script>
     </figure>
+    From the summary plots, we see that the effect of epsilon on the g parameter is 
+    approximately halved when only a single map frequency is scaled compared to 
+    scaling every single map frequency. This makes sense intuitively because each map 
+    frequency covers about half of the cross maps (there are 16 total cross maps,
+    and each frequency occurs in 7 of them). An interesting trend is that the K95 
+    map scaling appears to cause the g parameter to drift in the opposite direction. 
+    This is likely because the K95 reobserved bandpowers are closer to zero, and 
+    the scaling can push the negative bandpowers even more negative, causing a 
+    negative bias in g.
     </section>
     <section>
         <h2>Effect on Angle Difference</h2>
@@ -634,16 +643,16 @@
 
                     ],
             }, function (params) {
-                const dirbase = '/liuto/home/GitHub/EB_analysis/';
-                const dirpath = dirbase + '/source/beam_scale_plots_ldiff/';
+                 dirbase = '/liuto/home/GitHub/EB_analysis/';
+                 dirpath1 = dirbase + '/source/beam_scale_plots_ldiff/';
                 
 
                 filename = 'summary_' + params.angle +'_' + params.ede1 + 
                               params.bin_num15;
                
-                filepath = dirpath + '/' + filename + '.png';
-                console.log(filepath)
-                return filepath;
+                filepath1 = dirpath1 + '/' + filename + '.png';
+                console.log(filepath1)
+                return filepath1;
             });
 
             pager.setparams({
