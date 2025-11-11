@@ -48,7 +48,7 @@
     </section>
     <section>
         <h2>Beam Uncertainty Pager</h2>
-        <section">
+        <section>
             <p>
                 We first read in the original beam window functions (\(B_{\ell}\)'s) 
                 from the files listed in
@@ -262,11 +262,7 @@
                         'BK18 all 4 maps|_BK18',
                         'BK18_B95lf only|_BK18_B95e',
                     ],
-                    'Bins Used|bin_num15': [
-                        '2-15|_bin2-15',
-                        '2-10|_bin2-10',
-
-                    ],
+          
                     'Beam Uncertainty|inj_sig': [
                         '-0.05|eps-0.05',
                         '-0.04|eps-0.04',
@@ -529,7 +525,7 @@
     </figure>
     </section>
     <section>
-        <h2>Effec ton Angle Difference</h2>
+        <h2>Effect on Angle Difference</h2>
         <figure>
             <img alt="Beam Uncertainties impact" id="beamimpact_ldiff" src="#" width="750" height="500"
                 onerror="javascript:this.src='dne.png'" />
@@ -640,7 +636,7 @@
                     ],
             }, function (params) {
                 const dirbase = '/liuto/home/GitHub/EB_analysis/';
-                const dirpath = dirbase + '/source/beam_scale_plots_solo/';
+                const dirpath = dirbase + '/source/beam_scale_plots_ldiff/';
                 
 
                 filename = 'summary_' + params.angle +'_' + params.ede1 + 
