@@ -134,8 +134,12 @@ def plot_sim_summary(dirpath, params_to_plot=None):
                     plt.ylim([-2, 3])
                 else:
                     plt.ylim([-0.6, 0.6])
+                if (param == 'gMpl' and b == 'bin2-15' and g == 'fede01'):
+                    plt.ylim([0.4, 1.6])
+                if (param == 'gMpl' and b == 'bin2-15' and g == 'zeroeb'):
+                    plt.ylim([-0.6, 0.6])
                 plt.grid(alpha=0.3)
-                plt.legend(title="MapFreq", fontsize=9)
+                plt.legend(title="Scaled Map", fontsize=8)
                 plt.tight_layout()
 
                 outfile = f"summary_{param}_{g}_{b}.png"
