@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import eb_plot_data as epd
 
-def plot_sim_summary_new(dirpath, params_to_plot=None):
+def plot_sim_summary(dirpath, params_to_plot=None):
     """
     Plots parameter means and stds vs injected beam uncertainty ε.
     Each parameter gets its own figure.
