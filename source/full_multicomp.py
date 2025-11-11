@@ -76,13 +76,22 @@ class BK18_full_multicomp(Likelihood):
                                                             num_bins = self.bin_num)
         
         if(len(self.injected_signal) >= 1):
-            if('eps' in self.injected_signal):
+            if any('eps' in key for key in self.injected_signal):
+                scaled_map = 'all'
+                key = next(iter(self.injected_signal))
+                if('BK18' in key):
+                    scaled_map = key.split('_',1)[1]
+                self.injected_signal['eps'] = self.injected_signal[key]
+                print('Scaled map: ' + str(scaled_map))
                 self.binned_dl_observed_dict = st.scale_dl_beams(self.used_maps,
                                                                  self.binned_dl_observed_dict,
                                                                  self.injected_signal,
                                                                  self.bin_num,
                                                                  output_dir = 'beam_scale_plots',
-                                                                 plot = False)
+                                                                 plot = False,
+
+                                                                 scale_map = scaled_map)
+                                                                 
             else:
                 self.binned_dl_observed_dict = ec.inject_signal_prebin(self.used_maps,
                                                         self.injected_signal, 
@@ -711,10 +720,16 @@ def get_injected_signal(calc_spectra, signal_type):
 
     injected_signal = {}
     if('eps' in signal_type):
-        eps_value = float(signal_type.replace('eps', ''))
-        injected_signal['eps'] = eps_value
-        print('Injected signal: ' + str(injected_signal))
-        return injected_signal 
+        map_freqs = ['BK18_B95e', 'BK18_150', 'BK18_220', 'BK18_K95']
+        for f in map_freqs:
+            if(f not in signal_type):
+                continue
+            eps_str, eps_val = signal_type.split(f)
+            key = eps_str + f
+            eps_value = float(eps_val)
+            injected_signal[key] = eps_value
+            print('Injected signal: ' + str(injected_signal))
+            return injected_signal 
     
     num_spectra = len(calc_spectra)
     count = 0
@@ -954,7 +969,7 @@ def do_plotting(input_args):
             continue
     '''
     chains_path = input_args.output_path + "XXX.1.txt"
-    epd.plot_sim_peaks(chains_path, input_args.sim_start, input_args.sim_num, overwrite=False)
+    epd.plot_sim_peaks(chains_path, input_args.sim_start, input_args.sim_num, overwrite=True)
 
 def parse_bin_range(s):
     """

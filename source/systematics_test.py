@@ -17,7 +17,7 @@ BK18_FILENAMES = {
 }
 
 def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, output_dir='.',
-                   eps_range=0.05, num_eps=11, plot=False):
+                   eps_range=0.05, num_eps=11, plot=False, scale_map = 'all'):
     """
     Scales the binned_dl_dict values using the ratio of scaled beams
     interpolated at the binned ell centers, restricted to specified bins.
@@ -32,7 +32,7 @@ def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, ou
     Returns:
         Updated binned_dl_dict with scaled values.
     """
-    scaled_beams_dict = load_scaled_beams() 
+    scaled_beams_dict = load_scaled_beams(scale_map = scale_map) 
     eps_val = injected_signal_dict.get('eps', 0.0)
     ell_bins_full = bdc.L_BIN_CENTERS
     bin_nums = [b-1 for b in bin_nums]
@@ -150,7 +150,7 @@ def scale_dl_beams(used_maps, binned_dl_dict, injected_signal_dict, bin_nums, ou
 
 
 def load_scaled_beams(file_pattern= '/n/home08/liuto/bicep2_analysis/aux_data/beams/beamfile_*.fits', 
-                      eps_range=0.05, n_eps=11):
+                      eps_range=0.05, n_eps=11, scale_map='all'):
     """
     Reads FITS files from the given pattern and returns a dict of scaled beams.
     
@@ -196,9 +196,11 @@ def load_scaled_beams(file_pattern= '/n/home08/liuto/bicep2_analysis/aux_data/be
 
                 ell = np.arange(len(beam_values))
                 results[mapname] = {}
-
                 for eps in epsilons:
-                    scaled_ell = ell * (1 + eps)
+                    if(not(scale_map == 'all' or scale_map == mapname)):
+                        scaled_ell = ell
+                    else:
+                        scaled_ell = ell * (1 + eps)
                     scaled_beam = np.interp(scaled_ell, ell, beam_values,
                                             left=np.nan, right=np.nan)
                     results[mapname][eps] = scaled_beam
