@@ -71,13 +71,13 @@
 
             <p>
                 For a specific map frequency \(\nu\), 
-                we consider a corrected beam \(B^{\nu}_{\text{corr}}(\ell)\) 
+                we consider a disorted beam \(B^{\nu}_{\text{dist}}(\ell)\) 
                 that is a slightly shifted version of the original beam 
                 \(B^{\nu}_{\text{orig}}(\ell)\):
             </p>
             
             <div class="math-container">
-                <p>\[B^{\nu}_{\text{corr}}(\ell) = B^{\nu}_{\text{orig}}(\ell(1+\epsilon))\]</p>
+                <p>\[B^{\nu}_{\text{dist}}(\ell) = B^{\nu}_{\text{orig}}(\ell(1+\epsilon))\]</p>
             </div>
 
             <p>
@@ -93,17 +93,17 @@
             <p>
                 This beam broadening translates to a scaling effect on the power spectra bandpowers. 
                 We define the scaling factor for a map at frequency \(\nu\) as the 
-                ratio of the corrected to the original beam:
+                ratio of the disorted to the original beam:
             </p>
             
            
             <div class="math-container">
-                <p>\[ \text{scaling}(\nu) = \frac{B^{\nu}_{\text{corr}}(\ell)}{B^{\nu}_{\text{orig}}(\ell)} = \frac{B^{\nu}_{\text{orig}}(\ell(1+\epsilon))}{B^{\nu}_{\text{orig}}(\ell)} \]</p>
+                <p>\[ \text{scaling}(\nu) = \frac{B^{\nu}_{\text{dist}}(\ell)}{B^{\nu}_{\text{orig}}(\ell)} = \frac{B^{\nu}_{\text{orig}}(\ell(1+\epsilon))}{B^{\nu}_{\text{orig}}(\ell)} \]</p>
             </div>
 
             <p>
                 This factor simulates the effect if the power spectra were originally multiplied 
-                by the original beam. Therefore, to obtain the corrected power spectrum, 
+                by the original beam. Therefore, to obtain the disorted power spectrum, 
                 we must multiply the original spectrum by this scaling factor.
             </p>
             
@@ -117,14 +117,14 @@
             <p>
                 So if the original power spectrum, \(D_{\ell, \text{orig}}^{\nu_1 \times \nu_2}\), 
                 was incorrectly calibrated due to the beam uncertainty, 
-                the new "corrected" power spectrum becomes:
+                the new "disorted" power spectrum becomes:
             </p>
 
             <div class="math-container">
-                <p>\[ D^{\nu_1 \times \nu_2}_{\text{corr}}(\ell) = D^{\nu_1 \times \nu_2}_{\text{orig}}(\ell) \times \left( \frac{B^{\nu_1}_{\text{orig}}(\ell(1+\epsilon))}{B^{\nu_1}_{\text{orig}}(\ell)} \right) \times \left( \frac{B^{\nu_2}_{\text{orig}}(\ell(1+\epsilon))}{B^{\nu_2}_{\text{orig}}(\ell)} \right) \]</p>
+                <p>\[ D^{\nu_1 \times \nu_2}_{\text{dist}}(\ell) = D^{\nu_1 \times \nu_2}_{\text{orig}}(\ell) \times \left( \frac{B^{\nu_1}_{\text{orig}}(\ell(1+\epsilon))}{B^{\nu_1}_{\text{orig}}(\ell)} \right) \times \left( \frac{B^{\nu_2}_{\text{orig}}(\ell(1+\epsilon))}{B^{\nu_2}_{\text{orig}}(\ell)} \right) \]</p>
             </div>
             <p>
-                The corrected power spectrum is obtained by applying the beam scaling factor for each frequency component, \(\nu_1\) and \(\nu_2\), of the cross-spectrum map.
+                The disorted power spectrum is obtained by applying the beam scaling factor for each frequency component, \(\nu_1\) and \(\nu_2\), of the cross-spectrum map.
                 We scale our bandpower spectra by calculating the scaling factor for each bin center.
             </p>
             
@@ -137,12 +137,12 @@
             for a given map frequency \(\nu\). 
             When <b>“Scaling Impact”</b> is selected, 
             the left panel shows an example simulated power spectrum \( D(\ell) \), 
-            with the original spectrum in black and the beam-corrected 
+            with the original spectrum in black and the beam-disorted 
             versions in red and blue corresponding to
              different beam scaling parameters \( \epsilon \). 
-             The right panel shows the ratio \( B_{\mathrm{corr}} / B_{\mathrm{orig}} \) 
+             The right panel shows the ratio \( B_{\mathrm{dist}} / B_{\mathrm{orig}} \) 
              for each frequency \( \nu_1 \), \( \nu_2 \), and their product, 
-             illustrating the ell-dependent scaling applied to obtain the corrected 
+             illustrating the ell-dependent scaling applied to obtain the disorted 
              \( D(\ell) \). </figcaption>
 
         <script type="text/javascript">
