@@ -26,7 +26,10 @@ def plot_sim_summary_ldiff(dirpath):
                 std_vals.append(std_params_dict[param])
             plt.figure(figsize=(8, 6))
             plt.title(f"{param} beam scaling — {g}", fontsize=14)
-
+            if(len(mean_vals) > 0):
+                    plt.errorbar(
+                        eps_values, mean_vals, yerr=std_vals, fmt='-o', label=f"{m}", capsize=4
+                    )
            
 
             plt.xlabel("epsilon", fontsize=12)
