@@ -195,4 +195,4 @@ def plot_sim_summary(dirpath, params_to_plot=None):
 
 if __name__=='__main__':
     dirpath = '/n/holylfs04/LABS/kovac_lab/users/liuto/ede_chains/'
-    plot_sim_summary(dirpath)
+    plot_sim_summary_ldiff(dirpath)
