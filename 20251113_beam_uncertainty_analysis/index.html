@@ -637,15 +637,14 @@
                     'BK18_B95lf|alpha_BK18_B95e',
                     'BK18_150|alpha_BK18_150',
                     'BK18_220|alpha_BK18_220',
-                    'gMpl|gMpl'
+                    'Delta Beta|angle_diff'
                 ],
                 'Injected EDE Signal|ede1': [
                         'g = 1, fede=0.07|fede01',
                         'g = 0|zeroeb'
                 ],
-                'Bins Used|bin_num15': [
+                'Bins Used|bin_num': [
                         '2-15|_bin2-15',
-                        '2-10|_bin2-10',
 
                     ],
             }, function (params) {
@@ -653,8 +652,8 @@
                  dirpath1 = dirbase + '/source/beam_scale_plots_ldiff/';
                 
 
-                filename = 'summary_' + params.angle +'_' + params.ede1 + 
-                              params.bin_num15;
+                filename = 'summary_ldiff12' + params.angle +'_' + params.ede1 + 
+                              params.bin_num;
                
                 filepath1 = dirpath1 + '/' + filename + '.png';
                 console.log(filepath1)
@@ -662,7 +661,7 @@
             });
 
             pager.setparams({
-                    'bin_num15': '_bin2-15',
+                    'bin_num': '_bin2-15',
                     'ede1': 'fede01',
                     'angle': 'gMpl'
                 });
