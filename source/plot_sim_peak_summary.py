@@ -28,22 +28,14 @@ def plot_sim_summary_ldiff(dirpath):
             plt.title(f"{param} beam scaling — {g}", fontsize=14)
             if(len(mean_vals) > 0):
                     plt.errorbar(
-                        eps_values, mean_vals, yerr=std_vals, fmt='-o', label=f"{m}", capsize=4
+                        eps_values, mean_vals, yerr=std_vals, fmt='-o', capsize=4
                     )
            
 
             plt.xlabel("epsilon", fontsize=12)
-            plt.ylabel(param, fontsize=12)
-            if param == 'gMpl':
-                plt.ylim([-2, 3])
-            else:
-                plt.ylim([-0.6, 0.6])
-            if (param == 'gMpl' and b == 'bin2-15' and g == 'fede01'):
-                plt.ylim([0.4, 1.6])
-            if (param == 'gMpl' and b == 'bin2-15' and g == 'zeroeb'):
-                plt.ylim([-0.6, 0.6])
+            plt.ylabel(param, fontsize=12) 
+            plt.ylim([-0.7, 0.7])
             plt.grid(alpha=0.3)
-            plt.legend(title="Scaled Map", fontsize=8)
             plt.tight_layout()
 
             outfile = f"summary_ldiff12_{param}_{g}_{b}.png"
