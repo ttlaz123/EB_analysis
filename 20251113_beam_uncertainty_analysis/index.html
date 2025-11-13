@@ -37,7 +37,8 @@
             experience a 5% beamshift in \(\ell\). Distorting only one of the 4 frequencies
             approximately halves the effect.
         </p>
-
+       <p> We reproduce the analysis done in <a href="../20230711_IPR9_beams/">Clara's posting, IPR9</a> extending 
+        the beam analysis on BICEP 3 to the Keck spectra.</p>
         <p>This posting builds upon previous updates:</p>
         <ul>
             <li><a href="../20240924_preliminary_eb_ede_results/">2024-09-24: Preliminary EB EDE Results</a></li>
@@ -45,11 +46,11 @@
             <li><a href="../20250218_ede_forecast/">2025-02-18: EDE Forecast</a></li>
             <li><a href="../20250513_dust_eb_ede_update/">2025-05-13: Dust Analysis</a></li>
             <li><a href="../20250605_time_dependent_constraints/">2025-06-05: Multipole-Dependent Analysis</a></li>
+            <li><a href="../20250710_unblinded_birefringence_angles//">2025-07-10: Unblinded results</a></li>
         </ul>
 
         <p>
-        We reproduce the analysis done in <a href="../20230711_IPR9_beams/">Clara's posting, IPR9</a> extending 
-        the beam analysis on BICEP 3 to the Keck spectra.
+        
         </p>
     </section>
     <section>
@@ -69,7 +70,7 @@
             </ul>
        
            <p>
-                We plot the beam window functions (\(B_{\ell}\)'s) in the pager 2.1 below, 
+                We plot the beam window functions (\(B_{\ell}\)'s) in the pager 3.1 below, 
                 as well as the potential errors on those \(B_{\ell}\)'s
                 up to 5% beam broadening as specified in section 3.3 of
                 <a href="../20230711_IPR9_beams/">IPR9</a>.
@@ -221,6 +222,8 @@
             });
         </script>
     </figure>
+    Note that the scaling is often greater than the uncertainty in ell, particularly 
+    for higher multipoles. 
     <h3>Impact on g</h3>
     We run the MCMC pipeline for the EB only spectra, varying epsilon and seeing its impact 
     on the recovered g. We also check the effect of only using BICEP3 data (B95lf), as 
