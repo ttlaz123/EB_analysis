@@ -4,6 +4,51 @@ import numpy as np
 import matplotlib.pyplot as plt
 import eb_plot_data as epd
 
+def plot_sim_summary_ldiff(dirpath):
+    g_list = ['zeroeb', 'fede01']
+    params_to_plot = ['alpha_BK18_B95e', 'alpha_BK18_K95', 
+                          'alpha_BK18_150', 'alpha_BK18_220', 'angle_diff']
+    b = 'bin2-15'
+    eps_values = np.arange(-0.05, 0.051, 0.01)
+    for param in params_to_plot:
+        for g in g_list:
+            mean_vals, std_vals = [], []
+            for eps in eps_values:
+                eps_tag = f"eps{eps:.2f}"
+                if eps_tag == "eps0.00":
+                    eps_tag = "eps-0.00" 
+                folder = f"{dirpath}/{g}_{b}_ldiff12_BK18_eb_sig{eps_tag}_ebfede0.07"
+                chains_path = os.path.join(folder, "sim")
+                mean_params_dict, std_params_dict = epd.plot_sim_peaks(
+                                chains_path, single_sim=1, overwrite=False, do_plots=False
+                            )
+                mean_vals.append(mean_params_dict[param])
+                std_vals.append(std_params_dict[param])
+            plt.figure(figsize=(8, 6))
+            plt.title(f"{param} beam scaling — {g}", fontsize=14)
+
+           
+
+            plt.xlabel("epsilon", fontsize=12)
+            plt.ylabel(param, fontsize=12)
+            if param == 'gMpl':
+                plt.ylim([-2, 3])
+            else:
+                plt.ylim([-0.6, 0.6])
+            if (param == 'gMpl' and b == 'bin2-15' and g == 'fede01'):
+                plt.ylim([0.4, 1.6])
+            if (param == 'gMpl' and b == 'bin2-15' and g == 'zeroeb'):
+                plt.ylim([-0.6, 0.6])
+            plt.grid(alpha=0.3)
+            plt.legend(title="Scaled Map", fontsize=8)
+            plt.tight_layout()
+
+            outfile = f"summary_ldiff12_{param}_{g}_{b}.png"
+            plt.savefig(outfile, dpi=150)
+            print(f"Saved {outfile}")
+            plt.close()
+
+
 def plot_sim_summary(dirpath, params_to_plot=None):
     """
     Plots parameter means and stds vs injected beam uncertainty ε.
