@@ -771,55 +771,122 @@
     This table lists all χ² and χ values that are &lt;0.01 or &gt;0.99, including total counts.
 </p>
 
+<!-- K95 Table -->
 <table border="1" cellspacing="0" cellpadding="5">
+    <caption>Total values per bin: 84</caption>
     <thead>
         <tr>
-            <th>Frequency</th>
             <th>Bin Range</th>
-            <th>Statistic</th>
-            <th>Total Values</th>
-            <th>Values &lt; 0.01</th>
-            <th>Values &gt; 0.99</th>
+            <th>χ²</th>
+            <th>χ</th>
         </tr>
     </thead>
     <tbody>
-        <!-- K95 -->
-        <tr><td>K95</td><td>1-5</td><td>chi²</td><td>84</td><td>—</td><td>—</td></tr>
-        <tr><td>K95</td><td>1-9</td><td>chi²</td><td>84</td><td>—</td><td>—</td></tr>
-        <tr><td>K95</td><td>1-14</td><td>chi²</td><td>84</td><td>—</td><td>—</td></tr>
-
-        <tr><td>K95</td><td>1-5</td><td>chi</td><td>84</td><td>—</td><td>0.9980, 0.9960</td></tr>
-        <tr><td>K95</td><td>1-9</td><td>chi</td><td>84</td><td>—</td><td>0.9920, 0.9980, 0.9940</td></tr>
-        <tr><td>K95</td><td>1-14</td><td>chi</td><td>84</td><td>0</td><td>0.9980, 0.9960, 0.9920</td></tr>
-
-        <!-- 220 -->
-        <tr><td>220</td><td>1-5</td><td>chi²</td><td>252</td><td>0.0020, 0.0080, 0.0040</td><td>—</td></tr>
-        <tr><td>220</td><td>1-9</td><td>chi²</td><td>252</td><td>0.0020, 0.0040, 0.0020</td><td>—</td></tr>
-        <tr><td>220</td><td>1-14</td><td>chi²</td><td>252</td><td>0.0020, 0.0080, 0.0080</td><td>1, 1</td></tr>
-
-        <tr><td>220</td><td>1-5</td><td>chi</td><td>252</td><td>0.0040, 0</td><td>0.9980, 0.9980, 0.9960, 1.0000, 0.9940</td></tr>
-        <tr><td>220</td><td>1-9</td><td>chi</td><td>252</td><td>0.0020, 0.0020, 0</td><td>0.9940, 0.9980, 0.9960</td></tr>
-        <tr><td>220</td><td>1-14</td><td>chi</td><td>252</td><td>0, 0, 0.0060</td><td>1.0000, 0.9920, 0.9920, 0.9980</td></tr>
-
-        <!-- 150 -->
-        <tr><td>150</td><td>1-5</td><td>chi²</td><td>210</td><td>0.0040, 0.0040</td><td>0.9920, 0.9940</td></tr>
-        <tr><td>150</td><td>1-9</td><td>chi²</td><td>210</td><td>0.0040, 0.0080, 0.0080</td><td>1.0000, 0.9920</td></tr>
-        <tr><td>150</td><td>1-14</td><td>chi²</td><td>210</td><td>0.0020, 0.0080, 0</td><td>0.9940</td></tr>
-
-        <tr><td>150</td><td>1-5</td><td>chi</td><td>210</td><td>0, 0.0040, 0.0060</td><td>0.9920, 0.9980, 0.9980</td></tr>
-        <tr><td>150</td><td>1-9</td><td>chi</td><td>210</td><td>0, 0.0040, 0.0040, 0.0080, 0, 0.0020</td><td>0.9920, 1.0000, 0.9920, 0.9980</td></tr>
-        <tr><td>150</td><td>1-14</td><td>chi</td><td>210</td><td>0.0040, 0.0020, 0, 0, 0.0020</td><td>0.9940, 0.9940</td></tr>
-
-        <!-- B95lf -->
-        <tr><td>B95lf</td><td>1-5</td><td>chi²</td><td>126</td><td>0.0040</td><td>—</td></tr>
-        <tr><td>B95lf</td><td>1-9</td><td>chi²</td><td>126</td><td>—</td><td>0.9920</td></tr>
-        <tr><td>B95lf</td><td>1-14</td><td>chi²</td><td>126</td><td>0.0080, 0.0060, 0, 0.0060</td><td>1</td></tr>
-
-        <tr><td>B95lf</td><td>1-5</td><td>chi</td><td>126</td><td>0, 0.0020</td><td>0.9980, 0.9960</td></tr>
-        <tr><td>B95lf</td><td>1-9</td><td>chi</td><td>126</td><td>0.0040</td><td>0.9960, 0.9960, 0.9920, 1.0000, 0.9980</td></tr>
-        <tr><td>B95lf</td><td>1-14</td><td>chi</td><td>126</td><td>0.0080</td><td>0.9920, 1.0000, 0.9960</td></tr>
+        <tr>
+            <td>1-5</td>
+            <td>—</td>
+            <td>0.9980, 0.9960 (2/84 ≈ 2.4%)</td>
+        </tr>
+        <tr>
+            <td>1-9</td>
+            <td>—</td>
+            <td>0.9920, 0.9980, 0.9940 (3/84 ≈ 3.6%)</td>
+        </tr>
+        <tr>
+            <td>1-14</td>
+            <td>—</td>
+            <td>0 (1/84 ≈ 1.2%), 0.9980, 0.9960, 0.9920 (3/84 ≈ 3.6%)</td>
+        </tr>
     </tbody>
 </table>
+
+<!-- 220 Table -->
+<table border="1" cellspacing="0" cellpadding="5">
+    <caption>Total values per bin: 252</caption>
+    <thead>
+        <tr>
+            <th>Bin Range</th>
+            <th>χ²</th>
+            <th>χ</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1-5</td>
+            <td>0.0020, 0.0080, 0.0040 (3/252 ≈ 1.2%)</td>
+            <td>0.0040, 0 (2/252 ≈ 0.8%), 0.9980, 0.9980, 0.9960, 1.0000, 0.9940 (5/252 ≈ 2.0%)</td>
+        </tr>
+        <tr>
+            <td>1-9</td>
+            <td>0.0020, 0.0040, 0.0020 (3/252 ≈ 1.2%)</td>
+            <td>0.0020, 0.0020, 0 (3/252 ≈ 1.2%), 0.9940, 0.9980, 0.9960 (3/252 ≈ 1.2%)</td>
+        </tr>
+        <tr>
+            <td>1-14</td>
+            <td>0.0020, 0.0080, 0.0080 (3/252 ≈ 1.2%), 1,1 (2/252 ≈ 0.8%)</td>
+            <td>0,0,0.0060 (3/252 ≈ 1.2%), 1.0000,0.9920,0.9920,0.9980 (4/252 ≈ 1.6%)</td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- 150 Table -->
+<table border="1" cellspacing="0" cellpadding="5">
+    <caption>Total values per bin: 210</caption>
+    <thead>
+        <tr>
+            <th>Bin Range</th>
+            <th>χ²</th>
+            <th>χ</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1-5</td>
+            <td>0.0040, 0.0040 (2/210 ≈ 1.0%), 0.9920,0.9940 (2/210 ≈ 1.0%)</td>
+            <td>0,0.0040,0.0060 (3/210 ≈ 1.4%), 0.9920,0.9980,0.9980 (3/210 ≈ 1.4%)</td>
+        </tr>
+        <tr>
+            <td>1-9</td>
+            <td>0.0040,0.0080,0.0080 (3/210 ≈ 1.4%), 1.0000,0.9920 (2/210 ≈ 1.0%)</td>
+            <td>0,0.0040,0.0040,0.0080,0,0.0020 (6/210 ≈ 2.9%), 0.9920,1.0000,0.9920,0.9980 (4/210 ≈ 1.9%)</td>
+        </tr>
+        <tr>
+            <td>1-14</td>
+            <td>0.0020,0.0080,0 (3/210 ≈ 1.4%), 0.9940 (1/210 ≈ 0.5%)</td>
+            <td>0.0040,0.0020,0,0,0.0020 (5/210 ≈ 2.4%), 0.9940,0.9940 (2/210 ≈ 1.0%)</td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- B95lf Table -->
+<table border="1" cellspacing="0" cellpadding="5">
+    <caption>Total values per bin: 126</caption>
+    <thead>
+        <tr>
+            <th>Bin Range</th>
+            <th>χ²</th>
+            <th>χ</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1-5</td>
+            <td>0.0040 (1/126 ≈ 0.8%)</td>
+            <td>0,0.0020 (2/126 ≈ 1.6%), 0.9980,0.9960 (2/126 ≈ 1.6%)</td>
+        </tr>
+        <tr>
+            <td>1-9</td>
+            <td>—</td>
+            <td>0.0040 (1/126 ≈ 0.8%), 0.9960,0.9960,0.9920,1.0000,0.9980 (5/126 ≈ 4.0%)</td>
+        </tr>
+        <tr>
+            <td>1-14</td>
+            <td>0.0080,0.0060,0,0.0060 (4/126 ≈ 3.2%), 1 (1/126 ≈ 0.8%)</td>
+            <td>0.0080 (1/126 ≈ 0.8%), 0.9920,1.0000,0.9960 (3/126 ≈ 2.4%)</td>
+        </tr>
+    </tbody>
+</table>
+
 
     </section>
     <section>
