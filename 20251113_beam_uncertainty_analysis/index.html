@@ -680,6 +680,93 @@
         but still within a single standard deviation. The effect essentially
         vanishes when looking at the simulations with no multipole dependence injected.
     </p>
+    </section>
+    <section>
+        <h2>Jackknife Tests</h2>
+      <p>
+        We examine the jackknives for each map frequency across all years of data collection. 
+        These tests correspond to the frequencies shown in the reference figures in 
+        <a href="https://arxiv.org/abs/2110.00483" target="_blank">
+            <em>BICEP/Keck XIII: Improved Constraints on Primordial Gravitational Waves</em>
+        </a>.
+        In particular, our B95lf GHz jackknives for bins 1-5 and 1-9
+        correspond to the BICEP3 distributions shown in Fig.11, 
+        and our 220 GHz jackknives for the same bins correspond to the Keck Array results in Fig.12. 
+        Below is the full set of files used in constructing our jackknife tables:
+    </p>
+    <ul>
+        <li>
+            <strong>K95:</strong>
+            <ul>
+                <li>final/1351/real_d_filtp3_weight3_gs_dp1102_jack01_pureB_overfreq.mat</li>
+                <li>final/1351/real_e_filtp3_weight3_gs_dp1102_jack01_pureB_overfreq.mat</li>
+            </ul>
+        </li>
+
+        <li>
+            <strong>220 GHz:</strong>
+            <ul>
+                <li>final/1351/real_f_filtp3_weight3_gs_dp1102_jack01_pureB_overfreq_norot.mat</li>
+                <li>final/1351/real_g_filtp3_weight3_gs_dp1102_jack01_pureB_overfreq_norot.mat</li>
+                <li>final/1351/real_h_filtp3_weight3_gs_dp1102_jack01_pureB_overfreq_norot.mat</li>
+            </ul>
+        </li>
+
+        <li>
+            <strong>150 GHz:</strong>
+            <ul>
+                <li>final/0751/real_a_filtp3_weight3_gs_dp1102_jack0_pureB_directbpwf.mat</li>
+                <li>final/1351/real_a_fixesub_filtp3_weight3_gs_dp1102_jack01_real_b_fixesub_filtp3_weight3_gs_dp1102_jack01_pureB_overrx.mat</li>
+                <li>final/1351/real_d_filtp3_weight3_gs_dp1102_jack01_pureB_overfreq.mat</li>
+                <li>final/1351/real_e_filtp3_weight3_gs_dp1102_jack01_pureB_overfreq.mat</li>
+                <li>final/1351/real_f_filtp3_weight3_gs_dp1102_jack01_pureB_overfreq_norot.mat</li>
+            </ul>
+        </li>
+
+        <li>
+            <strong>B95lf:</strong>
+            <ul>
+                <li>final/3553/real_f_filtp3_weight3_gs_dp1102_jack01_pureB_overfreq_norot.mat</li>
+                <li>final/3553/real_g_filtp3_weight3_gs_dp1102_jack01_pureB_overfreq_norot.mat</li>
+                <li>final/3553/real_h_filtp3_weight3_gs_dp1102_jack01_pureB_overfreq_norot.mat</li>
+            </ul>
+        </li>
+    </ul> 
+    <figure>
+    <img alt="Jackknife Plot" id="jackknife_plot" src="#" width="750" height="500"
+         onerror="swapFreqAndRetry(this)" />
+
+    <figcaption>Jackknife χ² and PTE distributions for each observing frequency.</figcaption>
+
+    <script type="text/javascript">
+        // Connect pager to frequency → file mapping
+        pager.link("#jackknife_plot", {
+            'Frequency|freq': [
+                'K95|K95_jackknife',
+                'B95lf|B95lf_jackknife',
+                '150 GHz|150_jackknife',
+                '220 GHz|220_jackknife'
+            ],
+        }, function (params) {
+
+            const dirbase = '/liuto/home/GitHub/EB_analysis/';
+            const dirpath = dirbase + '/jackknife_plots/';
+
+            // Build final filename
+            const filename = params.freq + '.jpg';
+            const fullpath = dirpath + filename;
+
+            console.log(fullpath);
+            return fullpath;
+        });
+
+        // Default image
+        pager.setparams({
+            'freq': 'K95_jackknife'
+        });
+    </script>
+</figure>
+    </section>
     <section>
         <h2>Conclusion</h2>
         <p>
