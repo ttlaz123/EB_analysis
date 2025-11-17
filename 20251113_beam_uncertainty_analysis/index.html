@@ -741,7 +741,7 @@
     <script type="text/javascript">
         // Connect pager to frequency → file mapping
         pager.link("#jackknife_plot", {
-            'Frequency|freq': [
+            'Frequency|jackfreq': [
                 'K95|K95_jackknife',
                 'B95lf|B95lf_jackknife',
                 '150 GHz|150_jackknife',
@@ -753,7 +753,7 @@
             const dirpath = dirbase + '/jackknife_plots/';
 
             // Build final filename
-            const filename = params.freq + '.jpg';
+            const filename = params.jackfreq + '.jpg';
             const fullpath = dirpath + filename;
 
             console.log(fullpath);
@@ -762,7 +762,7 @@
 
         // Default image
         pager.setparams({
-            'freq': 'K95_jackknife'
+            'jackfreq': 'K95_jackknife'
         });
     </script>
 </figure>
