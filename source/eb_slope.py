@@ -444,6 +444,11 @@ def make_triangle_plot(output_path, params_dict):
     plot_path = output_path + "_triangle.pdf"
     g.export(plot_path)
     print(f"Triangle plot saved → {plot_path}")
+
+ 
+# ══════════════════════════════════════════════════════════════════════════════
+#  EB BEST-FIT PLOT
+# ══════════════════════════════════════════════════════════════════════════════
  
 def plot_eb_bestfit(obs_dict, binned_theory_dict, covmat, used_maps, bin_num, output_path):
     """
@@ -455,26 +460,27 @@ def plot_eb_bestfit(obs_dict, binned_theory_dict, covmat, used_maps, bin_num, ou
     Rows    = E-side map  (K95, B95e, 150, 220)
     Columns = B-side map  (K95, B95e, 150, 220)
  
-    Each panel shows  C_ell^{EB}(nu_row × nu_col).
-    Both the ExB and BxE keys for the same pair are averaged before plotting
-    so that each panel contains exactly one curve.
+    Panel (row_i, col_j) shows  nu_row(E) × nu_col(B).
+    The data file stores each frequency pair in exactly one ordering
+    (either ExB or BxE) — we check both and use whichever is present.
+    This guarantees all 16 panels are populated.
  
     Parameters
     ----------
-    obs_dict         : dict  {key: binned observed spectrum}
+    obs_dict           : dict  {key: binned observed spectrum}
     binned_theory_dict : dict  {key: binned theory spectrum}
-    covmat           : ndarray  filtered covariance matrix (EB-only, shape N×N)
-    used_maps        : list  ordered list of spectrum keys (same order as covmat rows)
-    bin_num          : list  list of bin indices
-    output_path      : str   output prefix; saves <output_path>_bestfitEB.png
+    covmat             : ndarray  filtered covariance matrix (EB-only, shape N×N)
+    used_maps          : list  ordered list of spectrum keys (same order as covmat rows)
+    bin_num            : list  list of bin indices
+    output_path        : str   output prefix; saves <output_path>_bestfitEB.png
     """
     plt.rcParams.update({
-        "text.usetex":    True,
-        "font.family":    "serif",
-        "font.serif":     "Computer Modern",
-        "font.size":      14,
-        "axes.titlesize": 13,
-        "axes.labelsize": 14,
+        "text.usetex":     True,
+        "font.family":     "serif",
+        "font.serif":      "Computer Modern",
+        "font.size":       14,
+        "axes.titlesize":  13,
+        "axes.labelsize":  14,
         "xtick.labelsize": 11,
         "ytick.labelsize": 11,
         "legend.fontsize": 10,
@@ -483,78 +489,57 @@ def plot_eb_bestfit(obs_dict, binned_theory_dict, covmat, used_maps, bin_num, ou
     # ell bin centres for x-axis
     ell_centres = bc.L_BIN_CENTERS[[b - 1 for b in bin_num]]
  
-    # Variance = diagonal of the covmat; index in covmat matches index in used_maps
     n_bins   = len(bin_num)
-    cov_diag = np.diag(covmat)    # length = len(used_maps) * n_bins
+    cov_diag = np.diag(covmat)   # length = len(used_maps) * n_bins
  
-    # Short display labels (strip 'BK18_', shorten 'B95e' → 'B95')
     def short(map_name):
-        lbl = map_name.replace("BK18_", "")
-        return lbl.replace("B95e", "B95")
+        return map_name.replace("BK18_", "").replace("B95e", "B95")
  
-    # For each of the 16 (E-map, B-map) pairs, average the ExB and BxE keys.
-    # We iterate over MAPS in the fixed order so the grid is deterministic.
-    fig, axes = plt.subplots(
-        4, 4,
-        figsize=(14, 12),
-        sharex=True, sharey=True,
-    )
+    fig, axes = plt.subplots(4, 4, figsize=(14, 12), sharex=True, sharey=True)
  
-    for row_i, map_e in enumerate(MAPS):      # E-side
-        for col_j, map_b in enumerate(MAPS):  # B-side
+    for row_i, map_e in enumerate(MAPS):
+        for col_j, map_b in enumerate(MAPS):
             ax = axes[row_i, col_j]
  
+            # The data file stores each pair in one canonical ordering only.
+            # Try ExB first; fall back to BxE (which represents the same
+            # physical cross-spectrum with E and B sides swapped).
             key_exb = f"{map_e}_Ex{map_b}_B"
-            key_bxe = f"{map_e}_Bx{map_b}_E"
+            key_bxe = f"{map_b}_Ex{map_e}_B"   # equivalent pair, other ordering
  
-            # ── observed: average ExB and BxE if both present ────────────────
-            obs_vals = []
-            var_vals = []
-            for key in (key_exb, key_bxe):
-                if key in obs_dict and key in used_maps:
-                    obs_vals.append(np.asarray(obs_dict[key]))
-                    k_idx   = used_maps.index(key)
-                    var_vals.append(
-                        cov_diag[k_idx * n_bins : (k_idx + 1) * n_bins]
-                    )
- 
-            if not obs_vals:
-                ax.set_visible(False)
+            if key_exb in used_maps:
+                key = key_exb
+            elif key_bxe in used_maps:
+                key = key_bxe
+            else:
+                # Neither ordering present — shouldn't happen for a complete set
+                ax.text(0.5, 0.5, "no data", transform=ax.transAxes,
+                        ha="center", va="center", fontsize=9, color="red")
                 continue
  
-            obs_mean = np.mean(obs_vals, axis=0)
-            # Combined variance: var of mean = mean(var)/N  (N=1 or 2)
-            var_mean = np.mean(var_vals, axis=0) / len(var_vals)
-            err      = np.sqrt(var_mean)
+            k_idx   = used_maps.index(key)
+            obs     = np.asarray(obs_dict[key])
+            var     = cov_diag[k_idx * n_bins : (k_idx + 1) * n_bins]
+            err     = np.sqrt(var)
+            theory  = np.asarray(binned_theory_dict[key])
  
-            # ── theory: average same two keys ────────────────────────────────
-            th_vals = [
-                np.asarray(binned_theory_dict[k])
-                for k in (key_exb, key_bxe)
-                if k in binned_theory_dict
-            ]
-            th_mean = np.mean(th_vals, axis=0)
- 
-            # ── panel label ──────────────────────────────────────────────────
             label = rf"{short(map_e)} $\times$ {short(map_b)}"
  
             ax.errorbar(
-                ell_centres, obs_mean, yerr=err,
+                ell_centres, obs, yerr=err,
                 fmt="o", color="black", markersize=3,
                 linewidth=1, capsize=2, label=label,
             )
-            ax.plot(ell_centres, th_mean, color="royalblue", linewidth=1.5)
+            ax.plot(ell_centres, theory, color="royalblue", linewidth=1.5)
             ax.axhline(0, color="gray", linestyle="--", linewidth=0.8)
             ax.legend(loc="upper left", fontsize=9, handlelength=0)
  
-    # shared axis labels
     fig.supxlabel(r"Multipole $\ell$", fontsize=16, y=0.02)
     fig.supylabel(
         r"$D_b^{EB}(\nu_1 \times \nu_2)\ [\mu\mathrm{K}^2]$",
         fontsize=16, x=0.02,
     )
  
-    # outer row/column frequency labels
     freq_labels = [short(m) for m in MAPS]
     for col_j, lbl in enumerate(freq_labels):
         axes[0, col_j].set_title(lbl, fontsize=13, pad=6)
