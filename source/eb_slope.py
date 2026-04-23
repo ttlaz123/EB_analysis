@@ -93,32 +93,30 @@ def rotation_angle_ell(alpha_nu_rad, beta_rad_per_ell, ell_array):
     return alpha_nu_rad + beta_rad_per_ell * ell_array
 
 
-def rotate_cl_eb(cl_ee, cl_bb, alpha1, alpha2):
+def rotate_cl_eb(cl_ee, cl_bb, alpha_e, alpha_b):
     """
-    Compute the rotated EB cross-spectrum between two independently-rotated
-    detectors/maps, with primordial EB = BE = 0.
+    Rotated EB spectrum: map1 is E-side, map2 is B-side.
 
-    Derived from the full polarisation rotation matrix (see apply_det_rotation):
-        C_EB^rot = EE * cos(2a1)*sin(2a2) - BB * sin(2a1)*cos(2a2)
-
-    where a1 is the rotation angle of the E-side map and a2 is the rotation
-    angle of the B-side map.
-
-    Parameters
-    ----------
-    cl_ee, cl_bb : ndarray   theory EE and BB spectra (same ell grid)
-    alpha1 : ndarray or float   rotation angle of the E-side map [radians]
-    alpha2 : ndarray or float   rotation angle of the B-side map [radians]
-
-    Returns
-    -------
-    cl_eb_rot : ndarray
+    From apply_det_rotation with primordial EB = BE = 0:
+        spec == 'EB':  EE * c1*s2 - BB * s1*c2
+    where c1,s1 = cos/sin(2*alpha_e), c2,s2 = cos/sin(2*alpha_b)
     """
-    c1 = np.cos(2.0 * alpha1)
-    s1 = np.sin(2.0 * alpha1)
-    c2 = np.cos(2.0 * alpha2)
-    s2 = np.sin(2.0 * alpha2)
-    return cl_ee * c1 * s2 - cl_bb * s1 * c2
+    c_e = np.cos(2.0 * alpha_e);  s_e = np.sin(2.0 * alpha_e)
+    c_b = np.cos(2.0 * alpha_b);  s_b = np.sin(2.0 * alpha_b)
+    return cl_ee * c_e * s_b - cl_bb * s_e * c_b
+
+
+def rotate_cl_be(cl_ee, cl_bb, alpha_b, alpha_e):
+    """
+    Rotated BE spectrum: map1 is B-side, map2 is E-side.
+
+    From apply_det_rotation with primordial EB = BE = 0:
+        spec == 'BE':  EE * s1*c2 - BB * c1*s2
+    where c1,s1 = cos/sin(2*alpha_b), c2,s2 = cos/sin(2*alpha_e)
+    """
+    c_b = np.cos(2.0 * alpha_b);  s_b = np.sin(2.0 * alpha_b)
+    c_e = np.cos(2.0 * alpha_e);  s_e = np.sin(2.0 * alpha_e)
+    return cl_ee * s_b * c_e - cl_bb * c_b * s_e
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -301,22 +299,21 @@ class EBSlopeLikelihood(Likelihood):
         cl_ee = np.asarray(self.theory["EE"])
         cl_bb = np.asarray(self.theory["BB"])
 
-        # Build a dict of pre-rotated (unbinned) EB spectra for each key
+        # Build a dict of pre-rotated (unbinned) EB/BE spectra for each key
         theory_dict = {}
         for key in self.used_maps:
             map1, pol1, map2, pol2 = self._parse_spectrum_key(key)
 
-            # alpha1 must be the E-side map, alpha2 the B-side map,
-            # because rotate_cl_eb uses: EE*cos(2a_E)*sin(2a_B) - BB*sin(2a_E)*cos(2a_B)
             if pol1 == "E":
-                map_e, map_b = map1, map2
-            else:   # pol1 == "B", so this is a BxE key
-                map_e, map_b = map2, map1
-
-            a_e = np.deg2rad(alpha_deg[map_e] + beta_deg_per_ell * self.ell_array)
-            a_b = np.deg2rad(alpha_deg[map_b] + beta_deg_per_ell * self.ell_array)
-
-            theory_dict[key] = rotate_cl_eb(cl_ee, cl_bb, a_e, a_b)
+                # ExB key: map1 is E-side, map2 is B-side
+                a_e = np.deg2rad(alpha_deg[map1] + beta_deg_per_ell * self.ell_array)
+                a_b = np.deg2rad(alpha_deg[map2] + beta_deg_per_ell * self.ell_array)
+                theory_dict[key] = rotate_cl_eb(cl_ee, cl_bb, a_e, a_b)
+            else:
+                # BxE key: map1 is B-side, map2 is E-side
+                a_b = np.deg2rad(alpha_deg[map1] + beta_deg_per_ell * self.ell_array)
+                a_e = np.deg2rad(alpha_deg[map2] + beta_deg_per_ell * self.ell_array)
+                theory_dict[key] = rotate_cl_be(cl_ee, cl_bb, a_b, a_e)
 
         # Apply band-power window functions to go from ell → bins
         binned_dict = ec.apply_bpwf(
@@ -468,43 +465,49 @@ def plot_eb_bestfit(obs_dict, binned_theory_dict, covmat, used_maps, bin_num, ou
         return map_name.replace("BK18_", "").replace("B95e", "B95")
 
     fig, axes = plt.subplots(4, 4, figsize=(14, 12), sharex=True, sharey=True)
+    # Blank all panels first; we'll fill only those with data
+    for ax in axes.flat:
+        ax.set_visible(False)
 
-    for row_i, map_e in enumerate(MAPS):
-        for col_j, map_b in enumerate(MAPS):
-            ax = axes[row_i, col_j]
+    map_to_row = {m: i for i, m in enumerate(MAPS)}
 
-            # The data file stores each pair in one canonical ordering only.
-            # Try ExB first; fall back to BxE (which represents the same
-            # physical cross-spectrum with E and B sides swapped).
-            key_exb = f"{map_e}_Ex{map_b}_B"
-            key_bxe = f"{map_b}_Ex{map_e}_B"   # equivalent pair, other ordering
+    for key in used_maps:
+        # Parse the key to find E-side and B-side map names
+        if "_Ex" in key:
+            left, right = key.split("_Ex", 1)
+            map_e = left
+            map_b = right[:-2]   # strip trailing "_B"
+        elif "_Bx" in key:
+            left, right = key.split("_Bx", 1)
+            map_b = left
+            map_e = right[:-2]   # strip trailing "_E"
+        else:
+            continue
 
-            if key_exb in used_maps:
-                key = key_exb
-            elif key_bxe in used_maps:
-                key = key_bxe
-            else:
-                # Neither ordering present — shouldn't happen for a complete set
-                ax.text(0.5, 0.5, "no data", transform=ax.transAxes,
-                        ha="center", va="center", fontsize=9, color="red")
-                continue
+        row_i = map_to_row.get(map_e)
+        col_j = map_to_row.get(map_b)
+        if row_i is None or col_j is None:
+            continue
 
-            k_idx   = used_maps.index(key)
-            obs     = np.asarray(obs_dict[key])
-            var     = cov_diag[k_idx * n_bins : (k_idx + 1) * n_bins]
-            err     = np.sqrt(var)
-            theory  = np.asarray(binned_theory_dict[key])
+        ax = axes[row_i, col_j]
+        ax.set_visible(True)
 
-            label = rf"{short(map_e)} $\times$ {short(map_b)}"
+        k_idx  = used_maps.index(key)
+        obs    = np.asarray(obs_dict[key])
+        var    = cov_diag[k_idx * n_bins : (k_idx + 1) * n_bins]
+        err    = np.sqrt(var)
+        theory = np.asarray(binned_theory_dict[key])
 
-            ax.errorbar(
-                ell_centres, obs, yerr=err,
-                fmt="o", color="black", markersize=3,
-                linewidth=1, capsize=2, label=label,
-            )
-            ax.plot(ell_centres, theory, color="royalblue", linewidth=1.5)
-            ax.axhline(0, color="gray", linestyle="--", linewidth=0.8)
-            ax.legend(loc="upper left", fontsize=9, handlelength=0)
+        label = rf"{short(map_e)} $\times$ {short(map_b)}"
+
+        ax.errorbar(
+            ell_centres, obs, yerr=err,
+            fmt="o", color="black", markersize=3,
+            linewidth=1, capsize=2, label=label,
+        )
+        ax.plot(ell_centres, theory, color="royalblue", linewidth=1.5)
+        ax.axhline(0, color="gray", linestyle="--", linewidth=0.8)
+        ax.legend(loc="upper left", fontsize=9, handlelength=0)
 
     fig.supxlabel(r"Multipole $\ell$", fontsize=16, y=0.02)
     fig.supylabel(
