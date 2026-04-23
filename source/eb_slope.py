@@ -444,7 +444,129 @@ def make_triangle_plot(output_path, params_dict):
     plot_path = output_path + "_triangle.pdf"
     g.export(plot_path)
     print(f"Triangle plot saved → {plot_path}")
-
+ 
+def plot_eb_bestfit(obs_dict, binned_theory_dict, covmat, used_maps, bin_num, output_path):
+    """
+    Plot all 16 EB cross-spectra (4×4 grid) with observed data + error bars
+    and the best-fit theory line.
+ 
+    Layout
+    ------
+    Rows    = E-side map  (K95, B95e, 150, 220)
+    Columns = B-side map  (K95, B95e, 150, 220)
+ 
+    Each panel shows  C_ell^{EB}(nu_row × nu_col).
+    Both the ExB and BxE keys for the same pair are averaged before plotting
+    so that each panel contains exactly one curve.
+ 
+    Parameters
+    ----------
+    obs_dict         : dict  {key: binned observed spectrum}
+    binned_theory_dict : dict  {key: binned theory spectrum}
+    covmat           : ndarray  filtered covariance matrix (EB-only, shape N×N)
+    used_maps        : list  ordered list of spectrum keys (same order as covmat rows)
+    bin_num          : list  list of bin indices
+    output_path      : str   output prefix; saves <output_path>_bestfitEB.png
+    """
+    plt.rcParams.update({
+        "text.usetex":    True,
+        "font.family":    "serif",
+        "font.serif":     "Computer Modern",
+        "font.size":      14,
+        "axes.titlesize": 13,
+        "axes.labelsize": 14,
+        "xtick.labelsize": 11,
+        "ytick.labelsize": 11,
+        "legend.fontsize": 10,
+    })
+ 
+    # ell bin centres for x-axis
+    ell_centres = bc.L_BIN_CENTERS[[b - 1 for b in bin_num]]
+ 
+    # Variance = diagonal of the covmat; index in covmat matches index in used_maps
+    n_bins   = len(bin_num)
+    cov_diag = np.diag(covmat)    # length = len(used_maps) * n_bins
+ 
+    # Short display labels (strip 'BK18_', shorten 'B95e' → 'B95')
+    def short(map_name):
+        lbl = map_name.replace("BK18_", "")
+        return lbl.replace("B95e", "B95")
+ 
+    # For each of the 16 (E-map, B-map) pairs, average the ExB and BxE keys.
+    # We iterate over MAPS in the fixed order so the grid is deterministic.
+    fig, axes = plt.subplots(
+        4, 4,
+        figsize=(14, 12),
+        sharex=True, sharey=True,
+    )
+ 
+    for row_i, map_e in enumerate(MAPS):      # E-side
+        for col_j, map_b in enumerate(MAPS):  # B-side
+            ax = axes[row_i, col_j]
+ 
+            key_exb = f"{map_e}_Ex{map_b}_B"
+            key_bxe = f"{map_e}_Bx{map_b}_E"
+ 
+            # ── observed: average ExB and BxE if both present ────────────────
+            obs_vals = []
+            var_vals = []
+            for key in (key_exb, key_bxe):
+                if key in obs_dict and key in used_maps:
+                    obs_vals.append(np.asarray(obs_dict[key]))
+                    k_idx   = used_maps.index(key)
+                    var_vals.append(
+                        cov_diag[k_idx * n_bins : (k_idx + 1) * n_bins]
+                    )
+ 
+            if not obs_vals:
+                ax.set_visible(False)
+                continue
+ 
+            obs_mean = np.mean(obs_vals, axis=0)
+            # Combined variance: var of mean = mean(var)/N  (N=1 or 2)
+            var_mean = np.mean(var_vals, axis=0) / len(var_vals)
+            err      = np.sqrt(var_mean)
+ 
+            # ── theory: average same two keys ────────────────────────────────
+            th_vals = [
+                np.asarray(binned_theory_dict[k])
+                for k in (key_exb, key_bxe)
+                if k in binned_theory_dict
+            ]
+            th_mean = np.mean(th_vals, axis=0)
+ 
+            # ── panel label ──────────────────────────────────────────────────
+            label = rf"{short(map_e)} $\times$ {short(map_b)}"
+ 
+            ax.errorbar(
+                ell_centres, obs_mean, yerr=err,
+                fmt="o", color="black", markersize=3,
+                linewidth=1, capsize=2, label=label,
+            )
+            ax.plot(ell_centres, th_mean, color="royalblue", linewidth=1.5)
+            ax.axhline(0, color="gray", linestyle="--", linewidth=0.8)
+            ax.legend(loc="upper left", fontsize=9, handlelength=0)
+ 
+    # shared axis labels
+    fig.supxlabel(r"Multipole $\ell$", fontsize=16, y=0.02)
+    fig.supylabel(
+        r"$D_b^{EB}(\nu_1 \times \nu_2)\ [\mu\mathrm{K}^2]$",
+        fontsize=16, x=0.02,
+    )
+ 
+    # outer row/column frequency labels
+    freq_labels = [short(m) for m in MAPS]
+    for col_j, lbl in enumerate(freq_labels):
+        axes[0, col_j].set_title(lbl, fontsize=13, pad=6)
+    for row_i, lbl in enumerate(freq_labels):
+        axes[row_i, 0].set_ylabel(lbl, fontsize=12, labelpad=4)
+ 
+    plt.tight_layout(rect=[0.04, 0.04, 1, 1])
+    save_path = output_path + "_bestfitEB.png"
+    plt.savefig(save_path, dpi=150)
+    plt.close(fig)
+    print(f"EB best-fit plot saved → {save_path}")
+ 
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  CLI
@@ -528,6 +650,63 @@ def main():
     # 4. Triangle plot
     make_triangle_plot(args.output_path, params_dict)
 
-
+    try:
+        from getdist import loadMCSamples
+        samples  = loadMCSamples(args.output_path, settings={"ignore_rows": 0.3})
+        bf_means = {p: float(samples.mean(p)) for p in params_dict}
+        print("Best-fit parameter means:", bf_means)
+ 
+        alpha_deg = {
+            "BK18_K95":  bf_means["alpha_K95"],
+            "BK18_B95e": bf_means["alpha_B95e"],
+            "BK18_150":  bf_means["alpha_150"],
+            "BK18_220":  bf_means["alpha_220"],
+        }
+        beta = bf_means["beta"]
+ 
+        # Build a bare likelihood instance (bypasses Cobaya initialisation)
+        # purely to reuse _parse_spectrum_key and the cached ell_array / bpwf.
+        lhood = EBSlopeLikelihood.__new__(EBSlopeLikelihood)
+        lhood.initialize()
+ 
+        # Compute unbinned rotated theory at best-fit angles
+        cl_ee = np.asarray(lhood.theory["EE"])
+        cl_bb = np.asarray(lhood.theory["BB"])
+        theory_dict_unbinned = {}
+        for key in lhood.used_maps:
+            map1, pol1, map2, pol2 = lhood._parse_spectrum_key(key)
+            a1 = np.deg2rad(alpha_deg[map1] + beta * lhood.ell_array)
+            a2 = np.deg2rad(alpha_deg[map2] + beta * lhood.ell_array)
+            if pol1 == "E":
+                theory_dict_unbinned[key] = rotate_cl_eb(cl_ee, cl_bb, a1, a2)
+            else:
+                theory_dict_unbinned[key] = rotate_cl_eb(cl_ee, cl_bb, a2, a1)
+ 
+        binned_theory = ec.apply_bpwf(
+            lhood.map_ref_hdr,
+            theory_dict_unbinned,
+            lhood.bpwf,
+            lhood.used_maps,
+            do_cross=True,
+        )
+ 
+        obs_dict, _ = ld.load_observed_spectra(
+            SHARED["file_paths"]["observed_data"],
+            lhood.used_maps,
+            lhood.map_ref_hdr,
+            num_bins=args.bin_num,
+        )
+ 
+        plot_eb_bestfit(
+            obs_dict           = obs_dict,
+            binned_theory_dict = binned_theory,
+            covmat             = SHARED["covmat"],
+            used_maps          = lhood.used_maps,
+            bin_num            = args.bin_num,
+            output_path        = args.output_path,
+        )
+    except Exception as exc:
+        print(f"Could not make EB best-fit plot: {exc}")
+ 
 if __name__ == "__main__":
     main()
