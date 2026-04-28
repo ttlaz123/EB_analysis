@@ -9,8 +9,8 @@ matplotlib.use('Agg')  # headless mode
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from matplotlib.colors import BoundaryNorm
-
-
+import matplotlib.lines as mlines
+import matplotlib.patches as mpatches
 from getdist.mcsamples import loadMCSamples
 
 
@@ -227,6 +227,10 @@ def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class
 
     num_columns = len(maps_B)  # Unique maps for columns
     num_rows = len(maps_E)      # Unique maps for rows
+    if(num_rows == 0):
+        num_rows = num_columns
+    if(num_columns == 0):
+        num_columns = num_rows
     # Create subplots
     fig, axes = plt.subplots(num_rows, num_columns, 
                     figsize=(num_columns * 4, num_rows * 4),
@@ -274,6 +278,9 @@ def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class
         map_index = multicomp_class.used_maps.index(key)
         num_bin = len(observed_data)
         covar_mat = multicomp_class.full_covmat
+        
+        if(False):
+            covar_mat = multicomp_class.filtered_covmat
         var = np.diag(covar_mat)[map_index*num_bin:num_bin*(map_index+1)]
         # Plotting observed data
         axes_index = row_idx * num_columns + col_idx
@@ -304,7 +311,11 @@ def plot_spectra_type(spectra_type, maps_E, maps_B, theory_dict, multicomp_class
     '''
     for ax in axes:
         ax.label_outer()
-        ax.set_ylim([-0.02, 0.15])
+        if(spectra_type in ['EB', 'BE']):
+            ax.set_ylim([-0.15, 0.15])
+        if(spectra_type == 'EE'):
+            ax.set_ylim([-0.02, 6])
+
         ax.axhline(0, color='gray', linestyle='--', linewidth=1)
     '''
     fig.text(
@@ -380,7 +391,11 @@ def plot_eebbeb(multicomp_class, outpath, param_names, param_bestfit, param_stat
         theory_vec=multicomp_class.theory(param_values, override_maps=override_maps)
     residuals = multicomp_class.binned_dl_observed_vec - theory_vec
     # Calculate the Mahalanobis distance using the inverse covariance matrix
-    chi_squared = residuals.T @ multicomp_class.sim_common_data['full_inv_covmat'] @ residuals
+    try:
+        chi_squared = residuals.T @ multicomp_class.sim_common_data['full_inv_covmat'] @ residuals
+    except ValueError:
+        chi_squared = residuals.T @ multicomp_class.sim_common_data['inv_covmat'] @ residuals
+
     print('Chi Squared: ' + str(chi_squared))
     theory_dict = multicomp_class.final_detection_dict
     maps_B = set()
@@ -405,13 +420,16 @@ def plot_eebbeb(multicomp_class, outpath, param_names, param_bestfit, param_stat
                     final_detection_dict=multicomp_class.final_detection_dict,
                     num_bins=len(multicomp_class.bin_num),
                     outpath = outpath)
-    for spectra_type in ['EB', 'EE', 'BB']:
-        plot_spectra_type(spectra_type, 
+    for spectra_type in ['EE', 'EB', 'BB']:
+        try:
+            plot_spectra_type(spectra_type, 
                       maps_E, 
                       maps_B, 
                       theory_dict, multicomp_class, observed_datas,
                       outpath, param_stats, chi_squared)
-    
+        except ValueError as e:
+            print(e)
+            continue
 
     return 
 
@@ -530,7 +548,9 @@ def plot_triangle(root, replace_dict={}):
         'alpha_BK18_220': r'$\alpha_\mathrm{220}$',
         'alpha_BK18_B95e': r'$\alpha_\mathrm{B95}$',
         'alpha_BK18_K95': r'$\alpha_\mathrm{K95}$',
+        'alpha_CMB': r'$\beta_\mathrm{cmb}$',
         'alpha_BK18_150': r'$\alpha_\mathrm{150}$',
+        'angle_diff': r'$\Delta \beta_{\ell}$',
     }
     plt.rcParams.update({
     "text.usetex": True,
@@ -542,7 +562,8 @@ def plot_triangle(root, replace_dict={}):
     })
     include_params = ['gMpl', 'alpha_BK18_220', 
                     'alpha_BK18_B95e', 'alpha_BK18_K95',
-                    'alpha_BK18_150']
+                    'alpha_BK18_150', 'angle_diff']
+    #include_params = ['gMpl','alpha_BK18_220']
     param_names = [p for p in param_names_all if p in include_params]
 
     # Compute mean, std, chi2, and prepare labels
@@ -579,6 +600,7 @@ def plot_triangle(root, replace_dict={}):
     best_fit_point = samples.samples[best_fit_index, :]
 
     # Add red mean dots and green best-fit dot
+    '''
     for i, pi in enumerate(param_names):
         for j, pj in enumerate(param_names):
             if j > i:
@@ -589,6 +611,7 @@ def plot_triangle(root, replace_dict={}):
                 x_idx = samples.paramNames.list().index(pi)
                 y_idx = samples.paramNames.list().index(pj)
                 ax.plot(best_fit_point[x_idx], best_fit_point[y_idx], 'o', color='lime', markersize=6, label='Min $\chi^2$ Point in CHain')
+    '''
     ax_for_legend = g.subplots[1, 0]  # or any subplot where you have the dots
     handles, labels = ax_for_legend.get_legend_handles_labels()
     fig.legend(handles, labels, loc='upper right', bbox_to_anchor=(1.15, 0.9), fontsize=12, frameon=False)
@@ -601,8 +624,9 @@ def plot_triangle(root, replace_dict={}):
     title_text = "\n".join(mean_std_strings)
     print('Saving: ' + title_text)
     # Save and show
-    plt.suptitle(title_text)
-    plt.savefig(f"{root}_triangle_plot.png", bbox_inches='tight')
+    #plt.suptitle(title_text)
+    plt.show()
+    plt.savefig(f"{root}_triangle_plot.pdf", bbox_inches='tight', format='pdf')
     print(f"Triangle plot saved as {root}_triangle_plot.png")
     plt.close(fig)
     return param_names_all, means, mean_std_strings
@@ -802,12 +826,13 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     for k, v in std_params.items():
         print(f"  {k}: {v:.4g}")
 
-    if(False): 
+    if(True): 
         selected_params = [
-            'gMpl',
+            'angle_diff',
+            #'gMpl',
             'alpha_BK18_B95e',
             'alpha_BK18_220',
-            'A_lens'
+            #'A_lens'
         ]
     if selected_params is not None:
         param_names = [p for p in param_names if p in selected_params]
@@ -854,7 +879,7 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
     ranges = compute_corner_ranges(means_df, param_names, percentile_clip)
 
     titles = make_titles(means_df, stds_df, minchisq_df, param_names)
-
+    show_titles=False
     # Plot means (red)
     fig = corner.corner(means_df[param_names],
                         labels=labels,
@@ -897,16 +922,47 @@ def plot_sim_peaks(chains_path, single_sim, sim_nums=None, single_path=None,
                       #truth_kwargs={'linewidth': 0.5, 'ls':'--'},
                       fig=fig,
                       return_fig=True)
-        draw_zero_lines_on_corner(fig.axes, param_names, df_chain.mean(), color='red')
+        draw_zero_lines_on_corner(fig.axes, param_names, df_chain.mean(), color='blue')
     except Exception as e:
         print(f"Could not overlay single sim: {e}")
+    # 1. Ensemble Representation (The Red Splotch)
+    # We use a solid circle with partial transparency to look like a contour core.
+    red_contour = mlines.Line2D([], [], color='none', marker='o',
+                                markerfacecolor='none', markeredgecolor='darkred',
+                                markersize=14, markeredgewidth=1)
 
-    # Save and show
-    outpath = chains_path.split("XXX")[0] + f"{single_sim}_summary.png"
+    # 2. Individual Sim (The Blue Ring)
+    blue_contour = mlines.Line2D([], [], color='none', marker='o',
+                                 markeredgecolor='blue', markerfacecolor='none',
+                                 markersize=16, markeredgewidth=1)
+
+    # 3. Coordinate Anchor (The Red Crosshair)
+    # We change this to red to match the 'ensemble' property it is marking.
+    red_cross = mlines.Line2D([], [], color='blue', linestyle='--', linewidth=1.5,
+                              marker='+', markersize=12, markeredgewidth=1)
+    red_dot = mlines.Line2D([],[],color='none', marker='.',
+                            markerfacecolor='red', markeredgecolor='red',
+                            markersize=8)
+
+    # 4. Grouping
+    # The tuple (blue_contour, red_cross) creates the overlaid legend key.
+    handles = [red_contour, (blue_contour, red_cross, red_dot)]
+    labels = ['Ensemble of 499 Sims', f'Sim {single_sim:03d}']
+
+    # 5. Legend Call (Updated with your opaque box settings)
+    fig.legend(handles=handles, labels=labels,
+               loc='upper right',
+               bbox_to_anchor=(0.95, 0.95),
+               fontsize=16,
+               frameon=True,
+               edgecolor='black',
+               facecolor='white',
+               framealpha=1.0)
+    outpath = chains_path.split("XXX")[0] + f"{single_sim}_summary.pdf"
     n_chains = len(means_df)
     title =  f"(N={n_chains} sims) Sim peaks (red) and Sim {single_sim} single chain (blue)"
     #plt.suptitle(title)
-    plt.savefig(outpath, bbox_inches='tight')
+    plt.savefig(outpath, bbox_inches='tight', format='pdf')
     print(f"Saved to {outpath}")
     return mean_params, std_params
 
@@ -924,6 +980,7 @@ def draw_zero_lines_on_corner(flat_axes, param_names, truth_vals, color):
             else:
                 ax.axvline(line_valy, color=color, lw=0.5, ls='--')
                 ax.axhline(line_valx, color=color, lw=0.5, ls='--')
+                ax.plot(line_valy, line_valx, marker='.', color='red', markersize=8)
             
 
 def plot_step_example(multicomp_class):

@@ -74,7 +74,7 @@ class BK18_full_multicomp(Likelihood):
                                                             self.used_maps,
                                                             self.map_reference_header,
                                                             num_bins = self.bin_num)
-        
+        print('Injected signal: ' + str(self.injected_signal)) 
         if(len(self.injected_signal) >= 1):
             if any('eps' in key for key in self.injected_signal):
                 scaled_map = 'all'
@@ -87,7 +87,7 @@ class BK18_full_multicomp(Likelihood):
                                                                  self.binned_dl_observed_dict,
                                                                  self.injected_signal,
                                                                  self.bin_num,
-                                                                 output_dir = 'beam_scale_plots',
+                                                                 output_dir = 'beam_scale_plots_ldiff',
                                                                  plot = False,
 
                                                                  scale_map = scaled_map)
@@ -312,6 +312,17 @@ class BK18_full_multicomp(Likelihood):
     def theory(self, params_values, override_maps=None):
         # define relevant dictionaries
         all_maps = self.sim_common_data['all_maps']
+        do_nothing = True
+        if(do_nothing):
+            self.final_detection_dict = ec.apply_bpwf(self.map_reference_header,
+                                      self.initial_theory_dict,
+                                      
+                                      self.bpwf,
+                                      self.used_maps,
+                                      do_cross=True)
+            theory_vec = self.dict_to_vec(self.final_detection_dict, self.used_maps)
+            return theory_vec
+
         if(self.theory_comps in ['all', 'fixed_dust', 'eskilt']):
             # do ede shift
             post_inflation_dict = ec.apply_EDE(self.initial_theory_dict,
@@ -354,7 +365,6 @@ class BK18_full_multicomp(Likelihood):
                                                         params_values, 
                                                         self.dl_theory,
                                                         override_maps=self.used_maps)
-
 
         # apply bpwf
         self.final_detection_dict = ec.apply_bpwf(self.map_reference_header,
@@ -451,7 +461,7 @@ def load_shared_data(input_args):
         bin_starts, raw_cl, SHARED_DATA_DICT['eskilt'] = ld.load_eskilt_data(ede_path=FILE_PATHS['EDE_spectrum'])
 
 def run_bk18_likelihood(params_dict, observation_file_path, input_args, 
-                        rstop = 0.03, max_tries=10000):
+                        rstop = 0.005, max_tries=10000):
     """
     Runs the Cobaya MCMC likelihood using BK18_full_multicomp likelihood class.
 
@@ -550,7 +560,7 @@ def define_priors(calc_spectra, theory_comps, angle_degree=5, spectra='all'):
                                 "proposal":0.1}
     if(spectra == 'alens'):
         params_dict['A_lens'] = {"prior": {"min":0.5, "max":2}, "ref": 1}
-    elif(spectra in ['nob', 'eb', 'all']):
+    elif(spectra in ['nob', 'eb', 'ee', 'all']):
         params_dict['A_lens'] = 1
     else:
         raise ValueError('Not proper spectra theory: ' + str(spectra))
@@ -713,11 +723,14 @@ def generate_cross_spectra(calc_spectra, do_crosses, spectra_type):
                 cross_spectra.append(cross_spectrum)
                 cross_spectrum = f"{spec1}_Bx{spec2}_E"
                 cross_spectra.append(cross_spectrum)
+            elif(spectra_type == 'ee'):
+                cross_spectrum = f"{spec1}_Ex{spec2}_E"
+                cross_spectra.append(cross_spectrum)
+
     return  cross_spectra 
 
 def get_injected_signal(calc_spectra, signal_type):
     
-
     injected_signal = {}
     if('eps' in signal_type):
         map_freqs = ['BK18_B95e', 'BK18_150', 'BK18_220', 'BK18_K95']
@@ -728,8 +741,10 @@ def get_injected_signal(calc_spectra, signal_type):
             key = eps_str + f
             eps_value = float(eps_val)
             injected_signal[key] = eps_value
-            print('Injected signal: ' + str(injected_signal))
-            return injected_signal 
+            return injected_signal
+        val = float(signal_type.split('eps')[1])
+        injected_signal['eps'] = val
+        return injected_signal
     
     num_spectra = len(calc_spectra)
     count = 0
@@ -767,7 +782,7 @@ def multicomp_mcmc_driver(input_args):
         input_args.spectra_type == 'all'
     input_args.injected_signal = get_injected_signal(calc_spectra, 
                                             signal_type=input_args.injected_signal)
-
+    print('Injected signal:' + str(input_args.injected_signal))
     if(input_args.sim_num > 1):
         parallel_simulation(input_args, params_dict)
     else:
@@ -853,15 +868,16 @@ def multicomp_mcmc_driver(input_args):
                     means.append(val)          
                     mean_std_strs.append(f"{key}: {params_dict[key]} +- 0")
         
-        try:
-            epd.plot_eebbeb(multicomp_class, 
+        #try:
+        epd.plot_eebbeb(multicomp_class, 
                         input_args.output_path, 
                         param_names, 
                         means, 
                         mean_std_strs,
                         override_maps = used_maps)
-        except ValueError:
-            print("Cannot make best fit plot")
+        #except ValueError as e:
+        #    print("Cannot make best fit plot")
+        #    print(e)
     # plot mcmc results
     replace_dict ={}# {"alpha_BK18_220":0.6}
     print(input_args.output_path)
@@ -1140,7 +1156,7 @@ def main():
     parser.add_argument(
         '-t', "--spectra_type",
         type=str,
-        choices=["all", "eb", "nob", "noe", 'alens'],
+        choices=["all", "eb", "nob", "noe", 'alens', 'ee'],
         default="all",
         help=(
             "Which spectra to include. 'all' includes EE, BB, EB, etc., while 'eb' only includes EB-related spectra. "
@@ -1204,10 +1220,10 @@ def main():
                         
                     else:
                         os.remove(item)  # Remove file
-                for f in os.listdir(os.path.dirname(args.output_path)):
-                    if f.endswith('.csv'):
-                        csv_path = os.path.join(args.output_path, f)
-                        os.remove(csv_path)
+                #for f in os.listdir(os.path.dirname(args.output_path)):
+                #    if f.endswith('.csv'):
+                #        csv_path = os.path.join(args.output_path, f)
+                #        os.remove(csv_path)
                 print(f"Deleted existing chains at: {args.output_path}")
             else:
                 print("Deletion cancelled. Existing chains will be kept.")
