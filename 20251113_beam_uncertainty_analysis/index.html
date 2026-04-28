@@ -30,16 +30,24 @@
 
     <section>
         <h2>Introduction</h2>
-        <p><strong>Summary:</strong>
-            We consider the impact of beam uncertainties on the ability to recover 
+        <p><strong>Summary:</strong></p>
+
+          <p> 
+          We reproduce the analysis done in 
+          <a href="../20230711_IPR9_beams/">Clara's posting, IPR9</a> extending 
+
+        the beam analysis on BICEP 3 to the Keck spectra.</p>
+          <p>
+          We consider the impact of beam uncertainties on the ability to recover 
             our multipole dependence parameters. We find that there is a ~20% multiplicative
             effect on the recovered parameter g in the extreme cases that all 4 BK18 maps
             experience a 5% beamshift in \(\ell\). Distorting only one of the 4 frequencies
             approximately halves the effect.
         </p>
-       <p> We reproduce the analysis done in <a href="../20230711_IPR9_beams/">Clara's posting, IPR9</a> extending 
-        the beam analysis on BICEP 3 to the Keck spectra.</p>
-        <p>This posting builds upon previous updates:</p>
+        <p>
+        We also run jackknife tests on the BK18 frequencies extended up to bin 15.
+        </p>
+       <p>This posting builds upon previous updates:</p>
         <ul>
             <li><a href="../20240924_preliminary_eb_ede_results/">2024-09-24: Preliminary EB EDE Results</a></li>
             <li><a href="../20241203_multicomp_eb_ede_update/">2024-12-03: Multicomponent EB EDE Update</a></li>
@@ -223,7 +231,10 @@
         </script>
     </figure>
     Note that the scaling is often greater than the uncertainty in ell, particularly 
-    for higher multipoles. 
+    for higher multipoles. This is because even though a 5% difference may not 
+    produce a significant absolute difference in the beam, the distorted beam
+    still has a great relative difference compared to the original beam if the
+    original beam is small.
     <h3>Impact on g</h3>
     We run the MCMC pipeline for the EB only spectra, varying epsilon and seeing its impact 
     on the recovered g. We also check the effect of only using BICEP3 data (B95lf), as 
@@ -397,7 +408,8 @@
       <p>
         We note that the bias is approximately 20% for an epsilon of 0.05, which is 
         still less than 1 sigma for an injected g of 1, and will be even less 
-        significant for the expected g, which is less than 0.2.
+        significant for the real value of g, which is expected to be significantly 
+        less than 0.2.
       </p>
     </section>
     <section>
@@ -677,7 +689,8 @@
     <p>We have similar results where we see the mean angle fits over 500 simulations 
         to correlate with epsilon. Here, the Delta Beta parameters has a bias of 
         approximately 0.1 degree for an epsilon of 5%, which is significant, 
-        but still within a single standard deviation. The effect essentially
+        but still within our uncertainty within 
+        a single standard deviation. The effect essentially
         vanishes when looking at the simulations with no multipole dependence injected.
     </p>
     </section>
@@ -691,7 +704,7 @@
         </a>.
         In particular, our B95lf GHz jackknives for bins 1-5 and 1-9
         correspond to the BICEP3 distributions shown in Fig.11, 
-        and our 220 GHz jackknives for the same bins correspond to the Keck Array results in Fig.12. 
+        and our 220 GHz jackknives for the same bins correspond to the Keck Array results in Fig.12. The K95 GHz jacknives correspond to the BK15 paper, except it contains both 2014 and 2015 data. 
         Below is the full set of files used in constructing our jackknife tables:
     </p>
     <ul>
@@ -736,7 +749,12 @@
     <img alt="Jackknife Plot" id="jackknife_plot" src="#" width="750" height="500"
          onerror="swapFreqAndRetry(this)" />
 
-    <figcaption>Jackknife χ² and PTE distributions for each observing frequency.</figcaption>
+    <figcaption>Jackknife χ² and PTE distributions for each observing frequency.
+    The p-value is calculated from the KS test comparing the histograms
+    with a uniform distribution from 0 to 1. Note that the bandpower 
+    numbers correspond to the bins minus 1. Eg. Bandpowers 1-9 corresopnd to 
+    multipole bins 2-10.
+    </figcaption>
 
     <script type="text/javascript">
         // Connect pager to frequency → file mapping
@@ -766,6 +784,27 @@
         });
     </script>
 </figure>
+<p>
+Visually, the distribution for frequency is consistent with the uniform distribution. 
+However, when performing the KS tests, we obtain the p-values seen in the plots.
+Some of the p-values appear quite small, such as the 0.003 for B95lf, bandpowers 1-9,
+and 0.001/0.002 for 150GHz, bandpowers 1-14.
+</p>
+<p>
+We believe that this is due to the correlations between some jackknife tests.
+The data is correlated across different years, so we tried running the KS-test on
+a subset of the 150GHz data. For each subset, no matter which file was excluded,
+the p-values became reasonable again.
+</p>
+<p>
+For further evidence, Baibhav performed a test using a 
+toy example of generating a distribution from a
+uniform distribution, but with certain values correlated. These toy examples
+yielded small p-values when performing the KS-test
+despite being drawn from the same underlying distribution. 
+This suggests that the KS-test is not necessarily appropriate for passing
+jackknife tests when there is strong correlation between the data.
+</p>
 <h3>Jackknife χ² and χ Extreme Values</h3>
 <p>
     This table lists all extreme χ² and χ values that are &lt;0.01 or &gt;0.99:
@@ -773,7 +812,7 @@
 
 <!-- K95 Table -->
 <table border="1" cellspacing="0" cellpadding="5">
-    <caption>K95 Frequency — Total values per bin: 84</caption>
+    <caption><h3>K95 Frequency — Total values per bin: 84</h3></caption>
     <thead>
         <tr>
             <th>Bin Range</th>
@@ -807,10 +846,13 @@
         </tr>
     </tbody>
 </table>
+<p>
 
+
+</p>
 <!-- 220 Table -->
 <table border="1" cellspacing="0" cellpadding="5">
-    <caption>220 Frequency — Total values per bin: 252</caption>
+    <caption><h3>220 Frequency — Total values per bin: 252</h3></caption>
     <thead>
         <tr>
             <th>Bin Range</th>
@@ -845,9 +887,10 @@
     </tbody>
 </table>
 
+<p></p>
 <!-- 150 Table -->
 <table border="1" cellspacing="0" cellpadding="5">
-    <caption>150 Frequency — Total values per bin: 210</caption>
+    <caption><h3>150 Frequency — Total values per bin: 210</h3></caption>
     <thead>
         <tr>
             <th>Bin Range</th>
@@ -884,7 +927,7 @@
 
 <!-- B95lf Table -->
 <table border="1" cellspacing="0" cellpadding="5">
-    <caption>B95lf Frequency — Total values per bin: 126</caption>
+    <caption><h3>B95lf Frequency — Total values per bin: 126</h3></caption>
     <thead>
         <tr>
             <th>Bin Range</th>
@@ -919,9 +962,12 @@
     </tbody>
 </table>
 
-<p>Even though the histograms look similar for the jackknife PTEs using higher bins, 
-    there is a mild trend of more extreme PTEs when the bin range is expanded.
-    However, it is unclear how significant this trend is.
+<p>When comparing the percentage of extreme PTE values, 
+there does not appear to be a signficant increase when extending the analysis up to bin 15. 
+The PTE histograms for the lower bin jackknives and the higher bin jackknives look similar.
+
+For the full final pager, see <a href='./finalpager/finalpager.html'>here</a> 
+(we have not finished generating all the plots for the pager yet).
 </p>
 
     </section>
@@ -934,6 +980,10 @@
             as shown by the zero correlation with epsilon for the standard lambda CDM sims.
             Given that our expected multipole dependence signal is close to zero, the 
             beamshift uncertainty is expected to be a small percent of the overall uncertainty.
+        </p>
+
+        <p>
+            We also verify that the jackknife PTE histograms appear reasonable and consistent with the uniform distribution. For certain configurations where the KS-test yields a low p-value when comparing to the uniform distribution, it is likely due to correlations in the data rather than systematics. This is further supported by the fact that there are not significantly higher numbers of extreme PTE values.
         </p>
     </section>
     <section>

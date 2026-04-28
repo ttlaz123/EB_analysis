@@ -21,7 +21,7 @@ def plot_sims():
         "mathtext.fontset": "dejavuserif", 
         "font.family": "serif", 
         "font.serif": 'Computer Modern',
-        "font.size": 20
+        "font.size": 24,
     })
 
     # Create the plot
@@ -47,8 +47,8 @@ def plot_sims():
     ax.axhline(0, color='black', linestyle='--', linewidth=1)
 
     # Axis labels
-    ax.set_xlabel(r"Multipole Breakpoint $\ell_b$", fontsize=22)
-    ax.set_ylabel(r"Step Size $\Delta \beta_{\ell_b}$ [deg.]", fontsize=22)
+    ax.set_xlabel(r"Multipole Breakpoint $\ell_b$", fontsize=24)
+    ax.set_ylabel(r"Step Size $\Delta \beta_{\ell_b}$ [deg.]", fontsize=24)
 
     # Set x-ticks to match ell_b
     ax.set_xticks(ell_b)
@@ -58,8 +58,8 @@ def plot_sims():
     ax.legend(fontsize=16)
 
     plt.tight_layout()
-    print('Saving: ' + "delta_beta_dual_plot.png")
-    plt.savefig("delta_beta_dual_plot.png", dpi=300)
+    print('Saving: ' + "delta_beta_dual_plot.pdf")
+    plt.savefig("delta_beta_dual_plot.pdf", format='pdf')
 
 
 def plot_reals():

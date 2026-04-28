@@ -4,7 +4,7 @@
 #SBATCH --error=ede_sim_%j.err
 #SBATCH --mem=500G
 #SBATCH --cpus-per-task=50
-#SBATCH --time=30:00:00
+#SBATCH --time=48:00:00
 
 module load python/3.10  
 
@@ -13,7 +13,7 @@ spectype=$1
 theory=$2
 binnum="2-15"
 bindiff=""
-mapset="BK18_planck"
+mapset="BK_planck_min"
 #mapset="BK18"
 #theory="all"
 #theory="ldiff"
@@ -27,14 +27,14 @@ dataset="BK18lf"
 base_dir="chain_store/iso_val_chains/"
 bin_tag="bin$binnum"
 
-theoryname="planck_dust"
+theoryname="planck_fixedEBdust_prior15"
 file_suffix="${theoryname}/test"
 
 param_path="${base_dir}/${real_data}_${spectype}_${bin_tag}_${file_suffix}"
 echo $param_path
 
 # Run your script with max_workers implicitly handled
-if true ; then
+if false ; then
 echo n | python source/full_multicomp.py \
     -s 1 -n 500 -c $theory \
     -p "$param_path" \

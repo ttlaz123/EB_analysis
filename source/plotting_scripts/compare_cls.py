@@ -83,16 +83,16 @@ def plot_scaled_comparison(ell_dict, cl_dict, scale_dict, output_path=None):
     base_colors = ['tab:blue', 'tab:red']
     plt.rcParams.update({
         "text.usetex": True,
-        'font.size': 20,
+        'font.size': 24,
         "font.family": "serif", 
         "font.serif": 'Computer Modern',
-        'axes.titlesize': 22,
-        'axes.labelsize': 22,
+        'axes.titlesize': 24,
+        'axes.labelsize': 24,
         'xtick.labelsize': 18,
         'ytick.labelsize': 18,
-        'legend.fontsize': 18
+        'legend.fontsize': 20
     })
-    fig, axes = plt.subplots(3, 1, figsize=(9, 12), sharex=False)
+    fig, axes = plt.subplots(2, 1, figsize=(9, 9), sharex=False)
 
     for i, fname in enumerate(files):
     
@@ -113,33 +113,33 @@ def plot_scaled_comparison(ell_dict, cl_dict, scale_dict, output_path=None):
         dl_eb = factor * cl_eb * scale
 
         base_color = base_colors[i]
-        if('camb' in fname):
-            axes[0].plot(ell, dl_ee, color=base_color, label='EE Spectrum')
+        #if('camb' in fname):
+        #    axes[0].plot(ell, dl_ee, color=base_color, label='EE Spectrum')
         if('camb' in fname):
             for j, a in enumerate(a_lens_vals):
                 shade = mcolors.to_rgba(base_color, alpha=0.4 + 0.15 * j)
-                axes[1].plot(ell, a * dl_bb, label=fr"$A_\mathrm{{lens}}={a:.1f}$", color=shade)
+                axes[0].plot(ell, a * dl_bb, label=fr"$A_\mathrm{{lens}}={a:.1f}$", color=shade)
         if('EDE' in fname):
             for j, g in enumerate(g_vals):
                 shade = mcolors.to_rgba(base_color, alpha=0.4 + 0.15 * j)
-                axes[2].plot(ell, -g * dl_eb, label=fr"$g={g:.1f}$", color=shade)
+                axes[1].plot(ell, -g * dl_eb, label=fr"$g={g:.1f}$", color=shade)
 
     for ax in axes:
         ax.set_xlim(0, 700)
         ax.legend()
         ax.grid(True)
 
-    axes[0].set_ylabel(r"$D_\ell^{EE,\mathrm{CMB}}$ [$\mu K^2$]", fontname='Computer Modern')
-    axes[1].set_ylabel(r"$D_\ell^{BB,\mathrm{CMB}}$ [$\mu K^2$]", fontname='Computer Modern')
-    axes[2].set_ylabel(r"$D_\ell^{EB,\mathrm{CMB}}$ [$\mu K^2$]", fontname='Computer Modern')
-    axes[2].set_xlabel(r"Multipole $\ell$", fontname='Computer Modern')
+    #axes[0].set_ylabel(r"$D_\ell^{EE,\mathrm{CMB}}$ [$\mu K^2$]", fontname='Computer Modern')
+    axes[0].set_ylabel(r"$D_\ell^{BB,\mathrm{CMB}}$ [$\mu K^2$]", fontname='Computer Modern')
+    axes[1].set_ylabel(r"$D_\ell^{EB,\mathrm{CMB}}$ [$\mu K^2$]", fontname='Computer Modern')
+    axes[1].set_xlabel(r"Multipole $\ell$", fontname='Computer Modern')
 
     #plt.suptitle("EE, BB (scaled), EB (scaled) Spectra Comparison")
     plt.tight_layout()
     plt.subplots_adjust(top=0.92)
 
     if output_path:
-        plt.savefig(output_path)
+        plt.savefig(output_path, format='pdf')
         print(f"Saved plot to {output_path}")
     else:
         plt.show()

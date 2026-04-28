@@ -15,7 +15,7 @@ model_config = {
     "BK18lf_eb_bin2-15_fixed_dust": ("no_fg",   0, "BK18 EB no foregrounds",               "#363bd3", 1),
     "eskilt_only":                  ("eskilt",  0, "Eskilt 2023",                           "#2ca02c", 3),
     "eskilt_BK18lf":                ("combined",0, "Eskilt 2023 + BK18 EB no foregrounds", "#d62728", 5),
-    "BK18lf_alens_bin2-15_all":     ("with_fg", 3, "BK18 EE+EB+scaled BB with foregrounds", "#1375bc", 1)
+    "BK18lf_alens_bin2-15_all":     ("with_fg", 3, r"BK18 EE+EB+BB with foregrounds and free $A_{lens}$", "#1375bc", 1)
 }
 
 
@@ -134,10 +134,10 @@ def plot_grouped_posteriors(fede_groups: Dict[str, List], output_dir: str):
         custom_lines = [Line2D([0], [0], color=color, lw=lw) for (_, _, _, color, lw) in plot_data]
         legend = g.subplots[0, 0].legend(custom_lines, legend_labels, loc='upper left', fontsize=24)
         for text in legend.get_texts():
-            text.set_fontname('Computer Modern')
+            text.set_fontname('Computer Modern Roman')
 
         # Save figure
-        filename = f"{fede_key}.png"
+        filename = f"{fede_key}.pdf"
         g.export(os.path.join(output_dir, filename))
 
 

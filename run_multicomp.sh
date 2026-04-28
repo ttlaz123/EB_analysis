@@ -3,36 +3,37 @@
 #SBATCH --output=ede_sim_%j.out
 #SBATCH --error=ede_sim_%j.err
 #SBATCH --mem=100G
-#SBATCH --cpus-per-task=11
-#SBATCH --time=24:00:00
+#SBATCH --cpus-per-task=51
+#SBATCH --time=1:00:00
 
 module load python/3.10  
 
 # Get suffix argument (e.g., _pysm1)
 spectype=$1
-injectedx=''
+injectedx=$3
 dataset=$2
-fede=$3
+fede=0.07
 binnum="2-15"
 bindiff=12
 #dataset="BK18lf_fede01_sigl"
-#dusttype="ldiff${bindiff}"
-#dusttype="no_ede_asym"
+dusttype="ldiff${bindiff}"
+#dusttype="planck2018"
 #mapset="BK18_planck"
+#dusttype='fixeddust'
 mapset="BK18"
 #dusttype="isorot"
-theory="all"
-#theory="ldiff"
+#theory="all"
+theory="ldiff"
 #theory="det_polrot"
 #theory="no_ede"
 #theory="fixed_dust"
 injected=""
 if [ -n "$injectedx" ]; then
-    injected="_sig$4"
+    injected="_sig$3"
 fi
 fedename=""
 if [ -n "$fede" ]; then
-    fedename="_ebfede$3"
+    fedename="_ebfede$fede"
 fi
 
 if [ "$dataset" == "BK18lf" ]; then
@@ -57,7 +58,7 @@ fi
 # Define full paths using the suffix
 base_dir="/n/holylfs04/LABS/kovac_lab/Users/liuto/ede_chains"
 bin_tag="bin$binnum"
-file_suffix="${dusttype}_${specname}${injected}${fedename}/sim"
+file_suffix="${dusttype}_${mapset}_${specname}${injected}${fedename}/sim"
 
 param_path="${base_dir}/${simdata}_${bin_tag}_${file_suffix}"
 
@@ -67,7 +68,7 @@ if [ -z "$injectedx" ]; then
 fi
 # Run your script with max_workers implicitly handled
 if true ; then
-echo n | python source/full_multicomp.py \
+echo y | python source/full_multicomp.py \
     -s 1 -n 500 -c $theory \
     -p "$param_path" \
     -d "$dataset" \

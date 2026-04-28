@@ -175,16 +175,27 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         }
 
         # Plot before bpwf
-        label = fr"$\alpha_\nu={base_angle}$, $\Delta\beta={angle_diff}$, $\ell_b={l_break}$"
+        if(l_break > 0):
+            label = fr"$\alpha_\nu={base_angle}$, $\Delta\beta={angle_diff}$, $\ell_b={l_break}$"
+        else:
+            label = fr"$\alpha_\nu={base_angle}$, $\Delta\beta={angle_diff}$"
         axs[1].plot(ell, combined[used_eb_map], label=label, linewidth=2)
-        
-        # Apply bpwf
+                # Apply bpwf
         final = ec.apply_bpwf(header, combined, bpwf, [used_eb_map], do_cross=True)
+        
         axs[2].plot(L_BIN_CENTERS, final[used_eb_map],  label=label,linewidth=2, marker='o', linestyle='-')
+        if(covmat is not None):
+            inv_cov = np.linalg.inv(covmat)
+            diff = real_file[used_eb_map] - final[used_eb_map]
+            chi2 = diff.T @ inv_cov @ diff
+            print(chi2)
+
     if(not real_file is None):
+
         min_len = 1000
         
         var = np.diag(covmat)
+        
         data_err = np.sqrt(var)
         eb = dl_theory['EB_EDE'][:min_len]
         ee = dl_theory['EE'][:min_len]
@@ -193,13 +204,16 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
         axs[0].plot(ell, np.arcsin(2 * ratio) / 4 * 180 / np.pi,  label='True EDE Rotation',linewidth=2,  color='black',)
         axs[1].plot(ell, eb, label='True EDE Rotation', linewidth=2,  color='black',)
         #axs[2].plot(L_BIN_CENTERS, real_file[used_eb_map],label='True EDE Rotation', linewidth=2, marker='o', linestyle='-')
+        diff = real_file[used_eb_map] - final[used_eb_map]
+        chi2 = diff.T @ inv_cov @ diff
+        print(r", $\chi^2={chi2:.1f}$")
         axs[2].errorbar(L_BIN_CENTERS, real_file[used_eb_map], yerr=data_err, linewidth=2, marker='o', linestyle='-', color='black', label='True EDE Rotation')
 
     # Formatting
     axs[-1].set_xlim([0, 600])
     for ax in axs[:-1]:
         ax.label_outer()
-    axs[0].set_ylabel(r'$\beta(\ell)$ [deg]', fontsize=24)
+    axs[0].set_ylabel(r'$\alpha_{\nu} + \beta(\ell)$ [deg.]', fontsize=24)
     axs[0].set_title('Multipole Dependent Rotation Angle', fontsize=24)
     axs[0].grid(True, linestyle='--', alpha=0.6)
     axs[0].axhline(y=0, color='gray', linestyle='--', 
@@ -241,7 +255,7 @@ def plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_
                 line.set_color('gray')
     plt.tight_layout()
     print("Saving:", outpath)
-    plt.savefig(outpath)
+    plt.savefig(outpath, format='pdf')
     plt.close()
 
 
@@ -306,8 +320,8 @@ def plot_eb_spectra_with_bpwf_comparison(dl_theory, eb_maps, params_values, bpwf
         ax.set_xlim(0, 600)
 
     plt.tight_layout()
-    print("Saving:", outpath + '_eb.png')
-    plt.savefig(outpath + '_eb.png')
+    print("Saving:", outpath + '_eb.pdf')
+    plt.savefig(outpath + '_eb.pdf', format='pdf')
     plt.close()
 
 def plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, outpath):
@@ -336,6 +350,7 @@ def plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, head
         label = ", ".join(
                 f"{lat[k]} = {param_values[k]}" for k in varying_keys
             )
+        print(param_values)
         rot = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, used_maps)
         dust = ec.apply_dust(rot, bandpasses, param_values)
         detrot = ec.apply_det_rotation(dust, param_values, dl_theory)
@@ -376,8 +391,8 @@ def plot_dust_eb_spectra_with_bpwf(dl_theory, eb_maps, params_values, bpwf, head
         ax.set_xlim(0, 600)
 
     plt.tight_layout()
-    print("Saving:", outpath + '_dust.png')
-    plt.savefig(outpath + '_dust.png')
+    print("Saving:", outpath + '_dust.pdf')
+    plt.savefig(outpath + '_dust.pdf', format='pdf')
     plt.close()
 
 def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, bandpasses, used_maps, outpath):
@@ -406,16 +421,17 @@ def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, ba
     for param_values in params_values:
         alpha_val = param_values['alpha_CMB']
         color = cmap(norm(alpha_val))
-
+        if(alpha_val == 0):
+            color='darkgrey'
         rot = ec.apply_cmb_rotation(eb_maps[0], param_values, dl_theory, used_maps)
         label = fr"$\beta_{{\mathrm{{CMB}}}}={param_values['alpha_CMB']:.2f}$"
         spectrum = rot[used_map][:maxlen]
-        axs[0].plot(ell, spectrum, label=label, color=color)
+        axs[0].plot(ell, spectrum, label=label, color=color, linewidth=3)
 
         rot = ec.apply_cmb_rotation(eb_maps[1], param_values, dl_theory, used_maps)
         label = fr"$\beta_{{\mathrm{{CMB}}}}={param_values['alpha_CMB']:.2f}$"
         spectrum = rot[used_map][:maxlen]
-        axs[1].plot(ell, spectrum, label=label, color=color)
+        axs[1].plot(ell, spectrum, label=label, color=color, linewidth=3)
     
     axs[0].set_title(r"Input EB with $g = 0$", fontsize=24)
     axs[0].set_ylabel(r"$\tilde{D}_\ell^{EB,\mathrm{rot}}$ [$\mu$K$^2$]", fontsize=24)
@@ -428,7 +444,7 @@ def plot_isotropic_rotations(dl_theory, eb_maps, params_values, bpwf, header, ba
     axs[1].legend(fontsize=20)
     plt.tight_layout()
     print("Saving:", outpath)
-    plt.savefig(outpath)
+    plt.savefig(outpath, format='pdf')
     plt.close()
     return 
 def plot_bpwf(bpwf, map_reference_header, outpath):
@@ -440,7 +456,7 @@ def plot_bpwf(bpwf, map_reference_header, outpath):
     L_BIN_CENTERS = np.array([
         37.5, 72.5, 107.5, 142.5, 177.5, 
         212.5, 247.5, 282.5, 317.5, 352.5,
-        387.5, 422.5, 457.5, 492.5, 527.5, 562.5
+        387.5, 422.5, 457.5, 492.5#, 527.5, 562.5
     ])
     
     plt.rcParams.update({
@@ -457,7 +473,7 @@ def plot_bpwf(bpwf, map_reference_header, outpath):
 
     plt.figure(figsize=(12, 9))
     print('Plotting bpwf:')
-    max_ell = 650
+    max_ell = 550
     ell = np.arange(max_ell)
     
     # Colormaps for each cross_spec
@@ -468,7 +484,7 @@ def plot_bpwf(bpwf, map_reference_header, outpath):
     
     for cross_spec, label in cross_specs.items():
         cmap = base_cmaps[cross_spec]
-        for bin in range(2, 18):  # bins 2 through 17 inclusive
+        for bin in range(2, 16):  # bins 2 through 15 inclusive
             color = cmap(0.5+(bin - 2) / 32)   # normalize between 0.5 and 1
             plt.plot(ell, bpwf[bin - 2, :max_ell, cross_spec], 
                      color=color)#, 
@@ -486,13 +502,13 @@ def plot_bpwf(bpwf, map_reference_header, outpath):
     plt.title("Band Power Window Functions for EB")
     plt.legend(ncol=2, loc='upper right', fontsize=14)
     
-    print("Saving fig to " + outpath + '_bpwf.png')
-    plt.savefig(outpath + '_bpwf.png')
+    print("Saving fig to " + outpath + '_bpwf.pdf')
+    plt.savefig(outpath + '_bpwf.pdf',format='pdf')
     plt.close()
-    raise TimeoutError
+    raise Exception()
 
 def get_plotted_values():
-    used_maps = ['BK18_220_BxBK18_220_E', 'BK18_220_BxBK18_220_B', 'BK18_220_ExBK18_220_E']
+    #used_maps = ['BK18_220_BxBK18_220_E', 'BK18_220_BxBK18_220_B', 'BK18_220_ExBK18_220_E']
     used_maps = ['BK18_B95e_BxBK18_B95e_E', 'BK18_B95e_BxBK18_B95e_B', 'BK18_B95e_ExBK18_B95e_E']
 
     DATA_BASE_PATH = '/n/home08/liuto/cosmo_package/data/bicep_keck_2018/BK18_cosmomc/data/'
@@ -595,7 +611,8 @@ def main():
         filtered_covmat = ec.filter_matrix(header, 
                                         full_covmat, 
                                         [used_maps[0]],
-                                        num_bins=range(2,18))
+                                       num_bins=range(2,18))
+        print(filtered_covmat)
         param_combos = [
         (-0.5, 1, 405),
         (0, 0.4, 300),
@@ -605,14 +622,14 @@ def main():
         ]
 
         plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_maps[0], 
-                                  param_combos, args.outpath + '_ldiffmodel.png')
+                                  param_combos, args.outpath + '_ldiffmodel.pdf')
         
         param_combos = [
         (0.26, 0.5, 370),
-        (0.47, 0, 300)
+        (0.47, 0, 0)
         ]
         plot_theory_diff_steps_ebonly(dl_theory, initial_eb_map, bpwf, header, used_maps[0], 
-                                  param_combos, args.outpath + '_ldiffsim.png', binned_dl_observed_dict, covmat=filtered_covmat)
+                                  param_combos, args.outpath + '_ldiffsim.pdf', binned_dl_observed_dict, covmat=filtered_covmat)
    
 if __name__ == '__main__':
     main()
